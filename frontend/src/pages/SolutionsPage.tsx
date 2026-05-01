@@ -51,7 +51,7 @@ export const SolutionsPage = () => (
           BUILT FOR EVERY SCHOOL TYPE
         </div>
         <h1 className="text-5xl font-black mb-4">Solutions for Every Institution</h1>
-        <p className="text-slate-400 max-w-2xl mx-auto text-lg">Whether you run a single primary school or a chain of campuses, EliteEdu SYSTEM scales with you.</p>
+        <p className="text-slate-400 max-w-2xl mx-auto text-lg">Whether you run a single primary school or a chain of campuses, BidiiElimu SYSTEM scales with you.</p>
       </motion.div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">

@@ -103,7 +103,7 @@ export const CommandPalette = () => {
                 <span><kbd className="bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700 text-slate-400 mr-1">↵</kbd> Select</span>
                 <span><kbd className="bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700 text-slate-400 mr-1">esc</kbd> Close</span>
               </div>
-              <span>EliteEdu Search</span>
+              <span>BidiiElimu Search</span>
             </div>
           </motion.div>
         </div>

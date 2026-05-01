@@ -1,4 +1,4 @@
-const CACHE_NAME = 'eliteedu-cache-v1';
+const CACHE_NAME = 'bidiielimu-cache-v1';
 const urlsToCache = [
   '/',
   '/index.html',

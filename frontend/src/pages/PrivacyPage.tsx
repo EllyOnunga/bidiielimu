@@ -25,7 +25,7 @@ export const PrivacyPage = () => (
         <Section title="2. How We Use Your Data">
           <p>Your data is used exclusively to:</p>
           <ul className="list-disc list-inside space-y-1">
-            <li>Provide and improve the EliteEdu SYSTEM service</li>
+            <li>Provide and improve the BidiiElimu SYSTEM service</li>
             <li>Send service-related notifications (billing, downtime alerts)</li>
             <li>Generate aggregated, anonymized product analytics</li>
           </ul>

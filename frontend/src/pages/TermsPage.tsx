@@ -19,17 +19,17 @@ export const TermsPage = () => (
 
       <div className="glass-dark rounded-[32px] border border-white/5 p-8 md:p-12">
         <Section title="1. Acceptance of Terms">
-          <p>By accessing or using EliteEdu SYSTEM ("the Service"), you agree to be bound by these Terms of Service. If you do not agree, please discontinue use immediately.</p>
+          <p>By accessing or using BidiiElimu SYSTEM ("the Service"), you agree to be bound by these Terms of Service. If you do not agree, please discontinue use immediately.</p>
         </Section>
         <Section title="2. Use of the Service">
-          <p>EliteEdu SYSTEM is licensed to educational institutions for academic management purposes. You may not use the Service for any unlawful purpose or in violation of any regulations.</p>
+          <p>BidiiElimu SYSTEM is licensed to educational institutions for academic management purposes. You may not use the Service for any unlawful purpose or in violation of any regulations.</p>
           <p>Each school account (tenant) is solely responsible for the data entered and the accuracy of that data.</p>
         </Section>
         <Section title="3. Account Registration">
           <p>To use the Service, a school administrator must register and provide accurate information. You are responsible for maintaining the confidentiality of your account credentials.</p>
         </Section>
         <Section title="4. Data Ownership">
-          <p>All data entered into the system by your institution remains your property. EliteEdu does not claim ownership of school or student data. You grant us a limited license to process that data solely to deliver the Service.</p>
+          <p>All data entered into the system by your institution remains your property. BidiiElimu does not claim ownership of school or student data. You grant us a limited license to process that data solely to deliver the Service.</p>
         </Section>
         <Section title="5. Service Availability">
           <p>We aim for 99.9% uptime but do not guarantee uninterrupted access. Scheduled maintenance windows will be communicated in advance where possible.</p>
@@ -38,7 +38,7 @@ export const TermsPage = () => (
           <p>Either party may terminate the agreement with 30 days written notice. Upon termination, you may request a data export before account deletion.</p>
         </Section>
         <Section title="7. Limitation of Liability">
-          <p>EliteEdu shall not be liable for indirect, incidental, or consequential damages arising from your use of or inability to use the Service.</p>
+          <p>BidiiElimu shall not be liable for indirect, incidental, or consequential damages arising from your use of or inability to use the Service.</p>
         </Section>
         <Section title="8. Changes to Terms">
           <p>We may update these terms periodically. Continued use of the Service after changes constitutes acceptance of the new terms.</p>

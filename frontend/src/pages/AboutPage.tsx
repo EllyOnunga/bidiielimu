@@ -23,10 +23,10 @@ export const AboutPage = () => (
           </div>
           <h1 className="text-5xl font-black mb-6">Built by Educators, <br />for Educators</h1>
           <p className="text-slate-400 text-lg leading-relaxed mb-4">
-            EliteEdu was born in 2022 out of frustration. Our founders — former teachers and school administrators — spent years watching schools struggle with paper registers, Excel fee sheets, and WhatsApp grade reports.
+            BidiiElimu was born in 2022 out of frustration. Our founders — former teachers and school administrators — spent years watching schools struggle with paper registers, Excel fee sheets, and WhatsApp grade reports.
           </p>
           <p className="text-slate-400 text-lg leading-relaxed">
-            We built EliteEdu SYSTEM to fix that. A single, beautiful, reliable platform that every school in Africa can afford and use from day one.
+            We built BidiiElimu SYSTEM to fix that. A single, beautiful, reliable platform that every school in Africa can afford and use from day one.
           </p>
         </div>
 

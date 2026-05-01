@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { DashboardMockup } from '../components/DashboardMockup';
 import {
   GraduationCap,
   Shield,
@@ -70,6 +71,7 @@ export const LandingPage = () => {
                 {item}
               </button>
             ))}
+            <Link to="/guide" className="text-xs font-black uppercase tracking-widest text-primary-200/60 hover:text-white transition-colors">Guide</Link>
           </nav>
 
           <div className="hidden md:flex items-center gap-6">
@@ -96,6 +98,7 @@ export const LandingPage = () => {
                 {['Features', 'Pricing', 'Contact'].map((item) => (
                   <button key={item} onClick={() => scrollTo(item.toLowerCase())} className="block text-lg font-black uppercase tracking-widest text-primary-200/60 w-full text-left">{item}</button>
                 ))}
+                <Link to="/guide" className="block text-lg font-black uppercase tracking-widest text-primary-200/60 w-full text-left">Guide</Link>
                 <hr className="border-white/5" />
                 <Link to="/login" onClick={() => setIsMenuOpen(false)} className="block text-lg font-black uppercase tracking-widest text-white">Sign In</Link>
                 <Link to="/register" onClick={() => setIsMenuOpen(false)} className="block py-4 bg-primary-600 text-center rounded-2xl font-black uppercase tracking-widest text-xs shadow-premium">Start Free Trial</Link>
@@ -133,9 +136,9 @@ export const LandingPage = () => {
               <Link to="/register" className="w-full sm:w-auto px-10 py-5 bg-primary-600 hover:bg-primary-500 text-white rounded-[24px] font-black uppercase tracking-widest text-xs shadow-premium active:scale-[0.98] transition-all flex items-center justify-center gap-3">
                 Experience BidiiElimu <ArrowRight className="w-5 h-5" />
               </Link>
-              <button className="w-full sm:w-auto px-10 py-5 bg-white/5 hover:bg-white/10 text-white rounded-[24px] font-black uppercase tracking-widest text-xs border border-white/5 transition-all flex items-center justify-center gap-3 group">
+              <Link to="/solutions" className="w-full sm:w-auto px-10 py-5 bg-white/5 hover:bg-white/10 text-white rounded-[24px] font-black uppercase tracking-widest text-xs border border-white/5 transition-all flex items-center justify-center gap-3 group">
                 <Play className="w-4 h-4 fill-primary-400 text-primary-400 group-hover:scale-125 transition-transform" /> Watch Demo
-              </button>
+              </Link>
             </div>
           </motion.div>
 
@@ -147,12 +150,10 @@ export const LandingPage = () => {
           >
             <div className="absolute inset-0 bg-primary-600/30 blur-[120px] rounded-full animate-pulse-slow" />
             <div className="glass p-3 rounded-[48px] shadow-glass relative overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-              <img
-                src="/C:/Users/Onung/.gemini/antigravity/brain/e6fa4135-87f0-4777-8928-2596687f8e7e/dashboard_mockup_premium_1777648608170.png"
-                alt="BidiiElimu Dashboard"
-                className="rounded-[36px] w-full shadow-premium transform group-hover:scale-[1.02] transition-transform duration-1000"
-              />
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 z-20 pointer-events-none" />
+              <div className="transform group-hover:scale-[1.02] transition-transform duration-1000 relative z-10">
+                <DashboardMockup />
+              </div>
             </div>
           </motion.div>
         </div>
@@ -292,17 +293,32 @@ export const LandingPage = () => {
                 Redefining institutional management with world-class technology.
               </p>
             </div>
-            <div className="flex gap-12">
-              {['Platform', 'Company', 'Legal'].map(col => (
-                <div key={col}>
-                  <h4 className="font-black text-[10px] uppercase tracking-[0.3em] text-white mb-6">{col}</h4>
-                  <ul className="space-y-3 text-[10px] font-black uppercase tracking-widest text-primary-200/30">
-                    <li className="hover:text-primary-400 transition-colors cursor-pointer">Access</li>
-                    <li className="hover:text-primary-400 transition-colors cursor-pointer">Protocol</li>
-                    <li className="hover:text-primary-400 transition-colors cursor-pointer">Encryption</li>
-                  </ul>
-                </div>
-              ))}
+            <div className="flex gap-12 text-left">
+              <div>
+                <h4 className="font-black text-[10px] uppercase tracking-[0.3em] text-white mb-6">Platform</h4>
+                <ul className="space-y-3 text-[10px] font-black uppercase tracking-widest text-primary-200/30">
+                  <li><Link to="/solutions" className="hover:text-primary-400 transition-colors">Solutions</Link></li>
+                  <li><Link to="/pricing" className="hover:text-primary-400 transition-colors">Pricing</Link></li>
+                  <li><a href="#features" className="hover:text-primary-400 transition-colors" onClick={(e) => { e.preventDefault(); document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }); }}>Features</a></li>
+                  <li><Link to="/guide" className="hover:text-primary-400 transition-colors">User Guide</Link></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-black text-[10px] uppercase tracking-[0.3em] text-white mb-6">Company</h4>
+                <ul className="space-y-3 text-[10px] font-black uppercase tracking-widest text-primary-200/30">
+                  <li><Link to="/about" className="hover:text-primary-400 transition-colors">About Us</Link></li>
+                  <li><Link to="/careers" className="hover:text-primary-400 transition-colors">Careers</Link></li>
+                  <li><a href="#contact" className="hover:text-primary-400 transition-colors" onClick={(e) => { e.preventDefault(); document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }); }}>Contact</a></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-black text-[10px] uppercase tracking-[0.3em] text-white mb-6">Legal</h4>
+                <ul className="space-y-3 text-[10px] font-black uppercase tracking-widest text-primary-200/30">
+                  <li><Link to="/terms" className="hover:text-primary-400 transition-colors">Terms</Link></li>
+                  <li><Link to="/privacy" className="hover:text-primary-400 transition-colors">Privacy</Link></li>
+                  <li><Link to="/cookies" className="hover:text-primary-400 transition-colors">Cookies</Link></li>
+                </ul>
+              </div>
             </div>
           </div>
           <div className="mt-20 pt-10 border-t border-white/5 flex flex-col md:flex-row items-center justify-between text-[10px] font-black text-primary-200/20 uppercase tracking-[0.3em]">

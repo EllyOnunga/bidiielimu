@@ -1,37 +1,41 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { LoginPage } from './pages/LoginPage';
-import { RegisterPage } from './pages/RegisterPage';
-import { DashboardPage } from './pages/DashboardPage';
-import { StudentsPage } from './pages/StudentsPage';
-import { TeachersPage } from './pages/TeachersPage';
-import { ClassesPage } from './pages/ClassesPage';
-import { ClassDetailPage } from './pages/ClassDetailPage';
-import { FeesPage } from './pages/FeesPage';
-import { ExamsPage } from './pages/ExamsPage';
-import { ExamMarksEntryPage } from './pages/ExamMarksEntryPage';
-import { ReportCardPage } from './pages/ReportCardPage';
-import { AttendancePage } from './pages/AttendancePage';
-import { AttendanceMarkingPage } from './pages/AttendanceMarkingPage';
-import { PortalDashboard } from './pages/PortalDashboard';
-import { SuperAdminPage } from './pages/SuperAdminPage';
-import { TimetablePage } from './pages/TimetablePage';
-import { AuditLogPage } from './pages/AuditLogPage';
-import { SettingsPage } from './pages/SettingsPage';
-import { LandingPage } from './pages/LandingPage';
-import { SolutionsPage } from './pages/SolutionsPage';
-import { PricingPage } from './pages/PricingPage';
-import { AboutPage } from './pages/AboutPage';
-import { CareersPage } from './pages/CareersPage';
-import { TermsPage } from './pages/TermsPage';
-import { PrivacyPage } from './pages/PrivacyPage';
-import { CookiePolicyPage } from './pages/CookiePolicyPage';
-import { AnalyticsPage } from './pages/AnalyticsPage';
-import { CommunicationPage } from './pages/CommunicationPage';
-import { GradingPage } from './pages/GradingPage';
 import { MainLayout } from './layouts/MainLayout';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import ErrorBoundary from './components/ErrorBoundary';
+import { PageLoader } from './components/PageLoader';
+
+const LoginPage = lazy(() => import('./pages/LoginPage').then(m => ({ default: m.LoginPage })));
+const RegisterPage = lazy(() => import('./pages/RegisterPage').then(m => ({ default: m.RegisterPage })));
+const DashboardPage = lazy(() => import('./pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
+const StudentsPage = lazy(() => import('./pages/StudentsPage').then(m => ({ default: m.StudentsPage })));
+const TeachersPage = lazy(() => import('./pages/TeachersPage').then(m => ({ default: m.TeachersPage })));
+const ClassesPage = lazy(() => import('./pages/ClassesPage').then(m => ({ default: m.ClassesPage })));
+const ClassDetailPage = lazy(() => import('./pages/ClassDetailPage').then(m => ({ default: m.ClassDetailPage })));
+const FeesPage = lazy(() => import('./pages/FeesPage').then(m => ({ default: m.FeesPage })));
+const ExamsPage = lazy(() => import('./pages/ExamsPage').then(m => ({ default: m.ExamsPage })));
+const ExamMarksEntryPage = lazy(() => import('./pages/ExamMarksEntryPage').then(m => ({ default: m.ExamMarksEntryPage })));
+const ReportCardPage = lazy(() => import('./pages/ReportCardPage').then(m => ({ default: m.ReportCardPage })));
+const AttendancePage = lazy(() => import('./pages/AttendancePage').then(m => ({ default: m.AttendancePage })));
+const AttendanceMarkingPage = lazy(() => import('./pages/AttendanceMarkingPage').then(m => ({ default: m.AttendanceMarkingPage })));
+const PortalDashboard = lazy(() => import('./pages/PortalDashboard').then(m => ({ default: m.PortalDashboard })));
+const SuperAdminPage = lazy(() => import('./pages/SuperAdminPage').then(m => ({ default: m.SuperAdminPage })));
+const TimetablePage = lazy(() => import('./pages/TimetablePage').then(m => ({ default: m.TimetablePage })));
+const AuditLogPage = lazy(() => import('./pages/AuditLogPage').then(m => ({ default: m.AuditLogPage })));
+const SettingsPage = lazy(() => import('./pages/SettingsPage').then(m => ({ default: m.SettingsPage })));
+const LandingPage = lazy(() => import('./pages/LandingPage').then(m => ({ default: m.LandingPage })));
+const SolutionsPage = lazy(() => import('./pages/SolutionsPage').then(m => ({ default: m.SolutionsPage })));
+const PricingPage = lazy(() => import('./pages/PricingPage').then(m => ({ default: m.PricingPage })));
+const AboutPage = lazy(() => import('./pages/AboutPage').then(m => ({ default: m.AboutPage })));
+const CareersPage = lazy(() => import('./pages/CareersPage').then(m => ({ default: m.CareersPage })));
+const TermsPage = lazy(() => import('./pages/TermsPage').then(m => ({ default: m.TermsPage })));
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage').then(m => ({ default: m.PrivacyPage })));
+const CookiePolicyPage = lazy(() => import('./pages/CookiePolicyPage').then(m => ({ default: m.CookiePolicyPage })));
+const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage').then(m => ({ default: m.AnalyticsPage })));
+const CommunicationPage = lazy(() => import('./pages/CommunicationPage').then(m => ({ default: m.CommunicationPage })));
+const GradingPage = lazy(() => import('./pages/GradingPage').then(m => ({ default: m.GradingPage })));
+const GuidePage = lazy(() => import('./pages/GuidePage').then(m => ({ default: m.GuidePage })));
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -62,7 +66,8 @@ function App() {
           }}
         />
         <ErrorBoundary>
-          <Routes>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
             {/* ── Public / Marketing Routes ── */}
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
@@ -74,6 +79,7 @@ function App() {
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/cookies" element={<CookiePolicyPage />} />
+            <Route path="/guide" element={<GuidePage />} />
 
             <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
               <Route path="/dashboard" element={
@@ -132,7 +138,8 @@ function App() {
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+            </Routes>
+          </Suspense>
         </ErrorBoundary>
       </Router>
     </QueryClientProvider>

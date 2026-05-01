@@ -22,7 +22,7 @@ export const CookiePolicyPage = () => (
           <p>Cookies are small text files stored on your device when you visit a website. They help websites remember your preferences and improve your experience.</p>
         </Section>
         <Section title="2. How We Use Cookies">
-          <p>EliteEdu SYSTEM uses the following types of cookies:</p>
+          <p>BidiiElimu SYSTEM uses the following types of cookies:</p>
           <ul className="list-disc list-inside space-y-2">
             <li><strong className="text-white">Essential Cookies:</strong> Required for authentication and session management (e.g., JWT tokens stored in memory).</li>
             <li><strong className="text-white">Preference Cookies:</strong> Remember your theme (dark/light) and sidebar state.</li>
