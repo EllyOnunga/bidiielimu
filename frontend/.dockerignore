@@ -2,7 +2,7 @@ node_modules
 dist
 .git
 .vscode
-.env
+# .env removed to allow build-time variable injection
 .env.local
 npm-debug.log*
 yarn-debug.log*
