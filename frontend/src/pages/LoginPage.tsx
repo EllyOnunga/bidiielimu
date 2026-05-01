@@ -26,9 +26,10 @@ export const LoginPage = () => {
       } else {
         navigate('/dashboard');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login failed', error);
-      alert('Login failed. Please check your credentials.');
+      const msg = error.response?.data?.detail || error.message || 'Unknown error';
+      alert(`Login failed: ${msg}\nTarget: ${client.defaults.baseURL}`);
     } finally {
       setIsLoading(false);
     }

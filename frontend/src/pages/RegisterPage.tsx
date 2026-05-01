@@ -35,12 +35,13 @@ export const RegisterPage = () => {
     } catch (error: any) {
       console.error('Registration failed', error);
       const errorData = error.response?.data;
+      const errorMsg = error.message || 'Unknown error';
       if (errorData && typeof errorData === 'object') {
         const firstErrorKey = Object.keys(errorData)[0];
         const firstErrorMsg = Array.isArray(errorData[firstErrorKey]) ? errorData[firstErrorKey][0] : errorData[firstErrorKey];
-        alert(`Registration failed: ${firstErrorMsg}`);
+        alert(`Registration failed: ${firstErrorMsg}\nTarget: ${client.defaults.baseURL}`);
       } else {
-        alert('Registration failed. Please try again.');
+        alert(`Registration failed: ${errorMsg}\nTarget: ${client.defaults.baseURL}`);
       }
     } finally {
       setIsLoading(false);
