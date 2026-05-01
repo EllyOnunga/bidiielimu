@@ -39,6 +39,11 @@ urlpatterns = [
     path('api/v1/schools/', include('schools.urls')),
     path('api/v1/notifications/', include('notifications.urls')),
     
+    # Auth endpoints
+    path('api/v1/auth/', include('dj_rest_auth.urls')),
+    path('api/v1/auth/registration/', include('dj_rest_auth.registration.urls')),
+    path('api/v1/auth/social/', include('allauth.socialaccount.urls')),
+    
     # API Documentation
     path('api/v1/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/v1/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),

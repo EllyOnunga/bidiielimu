@@ -7,6 +7,12 @@ import client from '../api/client';
 import { useAuthStore } from '../store/authStore';
 import { mobileService } from '../services/mobileService';
 
+declare global {
+  interface Window {
+    google: any;
+  }
+}
+
 export const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -17,7 +23,36 @@ export const LoginPage = () => {
 
   useEffect(() => {
     mobileService.checkBiometrics().then(setBiometricAvailable);
+    
+    // Initialize Google Login
+    if (window.google) {
+      window.google.accounts.id.initialize({
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        callback: handleGoogleLogin,
+      });
+      window.google.accounts.id.renderButton(
+        document.getElementById("googleBtn"),
+        { theme: "filled_blue", size: "large", width: "400", shape: "pill" }
+      );
+    }
   }, []);
+
+  const handleGoogleLogin = async (response: any) => {
+    setIsLoading(true);
+    try {
+      const res = await client.post('accounts/google/', {
+        access_token: response.credential,
+      });
+      const { access, user } = res.data;
+      setAuth(user, access);
+      toast.success(`Welcome, ${user.first_name}!`);
+      navigate(user.role === 'STUDENT' || user.role === 'PARENT' ? '/portal' : '/dashboard');
+    } catch (error: any) {
+      toast.error('Google login failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleLogin = async (e?: React.FormEvent, customEmail?: string, customPassword?: string) => {
     e?.preventDefault();
@@ -117,7 +152,7 @@ export const LoginPage = () => {
             <div className="space-y-2">
               <div className="flex items-center justify-between ml-1">
                 <label className="text-sm font-semibold text-primary-200/70">Password</label>
-                <a href="#" className="text-xs font-bold text-primary-400 hover:text-primary-300 transition-colors">Forgot Password?</a>
+                <Link to="/forgot-password" className="text-xs font-bold text-primary-400 hover:text-primary-300 transition-colors">Forgot Password?</Link>
               </div>
               <div className="relative group">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-400/50 group-focus-within:text-primary-400 transition-colors" />
@@ -159,6 +194,17 @@ export const LoginPage = () => {
                 Fast Access with Biometrics
               </motion.button>
             )}
+
+            <div className="relative my-8">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-white/10"></div>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-[#0f172a] px-4 text-primary-200/30 font-bold tracking-widest">Or continue with</span>
+              </div>
+            </div>
+
+            <div id="googleBtn" className="flex justify-center"></div>
           </form>
 
           <div className="mt-10 text-center">

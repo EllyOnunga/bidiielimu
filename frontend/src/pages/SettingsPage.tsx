@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '../store/authStore';
 import {
-  User, School, Bell, Save,
-  CreditCard, Palette, GraduationCap, Mail, MessageSquare, ChevronRight
+  User, School, Bell, Save, Lock,
+  CreditCard, Palette, GraduationCap, Mail, MessageSquare, ChevronRight, Phone
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import client from '../api/client';
@@ -31,6 +31,18 @@ export const SettingsPage = () => {
     address: '',
     contact_email: '',
     contact_phone: '',
+  });
+
+  const [personalInfo, setPersonalInfo] = useState({
+    first_name: user?.first_name || '',
+    last_name: user?.last_name || '',
+    phone_number: user?.phone_number || '',
+  });
+
+  const [passwordData, setPasswordData] = useState({
+    old_password: '',
+    new_password: '',
+    confirm_password: '',
   });
 
   const fetchSettings = useCallback(async () => {
@@ -79,7 +91,20 @@ export const SettingsPage = () => {
     }
   };
 
-  const handleUpdateProfile = async (e: React.FormEvent) => {
+  const handleUpdatePersonalInfo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await client.patch('accounts/me/', personalInfo);
+      toast.success('Personal profile updated successfully');
+    } catch {
+      toast.error('Failed to update personal profile');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateSchoolProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
@@ -87,6 +112,27 @@ export const SettingsPage = () => {
       toast.success('School profile updated successfully');
     } catch {
       toast.error('Failed to update school profile');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passwordData.new_password !== passwordData.confirm_password) {
+      toast.error('New passwords do not match');
+      return;
+    }
+    setLoading(true);
+    try {
+      await client.post('auth/password/change/', {
+        old_password: passwordData.old_password,
+        new_password: passwordData.new_password,
+      });
+      toast.success('Password changed successfully');
+      setPasswordData({ old_password: '', new_password: '', confirm_password: '' });
+    } catch (error: any) {
+      toast.error(error.response?.data?.detail || 'Failed to change password. Check your current password.');
     } finally {
       setLoading(false);
     }
@@ -161,42 +207,123 @@ export const SettingsPage = () => {
               className="glass p-10 md:p-12 rounded-[40px] border-white/5 shadow-premium min-h-[500px]"
             >
               {activeTab === 'profile' && (
-                <div className="space-y-10">
-                  <div>
-                    <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-2">Identity Configuration</h2>
-                    <p className="text-primary-200/30 text-[10px] font-black uppercase tracking-[0.2em]">Manage your personal credentials within the network.</p>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-3">
-                      <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pl-1">Operational Handle</label>
-                      <div className="relative">
-                        <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-200/20" />
+                <div className="space-y-12">
+                  <form onSubmit={handleUpdatePersonalInfo} className="space-y-8">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-2">Identity Configuration</h2>
+                        <p className="text-primary-200/30 text-[10px] font-black uppercase tracking-[0.2em]">Manage your personal credentials within the network.</p>
+                      </div>
+                      <Button type="submit" disabled={loading} className="gap-2 h-12 px-6 bg-primary-600 rounded-2xl font-black uppercase tracking-widest text-[10px]">
+                        <Save className="w-4 h-4" />
+                        Update Identity
+                      </Button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pl-1">First Name</label>
+                        <div className="relative">
+                          <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-200/20" />
+                          <Input
+                            type="text"
+                            value={personalInfo.first_name}
+                            onChange={(e) => setPersonalInfo({ ...personalInfo, first_name: e.target.value })}
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-12 py-4 text-white text-sm font-bold h-auto focus:bg-white/10"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pl-1">Last Name</label>
+                        <div className="relative">
+                          <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-200/20" />
+                          <Input
+                            type="text"
+                            value={personalInfo.last_name}
+                            onChange={(e) => setPersonalInfo({ ...personalInfo, last_name: e.target.value })}
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-12 py-4 text-white text-sm font-bold h-auto focus:bg-white/10"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pl-1">Phone Number</label>
+                        <div className="relative">
+                          <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-200/20" />
+                          <Input
+                            type="text"
+                            value={personalInfo.phone_number}
+                            onChange={(e) => setPersonalInfo({ ...personalInfo, phone_number: e.target.value })}
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-12 py-4 text-white text-sm font-bold h-auto focus:bg-white/10"
+                            placeholder="+254..."
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pl-1">Email (Immutable)</label>
+                        <div className="relative">
+                          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-200/10" />
+                          <Input
+                            type="email"
+                            value={user?.email || ''}
+                            readOnly
+                            className="w-full bg-white/2 border border-white/5 rounded-2xl px-12 py-4 text-white/30 text-sm font-medium h-auto cursor-not-allowed"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+
+                  <div className="h-px bg-white/5 w-full" />
+
+                  <form onSubmit={handleChangePassword} className="space-y-8">
+                    <div>
+                      <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-2">Security Override</h2>
+                      <p className="text-primary-200/30 text-[10px] font-black uppercase tracking-[0.2em]">Update your cryptographic access keys.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pl-1">Current Password</label>
                         <Input
-                          type="text"
-                          value={`${user?.first_name || ''} ${user?.last_name || ''}`}
-                          readOnly
-                          className="w-full bg-white/5 border border-white/5 rounded-2xl px-12 py-4 text-white text-sm font-black uppercase tracking-tight opacity-50 cursor-not-allowed h-auto"
+                          type="password"
+                          required
+                          value={passwordData.old_password}
+                          onChange={(e) => setPasswordData({ ...passwordData, old_password: e.target.value })}
+                          className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white text-sm font-bold h-auto focus:bg-white/10"
+                        />
+                      </div>
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pl-1">New Password</label>
+                        <Input
+                          type="password"
+                          required
+                          value={passwordData.new_password}
+                          onChange={(e) => setPasswordData({ ...passwordData, new_password: e.target.value })}
+                          className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white text-sm font-bold h-auto focus:bg-white/10"
+                        />
+                      </div>
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pl-1">Confirm New Password</label>
+                        <Input
+                          type="password"
+                          required
+                          value={passwordData.confirm_password}
+                          onChange={(e) => setPasswordData({ ...passwordData, confirm_password: e.target.value })}
+                          className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white text-sm font-bold h-auto focus:bg-white/10"
                         />
                       </div>
                     </div>
-                    <div className="space-y-3">
-                      <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pl-1">Primary Transmission Line</label>
-                      <div className="relative">
-                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-200/20" />
-                        <Input
-                          type="email"
-                          value={user?.email || ''}
-                          readOnly
-                          className="w-full bg-white/5 border border-white/5 rounded-2xl px-12 py-4 text-white text-sm font-black tracking-tight opacity-50 cursor-not-allowed h-auto"
-                        />
-                      </div>
-                    </div>
-                  </div>
+
+                    <Button type="submit" disabled={loading} className="gap-2 h-14 px-10 bg-accent-600 hover:bg-accent-500 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-premium">
+                      <Lock className="w-4 h-4" />
+                      Update Password
+                    </Button>
+                  </form>
                 </div>
               )}
 
               {activeTab === 'school' && (
-                <form onSubmit={handleUpdateProfile} className="space-y-10">
+                <form onSubmit={handleUpdateSchoolProfile} className="space-y-10">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                     <div>
                       <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-2">Institutional Profile</h2>

@@ -36,6 +36,8 @@ const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage').then(m => ({ de
 const CommunicationPage = lazy(() => import('./pages/CommunicationPage').then(m => ({ default: m.CommunicationPage })));
 const GradingPage = lazy(() => import('./pages/GradingPage').then(m => ({ default: m.GradingPage })));
 const GuidePage = lazy(() => import('./pages/GuidePage').then(m => ({ default: m.GuidePage })));
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage').then(m => ({ default: m.ForgotPasswordPage })));
+const ResetPasswordConfirmPage = lazy(() => import('./pages/ResetPasswordConfirmPage').then(m => ({ default: m.ResetPasswordConfirmPage })));
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -72,6 +74,8 @@ function App() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password/:uid/:token" element={<ResetPasswordConfirmPage />} />
             <Route path="/solutions" element={<SolutionsPage />} />
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/about" element={<AboutPage />} />
