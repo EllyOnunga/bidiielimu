@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Users, UserSquare2, BookOpen, Wallet, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { Users, UserSquare2, BookOpen, Wallet, ArrowUpRight, ArrowDownRight, TrendingUp, Calendar, FileText } from 'lucide-react';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { motion } from 'framer-motion';
 import client from '../api/client';
 import { Skeleton } from '../components/ui/Skeleton';
 import { Link } from 'react-router-dom';
+import { useAuthStore } from '../store/authStore';
 
 interface Stats {
   students: number;
@@ -29,24 +31,28 @@ interface StatCardProps {
   trend?: 'up' | 'down';
   trendValue?: string;
   color: string;
+  to?: string;
 }
 
-const StatCard = ({ title, value, icon: Icon, trend, trendValue, color, to }: StatCardProps & { to?: string }) => {
+const StatCard = ({ title, value, icon: Icon, trend, trendValue, color, to }: StatCardProps) => {
   const CardContent = (
-    <div className="glass-dark p-6 rounded-3xl border border-white/5 hover:border-primary-500/30 transition-all group h-full">
-      <div className="flex items-center justify-between mb-4">
-        <div className={`p-3 rounded-2xl ${color}`}>
+    <div className="glass-interactive p-6 rounded-[32px] h-full group">
+      <div className="flex items-center justify-between mb-6">
+        <div className={`p-4 rounded-2xl ${color} shadow-premium border border-white/10 group-hover:scale-110 transition-transform duration-500`}>
           <Icon className="w-6 h-6 text-white" />
         </div>
         {trend && (
-          <div className={`flex items-center gap-1 text-sm font-medium ${trend === 'up' ? 'text-emerald-400' : 'text-rose-400'}`}>
+          <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black tracking-tighter uppercase ${trend === 'up' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'
+            }`}>
             {trend === 'up' ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
             {trendValue}
           </div>
         )}
       </div>
-      <h3 className="text-slate-400 text-sm font-medium mb-1">{title}</h3>
-      <p className="text-3xl font-bold text-white tracking-tight">{value}</p>
+      <div className="space-y-1">
+        <h3 className="text-primary-200/50 text-xs font-black uppercase tracking-widest">{title}</h3>
+        <p className="text-4xl font-black text-white tracking-tight">{value}</p>
+      </div>
     </div>
   );
 
@@ -57,21 +63,19 @@ const StatCard = ({ title, value, icon: Icon, trend, trendValue, color, to }: St
 };
 
 const StatCardSkeleton = () => (
-  <div className="glass-dark p-6 rounded-3xl border border-white/5 h-[140px]">
-    <Skeleton className="w-12 h-12 rounded-2xl mb-4" />
-    <Skeleton className="w-24 h-4 mb-2" />
-    <Skeleton className="w-16 h-8" />
+  <div className="glass p-6 rounded-[32px] h-[180px]">
+    <Skeleton className="w-14 h-14 rounded-2xl mb-6" />
+    <Skeleton className="w-24 h-3 mb-2" />
+    <Skeleton className="w-20 h-8" />
   </div>
 );
 
-import { useAuthStore } from '../store/authStore';
-
 export const DashboardPage = () => {
   const user = useAuthStore((state) => state.user);
-  const [stats, setStats] = useState<Stats>({ 
-    students: 0, 
-    teachers: 0, 
-    classes: 0, 
+  const [stats, setStats] = useState<Stats>({
+    students: 0,
+    teachers: 0,
+    classes: 0,
     fees: 'KSh 0',
     student_trend: '0%',
     teacher_trend: '0%',
@@ -80,15 +84,6 @@ export const DashboardPage = () => {
   const [revenueData, setRevenueData] = useState<any[]>([]);
   const [activities, setActivities] = useState<RecentActivity[]>([]);
   const [loadingStats, setLoadingStats] = useState(true);
-
-  const handleExport = () => {
-    window.print();
-  };
-
-  const handleQuickAction = () => {
-    // Navigate to students for quick admission
-    window.location.href = '/students';
-  };
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -105,7 +100,6 @@ export const DashboardPage = () => {
         });
         setRevenueData(res.data.revenue_trend);
 
-        // Fetch recent audit logs separately as they are not aggregated stats
         const auditRes = await client.get('audit/logs/');
         const logs = Array.isArray(auditRes.data) ? auditRes.data : (auditRes.data.results || []);
         const mapped = logs.slice(0, 4).map((log: any) => ({
@@ -115,107 +109,142 @@ export const DashboardPage = () => {
           time: new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         }));
         setActivities(mapped);
-        
       } catch (err) {
         console.error('Dashboard fetch error', err);
       } finally {
         setLoadingStats(false);
       }
     };
-     
     fetchStats();
   }, []);
 
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 }
+  };
+
   return (
-    <div className="space-y-6 md:space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <motion.div
+      variants={container}
+      initial="hidden"
+      animate="show"
+      className="space-y-10 pb-12"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">School Overview</h1>
-          <p className="text-slate-400 text-sm md:text-base">Welcome back! Here's what's happening today.</p>
+          <motion.h1 variants={item} className="text-4xl md:text-5xl font-black text-white tracking-tight mb-2">
+            School <span className="text-gradient">Intelligence</span>
+          </motion.h1>
+          <motion.p variants={item} className="text-primary-200/50 text-base font-medium">
+            Real-time operational insights for your educational institution.
+          </motion.p>
         </div>
-        <div className="flex gap-2 md:gap-3">
-          <button 
-            onClick={handleExport}
-            className="flex-1 sm:flex-none px-4 py-2 bg-slate-800 text-white rounded-xl text-sm font-medium hover:bg-slate-700 transition-all border border-slate-700"
-          >
-            Export Report
+        <motion.div variants={item} className="flex gap-3">
+          <button className="flex-1 sm:flex-none px-6 py-3 bg-white/5 text-white rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-white/10 transition-all border border-white/5 flex items-center gap-2">
+            <FileText className="w-4 h-4" />
+            Report
           </button>
-          <button 
-            onClick={handleQuickAction}
-            className="flex-1 sm:flex-none px-4 py-2 bg-primary-600 text-white rounded-xl text-sm font-medium hover:bg-primary-500 transition-all shadow-lg shadow-primary-900/20"
-          >
-            Quick Actions
+          <button className="flex-1 sm:flex-none px-6 py-3 bg-primary-600 text-white rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-primary-500 transition-all shadow-premium flex items-center gap-2">
+            <TrendingUp className="w-4 h-4" />
+            Insights
           </button>
-        </div>
+        </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {loadingStats ? (
-          <>
-            <StatCardSkeleton />
-            <StatCardSkeleton />
-            <StatCardSkeleton />
-            <StatCardSkeleton />
-          </>
+          Array.from({ length: 4 }).map((_, i) => <StatCardSkeleton key={i} />)
         ) : (
           <>
-            <StatCard to="/students" title="Total Students" value={stats.students} icon={Users} color="bg-blue-500/10" trend={stats.student_trend.startsWith('-') ? 'down' : 'up'} trendValue={stats.student_trend} />
-            <StatCard to="/teachers" title="Active Teachers" value={stats.teachers} icon={UserSquare2} color="bg-purple-500/10" trend={stats.teacher_trend.startsWith('-') ? 'down' : 'up'} trendValue={stats.teacher_trend} />
-            <StatCard to="/classes" title="Total Classes" value={stats.classes} icon={BookOpen} color="bg-amber-500/10" />
+            <motion.div variants={item}>
+              <StatCard to="/students" title="Total Students" value={stats.students} icon={Users} color="bg-primary-500" trend={stats.student_trend.startsWith('-') ? 'down' : 'up'} trendValue={stats.student_trend} />
+            </motion.div>
+            <motion.div variants={item}>
+              <StatCard to="/teachers" title="Active Teachers" value={stats.teachers} icon={UserSquare2} color="bg-accent-500" trend={stats.teacher_trend.startsWith('-') ? 'down' : 'up'} trendValue={stats.teacher_trend} />
+            </motion.div>
+            <motion.div variants={item}>
+              <StatCard to="/classes" title="Total Classes" value={stats.classes} icon={BookOpen} color="bg-primary-600" />
+            </motion.div>
             {user?.role === 'ADMIN' && (
-              <StatCard to="/fees" title="Fees Collected" value={stats.fees} icon={Wallet} color="bg-emerald-500/10" trend={stats.fees_trend.startsWith('-') ? 'down' : 'up'} trendValue={stats.fees_trend} />
+              <motion.div variants={item}>
+                <StatCard to="/fees" title="Revenue" value={stats.fees} icon={Wallet} color="bg-emerald-500" trend={stats.fees_trend.startsWith('-') ? 'down' : 'up'} trendValue={stats.fees_trend} />
+              </motion.div>
             )}
           </>
         )}
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
+      <div className="grid lg:grid-cols-3 gap-8">
         {user?.role === 'ADMIN' && (
-          <div className="lg:col-span-2 glass-dark p-4 sm:p-6 rounded-3xl border border-white/5">
-            <div className="flex items-center justify-between mb-6 md:mb-8">
+          <motion.div variants={item} className="lg:col-span-2 glass p-8 rounded-[40px]">
+            <div className="flex items-center justify-between mb-10">
               <div>
-                <h2 className="text-lg md:text-xl font-bold text-white">Revenue Overview</h2>
-                <p className="text-sm text-slate-400 mt-1">Fee collection trends over the last 6 months</p>
+                <h2 className="text-2xl font-black text-white flex items-center gap-3">
+                  <TrendingUp className="w-6 h-6 text-primary-400" />
+                  Revenue Trends
+                </h2>
+                <p className="text-sm font-medium text-primary-200/40 mt-1">Financial growth visualization</p>
               </div>
-              <select className="bg-slate-800 text-white text-sm border border-slate-700 rounded-lg px-3 py-1.5 outline-none focus:ring-2 focus:ring-primary-500">
-                <option>This Year</option>
-                <option>Last Year</option>
-              </select>
+              <div className="flex gap-2">
+                <button className="px-4 py-2 bg-white/5 text-white text-xs font-black uppercase tracking-widest rounded-xl border border-white/5 hover:bg-white/10 transition-all">6 Months</button>
+              </div>
             </div>
-            <div className="h-[300px] w-full relative mt-6">
+            <div className="h-[350px] w-full mt-6">
               {loadingStats ? (
-                <Skeleton className="w-full h-full rounded-2xl" />
+                <Skeleton className="w-full h-full rounded-[32px]" />
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="oklch(0.55 0.22 240)" stopOpacity={0.4} />
+                        <stop offset="95%" stopColor="oklch(0.55 0.22 240)" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                    <XAxis dataKey="name" stroke="rgba(255,255,255,0.2)" fontSize={12} tickMargin={10} axisLine={false} tickLine={false} />
-                    <YAxis stroke="rgba(255,255,255,0.2)" fontSize={12} tickFormatter={(val) => `KSh ${val / 1000}k`} axisLine={false} tickLine={false} />
-                    <Tooltip 
-                      contentStyle={{ backgroundColor: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
-                      itemStyle={{ color: '#fff', fontWeight: 'bold' }}
+                    <CartesianGrid strokeDasharray="3 3" stroke="oklch(1 0 0 / 0.05)" vertical={false} />
+                    <XAxis dataKey="name" stroke="oklch(1 0 0 / 0.2)" fontSize={11} tickMargin={15} axisLine={false} tickLine={false} fontWeight="bold" />
+                    <YAxis stroke="oklch(1 0 0 / 0.2)" fontSize={11} tickFormatter={(val) => `KSh ${val / 1000}k`} axisLine={false} tickLine={false} fontWeight="bold" />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'oklch(0.16 0.03 240 / 0.9)',
+                        backdropFilter: 'blur(16px)',
+                        border: '1px solid oklch(1 0 0 / 0.1)',
+                        borderRadius: '16px',
+                        boxShadow: 'var(--shadow-premium)'
+                      }}
+                      itemStyle={{ color: '#fff', fontWeight: '900', fontSize: '14px' }}
                     />
-                    <Area type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" />
+                    <Area type="monotone" dataKey="value" stroke="oklch(0.55 0.22 240)" strokeWidth={4} fillOpacity={1} fill="url(#colorValue)" />
                   </AreaChart>
                 </ResponsiveContainer>
               )}
             </div>
-          </div>
+          </motion.div>
         )}
 
-        <div className={user?.role === 'ADMIN' ? "glass-dark p-6 md:p-8 rounded-3xl border border-white/5" : "lg:col-span-3 glass-dark p-6 md:p-8 rounded-3xl border border-white/5"}>
-          <h2 className="text-lg md:text-xl font-bold text-white mb-6">Recent Activities</h2>
+        <motion.div variants={item} className={user?.role === 'ADMIN' ? "glass p-8 rounded-[40px]" : "lg:col-span-3 glass p-8 rounded-[40px]"}>
+          <div className="flex items-center justify-between mb-10">
+            <h2 className="text-2xl font-black text-white flex items-center gap-3">
+              <Calendar className="w-6 h-6 text-accent-400" />
+              Activity
+            </h2>
+            <Link to="/audit-logs" className="text-xs font-black uppercase tracking-widest text-primary-400 hover:text-primary-300 transition-colors">View All</Link>
+          </div>
           <div className="space-y-4">
             {loadingStats ? (
               Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
-                  <Skeleton className="w-10 h-10 rounded-full shrink-0" />
+                <div key={i} className="flex items-center gap-4 p-5 rounded-3xl glass border border-white/5">
+                  <Skeleton className="w-12 h-12 rounded-2xl shrink-0" />
                   <div className="flex-1 space-y-2">
                     <Skeleton className="w-32 h-4" />
                     <Skeleton className="w-24 h-3" />
@@ -223,24 +252,32 @@ export const DashboardPage = () => {
                 </div>
               ))
             ) : activities.length === 0 ? (
-              <p className="text-slate-500 text-sm text-center py-6">No recent activities</p>
+              <div className="flex flex-col items-center justify-center py-20 text-primary-200/20">
+                <Calendar className="w-16 h-16 mb-4 opacity-10" />
+                <p className="text-sm font-black uppercase tracking-widest">No Recent Logs</p>
+              </div>
             ) : (
               activities.map((act) => (
-                <div key={act.id} className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all cursor-pointer group">
-                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary-600/20 shrink-0 flex items-center justify-center text-primary-400 text-xs font-bold group-hover:bg-primary-600 group-hover:text-white transition-all">
-                    {act.label[0]}
+                <motion.div
+                  key={act.id}
+                  whileHover={{ x: 5 }}
+                  className="flex items-center gap-4 p-5 rounded-3xl bg-white/5 border border-white/5 hover:border-primary-500/20 transition-all cursor-pointer group"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-primary-600/10 shrink-0 flex items-center justify-center text-primary-400 group-hover:bg-primary-600 group-hover:text-white transition-all duration-500 shadow-premium">
+                    {act.label[0].toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs md:text-sm font-medium text-white truncate group-hover:text-primary-400 transition-colors">{act.label}</p>
-                    <p className="text-[10px] md:text-xs text-slate-500 truncate">{act.detail}</p>
+                    <p className="text-sm font-black text-white truncate group-hover:text-primary-400 transition-colors uppercase tracking-tight">{act.label}</p>
+                    <p className="text-xs font-bold text-primary-200/30 truncate mt-0.5">{act.detail}</p>
                   </div>
-                  <span className="text-[10px] md:text-xs text-slate-500 whitespace-nowrap">{act.time}</span>
-                </div>
+                  <span className="text-[10px] font-black text-primary-200/20 whitespace-nowrap uppercase tracking-tighter">{act.time}</span>
+                </motion.div>
               ))
             )}
           </div>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
+

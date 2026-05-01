@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Search, CheckCircle2, AlertCircle, Phone, CreditCard, Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { feesService, type Payment, type StudentBalance } from '../api/services/feesService';
 import { Button } from '../components/ui/Button';
@@ -8,7 +9,6 @@ import { Input } from '../components/ui/Input';
 import { Modal } from '../components/ui/Modal';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/Table';
 import { TableSkeleton } from '../components/ui/Skeleton';
-import { useEffect } from 'react';
 
 export const FeesPage = () => {
   const queryClient = useQueryClient();
@@ -81,83 +81,116 @@ export const FeesPage = () => {
   const completionRate = totalExpected > 0 ? ((totalCollected / totalExpected) * 100).toFixed(1) : '0.0';
 
   return (
-    <div className="space-y-6 md:space-y-8 pb-20">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-12 pb-24"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Fee Management</h1>
-          <p className="text-slate-400 text-sm md:text-base">Track collections and manage payment structures.</p>
+          <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight mb-2">Revenue <span className="text-gradient">Engine</span></h1>
+          <p className="text-primary-200/50 text-base font-medium">Monitor financial health and manage secure transaction protocols.</p>
         </div>
-        <Button onClick={() => setShowPaymentModal(true)} className="gap-2 w-full sm:w-auto">
-          <Plus className="w-5 h-5" /> Record New Payment
+        <Button onClick={() => setShowPaymentModal(true)} className="gap-2 h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-xs shadow-premium w-full sm:w-auto">
+          <Plus className="w-5 h-5" /> Execute New Payment
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-        <div className="glass-dark p-6 rounded-3xl border border-white/5">
-          <p className="text-sm text-slate-400 mb-2">Total Collected</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="glass p-8 rounded-[40px] border-white/5 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 blur-[80px] -mr-16 -mt-16 group-hover:bg-primary-500/20 transition-all" />
+          <p className="text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em] mb-4">Gross Collected</p>
           <div className="flex items-end justify-between">
-            <h3 className="text-2xl md:text-3xl font-bold text-white">KSh {(totalCollected / 1000).toFixed(1)}k</h3>
+            <h3 className="text-4xl font-black text-white tracking-tight">KSh {(totalCollected / 1000).toFixed(1)}k</h3>
+            <div className="w-10 h-10 rounded-xl bg-primary-500/10 flex items-center justify-center border border-primary-500/10">
+              <CreditCard className="w-5 h-5 text-primary-400" />
+            </div>
           </div>
         </div>
-        <div className="glass-dark p-6 rounded-3xl border border-white/5">
-          <p className="text-sm text-slate-400 mb-2">Outstanding Balance</p>
-          <h3 className="text-2xl md:text-3xl font-bold text-rose-400">KSh {(totalOutstanding / 1000).toFixed(1)}k</h3>
+        <div className="glass p-8 rounded-[40px] border-white/5 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/10 blur-[80px] -mr-16 -mt-16 group-hover:bg-rose-500/20 transition-all" />
+          <p className="text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em] mb-4">Outstanding Assets</p>
+          <h3 className="text-4xl font-black text-rose-400 tracking-tight">KSh {(totalOutstanding / 1000).toFixed(1)}k</h3>
         </div>
-        <div className="glass-dark p-6 rounded-3xl border border-white/5 sm:col-span-2 lg:col-span-1">
-          <p className="text-sm text-slate-400 mb-2">Completion Rate</p>
-          <h3 className="text-2xl md:text-3xl font-bold text-primary-400">{completionRate}%</h3>
+        <div className="glass p-8 rounded-[40px] border-white/5 relative overflow-hidden group sm:col-span-2 lg:col-span-1">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-[80px] -mr-16 -mt-16 group-hover:bg-emerald-500/20 transition-all" />
+          <p className="text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em] mb-4">Collection Index</p>
+          <div className="flex items-center gap-4">
+            <h3 className="text-4xl font-black text-primary-400 tracking-tight">{completionRate}%</h3>
+            <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden border border-white/5">
+              <motion.div 
+                initial={{ width: 0 }}
+                animate={{ width: `${completionRate}%` }}
+                className="h-full bg-primary-500 shadow-[0_0_15px_rgba(59,130,246,0.5)]"
+              />
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="glass-dark rounded-3xl border border-white/5 overflow-hidden">
-        <div className="p-4 md:p-6 border-b border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <h2 className="text-lg md:text-xl font-bold text-white">Recent Transactions</h2>
-          <div className="relative w-full sm:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+      <div className="glass rounded-[40px] border-white/5 overflow-hidden">
+        <div className="p-8 border-b border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <h2 className="text-xl font-black text-white uppercase tracking-widest">Transaction Journal</h2>
+          <div className="relative w-full sm:w-80">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-200/30" />
             <Input 
-              placeholder="Search transactions..."
-              className="pl-9 bg-slate-800/50 border-slate-700"
+              placeholder="Query reference or ID..."
+              className="pl-11 h-12 bg-white/5 border-white/5 rounded-2xl focus:bg-white/10 transition-all font-medium text-sm"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
         </div>
 
-        <div className="p-0">
-          <Table className="min-w-[700px]">
+        <div className="overflow-x-auto">
+          <Table className="min-w-[1000px]">
             <TableHeader className="bg-white/5">
-              <TableRow className="border-0 hover:bg-transparent">
-                <TableHead className="text-slate-400">Student</TableHead>
-                <TableHead className="text-slate-400">Reference</TableHead>
-                <TableHead className="text-slate-400">Amount</TableHead>
-                <TableHead className="text-slate-400">Status</TableHead>
-                <TableHead className="text-slate-400">Date</TableHead>
+              <TableRow className="border-0 hover:bg-transparent h-16">
+                <TableHead className="text-primary-200/40 text-[10px] font-black uppercase tracking-widest pl-8">Operational Unit</TableHead>
+                <TableHead className="text-primary-200/40 text-[10px] font-black uppercase tracking-widest">Protocol Reference</TableHead>
+                <TableHead className="text-primary-200/40 text-[10px] font-black uppercase tracking-widest">Quantum (Amount)</TableHead>
+                <TableHead className="text-primary-200/40 text-[10px] font-black uppercase tracking-widest">Status</TableHead>
+                <TableHead className="text-primary-200/40 text-[10px] font-black uppercase tracking-widest pr-8">Timestamp</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody className="divide-y divide-white/5 border-t border-white/5">
+            <TableBody className="divide-y divide-white/5">
               {paymentsLoading ? (
-                <TableSkeleton rows={8} cols={5} />
+                <TableSkeleton rows={10} cols={5} />
               ) : paymentsData.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-slate-500 py-12">No transactions found.</TableCell>
+                  <TableCell colSpan={5} className="text-center py-32 opacity-20">
+                    <CreditCard className="w-20 h-20 mx-auto mb-4" />
+                    <p className="text-lg font-black uppercase tracking-widest">No Financial Activity</p>
+                  </TableCell>
                 </TableRow>
               ) : (
-                paymentsData.map((payment: Payment) => (
-                  <TableRow key={payment.id} className="hover:bg-white/5 border-white/5">
-                    <TableCell>
-                      <div className="text-sm font-bold text-white">{payment.student_name}</div>
-                      <div className="text-[10px] md:text-xs text-slate-500">{payment.student_admission}</div>
+                paymentsData.map((payment: Payment, idx: number) => (
+                  <motion.tr 
+                    key={payment.id} 
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: idx * 0.05 }}
+                    className="group transition-all h-20 border-white/5 hover:bg-white/5"
+                  >
+                    <TableCell className="pl-8">
+                      <div className="text-sm font-black text-white uppercase tracking-tight">{payment.student_name}</div>
+                      <div className="text-[10px] font-black text-primary-200/30 uppercase tracking-tighter">{payment.student_admission}</div>
                     </TableCell>
-                    <TableCell className="font-mono text-[10px] md:text-xs text-slate-400">{payment.transaction_reference}</TableCell>
-                    <TableCell className="font-bold text-sm md:text-base text-white">KSh {Number(payment.amount).toLocaleString()}</TableCell>
+                    <TableCell className="font-mono text-[10px] text-primary-200/50 uppercase tracking-widest">{payment.transaction_reference}</TableCell>
+                    <TableCell className="font-black text-base text-white tracking-tight">KSh {Number(payment.amount).toLocaleString()}</TableCell>
                     <TableCell>
-                      <span className={`flex items-center gap-1.5 text-[10px] md:text-xs font-bold ${payment.status === 'COMPLETED' ? 'text-emerald-400' : payment.status === 'FAILED' ? 'text-rose-400' : 'text-amber-400'}`}>
-                        {payment.status === 'COMPLETED' && <CheckCircle2 className="w-4 h-4" />}
+                      <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${
+                        payment.status === 'COMPLETED' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 
+                        payment.status === 'FAILED' ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' : 
+                        'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                      }`}>
+                        {payment.status === 'COMPLETED' && <CheckCircle2 className="w-3 h-3" />}
+                        {payment.status === 'PENDING' && <Loader2 className="w-3 h-3 animate-spin" />}
                         {payment.status}
                       </span>
                     </TableCell>
-                    <TableCell className="text-[10px] md:text-xs text-slate-500">{payment.payment_date}</TableCell>
-                  </TableRow>
+                    <TableCell className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pr-8">{payment.payment_date}</TableCell>
+                  </motion.tr>
                 ))
               )}
             </TableBody>
@@ -168,91 +201,94 @@ export const FeesPage = () => {
       <Modal
         isOpen={showPaymentModal}
         onClose={() => setShowPaymentModal(false)}
-        className="max-w-md p-0 bg-transparent border-0 shadow-none overflow-hidden"
+        className="max-w-xl glass border-white/10"
       >
-        <div className="glass-dark rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
-          <div className="p-6 md:p-8 bg-primary-600">
-            <div className="flex items-center gap-4 mb-2">
-              <div className="p-2.5 md:p-3 bg-white/20 rounded-2xl">
-                <CreditCard className="w-6 h-6 md:w-8 md:h-8 text-white" />
-              </div>
-              <div>
-                <h3 className="text-xl md:text-2xl font-bold text-white">Record Payment</h3>
-                <p className="text-primary-100 text-xs md:text-sm">Automated M-Pesa STK Push</p>
-              </div>
+        <div className="space-y-8 mt-6 pb-4">
+          <div className="flex items-center gap-6 p-6 bg-primary-600 rounded-[32px] shadow-premium">
+            <div className="w-16 h-16 bg-white/20 rounded-[20px] flex items-center justify-center border border-white/30">
+              <CreditCard className="w-10 h-10 text-white" />
+            </div>
+            <div>
+              <h3 className="text-2xl font-black text-white uppercase tracking-tight">Record Payment</h3>
+              <p className="text-primary-100 text-[10px] font-black uppercase tracking-[0.2em] mt-1">Automated M-Pesa STK Push Protocol</p>
             </div>
           </div>
 
-          <form onSubmit={handlePayment} className="p-6 md:p-8 space-y-4 md:space-y-6 bg-slate-900">
-            <div>
-              <label className="block text-xs md:text-sm font-medium text-slate-400 mb-2">Select Student</label>
-              <select
-                required
-                value={selectedStudentId}
-                onChange={(e) => setSelectedStudentId(e.target.value)}
-                className="flex h-12 w-full rounded-xl border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 transition-all"
-              >
-                <option value="">Select a student...</option>
-                {balances.map((b: StudentBalance) => (
-                  <option key={b.student_id} value={b.student_id}>
-                    {b.name} ({b.admission_number}) - Bal: KSh {Number(b.balance).toLocaleString()}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs md:text-sm font-medium text-slate-400 mb-2">Phone Number (M-Pesa)</label>
-              <div className="relative">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-slate-500" />
-                <Input 
+          <form onSubmit={handlePayment} className="space-y-8">
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pl-1">Target Operational Unit (Student)</label>
+                <select
                   required
-                  placeholder="0712 345 678"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  className="pl-12 bg-slate-800 border-slate-700 h-12"
-                />
+                  value={selectedStudentId}
+                  onChange={(e) => setSelectedStudentId(e.target.value)}
+                  className="w-full h-14 bg-white/5 border border-white/5 rounded-2xl px-4 text-white text-sm outline-none focus:border-primary-500 transition-all appearance-none font-medium"
+                >
+                  <option value="" className="bg-slate-900">Select Identity...</option>
+                  {balances.map((b: StudentBalance) => (
+                    <option key={b.student_id} value={b.student_id} className="bg-slate-900">
+                      {b.name} ({b.admission_number}) • Bal: KSh {Number(b.balance).toLocaleString()}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pl-1">M-Pesa Gateway Line</label>
+                  <div className="relative">
+                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-200/30" />
+                    <Input 
+                      required
+                      placeholder="07XX XXX XXX"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      className="pl-12 bg-white/5 border-white/5 rounded-2xl h-14 font-black"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pl-1">Quantum (Amount)</label>
+                  <Input 
+                    required
+                    type="number"
+                    placeholder="0.00"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    className="bg-white/5 border-white/5 rounded-2xl h-14 font-black text-xl text-primary-400"
+                  />
+                </div>
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs md:text-sm font-medium text-slate-400 mb-2">Amount (KSh)</label>
-              <Input 
-                required
-                type="number"
-                placeholder="Enter amount..."
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                className="bg-slate-800 border-slate-700 font-bold text-lg md:text-xl h-12"
-              />
-            </div>
-
-            <div className="p-3 md:p-4 bg-primary-500/10 border border-primary-500/20 rounded-2xl flex gap-3">
-              <AlertCircle className="w-4 h-4 md:w-5 md:h-5 text-primary-400 shrink-0" />
-              <p className="text-[10px] md:text-xs text-primary-300">
-                Clicking pay will send a request to the parent's phone. They will need to enter their M-Pesa PIN.
+            <div className="p-6 bg-primary-500/5 border border-primary-500/10 rounded-[28px] flex gap-4">
+              <AlertCircle className="w-5 h-5 text-primary-400 shrink-0" />
+              <p className="text-[10px] font-black text-primary-300 uppercase tracking-widest leading-relaxed">
+                Execution will trigger an encrypted STK push to the specified terminal. User authorization (PIN) is required to finalize the transaction.
               </p>
             </div>
 
-            <div className="flex gap-3 md:gap-4">
+            <div className="flex gap-4">
               <Button 
                 type="button"
                 variant="outline"
                 onClick={() => setShowPaymentModal(false)}
-                className="flex-1 h-12 bg-slate-800 border-slate-700 hover:bg-slate-700 text-white"
+                className="flex-1 h-14 bg-white/5 border-white/5 text-primary-200/50 rounded-2xl font-black uppercase tracking-widest text-xs"
               >
-                Cancel
+                Abort
               </Button>
               <Button 
                 type="submit"
                 disabled={initiatePaymentMutation.isPending}
-                className="flex-1 h-12"
+                className="flex-[2] h-14 rounded-2xl font-black uppercase tracking-widest text-xs shadow-premium"
               >
-                {initiatePaymentMutation.isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Pay Now'}
+                {initiatePaymentMutation.isPending ? <Loader2 className="w-6 h-6 animate-spin mx-auto" /> : 'Confirm & Execute'}
               </Button>
             </div>
           </form>
         </div>
       </Modal>
-    </div>
+    </motion.div>
   );
 };

@@ -138,141 +138,144 @@ export const ClassesPage = () => {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-12 pb-12"
+    >
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black text-white tracking-tight">Classes</h1>
-          <p className="text-slate-400 mt-1">
-            Navigate: <span className="text-primary-400 font-bold">School</span>
-            <ChevronRight className="inline w-3 h-3 mx-1 text-slate-600" />
-            <span className="text-slate-300 font-bold">Grade</span>
-            <ChevronRight className="inline w-3 h-3 mx-1 text-slate-600" />
-            <span className="text-slate-300 font-bold">Stream</span>
-            <ChevronRight className="inline w-3 h-3 mx-1 text-slate-600" />
-            <span className="text-slate-300 font-bold">Students</span>
+          <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight mb-2">Academic <span className="text-gradient">Architecture</span></h1>
+          <p className="text-primary-200/50 text-base font-medium max-w-xl">
+            Engineer your school's structural hierarchy from grades to specialized learning streams.
           </p>
         </div>
-        <div className="flex items-center gap-3 w-full md:w-auto">
-          <div className="relative w-full md:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+          <div className="relative w-full md:w-80">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-200/30" />
             <input
-              placeholder="Search grades..."
+              placeholder="Query grade systems..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-800/50 border border-slate-700/50 rounded-xl text-white text-sm outline-none focus:ring-2 focus:ring-primary-500 h-12"
+              className="w-full pl-11 pr-4 py-2 bg-white/5 border border-white/5 rounded-2xl text-white text-sm outline-none focus:bg-white/10 transition-all h-14 font-medium"
             />
           </div>
-          <Button onClick={() => setShowGradeModal(true)} className="gap-2 w-full md:w-auto h-12 shrink-0">
-            <Plus className="w-5 h-5" /> Add Grade Level
+          <Button onClick={() => setShowGradeModal(true)} className="gap-2 w-full md:w-auto h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-xs shadow-premium shrink-0">
+            <Plus className="w-5 h-5" /> Initialize Grade
           </Button>
         </div>
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 gap-6">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="glass-dark rounded-3xl border border-white/5 p-6 space-y-4">
-              <div className="flex items-center gap-4">
-                <Skeleton className="w-12 h-12 rounded-2xl" />
-                <div className="space-y-2">
-                  <Skeleton className="w-32 h-6" />
-                  <Skeleton className="w-48 h-4" />
+        <div className="grid grid-cols-1 gap-8">
+          {[1, 2].map(i => (
+            <div key={i} className="glass rounded-[40px] border-white/5 p-8 space-y-6">
+              <div className="flex items-center gap-6">
+                <Skeleton className="w-16 h-16 rounded-[24px]" />
+                <div className="space-y-3">
+                  <Skeleton className="w-48 h-8" />
+                  <Skeleton className="w-64 h-4" />
                 </div>
               </div>
-              <div className="grid grid-cols-4 gap-4 pt-4">
-                <Skeleton className="h-20 rounded-2xl" />
-                <Skeleton className="h-20 rounded-2xl" />
-                <Skeleton className="h-20 rounded-2xl" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-4">
+                <Skeleton className="h-32 rounded-[32px]" />
+                <Skeleton className="h-32 rounded-[32px]" />
+                <Skeleton className="h-32 rounded-[32px]" />
+                <Skeleton className="h-32 rounded-[32px]" />
               </div>
             </div>
           ))}
         </div>
       ) : grades.length === 0 ? (
-        <div className="glass-dark rounded-3xl border border-white/5 p-16 text-center">
-          <GraduationCap className="w-16 h-16 text-slate-700 mx-auto mb-6" />
-          <h3 className="text-xl font-bold text-slate-400 mb-2">No Grade Levels Yet</h3>
-          <p className="text-slate-500 text-sm mb-6">Start by creating your first grade level (e.g. Grade 9), then add streams to it.</p>
-          <Button onClick={() => setShowGradeModal(true)} className="h-12 px-6">
-            Create First Grade
+        <div className="glass rounded-[40px] border-white/5 p-24 text-center">
+          <GraduationCap className="w-20 h-20 text-primary-200/10 mx-auto mb-8" />
+          <h3 className="text-2xl font-black text-white uppercase tracking-widest mb-4">No Academic Records</h3>
+          <p className="text-primary-200/40 text-sm font-medium mb-10 max-w-md mx-auto">Establish your school's foundation by defining the primary grade levels and their operational streams.</p>
+          <Button onClick={() => setShowGradeModal(true)} className="h-14 px-10 rounded-2xl font-black uppercase tracking-widest text-xs shadow-premium">
+            Launch First Grade System
           </Button>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-10">
           {grades.map((grade: GradeLevel, gi: number) => (
             <motion.div
               key={grade.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: gi * 0.05 }}
-              className="glass-dark rounded-3xl border border-white/5 overflow-hidden"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: gi * 0.1 }}
+              className="glass rounded-[40px] border-white/5 overflow-hidden group"
             >
-              <div className="flex items-center justify-between p-6 border-b border-white/5 bg-white/[0.02]">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-primary-600/10 rounded-2xl">
-                    <BookOpen className="w-6 h-6 text-primary-400" />
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between p-8 gap-6 border-b border-white/5 bg-white/[0.02]">
+                <div className="flex items-center gap-6">
+                  <div className="w-16 h-16 bg-primary-600/20 rounded-[24px] flex items-center justify-center border border-primary-500/20 group-hover:scale-110 transition-transform">
+                    <BookOpen className="w-8 h-8 text-primary-400" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-black text-white">{grade.name}</h2>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <Users className="w-3.5 h-3.5 text-slate-500" />
-                      <span className="text-sm text-slate-400">
-                        <span className="text-primary-400 font-bold">{grade.student_count}</span> students total
-                        {' · '}
-                        <span className="text-slate-400">{grade.streams.length} stream{grade.streams.length !== 1 ? 's' : ''}</span>
-                      </span>
+                    <h2 className="text-3xl font-black text-white uppercase tracking-tight">{grade.name}</h2>
+                    <div className="flex items-center gap-3 mt-1.5">
+                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 border border-white/5">
+                        <Users className="w-3.5 h-3.5 text-primary-400" />
+                        <span className="text-[10px] font-black text-white uppercase tracking-widest">{grade.student_count} Enrolled</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 border border-white/5">
+                        <Users className="w-3.5 h-3.5 text-accent-400" />
+                        <span className="text-[10px] font-black text-white uppercase tracking-widest">{grade.streams.length} Operations</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <Button
                     variant="outline"
                     onClick={() => openAddStream(grade)}
-                    className="gap-1.5 bg-slate-800 border-slate-700 text-slate-300 hover:text-white"
+                    className="gap-2 h-12 px-6 bg-white/5 border-white/5 text-primary-200/60 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:text-white transition-all"
                   >
                     <Plus className="w-4 h-4" /> Add Stream
                   </Button>
                   <button 
                     onClick={() => setGradeToDelete(grade)}
-                    className="p-2 hover:bg-rose-500/10 text-slate-400 hover:text-rose-400 rounded-lg transition-all"
+                    className="p-3.5 hover:bg-rose-500/10 text-primary-200/20 hover:text-rose-400 rounded-2xl transition-all border border-transparent hover:border-rose-500/20"
                   >
                     <Trash2 className="w-5 h-5" />
                   </button>
                 </div>
               </div>
 
-              <div className="p-6">
+              <div className="p-8">
                 {grade.streams.length === 0 ? (
-                  <div className="text-center py-8 text-slate-600">
-                    <p className="text-sm">No streams yet. Click "Add Stream" to create one (e.g. East, West, Alpha).</p>
+                  <div className="text-center py-12 border-2 border-dashed border-white/5 rounded-[32px]">
+                    <p className="text-xs font-black text-primary-200/20 uppercase tracking-[0.3em]">No Active Streams Defined</p>
                   </div>
                 ) : (
-                  <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                     {grade.streams.map((stream: any) => (
                       <button
                         key={stream.id}
                         onClick={() => navigate(`/classes/${stream.id}`)}
-                        className="group text-left p-5 rounded-2xl border border-white/5 hover:border-primary-500/40 bg-slate-900/50 hover:bg-primary-500/5 transition-all"
+                        className="group/stream text-left p-6 rounded-[32px] border border-white/5 hover:border-primary-500/40 bg-white/[0.03] hover:bg-primary-500/5 transition-all relative overflow-hidden"
                       >
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="text-sm font-black text-white">{grade.name} {stream.name}</span>
-                          <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-primary-400 transition-colors" />
+                        <div className="flex items-center justify-between mb-4">
+                          <span className="text-base font-black text-white uppercase tracking-tight">{grade.name} {stream.name}</span>
+                          <ChevronRight className="w-4 h-4 text-primary-200/20 group-hover/stream:text-primary-400 group-hover/stream:translate-x-1 transition-all" />
                         </div>
-                        <div className="flex items-center gap-2 text-xs text-slate-500">
-                          <Users className="w-3 h-3" />
-                          <span className="font-bold text-slate-300">{stream.student_count}</span> students
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
+                          <span className="text-[10px] font-black text-primary-200/40 uppercase tracking-widest">
+                            <span className="text-white">{stream.student_count}</span> Operational Units
+                          </span>
                         </div>
-                        <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/5">
-                          <div className="text-[11px] text-slate-600 truncate">
-                            Teacher: {stream.teacher_name || 'Unassigned'}
+                        <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+                          <div className="text-[9px] font-black text-primary-200/30 uppercase tracking-widest truncate max-w-[120px]">
+                            Lead: {stream.teacher_name || 'Unassigned'}
                           </div>
                           <button 
                             onClick={(e) => {
                               e.stopPropagation();
                               setStreamToDelete({id: stream.id, name: `${grade.name} ${stream.name}`});
                             }}
-                            className="p-1 hover:bg-rose-500/10 text-slate-700 hover:text-rose-400 rounded transition-all"
+                            className="p-2 hover:bg-rose-500/10 text-primary-200/20 hover:text-rose-400 rounded-xl transition-all"
                           >
-                            <Trash2 className="w-3 h-3" />
+                            <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       </button>
@@ -280,10 +283,10 @@ export const ClassesPage = () => {
 
                     <button
                       onClick={() => openAddStream(grade)}
-                      className="p-5 rounded-2xl border-2 border-dashed border-slate-800 text-slate-600 hover:border-primary-500/40 hover:text-primary-400 transition-all flex flex-col items-center justify-center gap-2"
+                      className="p-6 rounded-[32px] border-4 border-dashed border-white/5 text-primary-200/20 hover:border-primary-500/40 hover:text-primary-400 transition-all flex flex-col items-center justify-center gap-3 group/add"
                     >
-                      <Plus className="w-5 h-5" />
-                      <span className="text-xs font-bold">New Stream</span>
+                      <Plus className="w-8 h-8 group-hover/add:scale-110 transition-transform" />
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em]">Deploy Stream</span>
                     </button>
                   </div>
                 )}
@@ -294,38 +297,44 @@ export const ClassesPage = () => {
       )}
 
       {/* Subjects Management Section */}
-      <div className="pt-8 border-t border-white/5 space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="pt-16 border-t border-white/5 space-y-10">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div>
-            <h2 className="text-2xl font-bold text-white">Subjects</h2>
-            <p className="text-slate-500 text-sm">Manage the subjects taught in your school.</p>
+            <h2 className="text-3xl font-black text-white uppercase tracking-tight">Intelligence <span className="text-gradient">Domains</span></h2>
+            <p className="text-primary-200/30 text-xs font-black uppercase tracking-[0.2em] mt-1">Manage the core curriculum infrastructure.</p>
           </div>
-          <Button onClick={() => setShowSubjectModal(true)} variant="outline" className="gap-2 border-primary-500/30 text-primary-400 hover:bg-primary-500/10">
-            <Plus className="w-4 h-4" /> Add Subject
+          <Button onClick={() => setShowSubjectModal(true)} variant="outline" className="gap-2 h-12 px-6 bg-primary-500/5 border-primary-500/20 text-primary-400 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-primary-500/10 transition-all">
+            <Plus className="w-4 h-4" /> Add Knowledge Domain
           </Button>
         </div>
 
         {subjects.length === 0 ? (
-          <div className="p-8 text-center glass-dark rounded-2xl border border-white/5">
-            <BookOpen className="w-10 h-10 text-slate-700 mx-auto mb-3" />
-            <p className="text-slate-500 text-sm italic">No subjects added yet. Add subjects to assign them to teachers.</p>
+          <div className="p-16 text-center glass rounded-[40px] border border-dashed border-white/5 opacity-30">
+            <BookOpen className="w-16 h-16 text-white/10 mx-auto mb-6" />
+            <p className="text-sm font-black uppercase tracking-widest">No Intelligence Domains Established</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {subjects.map((sub: any) => (
-              <div key={sub.id} className="glass-dark p-4 rounded-2xl border border-white/5 flex flex-col items-center justify-center text-center group relative hover:border-primary-500/30 transition-all">
-                <div className="w-10 h-10 rounded-xl bg-primary-500/10 flex items-center justify-center text-primary-400 mb-2 font-bold text-xs">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5">
+            {subjects.map((sub: any, idx: number) => (
+              <motion.div 
+                key={sub.id} 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: idx * 0.03 }}
+                className="glass p-6 rounded-[32px] border-white/5 flex flex-col items-center justify-center text-center group relative hover:border-primary-500/40 transition-all"
+              >
+                <div className="w-14 h-14 rounded-2xl bg-primary-500/10 flex items-center justify-center text-primary-400 mb-4 font-black text-xs border border-primary-500/10 group-hover:scale-110 transition-transform">
                   {sub.code || sub.name.substring(0, 3).toUpperCase()}
                 </div>
-                <span className="text-sm font-bold text-slate-300 truncate w-full">{sub.name}</span>
+                <span className="text-[10px] font-black text-white uppercase tracking-widest truncate w-full">{sub.name}</span>
                 
                 <button 
                   onClick={() => setSubjectToDelete({id: sub.id, name: sub.name})}
-                  className="absolute top-2 right-2 p-1.5 opacity-0 group-hover:opacity-100 hover:bg-rose-500/10 text-rose-500 rounded-lg transition-all"
+                  className="absolute top-4 right-4 p-2 opacity-0 group-hover:opacity-100 hover:bg-rose-500/10 text-primary-200/20 hover:text-rose-400 rounded-xl transition-all"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}
@@ -335,75 +344,66 @@ export const ClassesPage = () => {
       <Modal
         isOpen={showSubjectModal}
         onClose={() => setShowSubjectModal(false)}
-        title="Add New Subject"
-        className="max-w-md bg-slate-900 border-white/10"
+        title="New Intelligence Domain"
+        className="max-w-md glass border-white/10"
       >
-        <form onSubmit={handleAddSubject} className="space-y-5 mt-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-400">Subject Name</label>
-            <Input
-              required autoFocus
-              value={subjectData.name}
-              onChange={e => setSubjectData(prev => ({ ...prev, name: e.target.value }))}
-              placeholder="e.g. Mathematics, English, Kiswahili"
-              className="bg-slate-800/50 border-slate-700"
-            />
+        <form onSubmit={handleAddSubject} className="space-y-8 mt-6 pb-2">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">Domain Title</label>
+              <Input
+                required autoFocus
+                value={subjectData.name}
+                onChange={e => setSubjectData(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="e.g. Quantum Computing"
+                className="bg-white/5 border-white/5 rounded-xl h-14"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">Registry Code (Short)</label>
+              <Input
+                value={subjectData.code}
+                onChange={e => setSubjectData(prev => ({ ...prev, code: e.target.value }))}
+                placeholder="e.g. QNT"
+                className="bg-white/5 border-white/5 rounded-xl h-14 uppercase"
+              />
+            </div>
           </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-400">Subject Code (Optional)</label>
-            <Input
-              value={subjectData.code}
-              onChange={e => setSubjectData(prev => ({ ...prev, code: e.target.value }))}
-              placeholder="e.g. MAT, ENG, BIO"
-              className="bg-slate-800/50 border-slate-700 uppercase"
-            />
-          </div>
-          <div className="flex gap-3 pt-2">
-            <Button type="button" variant="outline" className="flex-1 bg-slate-800 border-slate-700 text-white hover:bg-slate-700" onClick={() => setShowSubjectModal(false)}>
-              Cancel
+          <div className="flex gap-4">
+            <Button type="button" variant="outline" className="flex-1 h-14 bg-white/5 border-white/5 text-primary-200/50 rounded-2xl font-black uppercase tracking-widest text-xs" onClick={() => setShowSubjectModal(false)}>
+              Discard
             </Button>
-            <Button type="submit" className="flex-[2]" disabled={createSubjectMutation.isPending}>
-              {createSubjectMutation.isPending ? 'Adding...' : 'Add Subject'}
+            <Button type="submit" className="flex-[2] h-14 rounded-2xl font-black uppercase tracking-widest text-xs shadow-premium" disabled={createSubjectMutation.isPending}>
+              {createSubjectMutation.isPending ? 'Syncing...' : 'Establish Domain'}
             </Button>
           </div>
         </form>
       </Modal>
 
-      <ConfirmModal
-        isOpen={!!subjectToDelete}
-        onClose={() => setSubjectToDelete(null)}
-        onConfirm={() => {
-          if (subjectToDelete) deleteSubjectMutation.mutate(subjectToDelete.id);
-          setSubjectToDelete(null);
-        }}
-        title="Delete Subject"
-        description={`Are you sure you want to delete ${subjectToDelete?.name}? This will remove all its assignments.`}
-      />
-
       <Modal
         isOpen={showStreamModal}
         onClose={() => setShowStreamModal(false)}
-        title="Add Stream"
-        description={`to ${targetGradeName}`}
-        className="max-w-md bg-slate-900 border-white/10"
+        title="Deploy Learning Stream"
+        description={`Integration targeted for ${targetGradeName}`}
+        className="max-w-md glass border-white/10"
       >
-        <form onSubmit={handleAddStream} className="space-y-5 mt-4">
+        <form onSubmit={handleAddStream} className="space-y-8 mt-6 pb-2">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-400">Stream Name</label>
+            <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">Stream Identifier</label>
             <Input
               required autoFocus
               value={streamName}
               onChange={e => setStreamName(e.target.value)}
-              placeholder="e.g. East, West, Alpha, Blue"
-              className="bg-slate-800/50 border-slate-700"
+              placeholder="e.g. Alpha-X, Omega"
+              className="bg-white/5 border-white/5 rounded-xl h-14"
             />
           </div>
-          <div className="flex gap-3 pt-2">
-            <Button type="button" variant="outline" className="flex-1 bg-slate-800 border-slate-700 text-white hover:bg-slate-700" onClick={() => setShowStreamModal(false)}>
-              Cancel
+          <div className="flex gap-4">
+            <Button type="button" variant="outline" className="flex-1 h-14 bg-white/5 border-white/5 text-primary-200/50 rounded-2xl font-black uppercase tracking-widest text-xs" onClick={() => setShowStreamModal(false)}>
+              Discard
             </Button>
-            <Button type="submit" className="flex-[2]" disabled={createStreamMutation.isPending}>
-              {createStreamMutation.isPending ? 'Adding...' : 'Add Stream'}
+            <Button type="submit" className="flex-[2] h-14 rounded-2xl font-black uppercase tracking-widest text-xs shadow-premium" disabled={createStreamMutation.isPending}>
+              {createStreamMutation.isPending ? 'Deploying...' : 'Execute Deployment'}
             </Button>
           </div>
         </form>
@@ -412,26 +412,26 @@ export const ClassesPage = () => {
       <Modal
         isOpen={showGradeModal}
         onClose={() => setShowGradeModal(false)}
-        title="Add Grade Level"
-        className="max-w-md bg-slate-900 border-white/10"
+        title="Initialize Grade System"
+        className="max-w-md glass border-white/10"
       >
-        <form onSubmit={handleAddGrade} className="space-y-5 mt-4">
+        <form onSubmit={handleAddGrade} className="space-y-8 mt-6 pb-2">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-400">Grade Name</label>
+            <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">System Level Title</label>
             <Input
               required autoFocus
               value={gradeName}
               onChange={e => setGradeName(e.target.value)}
-              placeholder="e.g. Grade 9, Form 3, Class 8"
-              className="bg-slate-800/50 border-slate-700"
+              placeholder="e.g. Senior Phase, Level 9"
+              className="bg-white/5 border-white/5 rounded-xl h-14"
             />
           </div>
-          <div className="flex gap-3 pt-2">
-            <Button type="button" variant="outline" className="flex-1 bg-slate-800 border-slate-700 text-white hover:bg-slate-700" onClick={() => setShowGradeModal(false)}>
-              Cancel
+          <div className="flex gap-4">
+            <Button type="button" variant="outline" className="flex-1 h-14 bg-white/5 border-white/5 text-primary-200/50 rounded-2xl font-black uppercase tracking-widest text-xs" onClick={() => setShowGradeModal(false)}>
+              Discard
             </Button>
-            <Button type="submit" className="flex-[2]" disabled={createGradeMutation.isPending}>
-              {createGradeMutation.isPending ? 'Creating...' : 'Create Grade'}
+            <Button type="submit" className="flex-[2] h-14 rounded-2xl font-black uppercase tracking-widest text-xs shadow-premium" disabled={createGradeMutation.isPending}>
+              {createGradeMutation.isPending ? 'Initializing...' : 'Confirm System'}
             </Button>
           </div>
         </form>
@@ -443,8 +443,8 @@ export const ClassesPage = () => {
         onConfirm={() => {
           if (gradeToDelete) deleteGradeMutation.mutate(gradeToDelete.id);
         }}
-        title="Delete Grade Level"
-        description={`Are you sure you want to delete ${gradeToDelete?.name}? This will delete all streams and student assignments under this grade.`}
+        title="System Decommission"
+        description={`This will permanently purge ${gradeToDelete?.name} and all associated stream operational units from the network.`}
       />
 
       <ConfirmModal 
@@ -453,9 +453,20 @@ export const ClassesPage = () => {
         onConfirm={() => {
           if (streamToDelete) deleteStreamMutation.mutate(streamToDelete.id);
         }}
-        title="Delete Stream"
-        description={`Are you sure you want to delete ${streamToDelete?.name}?`}
+        title="Stream Termination"
+        description={`Execute termination protocol for ${streamToDelete?.name}?`}
       />
-    </div>
+
+      <ConfirmModal 
+        isOpen={subjectToDelete !== null}
+        onClose={() => setSubjectToDelete(null)}
+        onConfirm={() => {
+          if (subjectToDelete) deleteSubjectMutation.mutate(subjectToDelete.id);
+          setSubjectToDelete(null);
+        }}
+        title="Domain Deletion"
+        description={`Permanently purge ${subjectToDelete?.name} from the academic intelligence matrix?`}
+      />
+    </motion.div>
   );
 };

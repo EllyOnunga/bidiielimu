@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { GraduationCap, Lock, Mail, User, School, ArrowRight, Loader2, ChevronLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 import client from '../api/client';
 
 export const RegisterPage = () => {
@@ -17,6 +18,7 @@ export const RegisterPage = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    const regToast = toast.loading('Creating your school account...');
     try {
       const [first_name, ...rest] = formData.admin_name.trim().split(' ');
       const last_name = rest.join(' ');
@@ -30,18 +32,19 @@ export const RegisterPage = () => {
       };
       
       await client.post('accounts/register/', payload);
-      alert('Registration successful! Please login.');
+      toast.success('Registration successful! Welcome to the family.', { id: regToast });
       navigate('/login');
     } catch (error: any) {
       console.error('Registration failed', error);
       const errorData = error.response?.data;
-      const errorMsg = error.message || 'Unknown error';
+      const errorMsg = error.message || 'Check your connection';
+      
       if (errorData && typeof errorData === 'object') {
         const firstErrorKey = Object.keys(errorData)[0];
         const firstErrorMsg = Array.isArray(errorData[firstErrorKey]) ? errorData[firstErrorKey][0] : errorData[firstErrorKey];
-        alert(`Registration failed: ${firstErrorMsg}\nTarget: ${client.defaults.baseURL}`);
+        toast.error(`Failed: ${firstErrorMsg}`, { id: regToast });
       } else {
-        alert(`Registration failed: ${errorMsg}\nTarget: ${client.defaults.baseURL}`);
+        toast.error(`Failed: ${errorMsg}`, { id: regToast });
       }
     } finally {
       setIsLoading(false);
@@ -49,53 +52,60 @@ export const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0f172a] relative overflow-hidden px-4 py-12">
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary-600/20 rounded-full blur-[120px]" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary-900/20 rounded-full blur-[120px]" />
+    <div className="min-h-screen flex items-center justify-center bg-transparent relative overflow-hidden px-4 py-12">
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-primary-500/10 rounded-full blur-[120px] animate-pulse-slow" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-accent-500/10 rounded-full blur-[120px] animate-pulse-slow" />
       
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-[500px] relative z-10"
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="w-full max-w-[520px] relative z-10"
       >
-        <Link to="/" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-6 text-sm">
-          <ChevronLeft className="w-4 h-4" /> Back to Home
+        <Link to="/" className="inline-flex items-center gap-2 text-primary-400 hover:text-primary-300 transition-colors mb-8 text-sm font-semibold group">
+          <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to Home
         </Link>
-        <div className="glass-dark p-6 md:p-10 rounded-[32px] border border-white/5 shadow-2xl">
-          <div className="text-center mb-8 md:mb-10">
-            <div className="inline-flex p-3 md:p-4 bg-primary-600 rounded-2xl mb-4 md:mb-6">
-              <GraduationCap className="w-8 h-8 md:w-10 md:h-10 text-white" />
-            </div>
-            <h1 className="text-2xl md:text-4xl font-black text-white tracking-tight mb-2">Register School</h1>
-            <p className="text-slate-400 font-medium text-sm md:text-base">Start your journey with EliteEdu today</p>
+
+        <div className="glass p-8 md:p-12 rounded-[40px]">
+          <div className="text-center mb-10">
+            <motion.div 
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="inline-flex p-4 bg-primary-600 rounded-3xl mb-6 shadow-premium"
+            >
+              <GraduationCap className="w-10 h-10 text-white" />
+            </motion.div>
+            <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight mb-2">Register School</h1>
+            <p className="text-primary-200/60 font-medium text-sm md:text-base">Join the future of education management</p>
           </div>
 
-          <form onSubmit={handleRegister} className="space-y-4 md:space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={handleRegister} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-xs md:text-sm font-semibold text-slate-400 ml-1">School Name</label>
+                <label className="text-sm font-semibold text-primary-200/70 ml-1">School Name</label>
                 <div className="relative group">
-                  <School className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                  <School className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-400/50 group-focus-within:text-primary-400" />
                   <input
                     type="text"
                     required
                     value={formData.school_name}
                     onChange={(e) => setFormData({ ...formData, school_name: e.target.value })}
-                    className="w-full bg-slate-800/50 border border-slate-700/50 text-white pl-11 pr-4 py-3 rounded-2xl outline-none focus:border-primary-500 transition-all text-sm"
+                    className="w-full bg-white/5 border border-white/10 text-white pl-11 pr-4 py-3.5 rounded-2xl outline-none focus:border-primary-500 transition-all text-sm"
                     placeholder="Excellence Academy"
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-xs md:text-sm font-semibold text-slate-400 ml-1">Admin Name</label>
+                <label className="text-sm font-semibold text-primary-200/70 ml-1">Admin Name</label>
                 <div className="relative group">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-400/50 group-focus-within:text-primary-400" />
                   <input
                     type="text"
                     required
                     value={formData.admin_name}
                     onChange={(e) => setFormData({ ...formData, admin_name: e.target.value })}
-                    className="w-full bg-slate-800/50 border border-slate-700/50 text-white pl-11 pr-4 py-3 rounded-2xl outline-none focus:border-primary-500 transition-all text-sm"
+                    className="w-full bg-white/5 border border-white/10 text-white pl-11 pr-4 py-3.5 rounded-2xl outline-none focus:border-primary-500 transition-all text-sm"
                     placeholder="John Doe"
                   />
                 </div>
@@ -103,30 +113,30 @@ export const RegisterPage = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs md:text-sm font-semibold text-slate-400 ml-1">Work Email</label>
+              <label className="text-sm font-semibold text-primary-200/70 ml-1">Work Email</label>
               <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-400/50 group-focus-within:text-primary-400" />
                 <input
                   type="email"
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full bg-slate-800/50 border border-slate-700/50 text-white pl-12 pr-4 py-3 md:py-4 rounded-2xl outline-none focus:border-primary-500 transition-all text-sm md:text-base"
+                  className="w-full bg-white/5 border border-white/10 text-white pl-12 pr-4 py-4 rounded-2xl outline-none focus:border-primary-500 transition-all text-base"
                   placeholder="admin@school.com"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs md:text-sm font-semibold text-slate-400 ml-1">Password</label>
+              <label className="text-sm font-semibold text-primary-200/70 ml-1">Password</label>
               <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-400/50 group-focus-within:text-primary-400" />
                 <input
                   type="password"
                   required
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full bg-slate-800/50 border border-slate-700/50 text-white pl-12 pr-4 py-3 md:py-4 rounded-2xl outline-none focus:border-primary-500 transition-all text-sm md:text-base"
+                  className="w-full bg-white/5 border border-white/10 text-white pl-12 pr-4 py-4 rounded-2xl outline-none focus:border-primary-500 transition-all text-base"
                   placeholder="••••••••"
                 />
               </div>
@@ -135,16 +145,23 @@ export const RegisterPage = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-primary-600 hover:bg-primary-500 text-white font-bold py-3 md:py-4 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm md:text-base"
+              className="w-full bg-primary-600 hover:bg-primary-500 text-white font-bold py-4 rounded-2xl shadow-premium active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-base mt-2"
             >
-              {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <>Create Account <ArrowRight className="w-5 h-5" /></>}
+              {isLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <>
+                  Create School Profile 
+                  <ArrowRight className="w-5 h-5" />
+                </>
+              )}
             </button>
           </form>
 
-          <div className="mt-8 text-center">
-            <p className="text-slate-400 font-medium text-xs md:text-sm">
-              Already have an account?{' '}
-              <Link to="/login" className="text-primary-400 font-bold hover:text-primary-300 transition-colors">Sign In</Link>
+          <div className="mt-10 text-center">
+            <p className="text-primary-200/50 font-medium text-sm">
+              Already managing with us?{' '}
+              <Link to="/login" className="text-primary-400 font-bold hover:text-primary-300 transition-colors underline-offset-4 hover:underline">Sign In</Link>
             </p>
           </div>
         </div>
