@@ -133,7 +133,6 @@ export const ReportCardPage = () => {
       const canvas = await html2canvas(element, { 
         scale: 2,
         useCORS: true,
-        allowTaint: true,
         logging: false
       });
       const imgData = canvas.toDataURL('image/png');
@@ -149,8 +148,9 @@ export const ReportCardPage = () => {
       
       // Add a notification for the activity
       await notificationsService.getAll(); // Refresh
-    } catch {
-      toast.error('Failed to generate PDF');
+    } catch (error) {
+      console.error('PDF Generation Error:', error);
+      toast.error('Failed to generate PDF. See console for details.');
     } finally {
       setLoading(false);
     }
@@ -158,9 +158,11 @@ export const ReportCardPage = () => {
 
   return (
     <div className="space-y-6 pb-20">
-      <Breadcrumbs />
+      <div className="print:hidden">
+        <Breadcrumbs />
+      </div>
       
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 print:hidden">
         <div className="flex items-center gap-4">
           <Link to="/students" className="p-2 hover:bg-slate-800 rounded-xl transition-all">
             <ChevronLeft className="w-6 h-6 text-slate-400" />
@@ -171,14 +173,17 @@ export const ReportCardPage = () => {
           </div>
         </div>
         <div className="flex gap-2 md:gap-3">
-          <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-xl border border-slate-700 hover:bg-slate-700 transition-all text-sm">
+          <button 
+            onClick={() => window.print()}
+            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-xl border border-slate-700 hover:bg-slate-700 transition-all text-sm print:hidden"
+          >
             <Printer className="w-4 h-4" />
             Print
           </button>
           <button
             onClick={generatePDF}
             disabled={loading || fetching}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 bg-primary-600 hover:bg-primary-500 text-white rounded-xl font-bold shadow-lg transition-all disabled:opacity-50 text-sm"
+            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 bg-primary-600 hover:bg-primary-500 text-white rounded-xl font-bold shadow-lg transition-all disabled:opacity-50 text-sm print:hidden"
           >
             <Download className="w-4 h-4" />
             {loading ? 'Generating...' : 'Download PDF'}
