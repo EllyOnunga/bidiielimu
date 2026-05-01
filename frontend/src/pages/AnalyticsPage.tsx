@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
-  LineChart, Line, PieChart, Pie, Cell, Legend, AreaChart, Area 
+  PieChart, Pie, Cell, Legend, AreaChart, Area 
 } from 'recharts';
 import { Users, Calendar, Award, FileDown } from 'lucide-react';
 import client from '../api/client';
@@ -192,7 +192,5 @@ export const AnalyticsPage = () => {
         </motion.div>
       </div>
     </motion.div>
-  );
-};
   );
 };
