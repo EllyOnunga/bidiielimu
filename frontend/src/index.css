@@ -113,13 +113,13 @@ body {
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border-color);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
 
-@utility glass-interactive:hover {
-  background: oklch(1 0 0 / 0.05);
-  transform: translateY(-2px);
-  border-color: oklch(1 0 0 / 0.2);
-  box-shadow: var(--shadow-premium);
+  &:hover {
+    background: oklch(1 0 0 / 0.05);
+    transform: translateY(-2px);
+    border-color: oklch(1 0 0 / 0.2);
+    box-shadow: var(--shadow-premium);
+  }
 }
 
 @utility text-gradient {
