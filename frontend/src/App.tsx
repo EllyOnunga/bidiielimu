@@ -56,12 +56,12 @@ function App() {
           position="top-right"
           toastOptions={{
             style: {
-              background: 'oklch(0.16 0.03 240 / 0.8)',
-              color: 'oklch(0.98 0.01 240)',
+              background: 'rgba(30, 41, 59, 0.8)',
+              color: '#f8fafc',
               backdropFilter: 'blur(16px)',
-              border: '1px solid oklch(1 0 0 / 0.1)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
               borderRadius: '16px',
-              boxShadow: '0 8px 32px 0 oklch(0 0 0 / 0.37)',
+              boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
             },
           }}
         />

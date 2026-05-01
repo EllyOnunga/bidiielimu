@@ -207,24 +207,24 @@ export const DashboardPage = () => {
                   <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="oklch(0.55 0.22 240)" stopOpacity={0.4} />
-                        <stop offset="95%" stopColor="oklch(0.55 0.22 240)" stopOpacity={0} />
+                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4} />
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="oklch(1 0 0 / 0.05)" vertical={false} />
-                    <XAxis dataKey="name" stroke="oklch(1 0 0 / 0.2)" fontSize={11} tickMargin={15} axisLine={false} tickLine={false} fontWeight="bold" />
-                    <YAxis stroke="oklch(1 0 0 / 0.2)" fontSize={11} tickFormatter={(val) => `KSh ${val / 1000}k`} axisLine={false} tickLine={false} fontWeight="bold" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" vertical={false} />
+                    <XAxis dataKey="name" stroke="rgba(255, 255, 255, 0.2)" fontSize={11} tickMargin={15} axisLine={false} tickLine={false} fontWeight="bold" />
+                    <YAxis stroke="rgba(255, 255, 255, 0.2)" fontSize={11} tickFormatter={(val) => `KSh ${val / 1000}k`} axisLine={false} tickLine={false} fontWeight="bold" />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: 'oklch(0.16 0.03 240 / 0.9)',
+                        backgroundColor: 'rgba(30, 41, 59, 0.9)',
                         backdropFilter: 'blur(16px)',
-                        border: '1px solid oklch(1 0 0 / 0.1)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
                         borderRadius: '16px',
                         boxShadow: 'var(--shadow-premium)'
                       }}
                       itemStyle={{ color: '#fff', fontWeight: '900', fontSize: '14px' }}
                     />
-                    <Area type="monotone" dataKey="value" stroke="oklch(0.55 0.22 240)" strokeWidth={4} fillOpacity={1} fill="url(#colorValue)" />
+                    <Area type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={4} fillOpacity={1} fill="url(#colorValue)" />
                   </AreaChart>
                 </ResponsiveContainer>
               )}

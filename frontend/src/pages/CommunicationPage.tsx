@@ -4,7 +4,6 @@ import toast from 'react-hot-toast';
 import client from '../api/client';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { Breadcrumbs } from '../components/ui/Breadcrumbs';
 
 export const CommunicationPage = () => {
   const [activeTab, setActiveTab] = useState<'email' | 'sms'>('email');
@@ -47,7 +46,6 @@ export const CommunicationPage = () => {
 
   return (
     <div className="space-y-8 pb-20">
-      <Breadcrumbs />
 
       <div>
         <h1 className="text-3xl font-bold text-white tracking-tight">Communication Center</h1>

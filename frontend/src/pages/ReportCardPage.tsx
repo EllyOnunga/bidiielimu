@@ -5,7 +5,6 @@ import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import toast from 'react-hot-toast';
 import client from '../api/client';
-import { Breadcrumbs } from '../components/ui/Breadcrumbs';
 import { Skeleton } from '../components/ui/Skeleton';
 import { notificationsService } from '../api/services/notificationsService';
 
@@ -158,10 +157,6 @@ export const ReportCardPage = () => {
 
   return (
     <div className="space-y-6 pb-20">
-      <div className="print:hidden">
-        <Breadcrumbs />
-      </div>
-      
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 print:hidden">
         <div className="flex items-center gap-4">
           <Link to="/students" className="p-2 hover:bg-slate-800 rounded-xl transition-all">

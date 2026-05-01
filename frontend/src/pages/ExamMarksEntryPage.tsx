@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import client from '../api/client';
 import { examsService } from '../api/services/examsService';
-import { Breadcrumbs } from '../components/ui/Breadcrumbs';
 import { TableSkeleton } from '../components/ui/Skeleton';
 
 interface StudentData {
@@ -117,7 +116,6 @@ export const ExamMarksEntryPage = () => {
 
   return (
     <div className="space-y-6 md:space-y-8 pb-20">
-      <Breadcrumbs />
       
       <div className="flex items-center gap-4">
         <Link to="/exams" className="p-2 hover:bg-slate-800 rounded-xl transition-all">
