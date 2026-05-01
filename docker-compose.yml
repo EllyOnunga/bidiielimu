@@ -1,0 +1,64 @@
+services:
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=bidiielimu
+      - POSTGRES_USER=bidii_user
+      - POSTGRES_PASSWORD=bidii_password
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  backend:
+    build: ./backend
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn --bind 0.0.0.0:8000 --timeout 120 --access-logfile - config.wsgi:application"
+    volumes:
+      - ./backend:/app
+    environment:
+      - DATABASE_URL=postgres://bidii_user:bidii_password@db:5432/bidiielimu
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - REDIS_URL=redis://redis:6379/1
+      - DEBUG=False
+      - SECRET_KEY=ng5p%t*ndp+kdc(!y44whdfl^46k7wag2#tk4uyhml=@we8uvl
+      - ALLOWED_HOSTS=localhost,127.0.0.1,backend
+      - CORS_ALLOWED_ORIGINS=http://localhost,http://127.0.0.1,http://localhost:80,http://localhost:5173
+      - SECURE_SSL_REDIRECT=False
+      - SESSION_COOKIE_SECURE=False
+      - CSRF_COOKIE_SECURE=False
+    depends_on:
+      - db
+      - redis
+    ports:
+      - "8000:8000"
+
+  celery:
+    build: ./backend
+    command: celery -A config worker -l info
+    volumes:
+      - ./backend:/app
+    environment:
+      - DATABASE_URL=postgres://bidii_user:bidii_password@db:5432/bidiielimu
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - REDIS_URL=redis://redis:6379/1
+    depends_on:
+      - db
+      - redis
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
