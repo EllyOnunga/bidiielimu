@@ -36,7 +36,10 @@ if not SECRET_KEY:
         raise ValueError("SECRET_KEY must be set in production environments (DEBUG=False).")
     SECRET_KEY = 'django-insecure-7t3$*uz#t-&3*q!8c7xbar+wia=+9c)*&e#bfa=^1pih-f)&=4'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+if DEBUG:
+    ALLOWED_HOSTS = ['*']
+else:
+    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 # Security Settings (Enforced in Production)
 SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', str(not DEBUG)) == 'True'
