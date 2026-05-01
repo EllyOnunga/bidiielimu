@@ -158,7 +158,7 @@ AUTHENTICATION_BACKENDS = [
 
 # Allauth Settings
 ACCOUNT_LOGIN_METHODS = {'email'}
-ACCOUNT_SIGNUP_FIELDS = ['email', 'first_name', 'last_name']
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'first_name', 'last_name']
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
