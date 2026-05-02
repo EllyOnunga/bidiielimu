@@ -24,7 +24,7 @@ export const mobileService = {
     try {
       const result = await NativeBiometric.isAvailable();
       return result.isAvailable;
-    } catch (e) {
+    } catch (_) {
       return false;
     }
   },
@@ -39,7 +39,7 @@ export const mobileService = {
         description: 'Use your fingerprint or face to log in',
       });
       return true;
-    } catch (e) {
+    } catch (_) {
       return false;
     }
   },
@@ -63,7 +63,7 @@ export const mobileService = {
       return await NativeBiometric.getCredentials({
         server: 'bidii-elimu.com',
       });
-    } catch (e) {
+    } catch (_) {
       return null;
     }
   }

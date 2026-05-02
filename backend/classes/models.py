@@ -1,11 +1,7 @@
 from django.db import models
 
 class GradeLevel(models.Model):
-    school = models.ForeignKey('schools.School', on_delete=models.CASCADE, related_name='grade_levels')
     name = models.CharField(max_length=50) # e.g., Grade 1, Grade 2, Class 8
-    
-    class Meta:
-        unique_together = ('school', 'name')
 
     def __str__(self):
         return self.name
@@ -19,18 +15,36 @@ class Stream(models.Model):
         return f"{self.grade_level.name} {self.name}"
 
 class Subject(models.Model):
-    school = models.ForeignKey('schools.School', on_delete=models.CASCADE, related_name='subjects')
+    CURRICULUM_CHOICES = (
+        ('CBC', 'Kenya CBC'),
+        ('KCSE', 'Kenya KCSE'),
+        ('IGCSE', 'Pearson Edexcel IGCSE'),
+    )
     name = models.CharField(max_length=100) # e.g., Mathematics, English, Science
     code = models.CharField(max_length=20, null=True, blank=True)
-
-    class Meta:
-        unique_together = ('school', 'name')
+    curriculum = models.CharField(max_length=10, choices=CURRICULUM_CHOICES, default='CBC')
 
     def __str__(self):
         return self.name
 
+class Strand(models.Model):
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='strands')
+    name = models.CharField(max_length=200)
+    description = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.subject.name} - {self.name}"
+
+class SubStrand(models.Model):
+    strand = models.ForeignKey(Strand, on_delete=models.CASCADE, related_name='sub_strands')
+    name = models.CharField(max_length=200)
+    learning_outcome = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.strand.name} - {self.name}"
+
+
 class SubjectAssignment(models.Model):
-    school = models.ForeignKey('schools.School', on_delete=models.CASCADE, related_name='subject_assignments')
     teacher = models.ForeignKey('teachers.Teacher', on_delete=models.CASCADE, related_name='subject_assignments')
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='assignments')
     stream = models.ForeignKey(Stream, on_delete=models.CASCADE, related_name='subject_assignments')
@@ -42,7 +56,6 @@ class SubjectAssignment(models.Model):
         return f"{self.teacher} - {self.subject} ({self.stream})"
 
 class Classroom(models.Model):
-    school = models.ForeignKey('schools.School', on_delete=models.CASCADE, related_name='classrooms')
     name = models.CharField(max_length=50)
     capacity = models.IntegerField(default=40)
 
@@ -108,3 +121,26 @@ class ScheduleSlot(models.Model):
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
+
+class CurriculumRequirement(models.Model):
+    grade_level = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, related_name='requirements')
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    weekly_periods = models.IntegerField(default=5) # e.g. 5 periods of 40 mins
+    
+    class Meta:
+        unique_together = ('grade_level', 'subject')
+
+    def __str__(self):
+        return f"{self.grade_level.name} - {self.subject.name} ({self.weekly_periods} periods)"
+
+class Substitution(models.Model):
+    schedule_slot = models.ForeignKey(ScheduleSlot, on_delete=models.CASCADE, related_name='substitutions')
+    original_teacher = models.ForeignKey('teachers.Teacher', on_delete=models.CASCADE, related_name='substitutions_given')
+    substitute_teacher = models.ForeignKey('teachers.Teacher', on_delete=models.CASCADE, related_name='substitutions_taken')
+    date = models.DateField()
+    reason = models.CharField(max_length=255, null=True, blank=True)
+    is_confirmed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Substitution: {self.substitute_teacher} for {self.original_teacher} on {self.date}"
+

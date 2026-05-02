@@ -1,31 +1,37 @@
-# Use official Python runtime as a parent image
-FROM python:3.12-slim
+# Stage 1: Build dependencies
+FROM python:3.11-slim as builder
 
-# Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# Set work directory
 WORKDIR /app
 
-# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt
+
+# Stage 2: Final image
+FROM python:3.11-slim
+
+WORKDIR /app
+
 RUN apt-get update && apt-get install -y \
     libpq-dev \
-    gcc \
-    --no-install-recommends && \
-    rm -rf /var/lib/apt/lists/*
+    netcat-openbsd \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
-COPY requirements.txt /app/
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir --default-timeout=1000 --retries 10 -r requirements.txt
-RUN pip install --no-cache-dir --default-timeout=1000 --retries 10 gunicorn
+COPY --from=builder /app/wheels /wheels
+COPY --from=builder /app/requirements.txt .
 
-# Copy project
-COPY . /app/
+RUN pip install --no-cache /wheels/*
 
-# Expose port
-EXPOSE 8000
+COPY . .
 
-# Run gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "config.wsgi:application"]
+# Execution script
+RUN chmod +x /app/entrypoint.sh
+
+ENTRYPOINT ["/app/entrypoint.sh"]

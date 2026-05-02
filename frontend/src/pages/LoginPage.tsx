@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import client from '../api/client';
 import { useAuthStore } from '../store/authStore';
 import { mobileService } from '../services/mobileService';
+import { useTheme } from '../contexts/ThemeContext';
 
 declare global {
   interface Window {
@@ -19,6 +20,7 @@ export const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [biometricAvailable, setBiometricAvailable] = useState(false);
   const navigate = useNavigate();
+  const { schoolName, logoUrl } = useTheme();
   const setAuth = useAuthStore((state) => state.setAuth);
 
   useEffect(() => {
@@ -125,9 +127,13 @@ export const LoginPage = () => {
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="inline-flex p-4 bg-primary-600 rounded-3xl mb-6 shadow-premium"
+              className="inline-flex w-20 h-20 bg-primary-600 rounded-3xl mb-6 shadow-premium items-center justify-center overflow-hidden border border-white/10"
             >
-              <GraduationCap className="w-10 h-10 text-white" />
+              {logoUrl ? (
+                <img src={logoUrl} alt={schoolName} className="w-full h-full object-cover" />
+              ) : (
+                <GraduationCap className="w-10 h-10 text-white" />
+              )}
             </motion.div>
             <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight mb-3">Welcome Back</h1>
             <p className="text-primary-200/60 font-medium text-sm md:text-base">Experience the next generation of school management</p>
@@ -176,7 +182,7 @@ export const LoginPage = () => {
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 <>
-                  Sign In to BidiiElimu
+                  Sign In to {schoolName}
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </>
               )}
@@ -209,7 +215,7 @@ export const LoginPage = () => {
 
           <div className="mt-10 text-center">
             <p className="text-primary-200/50 font-medium text-sm">
-              New to BidiiElimu?{' '}
+              New to {schoolName}?{' '}
               <Link to="/register" className="text-primary-400 font-bold hover:text-primary-300 transition-colors underline-offset-4 hover:underline">Create an Account</Link>
             </p>
           </div>

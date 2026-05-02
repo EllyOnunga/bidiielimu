@@ -20,7 +20,10 @@ class UserManager(BaseUserManager):
 
 class User(AbstractUser):
     ROLES = (
+        ('SUPER_ADMIN', 'Platform Super Admin'),
         ('ADMIN', 'School Admin'),
+        ('PRINCIPAL', 'Principal'),
+        ('HOD', 'Head of Department'),
         ('TEACHER', 'Teacher'),
         ('STUDENT', 'Student'),
         ('PARENT', 'Parent'),

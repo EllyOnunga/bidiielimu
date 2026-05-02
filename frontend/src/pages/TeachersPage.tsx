@@ -524,7 +524,7 @@ const TeacherAssignmentsModal = ({ isOpen, onClose, teacher }: { isOpen: boolean
                       await classesService.createSubject({ name });
                       queryClient.invalidateQueries({ queryKey: ['subjects'] });
                       toast.success('Domain Added');
-                    } catch (e) {
+                    } catch (_) {
                       toast.error('Induction Failed');
                     }
                   }

@@ -19,9 +19,10 @@ import {
   Calendar,
   ShieldAlert,
   Settings,
-  TrendingUp,
   MessageSquare,
-  Layers
+  Box,
+  Scale,
+  BrainCircuit
 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { ThemeToggle } from '../components/ThemeToggle';
@@ -30,7 +31,7 @@ import { Breadcrumbs } from '../components/ui/Breadcrumbs';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { notificationsService } from '../api/services/notificationsService';
 import { useState } from 'react';
-import client from '../api/client';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface NavItemProps {
   to: string;
@@ -91,8 +92,8 @@ const SidebarContent = ({ user, schoolName, schoolLogo, setIsSidebarOpen, handle
           )}
         </div>
         <div className="min-w-0">
-          <h1 className="text-lg font-black text-white tracking-tight truncate w-32" title={schoolName}>
-            {schoolName || 'BidiiElimu'}
+          <h1 className="text-lg font-black text-white tracking-tight truncate w-32 font-serif" title={schoolName}>
+            {schoolName || 'Scholara'}
           </h1>
           <p className="text-[10px] font-bold text-primary-400/60 uppercase tracking-widest">{user?.role} PORTAL</p>
         </div>
@@ -112,29 +113,38 @@ const SidebarContent = ({ user, schoolName, schoolLogo, setIsSidebarOpen, handle
 
       {(user?.role === 'ADMIN' || user?.role === 'TEACHER') && (
         <>
-          <NavItem to="/students" icon={Users} label="Students" onClick={() => setIsSidebarOpen(false)} />
-          <NavItem to="/classes" icon={BookOpen} label="Classes" onClick={() => setIsSidebarOpen(false)} />
-          <NavItem to="/exams" icon={ClipboardList} label="Exams" onClick={() => setIsSidebarOpen(false)} />
+          <div className="pt-4 pb-2 px-4 text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">Academic</div>
+          <NavItem to="/students" icon={Users} label="Student Info (SIS)" onClick={() => setIsSidebarOpen(false)} />
+          <NavItem to="/lms" icon={BookOpen} label="LMS & Classes" onClick={() => setIsSidebarOpen(false)} />
+          <NavItem to="/exams" icon={ClipboardList} label="Exams & Grading" onClick={() => setIsSidebarOpen(false)} />
           <NavItem to="/attendance" icon={CheckSquare} label="Attendance" onClick={() => setIsSidebarOpen(false)} />
+          <NavItem to="/timetable" icon={Calendar} label="Timetable" onClick={() => setIsSidebarOpen(false)} />
         </>
       )}
 
       {user?.role === 'ADMIN' && (
         <>
-          <NavItem to="/teachers" icon={UserSquare2} label="Teachers" onClick={() => setIsSidebarOpen(false)} />
-          <NavItem to="/fees" icon={Wallet} label="Fees" onClick={() => setIsSidebarOpen(false)} />
-          <NavItem to="/super-admin" icon={Shield} label="Super-Admin" onClick={() => setIsSidebarOpen(false)} />
-          <NavItem to="/analytics" icon={TrendingUp} label="Analytics" onClick={() => setIsSidebarOpen(false)} />
+          <div className="pt-4 pb-2 px-4 text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">Operations</div>
+          <NavItem to="/finance" icon={Wallet} label="Finance & Fees" onClick={() => setIsSidebarOpen(false)} />
+          <NavItem to="/hr" icon={UserSquare2} label="Staff & HR" onClick={() => setIsSidebarOpen(false)} />
+          <NavItem to="/inventory" icon={Box} label="Inventory" onClick={() => setIsSidebarOpen(false)} />
+          <NavItem to="/discipline" icon={Scale} label="Discipline" onClick={() => setIsSidebarOpen(false)} />
+
+          <div className="pt-4 pb-2 px-4 text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">Intelligence</div>
+          <NavItem to="/analytics" icon={BrainCircuit} label="AI Analytics" onClick={() => setIsSidebarOpen(false)} />
+
+          <div className="pt-4 pb-2 px-4 text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">System</div>
           <NavItem to="/communication" icon={MessageSquare} label="Communication" onClick={() => setIsSidebarOpen(false)} />
-          <NavItem to="/grading" icon={Layers} label="Grading Systems" onClick={() => setIsSidebarOpen(false)} />
+          <NavItem to="/super-admin" icon={Shield} label="Super-Admin" onClick={() => setIsSidebarOpen(false)} />
           <NavItem to="/audit-logs" icon={ShieldAlert} label="Audit Logs" onClick={() => setIsSidebarOpen(false)} />
         </>
       )}
 
-      <NavItem to="/timetable" icon={Calendar} label="Timetable" onClick={() => setIsSidebarOpen(false)} />
-
       {(user?.role === 'STUDENT' || user?.role === 'PARENT') && (
-        <NavItem to="/portal" icon={LayoutDashboard} label="Portal View" onClick={() => setIsSidebarOpen(false)} />
+        <>
+          <NavItem to="/portal" icon={LayoutDashboard} label="Portal View" onClick={() => setIsSidebarOpen(false)} />
+          <NavItem to="/timetable" icon={Calendar} label="Timetable" onClick={() => setIsSidebarOpen(false)} />
+        </>
       )}
     </nav>
 
@@ -156,6 +166,7 @@ export const MainLayout = () => {
   const queryClient = useQueryClient();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const { schoolName, logoUrl } = useTheme();
   const logout = useAuthStore((state) => state.logout);
   const user = useAuthStore((state) => state.user);
 
@@ -164,17 +175,6 @@ export const MainLayout = () => {
     queryFn: notificationsService.getAll,
     select: (data) => Array.isArray(data) ? data : (data.results || []),
     refetchInterval: 30000,
-  });
-
-  const { data: schoolInfo = { name: '', logo: '' } } = useQuery({
-    queryKey: ['school_settings'],
-    queryFn: async () => {
-      const res = await client.get('schools/settings/');
-      return {
-        name: res.data.school_name || '',
-        logo: res.data.school_logo || ''
-      };
-    },
   });
 
   const markAllReadMutation = useMutation({
@@ -226,8 +226,8 @@ export const MainLayout = () => {
       `}>
         <SidebarContent
           user={user}
-          schoolName={schoolInfo.name}
-          schoolLogo={schoolInfo.logo}
+          schoolName={schoolName}
+          schoolLogo={logoUrl || ''}
           setIsSidebarOpen={setIsSidebarOpen}
           handleLogout={handleLogout}
         />

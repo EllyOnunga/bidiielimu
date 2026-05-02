@@ -1,78 +1,131 @@
-# BidiiElimu
+# Scholara — Enterprise School Management SaaS
 
-**BidiiElimu** is a comprehensive, multi-tenant SaaS School Management Platform designed to streamline administrative tasks, enhance communication between teachers, students, and parents, and provide robust analytics and grading systems.
+> A world-class, AI-powered, multi-tenant School Information System built for East & West Africa.
 
-## Features
+---
 
-- **Role-Based Access Control (RBAC):** Dedicated portals and secure access for Super Admins, School Admins, Teachers, Students, and Parents.
-- **Academic Management:** Comprehensive tools for managing classes, subjects, exams, grading, and generating report cards.
-- **Attendance Tracking:** Easy attendance marking and reporting.
-- **Financial Management:** Track fee payments, balances, and financial reporting.
-- **Communication Hub:** Built-in messaging and notifications to keep stakeholders informed.
-- **Analytics Dashboard:** Real-time insights into school performance, student demographics, and financial health.
-- **Audit Logging:** System-wide tracking of critical administrative actions.
+## 🏗 Architecture
 
-## Technology Stack
+```
+Client (React PWA / React Native)
+        ↓  HTTPS / WSS
+  Nginx (Reverse Proxy + SSL)
+        ↓  Tenant subdomain routing
+  Django REST Framework (Daphne ASGI)
+        ↓  django-tenants middleware
+  PostgreSQL 16 (Schema-per-Tenant)
+        ↑  Async tasks       ↑ Cache
+  Celery Workers           Redis 7
+```
 
-- **Backend:** Python, Django 6, Django REST Framework, Celery, Redis, PostgreSQL/SQLite.
-- **Frontend:** React 19, TypeScript, Vite, Tailwind CSS, Zustand (State Management), React Query.
-- **Mobile/Native:** Capacitor (Android).
+## 📦 Stack
 
-## Project Structure
+| Layer | Technology |
+|---|---|
+| Backend | Django 6, DRF, Daphne (ASGI) |
+| Real-time | Django Channels, Redis |
+| Database | PostgreSQL 16 (per-tenant schemas) |
+| Task Queue | Celery + Redis |
+| Frontend | Vite, React 19, Tailwind CSS v4 |
+| Mobile | React Native (Expo) |
+| DevOps | Docker, GitHub Actions, Nginx |
+| Payments | M-Pesa Daraja, Stripe |
+| SMS | Africa's Talking |
+| AI | scikit-learn, pandas |
 
-- `/backend/` - Django REST API codebase, settings, models, and celery workers.
-- `/frontend/` - React SPA (Single Page Application) built with Vite and Tailwind.
+---
 
-## Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
-- Python 3.10+
-- Node.js 18+
-- Redis (for caching and celery workers, optional for basic dev)
+- Docker Desktop 24+
+- `make` (or run commands manually)
 
-### Backend Setup
+### 1. Clone & Configure
+```bash
+git clone https://github.com/your-org/scholara.git
+cd scholara
+cp .env.example .env
+# Edit .env with your credentials
+```
 
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
-2. Set up the Python virtual environment:
-   ```bash
-   python -m venv venv
-   # Windows
-   .\venv\Scripts\activate
-   # Linux/Mac
-   source venv/bin/activate
-   ```
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Run database migrations:
-   ```bash
-   python manage.py migrate
-   ```
-5. Start the development server:
-   ```bash
-   python manage.py runserver
-   ```
+### 2. Development (with live reload)
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+```
+- **Frontend:** http://localhost:5173
+- **Backend API:** http://localhost:8000/api/v1/
+- **API Docs:** http://localhost:8000/api/v1/docs/
 
-### Frontend Setup
+### 3. Production
+```bash
+make build   # Build all images
+make up      # Start all services
+make migrate # Run DB migrations
+make superuser # Create admin account
+```
 
-1. Navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
-The frontend will typically run on `http://localhost:5173/`.
+---
 
-## API Documentation
-Once the backend is running, the interactive Swagger UI API documentation can be accessed at:
-- `http://localhost:8000/api/schema/swagger-ui/`
+## 🔑 Useful Commands
+
+```bash
+make help           # Full command reference
+make logs           # Tail all logs
+make shell-backend  # Django shell
+make shell-db       # psql session
+make test           # Run test suite
+make clean          # Full teardown
+```
+
+---
+
+## 🔒 Security
+
+- **Cross-Tenant Isolation:** `TenantAccessMiddleware` hard-blocks users from accessing other schools' subdomains.
+- **RBAC:** 7 roles — Super Admin, Admin, Principal, HOD, Teacher, Parent, Student.
+- **Data Privacy:** QuerySet-level isolation ensures Parents only see their own children's records.
+- **JWT:** Stateless authentication with refresh token rotation.
+- **SSL:** Auto-renewed via Certbot/Let's Encrypt.
+
+---
+
+## 🌍 Multi-Tenancy
+
+Each school gets its own PostgreSQL schema:
+
+```
+public (shared)        → scholara.app
+pg_school_greenwood    → greenwood.scholara.app
+pg_school_stmarys      → stmarys.scholara.app
+```
+
+To onboard a new school:
+```bash
+docker compose exec backend python manage.py create_tenant \
+  --schema_name=greenwood \
+  --name="Greenwood Academy" \
+  --domain=greenwood.scholara.app
+```
+
+---
+
+## 📋 Modules
+
+| Module | Features |
+|---|---|
+| SIS | Admissions, CBC support, Guardians |
+| Exams | CATs, End-of-term, Bulk mark entry, Rankings |
+| Attendance | Daily marking, SMS alerts |
+| Finance | Fee structures, M-Pesa STK Push, Ledger |
+| HR | Staff directory, Payroll, Leave, P9 |
+| Inventory | Stock tracking, Low-stock alerts |
+| Analytics | AI grade prediction, Performance trends |
+| Communication | Bulk SMS, Notice board, WebSocket notifications |
+| Parent Portal | PWA, Offline support, Real-time updates |
+
+---
+
+## 📄 License
+
+Proprietary — All Rights Reserved © Scholara 2024

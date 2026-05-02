@@ -26,7 +26,7 @@ const getStoredUser = () => {
   const user = localStorage.getItem('user');
   try {
     return user ? JSON.parse(user) : null;
-  } catch (e) {
+  } catch (_) {
     return null;
   }
 };

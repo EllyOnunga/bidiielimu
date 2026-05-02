@@ -34,6 +34,8 @@ class FeePaymentViewSet(viewsets.ModelViewSet):
         qs = FeePayment.objects.filter(student__school=user.school).select_related('student__user', 'received_by')
         if user.role == 'STUDENT':
             qs = qs.filter(student__user=user)
+        elif user.role == 'PARENT':
+            qs = qs.filter(student__guardians__email=user.email)
         return qs
 
     def perform_create(self, serializer):
@@ -60,6 +62,8 @@ class FeePaymentViewSet(viewsets.ModelViewSet):
         
         if request.user.role == 'STUDENT':
             students = students.filter(user=request.user)
+        elif request.user.role == 'PARENT':
+            students = students.filter(guardians__email=request.user.email)
         
         # Pre-fetch fee structures for the school to avoid N+1 inside the loop
         structures = FeeStructure.objects.filter(school=school).values('grade_level_id').annotate(

@@ -1,0 +1,54 @@
+# docker-compose.dev.yml — Local Development Override
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+version: '3.9'
+
+services:
+
+  db:
+    ports:
+      - "5432:5432"
+
+  redis:
+    ports:
+      - "6379:6379"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app       # live code reload in dev
+    environment:
+      DEBUG: "True"
+    ports:
+      - "8000:8000"
+
+  celery_worker:
+    command: celery -A config worker --loglevel=debug --concurrency=2
+    volumes:
+      - ./backend:/app
+
+  # No celery_beat needed in dev
+  celery_beat:
+    profiles: ["beat"]   # opt-in only
+
+  # No nginx in dev — backend serves directly
+  nginx:
+    profiles: ["prod"]   # opt-in only in prod
+
+  certbot:
+    profiles: ["prod"]
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm run dev -- --host 0.0.0.0
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: "http://localhost:8000/api/v1/"

@@ -39,7 +39,18 @@ const GuidePage = lazy(() => import('./pages/GuidePage').then(m => ({ default: m
 const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage').then(m => ({ default: m.ForgotPasswordPage })));
 const ResetPasswordConfirmPage = lazy(() => import('./pages/ResetPasswordConfirmPage').then(m => ({ default: m.ResetPasswordConfirmPage })));
 
+// New Internal Modules
+const MarkEntryPage = lazy(() => import('./pages/MarkEntryPage').then(m => ({ default: m.MarkEntryPage })));
+const SubjectAnalyticsPage = lazy(() => import('./pages/SubjectAnalyticsPage').then(m => ({ default: m.SubjectAnalyticsPage })));
+const FinanceLedgerPage = lazy(() => import('./pages/FinanceLedgerPage').then(m => ({ default: m.FinanceLedgerPage })));
+const MPesaGatewayPage = lazy(() => import('./pages/MPesaGatewayPage').then(m => ({ default: m.MPesaGatewayPage })));
+const StaffDirectoryPage = lazy(() => import('./pages/StaffDirectoryPage').then(m => ({ default: m.StaffDirectoryPage })));
+const PayrollPage = lazy(() => import('./pages/PayrollPage').then(m => ({ default: m.PayrollPage })));
+const InventoryPage = lazy(() => import('./pages/InventoryPage').then(m => ({ default: m.InventoryPage })));
+const AccessControlPage = lazy(() => import('./pages/AccessControlPage').then(m => ({ default: m.AccessControlPage })));
+
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -53,99 +64,127 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            style: {
-              background: 'rgba(30, 41, 59, 0.8)',
-              color: '#f8fafc',
-              backdropFilter: 'blur(16px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '16px',
-              boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
-            },
-          }}
-        />
-        <ErrorBoundary>
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-            {/* ── Public / Marketing Routes ── */}
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/reset-password/:uid/:token" element={<ResetPasswordConfirmPage />} />
-            <Route path="/solutions" element={<SolutionsPage />} />
-            <Route path="/pricing" element={<PricingPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/careers" element={<CareersPage />} />
-            <Route path="/terms" element={<TermsPage />} />
-            <Route path="/privacy" element={<PrivacyPage />} />
-            <Route path="/cookies" element={<CookiePolicyPage />} />
-            <Route path="/guide" element={<GuidePage />} />
+      <ThemeProvider>
+        <Router>
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              style: {
+                background: 'rgba(30, 41, 59, 0.8)',
+                color: '#f8fafc',
+                backdropFilter: 'blur(16px)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '16px',
+                boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+              },
+            }}
+          />
+          <ErrorBoundary>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+              {/* ── Public / Marketing Routes ── */}
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/reset-password/:uid/:token" element={<ResetPasswordConfirmPage />} />
+              <Route path="/solutions" element={<SolutionsPage />} />
+              <Route path="/pricing" element={<PricingPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/careers" element={<CareersPage />} />
+              <Route path="/terms" element={<TermsPage />} />
+              <Route path="/privacy" element={<PrivacyPage />} />
+              <Route path="/cookies" element={<CookiePolicyPage />} />
+              <Route path="/guide" element={<GuidePage />} />
 
-            <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
-              <Route path="/dashboard" element={
-                <ProtectedRoute allowedRoles={['ADMIN', 'TEACHER']}><DashboardPage /></ProtectedRoute>
-              } />
-              <Route path="/students" element={
-                <ProtectedRoute allowedRoles={['ADMIN', 'TEACHER']}><StudentsPage /></ProtectedRoute>
-              } />
-              <Route path="/students/:id/report" element={
-                <ProtectedRoute allowedRoles={['ADMIN', 'TEACHER', 'STUDENT', 'PARENT']}><ReportCardPage /></ProtectedRoute>
-              } />
-              <Route path="/teachers" element={
-                <ProtectedRoute allowedRoles={['ADMIN']}><TeachersPage /></ProtectedRoute>
-              } />
-              <Route path="/classes" element={
-                <ProtectedRoute allowedRoles={['ADMIN', 'TEACHER']}><ClassesPage /></ProtectedRoute>
-              } />
-              <Route path="/classes/:streamId" element={
-                <ProtectedRoute allowedRoles={['ADMIN', 'TEACHER']}><ClassDetailPage /></ProtectedRoute>
-              } />
-              <Route path="/fees" element={
-                <ProtectedRoute allowedRoles={['ADMIN']}><FeesPage /></ProtectedRoute>
-              } />
-              <Route path="/exams" element={
-                <ProtectedRoute allowedRoles={['ADMIN', 'TEACHER']}><ExamsPage /></ProtectedRoute>
-              } />
-              <Route path="/exams/entry" element={
-                <ProtectedRoute allowedRoles={['ADMIN', 'TEACHER']}><ExamMarksEntryPage /></ProtectedRoute>
-              } />
-              <Route path="/attendance" element={
-                <ProtectedRoute allowedRoles={['ADMIN', 'TEACHER']}><AttendancePage /></ProtectedRoute>
-              } />
-              <Route path="/attendance/mark" element={
-                <ProtectedRoute allowedRoles={['ADMIN', 'TEACHER']}><AttendanceMarkingPage /></ProtectedRoute>
-              } />
-              <Route path="/portal" element={<PortalDashboard />} />
-              <Route path="/super-admin" element={
-                <ProtectedRoute allowedRoles={['ADMIN']}><SuperAdminPage /></ProtectedRoute>
-              } />
-              <Route path="/timetable" element={
-                <ProtectedRoute allowedRoles={['ADMIN', 'TEACHER', 'STUDENT', 'PARENT']}><TimetablePage /></ProtectedRoute>
-              } />
-              <Route path="/audit-logs" element={
-                <ProtectedRoute allowedRoles={['ADMIN']}><AuditLogPage /></ProtectedRoute>
-              } />
-              <Route path="/analytics" element={
-                <ProtectedRoute allowedRoles={['ADMIN']}><AnalyticsPage /></ProtectedRoute>
-              } />
-              <Route path="/communication" element={
-                <ProtectedRoute allowedRoles={['ADMIN']}><CommunicationPage /></ProtectedRoute>
-              } />
-              <Route path="/grading" element={
-                <ProtectedRoute allowedRoles={['ADMIN']}><GradingPage /></ProtectedRoute>
-              } />
-              <Route path="/settings" element={<SettingsPage />} />
-            </Route>
+              <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
+                <Route path="/dashboard" element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'TEACHER']}><DashboardPage /></ProtectedRoute>
+                } />
+                <Route path="/students" element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'TEACHER']}><StudentsPage /></ProtectedRoute>
+                } />
+                <Route path="/students/:id/report" element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'TEACHER', 'STUDENT', 'PARENT']}><ReportCardPage /></ProtectedRoute>
+                } />
+                <Route path="/teachers" element={
+                  <ProtectedRoute allowedRoles={['ADMIN']}><TeachersPage /></ProtectedRoute>
+                } />
+                <Route path="/classes" element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'TEACHER']}><ClassesPage /></ProtectedRoute>
+                } />
+                <Route path="/classes/:streamId" element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'TEACHER']}><ClassDetailPage /></ProtectedRoute>
+                } />
+                <Route path="/fees" element={
+                  <ProtectedRoute allowedRoles={['ADMIN']}><FeesPage /></ProtectedRoute>
+                } />
+                <Route path="/exams" element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'TEACHER']}><ExamsPage /></ProtectedRoute>
+                } />
+                <Route path="/exams/entry" element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'TEACHER']}><ExamMarksEntryPage /></ProtectedRoute>
+                } />
+                <Route path="/attendance" element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'TEACHER']}><AttendancePage /></ProtectedRoute>
+                } />
+                <Route path="/attendance/mark" element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'TEACHER']}><AttendanceMarkingPage /></ProtectedRoute>
+                } />
+                <Route path="/portal" element={<PortalDashboard />} />
+                <Route path="/super-admin" element={
+                  <ProtectedRoute allowedRoles={['ADMIN']}><SuperAdminPage /></ProtectedRoute>
+                } />
+                <Route path="/timetable" element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'TEACHER', 'STUDENT', 'PARENT']}><TimetablePage /></ProtectedRoute>
+                } />
+                <Route path="/audit-logs" element={
+                  <ProtectedRoute allowedRoles={['ADMIN']}><AuditLogPage /></ProtectedRoute>
+                } />
+                <Route path="/analytics" element={
+                  <ProtectedRoute allowedRoles={['ADMIN']}><AnalyticsPage /></ProtectedRoute>
+                } />
+                <Route path="/communication" element={
+                  <ProtectedRoute allowedRoles={['ADMIN']}><CommunicationPage /></ProtectedRoute>
+                } />
+                <Route path="/grading" element={
+                  <ProtectedRoute allowedRoles={['ADMIN']}><GradingPage /></ProtectedRoute>
+                } />
+                <Route path="/settings" element={<SettingsPage />} />
 
-            <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Suspense>
-        </ErrorBoundary>
-      </Router>
+                {/* New Internal Routes */}
+                <Route path="/exams/bulk-entry" element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'TEACHER']}><MarkEntryPage /></ProtectedRoute>
+                } />
+                <Route path="/exams/subject-analytics" element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'TEACHER']}><SubjectAnalyticsPage /></ProtectedRoute>
+                } />
+                <Route path="/finance/ledger" element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'FINANCE']}><FinanceLedgerPage /></ProtectedRoute>
+                } />
+                <Route path="/finance/mpesa" element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'FINANCE']}><MPesaGatewayPage /></ProtectedRoute>
+                } />
+                <Route path="/hr/directory" element={
+                  <ProtectedRoute allowedRoles={['ADMIN']}><StaffDirectoryPage /></ProtectedRoute>
+                } />
+                <Route path="/hr/payroll" element={
+                  <ProtectedRoute allowedRoles={['ADMIN']}><PayrollPage /></ProtectedRoute>
+                } />
+                <Route path="/inventory" element={
+                  <ProtectedRoute allowedRoles={['ADMIN', 'LIBRARIAN']}><InventoryPage /></ProtectedRoute>
+                } />
+                <Route path="/admin/permissions" element={
+                  <ProtectedRoute allowedRoles={['ADMIN']}><AccessControlPage /></ProtectedRoute>
+                } />
+              </Route>
+
+              <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Suspense>
+          </ErrorBoundary>
+        </Router>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

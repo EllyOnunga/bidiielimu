@@ -1,50 +1,47 @@
-import logging
-from django.core.mail import send_mail
-from django.conf import settings
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+from .models import Notification
 
-logger = logging.getLogger(__name__)
-
-class CommunicationService:
+class NotificationService:
     @staticmethod
-    def send_email(subject, message, recipient_list):
-        """
-        Sends an email using Django's core mail system.
-        """
-        try:
-            send_mail(
-                subject,
-                message,
-                settings.DEFAULT_FROM_EMAIL,
-                recipient_list,
-                fail_silently=False,
-            )
-            return True
-        except Exception as e:
-            logger.error(f"Failed to send email: {str(e)}")
-            return False
-
-    @staticmethod
-    def send_sms(phone_number, message):
-        """
-        Mock SMS sending logic. 
-        In production, integrate with AfricasTalking, Twilio, etc.
-        """
-        try:
-            # Simulate network latency
-            logger.info(f"Sending SMS to {phone_number}: {message}")
-            # Real integration would go here:
-            # client = AfricasTalkingSMS(api_key, username)
-            # client.send(message, [phone_number])
-            return True
-        except Exception as e:
-            logger.error(f"Failed to send SMS: {str(e)}")
-            return False
+    def send_to_user(user_id, title, message, level='INFO'):
+        # 1. Save to Database
+        notification = Notification.objects.create(
+            user_id=user_id,
+            title=title,
+            message=message,
+            level=level
+        )
+        
+        # 2. Trigger WebSocket
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f"user_{user_id}",
+            {
+                "type": "send_notification",
+                "content": {
+                    "id": notification.id,
+                    "title": title,
+                    "message": message,
+                    "level": level,
+                    "timestamp": notification.created_at.isoformat()
+                }
+            }
+        )
+        return notification
 
     @staticmethod
-    def notify_user(notification):
-        """
-        Checks notification preferences and sends external alerts if needed.
-        """
-        # For now, we'll just log that a system notification was created
-        # In a real app, you might check user.settings.wants_sms
-        pass
+    def broadcast_emergency(title, message):
+        # 1. Trigger WebSocket to all
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            "emergency_broadcast",
+            {
+                "type": "broadcast_emergency",
+                "content": {
+                    "title": title,
+                    "message": message,
+                    "level": 'CRITICAL'
+                }
+            }
+        )

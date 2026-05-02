@@ -5,6 +5,8 @@ from .views import (
     SubjectAssignmentViewSet, ClassroomViewSet, ScheduleSlotViewSet
 )
 
+from .views_timetable import TimetableAutoGenerateView, TimetableConflictView
+
 router = DefaultRouter()
 router.register(r'grades', GradeLevelViewSet, basename='gradelevel')
 router.register(r'streams', StreamViewSet, basename='stream')
@@ -14,5 +16,7 @@ router.register(r'classrooms', ClassroomViewSet, basename='classroom')
 router.register(r'schedule-slots', ScheduleSlotViewSet, basename='scheduleslot')
 
 urlpatterns = [
+    path('timetable/generate/', TimetableAutoGenerateView.as_view(), name='timetable-generate'),
+    path('timetable/check-conflict/', TimetableConflictView.as_view(), name='timetable-check-conflict'),
     path('', include(router.urls)),
 ]

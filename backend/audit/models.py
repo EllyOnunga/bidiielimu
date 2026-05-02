@@ -11,7 +11,6 @@ class AuditLog(models.Model):
     )
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='audit_logs')
-    school = models.ForeignKey('schools.School', on_delete=models.CASCADE, null=True, blank=True)
     action = models.CharField(max_length=10, choices=ACTIONS)
     model_name = models.CharField(max_length=100)
     object_id = models.CharField(max_length=50, null=True, blank=True)

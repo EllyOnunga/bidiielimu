@@ -82,6 +82,9 @@ class MarkViewSet(viewsets.ModelViewSet):
         qs = Mark.objects.filter(exam__school=user.school).select_related('student', 'student__user', 'exam', 'subject')
         if user.role == 'STUDENT':
             qs = qs.filter(student__user=user)
+        elif user.role == 'PARENT':
+            # Ensure parents only see marks for students they are linked to
+            qs = qs.filter(student__guardians__email=user.email)
         return qs
 
     @action(detail=False, methods=['post'])
@@ -110,4 +113,42 @@ class MarkViewSet(viewsets.ModelViewSet):
             )
             saved_marks.append(mark.id)
 
-        return Response({"status": "success", "saved_count": len(saved_marks)})
+    @action(detail=True, methods=['post'])
+    def compute_ranks(self, request, pk=None):
+        from .services_ranking import RankingService
+        try:
+            count = RankingService.compute_exam_ranks(pk)
+            return Response({"detail": f"Successfully computed ranks for {count} students."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['get'])
+    def export_mark_sheet(self, request, pk=None):
+        from .services_export import MarkSheetExportService
+        from django.http import HttpResponse
+        
+        csv_content = MarkSheetExportService.generate_mark_sheet_csv(pk)
+        response = HttpResponse(csv_content, content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="mark_sheet_exam_{pk}.csv"'
+        return response
+
+    @action(detail=False, methods=['get'])
+    def subject_analytics(self, request):
+        exam_id = request.query_params.get('exam')
+        subject_id = request.query_params.get('subject')
+        
+        if not exam_id or not subject_id:
+            return Response({"detail": "Exam and Subject parameters are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 1. Grade Distribution
+        from django.db.models import Count
+        # This assumes we have a way to map scores to grades. For simplicity, we'll return raw counts in ranges.
+        distribution = Mark.objects.filter(exam_id=exam_id, subject_id=subject_id).values('score').annotate(count=Count('id'))
+        
+        # 2. Historical Trend (Average score for this subject across recent exams)
+        trends = Mark.objects.filter(subject_id=subject_id, exam__school=request.user.school).values('exam__name', 'exam__start_date').annotate(avg=Avg('score')).order_by('exam__start_date')[:6]
+
+        return Response({
+            "distribution": distribution,
+            "trends": trends
+        })

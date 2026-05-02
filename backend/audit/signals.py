@@ -7,27 +7,27 @@ from attendance.models import DailyAttendance
 from exams.models import Mark
 from fees.models import FeePayment
 
+from .middleware import get_current_user, get_client_ip
+
 def log_change(instance, action, **kwargs):
-    # This is a basic implementation. 
-    # In a real app, we'd use a middleware to get the current user and IP.
-    # For now, we'll log with system context if no user is provided.
-    
     model_name = instance.__class__.__name__
     object_repr = str(instance)
     object_id = str(instance.pk)
-    school = getattr(instance, 'school', None)
     
-    # Try to find a related user if possible (e.g. for student/teacher profiles)
-    user = getattr(instance, 'user', None) if hasattr(instance, 'user') else None
+    user = get_current_user()
+    if user and not user.is_authenticated:
+        user = None
+        
+    ip_address = get_client_ip()
 
     AuditLog.objects.create(
         user=user,
-        school=school,
         action=action,
         model_name=model_name,
         object_id=object_id,
         object_repr=object_repr,
-        changes=None # For a full implementation, we'd compare old and new values
+        ip_address=ip_address,
+        changes=None
     )
 
 @receiver(post_save, sender=Student)

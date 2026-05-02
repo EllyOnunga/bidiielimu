@@ -38,6 +38,8 @@ urlpatterns = [
     path('api/v1/audit/', include('audit.urls')),
     path('api/v1/schools/', include('schools.urls')),
     path('api/v1/notifications/', include('notifications.urls')),
+    path('api/v1/hr/', include('hr.urls')),
+    path('api/v1/inventory/', include('inventory.urls')),
     
     # Auth endpoints
     path('api/v1/auth/', include('dj_rest_auth.urls')),

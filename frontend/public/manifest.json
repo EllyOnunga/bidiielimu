@@ -1,6 +1,6 @@
 {
-  "short_name": "BidiiElimu",
-  "name": "BidiiElimu - Smart School Management",
+  "short_name": "Scholara",
+  "name": "Scholara - Smart School Management",
   "icons": [
     {
       "src": "favicon.svg",
@@ -20,6 +20,6 @@
   ],
   "start_url": "/",
   "display": "standalone",
-  "theme_color": "#0f172a",
-  "background_color": "#0f172a"
+  "theme_color": "#1A2B4C",
+  "background_color": "#1A2B4C"
 }

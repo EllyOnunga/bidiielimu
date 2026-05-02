@@ -49,7 +49,11 @@ CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE', str(not DEBUG)) == 'True'
 
 # Application definition
 
-INSTALLED_APPS = [
+SHARED_APPS = [
+    'django_tenants',
+    'daphne',
+    'schools',
+    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -69,10 +73,27 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'dj_rest_auth',
     'dj_rest_auth.registration',
+    'django_otp',
+    'django_otp.plugins.otp_totp',
+    'allauth_2fa',
     
     # Local apps
     'accounts',
-    'schools',
+    'drf_spectacular',
+    'storages',
+]
+
+TENANT_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'channels',
+    
+    'rest_framework',
+    
     'students',
     'teachers',
     'classes',
@@ -81,27 +102,56 @@ INSTALLED_APPS = [
     'attendance',
     'audit',
     'notifications',
-    'drf_spectacular',
-    'storages',
+    'lms',
+    'inventory',
+    'hr',
+    'analytics',
+    'reports',
 ]
+
+INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
+
+ASGI_APPLICATION = 'config.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/0')],
+        },
+    },
+}
+
+TENANT_MODEL = "schools.School"
+TENANT_DOMAIN_MODEL = "schools.Domain"
+
+DATABASE_ROUTERS = (
+    'django_tenants.routers.TenantSyncRouter',
+)
 
 SITE_ID = 1
 
 MIDDLEWARE = [
+    'django_tenants.middleware.main.TenantMainMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'config.middleware.RequestCorrelationMiddleware',
+    'audit.middleware.RequestTrackingMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'config.middleware.TenantAccessMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    'django_otp.middleware.OTPMiddleware',
+    'allauth_2fa.middleware.AllauthTwoFactorMiddleware',
 ]
 
-ROOT_URLCONF = 'config.urls'
+ROOT_URLCONF = 'config.urls_tenant'
+PUBLIC_SCHEMA_URLCONF = 'config.urls_public'
 
 TEMPLATES = [
     {
@@ -124,12 +174,15 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+db_config = dj_database_url.config(
+    default="postgres://scholara_user:scholara_password@127.0.0.1:5432/scholara",
+    conn_max_age=600,
+    conn_health_checks=True,
+)
+db_config['ENGINE'] = 'django_tenants.postgresql_backend'
+
 DATABASES = {
-    'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
+    'default': db_config
 }
 
 
@@ -180,7 +233,7 @@ EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'support@bidiielimu.com')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'support@scholara.app')
 FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
 
 
@@ -286,8 +339,8 @@ if not CORS_ALLOW_ALL_ORIGINS:
 
 # API Documentation Settings
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'BidiiElimu SaaS API',
-    'DESCRIPTION': 'Official API for BidiiElimu School Management SaaS Platform',
+    'TITLE': 'Scholara SaaS API',
+    'DESCRIPTION': 'Official API for Scholara School Management SaaS Platform',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
 }
@@ -342,4 +395,13 @@ if USE_S3:
     PUBLIC_MEDIA_LOCATION = 'media'
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+# Celery Beat Schedule
+CELERY_BEAT_SCHEDULE = {
+    'run-nightly-risk-assessment': {
+        'task': 'analytics.tasks.run_nightly_risk_assessment',
+        'schedule': 86400.0, # Every 24 hours
+    },
+}
+
 

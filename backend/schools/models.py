@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django_tenants.models import TenantMixin, DomainMixin
 
 class SoftDeleteQuerySet(models.QuerySet):
     def delete(self):
@@ -27,7 +28,7 @@ class SoftDeleteModel(models.Model):
         abstract = True
 
 
-class School(models.Model):
+class School(TenantMixin):
     """
     Represents a tenant (School) in the SaaS platform.
     All major entities are linked back to a School instance.
@@ -40,8 +41,13 @@ class School(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    auto_create_schema = True
+
     def __str__(self):
         return self.name
+
+class Domain(DomainMixin):
+    pass
 
 class Subscription(models.Model):
     PLAN_CHOICES = (
@@ -65,8 +71,6 @@ class Subscription(models.Model):
         return f"{self.school.name} - {self.plan}"
 
 class SchoolSetting(models.Model):
-    school = models.OneToOneField(School, on_delete=models.CASCADE, related_name='settings')
-    
     # Academic Settings
     current_term = models.CharField(max_length=50, default='Term 1')
     academic_year = models.CharField(max_length=20, default='2026')
@@ -85,5 +89,5 @@ class SchoolSetting(models.Model):
     accent_color = models.CharField(max_length=20, default='#6366f1')
     
     def __str__(self):
-        return f"Settings for {self.school.name}"
+        return "School Settings"
 

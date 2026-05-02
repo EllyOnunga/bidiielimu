@@ -23,15 +23,22 @@ class SchoolViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # Allow Super Admin to see all schools, otherwise only the user's school
-        if self.request.user.role == 'ADMIN' and not self.request.user.school:
-            return School.objects.all().annotate(
+        from django.db import connection
+        if connection.schema_name == 'public':
+            return School.objects.exclude(schema_name='public').annotate(
                 student_count=Count('students', distinct=True),
-                total_revenue=Sum('students__payments__amount')
+                total_revenue=Sum('subscription__amount') # Simplified
             )
-        return School.objects.filter(id=self.request.user.school_id).annotate(
-            student_count=Count('students', distinct=True),
-            total_revenue=Sum('students__payments__amount')
+        return School.objects.filter(schema_name=connection.schema_name)
+
+    def perform_create(self, serializer):
+        from schools.models import Domain
+        tenant = serializer.save()
+        domain_name = self.request.data.get('domain_url', f"{tenant.schema_name}.scholara.app")
+        Domain.objects.create(
+            domain=domain_name,
+            tenant=tenant,
+            is_primary=True
         )
 
     @action(detail=False, methods=['get'])
@@ -44,23 +51,22 @@ class SchoolViewSet(viewsets.ModelViewSet):
             return Response({"detail": "Permission denied."}, status=403)
 
         # Count active students
-        student_count = school.students.filter(is_active=True).count()
+        student_count = Student.objects.filter(is_active=True).count()
         
         # Count active teachers
-        teacher_count = Teacher.objects.filter(school=school, is_active=True).count()
+        teacher_count = Teacher.objects.filter(is_active=True).count()
         
         # Count active streams (classes)
-        class_count = Stream.objects.filter(grade_level__school=school).count()
+        class_count = Stream.objects.count()
 
         # REAL FINANCIAL DATA
         
         # Calculate Total Fees Collected (all time or current year - let's do all time for the card)
-        total_fees = FeePayment.objects.filter(student__school=school).aggregate(total=Sum('amount'))['total'] or 0
+        total_fees = FeePayment.objects.aggregate(total=Sum('amount'))['total'] or 0
         
         # Calculate Revenue Trend for the last 6 months
         six_months_ago = datetime.now() - timedelta(days=180)
         monthly_revenue = FeePayment.objects.filter(
-            student__school=school,
             payment_date__gte=six_months_ago
         ).annotate(month=TruncMonth('payment_date')) \
          .values('month') \
@@ -86,8 +92,8 @@ class SchoolViewSet(viewsets.ModelViewSet):
         last_month_start = (this_month_start - timedelta(days=1)).replace(day=1)
 
         # Student Trend
-        students_this_month = school.students.filter(created_at__gte=this_month_start).count()
-        students_last_month = school.students.filter(created_at__gte=last_month_start, created_at__lt=this_month_start).count()
+        students_this_month = Student.objects.filter(created_at__gte=this_month_start).count()
+        students_last_month = Student.objects.filter(created_at__gte=last_month_start, created_at__lt=this_month_start).count()
         student_trend = "+0%"
         if students_last_month > 0:
             diff = ((students_this_month - students_last_month) / students_last_month) * 100
@@ -96,8 +102,8 @@ class SchoolViewSet(viewsets.ModelViewSet):
             student_trend = "+100%"
 
         # Teacher Trend
-        teachers_this_month = Teacher.objects.filter(school=school, joining_date__gte=this_month_start).count()
-        teachers_last_month = Teacher.objects.filter(school=school, joining_date__gte=last_month_start, joining_date__lt=this_month_start).count()
+        teachers_this_month = Teacher.objects.filter(joining_date__gte=this_month_start).count()
+        teachers_last_month = Teacher.objects.filter(joining_date__gte=last_month_start, joining_date__lt=this_month_start).count()
         teacher_trend = "+0%"
         if teachers_last_month > 0:
             diff = ((teachers_this_month - teachers_last_month) / teachers_last_month) * 100
@@ -106,8 +112,8 @@ class SchoolViewSet(viewsets.ModelViewSet):
             teacher_trend = "+100%"
 
         # Fees Trend
-        fees_this_month = FeePayment.objects.filter(student__school=school, payment_date__gte=this_month_start).aggregate(total=Sum('amount'))['total'] or 0
-        fees_last_month = FeePayment.objects.filter(student__school=school, payment_date__gte=last_month_start, payment_date__lt=this_month_start).aggregate(total=Sum('amount'))['total'] or 0
+        fees_this_month = FeePayment.objects.filter(payment_date__gte=this_month_start).aggregate(total=Sum('amount'))['total'] or 0
+        fees_last_month = FeePayment.objects.filter(payment_date__gte=last_month_start, payment_date__lt=this_month_start).aggregate(total=Sum('amount'))['total'] or 0
         fees_trend = "+0%"
         if fees_last_month > 0:
             diff = ((float(fees_this_month) - float(fees_last_month)) / float(fees_last_month)) * 100
@@ -139,16 +145,13 @@ class SchoolViewSet(viewsets.ModelViewSet):
             return Response({"detail": "Permission denied."}, status=403)
 
         # 1. Subject Performance (Aggregate scores from all exams)
-        subject_performance = Mark.objects.filter(
-            exam__school=school
-        ).values('subject__name') \
+        subject_performance = Mark.objects.values('subject__name') \
          .annotate(average=Avg('score')) \
          .order_by('-average')[:5]
 
         # 2. Attendance Trends (Last 30 days)
         thirty_days_ago = datetime.now() - timedelta(days=30)
         attendance_stats = DailyAttendance.objects.filter(
-            student__school=school,
             date__gte=thirty_days_ago
         ).values('date') \
          .annotate(
@@ -157,7 +160,7 @@ class SchoolViewSet(viewsets.ModelViewSet):
          ).order_by('date')
 
         # 3. Class Distribution
-        class_distribution = school.students.values('stream__grade_level__name') \
+        class_distribution = Student.objects.values('stream__grade_level__name') \
             .annotate(count=Count('id')) \
             .order_by('stream__grade_level__name')
 
@@ -181,7 +184,7 @@ class SchoolViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def super_admin_stats(self, request):
-        if not (request.user.role == 'ADMIN' and not request.user.school):
+        if request.user.role != 'SUPER_ADMIN':
              return Response({"detail": "Permission denied."}, status=403)
         
         total_schools = School.objects.count()
@@ -200,12 +203,12 @@ class SchoolViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get', 'patch'], url_path='settings')
     def school_settings(self, request):
-        school = request.user.school
-        if not school:
-            return Response({"detail": "User not assigned to a school."}, status=status.HTTP_400_BAD_REQUEST)
+        from django.db import connection
+        if connection.schema_name == 'public':
+            return Response({"detail": "Settings are tenant-specific."}, status=400)
 
-        # Get or create settings for this school
-        settings_obj, created = SchoolSetting.objects.get_or_create(school=school)
+        # Get or create settings for this tenant
+        settings_obj, created = SchoolSetting.objects.get_or_create()
 
         if request.method == 'GET':
             serializer = SchoolSettingSerializer(settings_obj)
@@ -224,6 +227,7 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        if self.request.user.role == 'ADMIN' and not self.request.user.school:
+        from django.db import connection
+        if self.request.user.role == 'SUPER_ADMIN':
             return Subscription.objects.all()
-        return Subscription.objects.filter(school=self.request.user.school)
+        return Subscription.objects.filter(school__schema_name=connection.schema_name)

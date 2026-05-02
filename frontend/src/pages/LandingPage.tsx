@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { DashboardMockup } from '../components/DashboardMockup';
+
 import {
   GraduationCap,
   Shield,
@@ -56,8 +56,8 @@ export const LandingPage = () => {
             <div className="p-2.5 bg-primary-600 rounded-xl shadow-premium group-hover:rotate-12 transition-transform duration-500">
               <GraduationCap className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl font-black tracking-tighter uppercase">
-              Bidii<span className="text-primary-400">Elimu</span>
+            <span className="text-2xl font-black tracking-tighter uppercase font-serif">
+              Schola<span className="text-teal-400">ra</span>
             </span>
           </Link>
 
@@ -124,17 +124,17 @@ export const LandingPage = () => {
             >
               <Zap className="w-3 h-3 animate-pulse" /> The Next-Gen School Management
             </motion.div>
-            <h1 className="text-6xl md:text-8xl font-black tracking-tight mb-8 leading-[0.9] text-white">
-              Smarter Data, <br />
-              <span className="text-gradient">Better Schools.</span>
+            <h1 className="text-6xl md:text-8xl font-black tracking-tight mb-8 leading-[0.9] text-white font-serif">
+              The Future of <br />
+              <span className="text-gradient italic">School Management</span>
             </h1>
-            <p className="text-xl text-primary-200/50 mb-12 font-medium leading-relaxed max-w-xl">
-              BidiiElimu is a state-of-the-art unified platform designed to streamline academics,
-              finances, and communication for high-performing educational institutions.
+            <p className="text-xl text-primary-200/50 mb-4 font-medium leading-relaxed max-w-xl">
+              Scholara is a comprehensive multi-tenant SaaS platform built on Django + Vite + React — engineered to outperform global standards in African and global markets.
             </p>
+            <p className="text-teal-400 font-serif italic mb-12 text-lg">"Empowering Minds, Streamlining Success."</p>
             <div className="flex flex-col sm:flex-row items-center gap-5">
-              <Link to="/register" className="w-full sm:w-auto px-10 py-5 bg-primary-600 hover:bg-primary-500 text-white rounded-[24px] font-black uppercase tracking-widest text-xs shadow-premium active:scale-[0.98] transition-all flex items-center justify-center gap-3">
-                Experience BidiiElimu <ArrowRight className="w-5 h-5" />
+              <Link to="/register" className="w-full sm:w-auto px-10 py-5 bg-teal-600 hover:bg-teal-500 text-white rounded-[24px] font-black uppercase tracking-widest text-xs shadow-premium active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+                Experience Scholara <ArrowRight className="w-5 h-5" />
               </Link>
               <Link to="/solutions" className="w-full sm:w-auto px-10 py-5 bg-white/5 hover:bg-white/10 text-white rounded-[24px] font-black uppercase tracking-widest text-xs border border-white/5 transition-all flex items-center justify-center gap-3 group">
                 <Play className="w-4 h-4 fill-primary-400 text-primary-400 group-hover:scale-125 transition-transform" /> Watch Demo
@@ -152,7 +152,7 @@ export const LandingPage = () => {
             <div className="glass p-3 rounded-[48px] shadow-glass relative overflow-hidden group">
               <div className="absolute inset-0 bg-gradient-to-tr from-primary-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 z-20 pointer-events-none" />
               <div className="transform group-hover:scale-[1.02] transition-transform duration-1000 relative z-10">
-                <DashboardMockup />
+                <img src="/dashboard-hero.jpg" alt="Scholara Dashboard" className="w-full h-auto rounded-[36px] object-cover" />
               </div>
             </div>
           </motion.div>
@@ -244,7 +244,7 @@ export const LandingPage = () => {
             <h2 className="text-4xl md:text-5xl font-black text-white mb-10 leading-tight uppercase tracking-tight">Let's Define Your Digital <br /> Future.</h2>
             <div className="space-y-10 relative z-10">
               {[
-                { icon: Mail, label: 'Transmission', value: 'intel@bidii-elimu.com' },
+                { icon: Mail, label: 'Transmission', value: 'intel@scholara.app' },
                 { icon: Phone, label: 'Secure Line', value: '+254 700 000 000' },
                 { icon: MapPin, label: 'Base', value: 'Westlands, Nairobi, KE' }
               ].map(item => (
@@ -287,7 +287,7 @@ export const LandingPage = () => {
             <div className="space-y-4">
               <div className="flex items-center gap-3 justify-center md:justify-start">
                 <div className="p-2 bg-primary-600 rounded-xl"><GraduationCap className="w-6 h-6 text-white" /></div>
-                <span className="text-2xl font-black tracking-tighter uppercase">Bidii<span className="text-primary-400">Elimu</span></span>
+                <span className="text-2xl font-black tracking-tighter uppercase font-serif">Schola<span className="text-teal-400">ra</span></span>
               </div>
               <p className="text-primary-200/30 text-xs font-black uppercase tracking-widest max-w-sm leading-loose">
                 Redefining institutional management with world-class technology.
@@ -322,7 +322,7 @@ export const LandingPage = () => {
             </div>
           </div>
           <div className="mt-20 pt-10 border-t border-white/5 flex flex-col md:flex-row items-center justify-between text-[10px] font-black text-primary-200/20 uppercase tracking-[0.3em]">
-            <p>&copy; {new Date().getFullYear()} BIDIIELIMU SYSTEM PROTOCOL. ALL RIGHTS RESERVED.</p>
+            <p>&copy; {new Date().getFullYear()} SCHOLARA SYSTEM PROTOCOL. ALL RIGHTS RESERVED.</p>
             <div className="flex gap-10 mt-6 md:mt-0">
               <Link to="/privacy" className="hover:text-white transition-colors">Privacy</Link>
               <Link to="/terms" className="hover:text-white transition-colors">Terms</Link>

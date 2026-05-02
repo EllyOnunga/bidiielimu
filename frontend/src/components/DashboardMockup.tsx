@@ -4,8 +4,8 @@ export const DashboardMockup = () => {
   return (
     <div className="w-full aspect-[16/10] bg-slate-900 rounded-[36px] p-6 shadow-premium flex flex-col gap-6 relative overflow-hidden border border-white/10">
       {/* Decorative gradient overlay */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-primary-600/20 blur-[80px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-600/20 blur-[80px] rounded-full pointer-events-none" />
+      <div className="absolute top-0 right-0 w-64 h-64 bg-teal-600/20 blur-[80px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-navy-600/20 blur-[80px] rounded-full pointer-events-none" />
 
       {/* Header */}
       <div className="flex justify-between items-center z-10">
@@ -14,8 +14,8 @@ export const DashboardMockup = () => {
             <Activity className="w-5 h-5 text-primary-400" />
           </div>
           <div>
-            <h4 className="text-white font-black text-sm uppercase tracking-wider">BidiiElimu HQ</h4>
-            <p className="text-primary-200/50 text-[10px] font-bold uppercase tracking-widest">Live Overview</p>
+            <h4 className="text-white font-black text-sm uppercase tracking-wider font-serif">Scholara HQ</h4>
+            <p className="text-teal-200/50 text-[10px] font-bold uppercase tracking-widest">Live Overview</p>
           </div>
         </div>
         <div className="flex gap-2">

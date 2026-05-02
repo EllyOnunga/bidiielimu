@@ -1,55 +1,37 @@
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import Notification
-from .serializers import NotificationSerializer
+from .models import Notification, Notice, SchoolEvent, PTMMeeting
+from .serializers import (
+    NotificationSerializer, NoticeSerializer, 
+    SchoolEventSerializer, PTMMeetingSerializer
+)
+from .services_sms import SMSService
 
 class NotificationViewSet(viewsets.ModelViewSet):
+    queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Notification.objects.filter(user=self.request.user)
+        return self.queryset.filter(user=self.request.user)
 
-    @action(detail=True, methods=['post'])
-    def mark_as_read(self, request, pk=None):
-        notification = self.get_object()
-        notification.is_read = True
-        notification.save()
-        return Response({'status': 'notification marked as read'})
+class NoticeViewSet(viewsets.ModelViewSet):
+    queryset = Notice.objects.all().order_by('-published_at')
+    serializer_class = NoticeSerializer
 
     @action(detail=False, methods=['post'])
-    def mark_all_as_read(self, request):
-        self.get_queryset().update(is_read=True)
-        return Response({'status': 'all notifications marked as read'})
-
-    @action(detail=False, methods=['post'])
-    def bulk_email(self, request):
-        from .services import CommunicationService
-        subject = request.data.get('subject')
+    def broadcast_sms(self, request):
         message = request.data.get('message')
-        recipients = request.data.get('recipients', []) # List of emails
+        if not message:
+            return Response({"detail": "Message is required"}, status=status.HTTP_400_BAD_REQUEST)
         
-        if not subject or not message or not recipients:
-            return Response({"detail": "Subject, message and recipients are required."}, status=400)
-            
-        success = CommunicationService.send_email(subject, message, recipients)
-        if success:
-            return Response({"status": f"Email sent to {len(recipients)} recipients."})
-        return Response({"detail": "Failed to send email."}, status=500)
+        res = SMSService.broadcast_to_parents(message)
+        return Response({"status": "Sent", "response": res})
 
-    @action(detail=False, methods=['post'])
-    def bulk_sms(self, request):
-        from .services import CommunicationService
-        message = request.data.get('message')
-        phones = request.data.get('phones', []) # List of phone numbers
-        
-        if not message or not phones:
-            return Response({"detail": "Message and phone numbers are required."}, status=400)
-            
-        success_count = 0
-        for phone in phones:
-            if CommunicationService.send_sms(phone, message):
-                success_count += 1
-                
-        return Response({"status": f"SMS sent to {success_count}/{len(phones)} recipients."})
+class SchoolEventViewSet(viewsets.ModelViewSet):
+    queryset = SchoolEvent.objects.all().order_by('start_date')
+    serializer_class = SchoolEventSerializer
+
+class PTMMeetingViewSet(viewsets.ModelViewSet):
+    queryset = PTMMeeting.objects.all().order_by('scheduled_time')
+    serializer_class = PTMMeetingSerializer
