@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Clock, ChevronLeft, ChevronRight, Send, HelpCircle } from 'lucide-react';
-import axios from 'axios';
+import client from '../../api/client';
 import toast from 'react-hot-toast';
 
 interface Question {
@@ -30,9 +30,13 @@ export const QuizInterface = ({ quizId, onComplete }: { quizId: string, onComple
 
   const fetchQuiz = async () => {
     try {
-      const res = await axios.get(`/api/v1/lms/quizzes/${quizId}/`);
-      setQuiz(res.data);
-      setTimeLeft(res.data.duration_minutes * 60);
+      const res = await client.get(`lms/quizzes/${quizId}/`);
+      if (res.data && Array.isArray(res.data.questions)) {
+        setQuiz(res.data);
+        setTimeLeft((res.data.duration_minutes || 30) * 60);
+      } else {
+        toast.error('Invalid quiz data received');
+      }
     } catch (err) {
       toast.error('Failed to load quiz');
     }
@@ -43,7 +47,7 @@ export const QuizInterface = ({ quizId, onComplete }: { quizId: string, onComple
     setIsSubmitting(true);
     const toastId = toast.loading('Marking your quiz...');
     try {
-      const res = await axios.post(`/api/v1/lms/quizzes/${quizId}/attempt/`, { answers });
+      const res = await client.post(`lms/quizzes/${quizId}/attempt/`, { answers });
       toast.success(`Quiz completed! Your score: ${res.data.score}/${res.data.max_score}`, { id: toastId, duration: 5000 });
       onComplete();
     } catch (err) {
@@ -113,7 +117,7 @@ export const QuizInterface = ({ quizId, onComplete }: { quizId: string, onComple
               </h3>
 
               <div className="grid grid-cols-1 gap-4">
-                {currentQuestion.options.map((option, idx) => (
+                {Array.isArray(currentQuestion?.options) && currentQuestion.options.map((option, idx) => (
                   <button
                     key={idx}
                     onClick={() => setAnswers({ ...answers, [currentQuestion.id]: String(idx) })}
@@ -168,7 +172,7 @@ export const QuizInterface = ({ quizId, onComplete }: { quizId: string, onComple
 
       {/* Progress Footer */}
       <div className="h-6 bg-white/5 flex">
-        {quiz.questions.map((_, idx) => (
+        {Array.isArray(quiz?.questions) && quiz.questions.map((_, idx) => (
           <div 
             key={idx} 
             className={`flex-1 transition-colors ${

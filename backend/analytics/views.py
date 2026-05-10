@@ -9,8 +9,16 @@ from .services_correlation import CorrelationService
 class DashboardAnalyticsView(APIView):
     def get(self, request):
         kpis = PerformanceAnalyticsService.get_school_kpis()
-        trends = PerformanceAnalyticsService.get_cohort_trends(grade_level_id=1)
-        
+
+        # Accept grade_level_id as query param; fallback to first available
+        grade_level_id = request.query_params.get('grade_level_id')
+        if not grade_level_id:
+            from classes.models import GradeLevel
+            first_grade = GradeLevel.objects.order_by('id').first()
+            grade_level_id = first_grade.id if first_grade else None
+
+        trends = PerformanceAnalyticsService.get_cohort_trends(grade_level_id=grade_level_id) if grade_level_id else []
+
         at_risk = PredictiveRisk.objects.filter(risk_level__in=['HIGH', 'CRITICAL']).order_by('-confidence_score')[:5]
         
         return Response({

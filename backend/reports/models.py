@@ -19,6 +19,7 @@ class StudentReport(models.Model):
     # AI Content
     ai_comment_draft = models.TextField(null=True, blank=True)
     teacher_comment = models.TextField(null=True, blank=True) # Final version
+    principal_comment = models.TextField(null=True, blank=True)
     
     # Metadata
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='DRAFT')

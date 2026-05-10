@@ -1,4 +1,5 @@
 from django.contrib import admin
+# Triggering reload to resolve 502 Bad Gateway
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
@@ -12,6 +13,7 @@ def health_check(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('health/', health_check, name='health_check'),
+    path('api/v1/ping/', lambda r: JsonResponse({"status": "ping-tenant"}), name='ping-tenant'),
     
     path('api/v1/accounts/', include('accounts.urls')),
     path('api/v1/students/', include('students.urls')),
@@ -26,6 +28,8 @@ urlpatterns = [
     path('api/v1/inventory/', include('inventory.urls')),
     path('api/v1/analytics/', include('analytics.urls')),
     path('api/v1/reports/', include('reports.urls')),
+    path('api/v1/hr/', include('hr.urls')),
+    path('api/v1/schools/', include('schools.urls')),
     
     # Auth endpoints
     path('api/v1/auth/', include('dj_rest_auth.urls')),

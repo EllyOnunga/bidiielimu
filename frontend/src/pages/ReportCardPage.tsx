@@ -23,18 +23,31 @@ interface StudentInfo {
   class: string;
   class_teacher: string;
   email: string;
-  parent_name: string;
-  parent_phone: string;
+  guardians?: { first_name: string; last_name: string; phone_number: string }[];
   photo: string | null;
   term: string;
   academic_year: string;
   marks: MarkRow[];
+  attendance: {
+    present_days: number;
+    absent_days: number;
+    total_days: number;
+    percentage: number;
+  };
+  remarks: {
+    teacher: string;
+    principal: string;
+    is_official: boolean;
+  };
   summary: {
     total_score: number;
     mean_score: number;
     total_points: number;
     mean_grade: string;
     overall_remarks: string;
+    class_position?: number;
+    stream_position?: number;
+    total_in_class?: number;
   }
 }
 
@@ -49,12 +62,22 @@ export const ReportCardPage = () => {
     class: '',
     class_teacher: '',
     email: '',
-    parent_name: '',
-    parent_phone: '',
+    guardians: [],
     photo: null,
     term: '',
     academic_year: '',
     marks: [],
+    attendance: {
+      present_days: 0,
+      absent_days: 0,
+      total_days: 0,
+      percentage: 0
+    },
+    remarks: {
+      teacher: '',
+      principal: '',
+      is_official: false
+    },
     summary: {
       total_score: 0,
       mean_score: 0,
@@ -89,13 +112,14 @@ export const ReportCardPage = () => {
           class: reportRes.data.student.grade_level ? `${reportRes.data.student.grade_level} ${reportRes.data.student.stream || ''}` : '',
           class_teacher: reportRes.data.student.class_teacher || '',
           email: reportRes.data.student.email || '',
-          parent_name: reportRes.data.student.parent_name || '',
-          parent_phone: reportRes.data.student.parent_phone || '',
+          guardians: reportRes.data.student.guardians || [],
           photo: reportRes.data.student.photo || null,
           term: reportRes.data.exam.term,
           academic_year: reportRes.data.exam.academic_year,
           marks: reportRes.data.results,
           summary: reportRes.data.summary,
+          attendance: reportRes.data.attendance,
+          remarks: reportRes.data.remarks,
         });
 
         if (settingsRes.data) {
@@ -140,7 +164,7 @@ export const ReportCardPage = () => {
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
       pdf.save(`Report_Card_${studentData.admission}.pdf`);
       
       toast.success('Report card downloaded!');
@@ -241,6 +265,10 @@ export const ReportCardPage = () => {
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Academic Year</p>
                 <p className="text-sm font-bold text-slate-600">{studentData.academic_year}</p>
               </div>
+              <div>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Attendance</p>
+                <p className="text-sm font-bold text-slate-600">{studentData.attendance.present_days} / {studentData.attendance.total_days} Days ({studentData.attendance.percentage}%)</p>
+              </div>
             </div>
           </div>
 
@@ -297,25 +325,54 @@ export const ReportCardPage = () => {
             </table>
           </div>
 
+          {/* Remarks & Positions */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Class Teacher's Remarks</p>
+                <p className="text-sm italic text-slate-700">"{studentData.remarks.teacher}"</p>
+              </div>
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Principal's Remarks</p>
+                <p className="text-sm italic text-slate-700">"{studentData.remarks.principal}"</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              {studentData.summary.class_position && (
+                <div className="p-4 bg-primary-50 rounded-xl border border-primary-100 text-center">
+                  <p className="text-[10px] font-bold text-primary-400 uppercase tracking-widest mb-1">Class Rank</p>
+                  <p className="text-2xl font-black text-primary-700">{studentData.summary.class_position} / {studentData.summary.total_in_class || '-'}</p>
+                </div>
+              )}
+              {studentData.summary.stream_position && (
+                <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100 text-center">
+                  <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-1">Stream Rank</p>
+                  <p className="text-2xl font-black text-emerald-700">{studentData.summary.stream_position} / {studentData.summary.total_in_class || '-'}</p>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Footer Signatures */}
-          <div className="grid grid-cols-3 gap-12 pt-12 border-t border-slate-100">
+          <div className="grid grid-cols-3 gap-12 pt-8 border-t border-slate-100">
             <div className="text-center space-y-4">
               <div className="h-16 flex items-end justify-center border-b border-slate-300 pb-1">
                 <p className="text-sm font-bold text-slate-800">{studentData.class_teacher || 'Class Teacher'}</p>
               </div>
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Class Teacher</p>
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Class Teacher's Signature</p>
             </div>
             <div className="text-center space-y-4">
               <div className="h-16 flex items-end justify-center border-b border-slate-300 pb-1">
-                <p className="text-sm font-serif italic text-slate-700">{schoolInfo.principalName}</p>
+                <p className="text-sm font-serif italic text-slate-700">{schoolInfo.principalName || 'School Principal'}</p>
               </div>
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Principal</p>
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Principal's Signature</p>
             </div>
             <div className="text-center space-y-4">
               <div className="h-16 flex items-end justify-center border-b border-slate-300 pb-1">
                 <p className="text-xs text-slate-400 font-bold">{new Date().toLocaleDateString()}</p>
               </div>
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Date of Issue</p>
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Date Issued</p>
             </div>
           </div>
         </div>

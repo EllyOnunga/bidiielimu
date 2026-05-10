@@ -1,6 +1,5 @@
 # docker-compose.dev.yml — Local Development Override
 # Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
-version: '3.9'
 
 services:
 
@@ -44,6 +43,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      target: build
     volumes:
       - ./frontend:/app
       - /app/node_modules

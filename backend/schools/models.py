@@ -33,7 +33,21 @@ class School(TenantMixin):
     Represents a tenant (School) in the SaaS platform.
     All major entities are linked back to a School instance.
     """
+    CURRICULUM_CHOICES = (
+        ('CBC', 'Kenya CBC'),
+        ('844', 'Kenya 8-4-4'),
+        ('IGCSE_EDEXCEL', 'Pearson Edexcel IGCSE'),
+        ('IGCSE_CAMBRIDGE', 'Cambridge IGCSE'),
+    )
+    STATUS_CHOICES = (
+        ('ACTIVE', 'Active'),
+        ('INACTIVE', 'Inactive'),
+        ('SUSPENDED', 'Suspended'),
+    )
+
     name = models.CharField(max_length=255)
+    curriculum = models.CharField(max_length=20, choices=CURRICULUM_CHOICES, default='CBC')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='ACTIVE')
     address = models.TextField(null=True, blank=True)
     contact_email = models.EmailField(null=True, blank=True)
     contact_phone = models.CharField(max_length=20, null=True, blank=True)

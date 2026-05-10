@@ -18,7 +18,7 @@ export const TeacherRadarChart = ({ data }: Props) => {
       <p className="text-primary-200/40 text-sm mb-10">Cross-dimensional performance metrics</p>
       
       <div className="h-[350px]">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
           <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
             <PolarGrid stroke="#ffffff10" />
             <PolarAngleAxis 

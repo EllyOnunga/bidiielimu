@@ -35,7 +35,7 @@ export const mobileService = {
       await NativeBiometric.verifyIdentity({
         reason,
         title: 'Biometric Login',
-        subtitle: 'BidiiElimu Secure Access',
+        subtitle: 'ElimuHub Secure Access',
         description: 'Use your fingerprint or face to log in',
       });
       return true;
@@ -50,7 +50,7 @@ export const mobileService = {
       await NativeBiometric.setCredentials({
         username: email,
         password: password,
-        server: 'bidii-elimu.com',
+        server: window.location.hostname,
       });
     } catch (e) {
       console.error('Failed to save credentials for biometrics', e);
@@ -61,7 +61,7 @@ export const mobileService = {
     if (!Capacitor.isNativePlatform()) return null;
     try {
       return await NativeBiometric.getCredentials({
-        server: 'bidii-elimu.com',
+        server: window.location.hostname,
       });
     } catch (_) {
       return null;

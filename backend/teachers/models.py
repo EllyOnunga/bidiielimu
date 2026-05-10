@@ -35,8 +35,12 @@ class Teacher(SoftDeleteModel):
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
 class StaffProfile(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='staff_profile')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='teacher_staff_profile')
     employee_id = models.CharField(max_length=50, unique=True)
     national_id = models.CharField(max_length=20, null=True, blank=True, unique=True)
     designation = models.CharField(max_length=100) # e.g. Accountant, Driver

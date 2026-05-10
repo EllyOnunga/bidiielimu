@@ -21,6 +21,7 @@ class Resource(models.Model):
 
 class Assignment(models.Model):
     subject = models.ForeignKey('classes.Subject', on_delete=models.CASCADE, related_name='assignments')
+    stream = models.ForeignKey('classes.Stream', on_delete=models.CASCADE, related_name='assignments', null=True, blank=True)
     teacher = models.ForeignKey('teachers.Teacher', on_delete=models.CASCADE, related_name='assignments')
     title = models.CharField(max_length=200)
     description = models.TextField()

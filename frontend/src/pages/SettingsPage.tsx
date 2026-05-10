@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '../store/authStore';
+import { ROLES } from '../constants/roles';
 import {
   User, School, Bell, Save, Lock,
   CreditCard, Palette, GraduationCap, Mail, MessageSquare, ChevronRight, Phone
@@ -9,6 +10,8 @@ import client from '../api/client';
 import { toast } from 'react-hot-toast';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
+import { PasswordInput } from '../components/ui/PasswordInput';
+import { PasswordHint } from '../components/ui/PasswordHint';
 
 type ActiveTab = 'profile' | 'school' | 'academic' | 'finance' | 'branding' | 'notifications';
 
@@ -46,18 +49,19 @@ export const SettingsPage = () => {
   });
 
   const fetchSettings = useCallback(async () => {
+    if (!user || user.role === ROLES.SUPER_ADMIN) return;
     try {
       const response = await client.get('schools/settings/');
       setSettings(response.data);
     } catch (error) {
       console.error('Failed to fetch settings', error);
     }
-  }, []);
+  }, [user]);
 
   const fetchSchoolProfile = useCallback(async () => {
-    if (!user?.school) return;
+    if (!user || !user.school) return;
     try {
-      const response = await client.get(`/schools/${user.school}/`);
+      const response = await client.get(`schools/${user.school}/`);
       setSchoolProfile({
         name: response.data.name,
         address: response.data.address || '',
@@ -72,7 +76,7 @@ export const SettingsPage = () => {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchSettings();
-    if (user?.role === 'ADMIN') {
+    if (user?.role === ROLES.ADMIN) {
 
       fetchSchoolProfile();
     }
@@ -108,7 +112,7 @@ export const SettingsPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await client.patch(`/schools/${user?.school}/`, schoolProfile);
+      await client.patch(`schools/${user?.school}/`, schoolProfile);
       toast.success('School profile updated successfully');
     } catch {
       toast.error('Failed to update school profile');
@@ -127,12 +131,21 @@ export const SettingsPage = () => {
     try {
       await client.post('auth/password/change/', {
         old_password: passwordData.old_password,
-        new_password: passwordData.new_password,
+        new_password1: passwordData.new_password,
+        new_password2: passwordData.new_password,
       });
       toast.success('Password changed successfully');
       setPasswordData({ old_password: '', new_password: '', confirm_password: '' });
     } catch (error: any) {
-      toast.error(error.response?.data?.detail || 'Failed to change password. Check your current password.');
+      const errorData = error.response?.data;
+      if (errorData) {
+        // Extract the first error message from any field (old_password, new_password, or non_field_errors)
+        const firstError = Object.values(errorData)[0];
+        const message = Array.isArray(firstError) ? firstError[0] : (errorData.detail || 'Failed to change password.');
+        toast.error(message);
+      } else {
+        toast.error('Failed to change password. Please check your connection.');
+      }
     } finally {
       setLoading(false);
     }
@@ -162,7 +175,7 @@ export const SettingsPage = () => {
         {/* Sidebar Tabs */}
         <div className="lg:w-72 space-y-3">
           {tabs.map((tab) => {
-            if (tab.adminOnly && user?.role !== 'ADMIN') return null;
+            if (tab.adminOnly && user?.role !== ROLES.ADMIN) return null;
             const isActive = activeTab === tab.id;
 
             return (
@@ -284,32 +297,30 @@ export const SettingsPage = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div className="space-y-3">
                         <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pl-1">Current Password</label>
-                        <Input
-                          type="password"
+                        <PasswordInput
                           required
                           value={passwordData.old_password}
                           onChange={(e) => setPasswordData({ ...passwordData, old_password: e.target.value })}
-                          className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white text-sm font-bold h-auto focus:bg-white/10"
+                          className="w-full bg-white/5 border border-white/10 rounded-2xl px-12 py-4 text-white text-sm font-bold h-auto focus:bg-white/10"
                         />
                       </div>
                       <div className="space-y-3">
                         <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pl-1">New Password</label>
-                        <Input
-                          type="password"
+                        <PasswordInput
                           required
                           value={passwordData.new_password}
                           onChange={(e) => setPasswordData({ ...passwordData, new_password: e.target.value })}
-                          className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white text-sm font-bold h-auto focus:bg-white/10"
+                          className="w-full bg-white/5 border border-white/10 rounded-2xl px-12 py-4 text-white text-sm font-bold h-auto focus:bg-white/10"
                         />
+                        <PasswordHint />
                       </div>
                       <div className="space-y-3">
                         <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pl-1">Confirm New Password</label>
-                        <Input
-                          type="password"
+                        <PasswordInput
                           required
                           value={passwordData.confirm_password}
                           onChange={(e) => setPasswordData({ ...passwordData, confirm_password: e.target.value })}
-                          className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white text-sm font-bold h-auto focus:bg-white/10"
+                          className="w-full bg-white/5 border border-white/10 rounded-2xl px-12 py-4 text-white text-sm font-bold h-auto focus:bg-white/10"
                         />
                       </div>
                     </div>

@@ -1,44 +1,70 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { GraduationCap, Lock, Mail, User, School, ArrowRight, Loader2, ChevronLeft } from 'lucide-react';
+import { Mail, User, GraduationCap, School, ArrowRight, Loader2, ChevronLeft } from 'lucide-react';
+import { PasswordInput } from '../components/ui/PasswordInput';
+import { PasswordHint } from '../components/ui/PasswordHint';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import client from '../api/client';
+import { authService } from '../api/services/authService';
 
 export const RegisterPage = () => {
   const [formData, setFormData] = useState({
     school_name: '',
     email: '',
     password: '',
+    confirm_password: '',
     admin_name: '',
+    curriculum: 'CBC',
   });
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (formData.password !== formData.confirm_password) {
+      toast.error('Passwords do not match');
+      return;
+    }
+
     setIsLoading(true);
     const regToast = toast.loading('Creating your school account...');
     try {
       const [first_name, ...rest] = formData.admin_name.trim().split(' ');
       const last_name = rest.join(' ');
-      
+
       const payload = {
         school_name: formData.school_name,
         email: formData.email,
         password: formData.password,
         first_name: first_name || '',
-        last_name: last_name || ''
+        last_name: last_name || '',
+        curriculum: formData.curriculum
       };
-      
-      await client.post('accounts/register/', payload);
-      toast.success('Registration successful! Welcome to the family.', { id: regToast });
-      navigate('/login');
+
+      const response = await authService.register(payload);
+
+      toast.success('Registration successful! Please check your email for verification.', { id: regToast });
+
+      // Redirect to the new subdomain using the 'domain' field
+      const schoolDomain = response.school_details?.domain;
+
+
+      if (schoolDomain) {
+        // Construct the new URL (e.g., http://abd-academy.localhost/login)
+        const newUrl = `${window.location.protocol}//${schoolDomain}${window.location.port ? ':' + window.location.port : ''}/login`;
+
+        window.location.href = newUrl;
+      } else {
+        console.warn('No school domain found in response. Falling back to /login');
+        toast.error('Could not find your school domain. Please login manually.');
+        navigate('/login');
+      }
     } catch (error: any) {
       console.error('Registration failed', error);
       const errorData = error.response?.data;
       const errorMsg = error.message || 'Check your connection';
-      
+
       if (errorData && typeof errorData === 'object') {
         const firstErrorKey = Object.keys(errorData)[0];
         const firstErrorMsg = Array.isArray(errorData[firstErrorKey]) ? errorData[firstErrorKey][0] : errorData[firstErrorKey];
@@ -55,8 +81,8 @@ export const RegisterPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-transparent relative overflow-hidden px-4 py-12">
       <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-primary-500/10 rounded-full blur-[120px] animate-pulse-slow" />
       <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-accent-500/10 rounded-full blur-[120px] animate-pulse-slow" />
-      
-      <motion.div 
+
+      <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
@@ -68,7 +94,7 @@ export const RegisterPage = () => {
 
         <div className="glass p-8 md:p-12 rounded-[40px]">
           <div className="text-center mb-10">
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2 }}
@@ -113,6 +139,25 @@ export const RegisterPage = () => {
             </div>
 
             <div className="space-y-2">
+              <label className="text-sm font-semibold text-primary-200/70 ml-1">Curriculum System</label>
+              <div className="relative group">
+                <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-400/50 group-focus-within:text-primary-400" />
+                <select
+                  required
+                  value={formData.curriculum}
+                  onChange={(e) => setFormData({ ...formData, curriculum: e.target.value })}
+                  className="w-full bg-white/5 border border-white/10 text-white pl-12 pr-4 py-4 rounded-2xl outline-none focus:border-primary-500 transition-all text-base appearance-none cursor-pointer"
+                >
+                  <option value="CBC" className="bg-[#0f172a]">Kenya CBC (Competency Based Curriculum)</option>
+                  <option value="844" className="bg-[#0f172a]">Kenya 8-4-4 System</option>
+                  <option value="IGCSE_EDEXCEL" className="bg-[#0f172a]">Pearson Edexcel IGCSE</option>
+                  <option value="IGCSE_CAMBRIDGE" className="bg-[#0f172a]">Cambridge IGCSE</option>
+                </select>
+                <ArrowRight className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-400/50 pointer-events-none rotate-90" />
+              </div>
+            </div>
+
+            <div className="space-y-2">
               <label className="text-sm font-semibold text-primary-200/70 ml-1">Work Email</label>
               <div className="relative group">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-400/50 group-focus-within:text-primary-400" />
@@ -127,16 +172,26 @@ export const RegisterPage = () => {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-primary-200/70 ml-1">Password</label>
-              <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-400/50 group-focus-within:text-primary-400" />
-                <input
-                  type="password"
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-primary-200/70 ml-1">Password</label>
+                <PasswordInput
                   required
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 text-white pl-12 pr-4 py-4 rounded-2xl outline-none focus:border-primary-500 transition-all text-base"
+                  className="w-full bg-white/5 border border-white/10 text-white pl-12 pr-12 py-4 rounded-2xl outline-none focus:border-primary-500 transition-all text-base"
+                  placeholder="••••••••"
+                />
+                <PasswordHint />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-primary-200/70 ml-1">Confirm Password</label>
+                <PasswordInput
+                  required
+                  value={formData.confirm_password}
+                  onChange={(e) => setFormData({ ...formData, confirm_password: e.target.value })}
+                  className="w-full bg-white/5 border border-white/10 text-white pl-12 pr-12 py-4 rounded-2xl outline-none focus:border-primary-500 transition-all text-base"
                   placeholder="••••••••"
                 />
               </div>
@@ -151,7 +206,7 @@ export const RegisterPage = () => {
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 <>
-                  Create School Profile 
+                  Create School Profile
                   <ArrowRight className="w-5 h-5" />
                 </>
               )}

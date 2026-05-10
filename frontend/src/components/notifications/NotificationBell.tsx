@@ -23,10 +23,25 @@ export const NotificationBell = () => {
   }, []);
 
   const connectWS = () => {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = 'localhost:8000'; // Update for production
+    let wsUrl = '';
+    const envURL = import.meta.env.VITE_API_URL;
     
-    ws.current = new WebSocket(`${protocol}//${host}/ws/notifications/`);
+    if (envURL) {
+      const url = new URL(envURL);
+      const protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
+      wsUrl = `${protocol}//${url.host}/ws/notifications/`;
+    } else {
+      const { protocol, hostname, port } = window.location;
+      const wsProtocol = protocol === 'https:' ? 'wss:' : 'ws:';
+      
+      if (port === '' || port === '80' || port === '443') {
+        wsUrl = `${wsProtocol}//${hostname}/ws/notifications/`;
+      } else {
+        wsUrl = `${wsProtocol}//${hostname}:8000/ws/notifications/`;
+      }
+    }
+    
+    ws.current = new WebSocket(wsUrl);
     
     ws.current.onmessage = (e) => {
       const data = JSON.parse(e.data);
@@ -49,7 +64,7 @@ export const NotificationBell = () => {
     };
 
     ws.current.onclose = () => {
-      console.log('WS Disconnected. Reconnecting in 5s...');
+
       setTimeout(connectWS, 5000);
     };
   };

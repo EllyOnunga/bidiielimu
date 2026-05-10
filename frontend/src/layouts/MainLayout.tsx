@@ -1,6 +1,7 @@
 import { toast } from 'react-hot-toast';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ROLES } from '../constants/roles';
 import {
   LayoutDashboard,
   Users,
@@ -22,9 +23,10 @@ import {
   MessageSquare,
   Box,
   Scale,
-  BrainCircuit
+  BrainCircuit,
+  Layers
 } from 'lucide-react';
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore, type User } from '../store/authStore';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { CommandPalette } from '../components/CommandPalette';
 import { Breadcrumbs } from '../components/ui/Breadcrumbs';
@@ -32,6 +34,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { notificationsService } from '../api/services/notificationsService';
 import { useState } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
+import { ElimuHubLogo } from '../components/ui/Logo';
 
 interface NavItemProps {
   to: string;
@@ -68,12 +71,7 @@ const NavItem = ({ to, icon: Icon, label, onClick }: NavItemProps) => (
 );
 
 interface SidebarContentProps {
-  user: {
-    role: string;
-    email: string;
-    first_name?: string;
-    last_name?: string;
-  } | null;
+  user: User | null;
   schoolName: string;
   schoolLogo: string;
   setIsSidebarOpen: (open: boolean) => void;
@@ -88,12 +86,12 @@ const SidebarContent = ({ user, schoolName, schoolLogo, setIsSidebarOpen, handle
           {schoolLogo ? (
             <img src={schoolLogo} alt="Logo" className="w-full h-full object-cover" />
           ) : (
-            <GraduationCap className="w-7 h-7 text-white" />
+            <ElimuHubLogo className="w-8 h-8" showText={false} />
           )}
         </div>
         <div className="min-w-0">
           <h1 className="text-lg font-black text-white tracking-tight truncate w-32 font-serif" title={schoolName}>
-            {schoolName || 'Scholara'}
+            {schoolName || 'ElimuHub'}
           </h1>
           <p className="text-[10px] font-bold text-primary-400/60 uppercase tracking-widest">{user?.role} PORTAL</p>
         </div>
@@ -107,42 +105,78 @@ const SidebarContent = ({ user, schoolName, schoolLogo, setIsSidebarOpen, handle
     </div>
 
     <nav className="space-y-1.5 flex-1 overflow-y-auto pr-2 custom-scrollbar">
-      {(user?.role === 'ADMIN' || user?.role === 'TEACHER') && (
+      {/* Dashboard - Accessible by all staff roles */}
+      {(user?.role === ROLES.ADMIN || user?.role === ROLES.PRINCIPAL || user?.role === ROLES.TEACHER || user?.role === ROLES.HOD || user?.role === ROLES.SUPER_ADMIN || user?.role === ROLES.LIBRARIAN || user?.role === ROLES.FINANCE) && (
         <NavItem to="/dashboard" icon={LayoutDashboard} label="Dashboard" onClick={() => setIsSidebarOpen(false)} />
       )}
 
-      {(user?.role === 'ADMIN' || user?.role === 'TEACHER') && (
+      {/* Academic Section */}
+      {(user?.role === ROLES.ADMIN || user?.role === ROLES.PRINCIPAL || user?.role === ROLES.TEACHER || user?.role === ROLES.HOD) && (
         <>
           <div className="pt-4 pb-2 px-4 text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">Academic</div>
           <NavItem to="/students" icon={Users} label="Student Info (SIS)" onClick={() => setIsSidebarOpen(false)} />
-          <NavItem to="/lms" icon={BookOpen} label="LMS & Classes" onClick={() => setIsSidebarOpen(false)} />
+          <NavItem to="/lms" icon={GraduationCap} label="Learning Portal (LMS)" onClick={() => setIsSidebarOpen(false)} />
+          <NavItem to="/classes" icon={BookOpen} label="Academic Structure" onClick={() => setIsSidebarOpen(false)} />
           <NavItem to="/exams" icon={ClipboardList} label="Exams & Grading" onClick={() => setIsSidebarOpen(false)} />
+          <NavItem to="/grading" icon={Layers} label="Grading Systems" onClick={() => setIsSidebarOpen(false)} />
           <NavItem to="/attendance" icon={CheckSquare} label="Attendance" onClick={() => setIsSidebarOpen(false)} />
           <NavItem to="/timetable" icon={Calendar} label="Timetable" onClick={() => setIsSidebarOpen(false)} />
         </>
       )}
 
-      {user?.role === 'ADMIN' && (
+      {/* Operations Section - Dynamic based on role */}
+      {(user?.role === ROLES.ADMIN || user?.role === ROLES.PRINCIPAL || user?.role === ROLES.FINANCE || user?.role === ROLES.LIBRARIAN || user?.role === ROLES.TEACHER || user?.role === ROLES.HOD) && (
         <>
           <div className="pt-4 pb-2 px-4 text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">Operations</div>
-          <NavItem to="/finance" icon={Wallet} label="Finance & Fees" onClick={() => setIsSidebarOpen(false)} />
-          <NavItem to="/hr" icon={UserSquare2} label="Staff & HR" onClick={() => setIsSidebarOpen(false)} />
-          <NavItem to="/inventory" icon={Box} label="Inventory" onClick={() => setIsSidebarOpen(false)} />
-          <NavItem to="/discipline" icon={Scale} label="Discipline" onClick={() => setIsSidebarOpen(false)} />
 
+          {(user?.role === ROLES.ADMIN || user?.role === ROLES.PRINCIPAL || user?.role === ROLES.FINANCE) && (
+            <NavItem to="/fees" icon={Wallet} label="Finance & Fees" onClick={() => setIsSidebarOpen(false)} />
+          )}
+
+          {(user?.role === ROLES.ADMIN || user?.role === ROLES.PRINCIPAL) && (
+            <NavItem to="/hr/directory" icon={UserSquare2} label="Staff & HR" onClick={() => setIsSidebarOpen(false)} />
+          )}
+
+          {(user?.role === ROLES.ADMIN || user?.role === ROLES.PRINCIPAL || user?.role === ROLES.FINANCE) && (
+            <NavItem to="/hr/payroll" icon={ClipboardList} label="Payroll" onClick={() => setIsSidebarOpen(false)} />
+          )}
+
+          {(user?.role === ROLES.ADMIN || user?.role === ROLES.PRINCIPAL || user?.role === ROLES.LIBRARIAN) && (
+            <NavItem to="/inventory" icon={Box} label="Inventory" onClick={() => setIsSidebarOpen(false)} />
+          )}
+
+          {(user?.role === ROLES.ADMIN || user?.role === ROLES.PRINCIPAL || user?.role === ROLES.HOD || user?.role === ROLES.TEACHER) && (
+            <NavItem to="/discipline" icon={Scale} label="Discipline" onClick={() => setIsSidebarOpen(false)} />
+          )}
+        </>
+      )}
+
+      {/* Intelligence & System Sections */}
+      {(user?.role === ROLES.ADMIN || user?.role === ROLES.PRINCIPAL) && (
+        <>
           <div className="pt-4 pb-2 px-4 text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">Intelligence</div>
           <NavItem to="/analytics" icon={BrainCircuit} label="AI Analytics" onClick={() => setIsSidebarOpen(false)} />
 
           <div className="pt-4 pb-2 px-4 text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">System</div>
           <NavItem to="/communication" icon={MessageSquare} label="Communication" onClick={() => setIsSidebarOpen(false)} />
-          <NavItem to="/super-admin" icon={Shield} label="Super-Admin" onClick={() => setIsSidebarOpen(false)} />
           <NavItem to="/audit-logs" icon={ShieldAlert} label="Audit Logs" onClick={() => setIsSidebarOpen(false)} />
         </>
       )}
 
-      {(user?.role === 'STUDENT' || user?.role === 'PARENT') && (
+      {/* Platform Level Section */}
+      {user?.role === ROLES.SUPER_ADMIN && (
+        <>
+          <div className="pt-4 pb-2 px-4 text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">Platform Control</div>
+          <NavItem to="/super-admin" icon={Shield} label="Super-Admin" onClick={() => setIsSidebarOpen(false)} />
+          <NavItem to="/audit-logs" icon={ShieldAlert} label="System Audit" onClick={() => setIsSidebarOpen(false)} />
+        </>
+      )}
+
+      {/* Portal View for Students/Parents */}
+      {(user?.role === ROLES.STUDENT || user?.role === ROLES.PARENT) && (
         <>
           <NavItem to="/portal" icon={LayoutDashboard} label="Portal View" onClick={() => setIsSidebarOpen(false)} />
+          <NavItem to="/lms" icon={GraduationCap} label="Learning Portal (LMS)" onClick={() => setIsSidebarOpen(false)} />
           <NavItem to="/timetable" icon={Calendar} label="Timetable" onClick={() => setIsSidebarOpen(false)} />
         </>
       )}
@@ -152,11 +186,18 @@ const SidebarContent = ({ user, schoolName, schoolLogo, setIsSidebarOpen, handle
       <NavItem to="/settings" icon={Settings} label="Settings" onClick={() => setIsSidebarOpen(false)} />
       <button
         onClick={handleLogout}
-        className="flex items-center gap-3 px-4 py-3 w-full text-primary-200/50 hover:text-rose-400 hover:bg-rose-500/10 rounded-2xl transition-all font-bold text-sm"
+        className="flex items-center gap-3 px-4 py-3 w-full text-primary-200/50 hover:text-rose-400 hover:bg-rose-500/10 rounded-2xl transition-all font-bold text-sm mb-4"
       >
         <LogOut className="w-5 h-5" />
         Logout
       </button>
+
+      {/* Powered By Branding */}
+      <div className="flex flex-col items-center justify-center pt-4 pb-2 border-t border-white/5 opacity-50 hover:opacity-100 transition-opacity">
+        <ElimuHubLogo className="w-8 h-8" showText={false} />
+        <p className="text-[9px] font-bold text-white mt-2 uppercase tracking-[0.2em]">Powered by</p>
+        <p className="text-xs font-black text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-[#22c55e]">ElimuHub</p>
+      </div>
     </div>
   </div>
 );
@@ -173,6 +214,7 @@ export const MainLayout = () => {
   const { data: notifications = [] } = useQuery({
     queryKey: ['notifications'],
     queryFn: notificationsService.getAll,
+    enabled: user?.role !== 'SUPER_ADMIN', // Super Admin doesn't have tenant-specific notifications
     select: (data) => Array.isArray(data) ? data : (data.results || []),
     refetchInterval: 30000,
   });
@@ -214,15 +256,16 @@ export const MainLayout = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsSidebarOpen(false)}
-            className="fixed inset-0 bg-black/60 backdrop-blur-md z-[30] lg:hidden"
+            className="fixed inset-0 bg-black/40 backdrop-blur-md z-[45] lg:hidden"
           />
         )}
       </AnimatePresence>
 
       {/* Sidebar */}
       <aside className={`
-        w-72 p-6 flex flex-col glass fixed h-[calc(100vh-2rem)] top-4 left-4 rounded-[40px] z-[40] transition-transform duration-500 ease-in-out
+        w-[280px] p-6 flex flex-col glass fixed h-[calc(100vh-2rem)] top-4 left-4 rounded-[32px] z-[50] transition-all duration-500 ease-in-out
         lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-[calc(100%+2rem)]'}
+        shadow-2xl lg:shadow-none
       `}>
         <SidebarContent
           user={user}
@@ -233,111 +276,127 @@ export const MainLayout = () => {
         />
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 lg:ml-80 p-4 md:p-6 lg:p-8 relative min-h-screen w-full">
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-w-0 lg:ml-[312px]">
         {/* Header Bar */}
-        <header className="flex items-center justify-between mb-8 glass p-2 md:p-3 rounded-[32px] gap-4 sticky top-4 z-20">
-          <button
-            onClick={() => setIsSidebarOpen(true)}
-            className="lg:hidden p-3 text-primary-200/50 hover:text-white bg-white/5 rounded-2xl border border-white/5"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
-
-          <button
-            onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))}
-            className="flex items-center gap-3 px-5 py-3 bg-white/5 rounded-2xl text-primary-200/40 hover:text-primary-200/60 transition-all border border-white/5 flex-1 lg:flex-none lg:w-80 text-sm font-medium"
-          >
-            <Search className="w-4 h-4" />
-            <span className="hidden sm:inline">Quick Search...</span>
-            <kbd className="ml-auto bg-white/10 px-2 py-1 rounded-lg text-[10px] font-bold border border-white/10 hidden sm:inline">Ctrl K</kbd>
-          </button>
-
-          <div className="flex items-center gap-3 md:gap-4">
-            <div className="relative">
+        <header className="sticky top-0 z-[40] px-4 md:px-6 lg:px-8 py-4">
+          <div className="glass p-2 md:p-3 rounded-[24px] flex items-center justify-between gap-3 shadow-xl">
+            <div className="flex items-center gap-2 lg:hidden">
               <button
-                onClick={() => setShowNotifications(!showNotifications)}
-                className={`p-3 rounded-2xl border transition-all relative ${showNotifications ? 'bg-primary-600 border-primary-500 text-white shadow-premium' : 'bg-white/5 border-white/5 text-primary-200/50 hover:text-white'
-                  }`}
+                onClick={() => setIsSidebarOpen(true)}
+                className="p-3 text-primary-200/50 hover:text-white bg-white/5 rounded-2xl border border-white/5 transition-all active:scale-95 shrink-0"
               >
-                <Bell className="w-5 h-5" />
-                {unreadCount > 0 && (
-                  <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-accent-500 rounded-full border-2 border-primary-950 animate-pulse" />
-                )}
+                <Menu className="w-5 h-5" />
               </button>
-
-              <AnimatePresence>
-                {showNotifications && (
-                  <>
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      onClick={() => setShowNotifications(false)}
-                      className="fixed inset-0 z-[-1]"
-                    />
-                    <motion.div
-                      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 20, scale: 0.95 }}
-                      className="absolute right-0 mt-6 w-96 glass rounded-[32px] shadow-premium overflow-hidden p-3 z-[60]"
-                    >
-                      <div className="p-4 flex items-center justify-between">
-                        <h3 className="font-black text-white text-lg">Notifications</h3>
-                        {unreadCount > 0 && (
-                          <span className="text-[10px] font-black bg-accent-600 text-white px-3 py-1 rounded-full uppercase tracking-tighter">{unreadCount} New</span>
-                        )}
-                      </div>
-                      <div className="max-h-[450px] overflow-y-auto pr-1 space-y-2">
-                        {!Array.isArray(notifications) || notifications.length === 0 ? (
-                          <div className="p-12 text-center text-primary-200/30 text-sm font-medium">
-                            No notifications yet
-                          </div>
-                        ) : (
-                          notifications.map((n) => (
-                            <motion.div
-                              key={n.id}
-                              layout
-                              onClick={() => markAsRead(n.id)}
-                              className={`p-4 hover:bg-white/5 rounded-2xl transition-all cursor-pointer group border border-transparent hover:border-white/10 ${!n.is_read ? 'bg-primary-500/5' : ''}`}
-                            >
-                              <div className="flex items-start gap-4">
-                                <div className={`w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 ${n.notification_type === 'success' ? 'bg-emerald-500' : n.notification_type === 'warning' ? 'bg-amber-500' : 'bg-primary-500'
-                                  } ${n.is_read ? 'opacity-20' : ''}`} />
-                                <div className="flex-1 min-w-0">
-                                  <p className={`text-sm font-bold truncate ${n.is_read ? 'text-primary-200/40' : 'text-white'}`}>{n.title}</p>
-                                  <p className="text-[11px] text-primary-200/50 line-clamp-2 mt-0.5 leading-relaxed">{n.message}</p>
-                                  <p className="text-[9px] font-bold text-primary-200/30 mt-2 uppercase tracking-tight">{new Date(n.created_at).toLocaleDateString()}</p>
-                                </div>
-                              </div>
-                            </motion.div>
-                          ))
-                        )}
-                      </div>
-                      <button
-                        onClick={markAllAsRead}
-                        className="w-full py-4 text-xs font-black text-primary-400 hover:text-primary-300 transition-all border-t border-white/5 mt-2 uppercase tracking-widest"
-                      >
-                        Clear All
-                      </button>
-                    </motion.div>
-                  </>
+              
+              <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center overflow-hidden shrink-0 border border-white/10 shadow-sm ml-1">
+                {logoUrl ? (
+                  <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                ) : (
+                  <ElimuHubLogo className="w-6 h-6" showText={false} />
                 )}
-              </AnimatePresence>
+              </div>
             </div>
-            <ThemeToggle />
+
+            <button
+              onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))}
+              className="flex items-center gap-3 px-4 py-2.5 bg-white/5 rounded-xl text-primary-200/40 hover:text-primary-200/60 transition-all border border-white/5 flex-1 lg:max-w-md text-sm font-medium group"
+            >
+              <Search className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              <span className="hidden sm:inline">Quick Search...</span>
+              <kbd className="ml-auto bg-white/10 px-2 py-0.5 rounded text-[10px] font-bold border border-white/10 hidden sm:inline opacity-50">⌘K</kbd>
+            </button>
+
+            <div className="flex items-center gap-2 md:gap-4">
+              <div className="relative">
+                <button
+                  onClick={() => setShowNotifications(!showNotifications)}
+                  className={`p-2.5 rounded-xl border transition-all relative active:scale-95 ${showNotifications ? 'bg-primary-600 border-primary-500 text-white shadow-premium' : 'bg-white/5 border-white/5 text-primary-200/50 hover:text-white'
+                    }`}
+                >
+                  <Bell className="w-5 h-5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-primary-950 animate-pulse shadow-glow" />
+                  )}
+                </button>
+
+                <AnimatePresence>
+                  {showNotifications && (
+                    <>
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setShowNotifications(false)}
+                        className="fixed inset-0 z-[-1]"
+                      />
+                      <motion.div
+                        initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 15, scale: 0.95 }}
+                        className="absolute right-0 mt-4 w-[calc(100vw-2rem)] sm:w-96 glass rounded-[24px] shadow-2xl overflow-hidden p-2 z-[60]"
+                      >
+                        <div className="p-4 flex items-center justify-between border-b border-white/5 mb-2">
+                          <h3 className="font-bold text-white">Notifications</h3>
+                          {unreadCount > 0 && (
+                            <span className="text-[10px] font-black bg-rose-500 text-white px-2 py-0.5 rounded-full uppercase">{unreadCount} New</span>
+                          )}
+                        </div>
+                        <div className="max-h-[60vh] sm:max-h-[400px] overflow-y-auto pr-1 space-y-1 custom-scrollbar">
+                          {!Array.isArray(notifications) || notifications.length === 0 ? (
+                            <div className="p-10 text-center text-primary-200/30 text-xs font-medium italic">
+                              No new transmissions
+                            </div>
+                          ) : (
+                            notifications.map((n) => (
+                              <motion.div
+                                key={n.id}
+                                layout
+                                onClick={() => markAsRead(n.id)}
+                                className={`p-3.5 hover:bg-white/5 rounded-xl transition-all cursor-pointer group border border-transparent hover:border-white/5 ${!n.is_read ? 'bg-primary-500/5' : ''}`}
+                              >
+                                <div className="flex items-start gap-3">
+                                  <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${n.notification_type === 'success' ? 'bg-emerald-500' : n.notification_type === 'warning' ? 'bg-amber-500' : 'bg-primary-500'
+                                    } ${n.is_read ? 'opacity-20' : 'shadow-glow'}`} />
+                                  <div className="flex-1 min-w-0">
+                                    <p className={`text-xs font-bold truncate ${n.is_read ? 'text-primary-200/40' : 'text-white'}`}>{n.title}</p>
+                                    <p className="text-[10px] text-primary-200/50 line-clamp-2 mt-0.5 leading-tight">{n.message}</p>
+                                    <p className="text-[8px] font-bold text-primary-200/20 mt-1.5 uppercase">{new Date(n.created_at).toLocaleDateString()}</p>
+                                  </div>
+                                </div>
+                              </motion.div>
+                            ))
+                          )}
+                        </div>
+                        <button
+                          onClick={markAllAsRead}
+                          className="w-full py-3 text-[10px] font-black text-primary-400 hover:text-primary-300 transition-all border-t border-white/5 mt-2 uppercase tracking-[0.2em]"
+                        >
+                          Clear Archive
+                        </button>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+              </div>
+              <ThemeToggle />
+            </div>
           </div>
         </header>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <Breadcrumbs />
-          <Outlet />
-        </motion.div>
-      </main>
+        {/* Content Wrapper */}
+        <main className="flex-1 px-4 md:px-6 lg:px-8 pb-12 relative min-h-0">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+            className="max-w-[1600px] mx-auto w-full"
+          >
+            <Breadcrumbs />
+            <Outlet />
+          </motion.div>
+        </main>
+      </div>
     </div>
   );
 };

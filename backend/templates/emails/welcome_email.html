@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Welcome to ElimuHub</title>
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; background-color: #f8fafc; color: #0B132B; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(11, 19, 43, 0.05); }
+        .header { background: linear-gradient(135deg, #0B132B 0%, #0d1b3e 100%); padding: 40px 20px; text-align: center; }
+        .logo { font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: 1px; margin: 0; }
+        .logo span { color: #22c55e; }
+        .content { padding: 40px; }
+        h1 { color: #0B132B; font-size: 24px; margin-top: 0; margin-bottom: 20px; }
+        p { color: #475569; line-height: 1.6; margin-bottom: 24px; font-size: 16px; }
+        .credentials-box { background-color: #f0fdf4; border-left: 4px solid #22c55e; padding: 20px; border-radius: 0 8px 8px 0; margin-bottom: 30px; }
+        .credentials-box p { margin: 8px 0; color: #0B132B; font-size: 15px; }
+        .credentials-box strong { color: #166534; }
+        .button-container { text-align: center; margin: 35px 0; }
+        .button { display: inline-block; padding: 14px 32px; background-color: #22c55e; color: #ffffff !important; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; transition: background-color 0.2s; }
+        .button:hover { background-color: #16a34a; }
+        .footer { background-color: #f8fafc; padding: 24px; text-align: center; border-top: 1px solid #e2e8f0; }
+        .footer p { color: #94a3b8; font-size: 14px; margin: 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2 class="logo">Elimu<span>Hub</span></h2>
+        </div>
+        
+        <div class="content">
+            <h1>Welcome to ElimuHub, {{ user.first_name }}!</h1>
+            
+            {% if plain_password %}
+                <p>An administrator has created an account for you on the ElimuHub platform. You can use the credentials below to log into your school's dashboard.</p>
+                
+                <div class="credentials-box">
+                    <p><strong>Login URL:</strong> <a href="{{ login_url }}" style="color: #22c55e;">{{ login_url }}</a></p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    <p><strong>Temporary Password:</strong> {{ plain_password }}</p>
+                </div>
+                
+                <p><em>For security reasons, please change your password immediately after logging in for the first time.</em></p>
+            {% else %}
+                <p>Your email has been successfully verified! Your school management platform is now ready to use.</p>
+                
+                <div class="credentials-box">
+                    <p><strong>Your Dashboard URL:</strong> <a href="{{ login_url }}" style="color: #22c55e;">{{ login_url }}</a></p>
+                    <p><strong>Registered Email:</strong> {{ user.email }}</p>
+                </div>
+            {% endif %}
+
+            <div class="button-container">
+                <a href="{{ login_url }}" class="button">Log In Now</a>
+            </div>
+            
+            <p>If you have any questions or need assistance, our support team is always here to help.</p>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; {% now "Y" %} ElimuHub. All rights reserved.</p>
+            <p>The modern school management system.</p>
+        </div>
+    </div>
+</body>
+</html>

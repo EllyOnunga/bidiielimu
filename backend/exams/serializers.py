@@ -42,12 +42,16 @@ class ExamSerializer(serializers.ModelSerializer):
 class MarkSerializer(serializers.ModelSerializer):
     student_name = serializers.SerializerMethodField()
     subject_name = serializers.CharField(source='subject.name', read_only=True)
+    grade = serializers.SerializerMethodField()
+    points = serializers.SerializerMethodField()
+    remarks = serializers.SerializerMethodField()
 
     class Meta:
         model = Mark
         fields = [
             'id', 'exam', 'student', 'student_name', 
             'subject', 'subject_name', 'score', 
+            'grade', 'points', 'remarks',
             'is_absent', 'teacher_remarks'
         ]
 
@@ -57,7 +61,7 @@ class MarkSerializer(serializers.ModelSerializer):
             return data
             
         user = request.user
-        if user.role == 'TEACHER':
+        if user.role_name == 'TEACHER':
             from classes.models import ScheduleSlot
             student = data.get('student')
             subject = data.get('subject')
@@ -78,4 +82,39 @@ class MarkSerializer(serializers.ModelSerializer):
 
     def get_student_name(self, obj):
         return f"{obj.student.first_name} {obj.student.last_name}"
+
+    def _get_threshold(self, obj):
+        if not obj.exam.grading_system:
+            return None
+            
+        rounded_score = round(float(obj.score))
+        
+        threshold = obj.exam.grading_system.thresholds.filter(
+            min_score__lte=rounded_score,
+            max_score__gte=rounded_score
+        ).first()
+        
+        if not threshold:
+            # Fallback to nearest threshold if score is slightly out of bounds
+            thresholds = obj.exam.grading_system.thresholds.order_by('min_score')
+            if thresholds.exists():
+                if rounded_score < thresholds.first().min_score:
+                    return thresholds.first()
+                if rounded_score > thresholds.last().max_score:
+                    return thresholds.last()
+                    
+        return threshold
+
+    def get_grade(self, obj):
+        threshold = self._get_threshold(obj)
+        return threshold.grade if threshold else "-"
+
+    def get_points(self, obj):
+        threshold = self._get_threshold(obj)
+        return threshold.points if threshold else 0
+
+    def get_remarks(self, obj):
+        threshold = self._get_threshold(obj)
+        return threshold.remarks if threshold else ""
+
 

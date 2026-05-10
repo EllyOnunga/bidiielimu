@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import {
   Book, Wallet, ClipboardList, CheckSquare,
   ChevronRight, Calendar, User, ArrowRight,
-  TrendingUp, Clock
+  TrendingUp, Clock, Bell, Megaphone
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -91,27 +91,42 @@ export const PortalDashboard = () => {
     enabled: !!selectedStudentId
   });
 
-  // Attendance Stats
+  // Attendance Stats — per student from DB
   const { data: attendanceStats, isLoading: loadingAttendance } = useQuery({
     queryKey: ['portal-attendance', selectedStudentId],
     queryFn: async () => {
-      const res = await client.get(`attendance/daily/stats/`); // This is global, but ideally we'd have student specific stats
+      const res = await client.get(`attendance/daily/student_stats/?student_id=${selectedStudentId}`);
       return res.data;
     },
     enabled: !!selectedStudentId
   });
 
-  // Fee Balance
-  const { data: feeBalances = [] } = useQuery({
-    queryKey: ['portal-fees'],
+  // Fee Summary — scoped to this student/parent from DB
+  const { data: feeSummary } = useQuery({
+    queryKey: ['portal-fees', selectedStudentId],
     queryFn: async () => {
-      const res = await client.get('fees/payments/student_balances/');
-      return Array.isArray(res.data) ? res.data : (res.data.results || []);
+      const params = user?.role === 'PARENT' && selectedStudentId
+        ? `?student_id=${selectedStudentId}`
+        : '';
+      const res = await client.get(`fees/payments/my_fee_summary/${params}`);
+      return res.data;
     },
     enabled: !!selectedStudentId
   });
 
-  const myBalance = feeBalances.find((b: any) => b.student_id === selectedStudentId);
+  // Library Books — from active issues
+  const { data: myBooks = [] } = useQuery({
+    queryKey: ['portal-library', selectedStudentId],
+    queryFn: async () => {
+      const params = selectedStudentId ? `?student_id=${selectedStudentId}` : '';
+      const res = await client.get(`inventory/book-issues/my_books/${params}`);
+      return res.data;
+    },
+    enabled: !!selectedStudentId
+  });
+
+  const activeBooksCount = myBooks.length;
+  const overdueBooks = myBooks.filter((b: any) => b.is_overdue).length;
 
   // Schedule
   const { data: schedule = [] } = useQuery({
@@ -188,12 +203,12 @@ export const PortalDashboard = () => {
       {/* Stats Overview */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <PortalStat
-          label="Attendance"
-          value={loadingAttendance ? '...' : (attendanceStats?.avg || '0%')}
+          label="Attendance Rate"
+          value={loadingAttendance ? '...' : (attendanceStats ? `${attendanceStats.attendance_rate}%` : '—')}
           icon={CheckSquare}
           color="bg-emerald-500/20"
           to="/attendance"
-          trend={attendanceStats?.date ? `As of ${attendanceStats.date}` : ''}
+          trend={attendanceStats?.as_of ? `As of ${attendanceStats.as_of}` : ''}
         />
         <PortalStat
           label="Academic Mean"
@@ -205,16 +220,18 @@ export const PortalDashboard = () => {
         />
         <PortalStat
           label="Fee Balance"
-          value={myBalance ? `KSh ${parseFloat(myBalance.balance).toLocaleString()}` : '0.00'}
+          value={feeSummary ? `KSh ${feeSummary.balance.toLocaleString()}` : '—'}
           icon={Wallet}
           color="bg-rose-500/20"
           to="/fees"
+          trend={feeSummary?.is_cleared ? '✓ Cleared' : feeSummary ? `KSh ${feeSummary.total_paid.toLocaleString()} paid` : ''}
         />
         <PortalStat
-          label="Library Books"
-          value="2"
+          label="My Books on Loan"
+          value={activeBooksCount.toString()}
           icon={Book}
           color="bg-purple-500/20"
+          trend={overdueBooks > 0 ? `${overdueBooks} overdue` : activeBooksCount > 0 ? 'All good' : ''}
         />
       </div>
 
@@ -314,36 +331,82 @@ export const PortalDashboard = () => {
           </div>
 
           {/* School Announcements */}
-          <div className="glass-dark p-8 rounded-[2.5rem] border border-white/5 shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4">
-              <span className="flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-primary-500"></span>
-              </span>
-            </div>
-            <h2 className="text-lg font-black text-white mb-6 uppercase tracking-widest text-[10px] text-slate-500">Announcements</h2>
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded text-[8px] font-bold bg-primary-500/20 text-primary-400 uppercase">Event</span>
-                  <span className="text-[10px] text-slate-600 font-bold">Today, 2:00 PM</span>
-                </div>
-                <p className="text-sm font-bold text-white">Annual Sports Day Meeting</p>
-                <p className="text-xs text-slate-500 leading-relaxed">All students are required to attend the briefing in the main hall.</p>
-              </div>
-              <div className="w-full h-px bg-white/5" />
-              <div className="space-y-2 opacity-50">
-                <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded text-[8px] font-bold bg-slate-800 text-slate-500 uppercase">General</span>
-                  <span className="text-[10px] text-slate-600 font-bold">Yesterday</span>
-                </div>
-                <p className="text-sm font-bold text-white">Term 1 Fee Deadline</p>
-                <p className="text-xs text-slate-500 leading-relaxed">Please ensure all balances are cleared by Friday to avoid disruption.</p>
-              </div>
-            </div>
-          </div>
+          <NoticesWidget />
         </div>
       </div>
+    </div>
+  );
+};
+
+const NoticesWidget = () => {
+  const { data: notices = [], isLoading } = useQuery({
+    queryKey: ['school-notices'],
+    queryFn: async () => {
+      const res = await client.get('notifications/notices/?ordering=-published_at&page_size=3');
+      const data = Array.isArray(res.data) ? res.data : (res.data.results || []);
+      return data.slice(0, 3);
+    },
+  });
+
+  const formatDate = (dateStr: string) => {
+    const d = new Date(dateStr);
+    const now = new Date();
+    const diffDays = Math.floor((now.getTime() - d.getTime()) / 86400000);
+    if (diffDays === 0) return `Today, ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    if (diffDays === 1) return 'Yesterday';
+    return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  };
+
+  return (
+    <div className="glass-dark p-8 rounded-[2.5rem] border border-white/5 shadow-2xl relative overflow-hidden">
+      {notices.length > 0 && (
+        <div className="absolute top-0 right-0 p-4">
+          <span className="flex h-3 w-3">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-primary-500"></span>
+          </span>
+        </div>
+      )}
+      <div className="flex items-center gap-3 mb-6">
+        <Megaphone className="w-4 h-4 text-primary-400" />
+        <h2 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Announcements</h2>
+      </div>
+      {isLoading ? (
+        <div className="space-y-4">
+          {[1, 2].map(i => (
+            <div key={i} className="space-y-2 animate-pulse">
+              <div className="h-3 bg-white/10 rounded w-1/3" />
+              <div className="h-4 bg-white/10 rounded w-3/4" />
+              <div className="h-3 bg-white/5 rounded w-full" />
+            </div>
+          ))}
+        </div>
+      ) : notices.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-8 text-slate-600">
+          <Bell className="w-8 h-8 mb-2 opacity-30" />
+          <p className="text-xs font-bold uppercase tracking-widest">No announcements yet</p>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {notices.map((notice: any, i: number) => (
+            <div key={notice.id}>
+              {i > 0 && <div className="w-full h-px bg-white/5 mb-6" />}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded text-[8px] font-bold bg-primary-500/20 text-primary-400 uppercase">
+                    {notice.target_audience || 'General'}
+                  </span>
+                  <span className="text-[10px] text-slate-600 font-bold">
+                    {formatDate(notice.published_at)}
+                  </span>
+                </div>
+                <p className="text-sm font-bold text-white">{notice.title}</p>
+                <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">{notice.content}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

@@ -4,8 +4,8 @@ import os
 
 class SMSService:
     def __init__(self):
-        self.username = os.getenv('AT_USERNAME', 'sandbox')
-        self.api_key = os.getenv('AT_API_KEY')
+        self.username = settings.AT_USERNAME
+        self.api_key = settings.AT_API_KEY
         africastalking.initialize(self.username, self.api_key)
         self.sms = africastalking.SMS
 

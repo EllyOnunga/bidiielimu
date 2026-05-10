@@ -7,7 +7,7 @@ class StaffProfile(models.Model):
         ('ON_LEAVE', 'On Leave'),
         ('TERMINATED', 'Terminated'),
     )
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='staff_profile')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='hr_staff_profile')
     employee_id = models.CharField(max_length=50, unique=True)
     department = models.CharField(max_length=100)
     job_title = models.CharField(max_length=100)

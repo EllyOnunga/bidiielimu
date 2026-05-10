@@ -13,15 +13,15 @@ class TenantThemeView(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         if connection.schema_name == 'public':
             return Response({
-                "school_name": "Scholara Platform",
-                "primary_color": "#2DD4BF", # Teal
+                "school_name": "ElimuHub Platform",
+                "primary_color": "#2DD4BF",
                 "logo_url": None,
                 "schema_name": "public"
             })
 
         try:
             school = School.objects.get(schema_name=connection.schema_name)
-            settings_obj = SchoolSetting.objects.first() # Tenant isolated, so only 1 row
+            settings_obj = SchoolSetting.objects.first()
             
             return Response({
                 "school_name": school.name,
@@ -29,5 +29,5 @@ class TenantThemeView(generics.GenericAPIView):
                 "logo_url": request.build_absolute_uri(school.logo.url) if school.logo else None,
                 "schema_name": school.schema_name
             })
-        except School.DoesNotExist:
-            return Response({"detail": "Tenant not found."}, status=404)
+        except Exception:
+            return Response({"school_name": "ElimuHub", "primary_color": "#6366f1", "schema_name": "public"})

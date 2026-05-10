@@ -14,5 +14,5 @@ python manage.py migrate_schemas --tenant --noinput
 # Collect static files
 python manage.py collectstatic --noinput
 
-# Start Daphne
-exec daphne -b 0.0.0.0 -p 8000 config.asgi:application
+# Execute the command passed as arguments
+exec "$@"

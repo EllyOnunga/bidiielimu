@@ -5,11 +5,11 @@ from django.conf import settings
 from .models import FeePayment
 
 class MpesaService:
-    CONSUMER_KEY = "YOUR_CONSUMER_KEY"
-    CONSUMER_SECRET = "YOUR_CONSUMER_SECRET"
-    SHORTCODE = "174379"
-    PASSKEY = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"
-    BASE_URL = "https://sandbox.safaricom.co.ke"
+    CONSUMER_KEY = settings.MPESA_CONSUMER_KEY
+    CONSUMER_SECRET = settings.MPESA_CONSUMER_SECRET
+    SHORTCODE = settings.MPESA_SHORTCODE
+    PASSKEY = settings.MPESA_PASSKEY
+    BASE_URL = "https://sandbox.safaricom.co.ke" if settings.DEBUG else "https://api.safaricom.co.ke"
 
     @staticmethod
     def get_access_token():
@@ -32,7 +32,7 @@ class MpesaService:
             "PartyA": phone,
             "PartyB": MpesaService.SHORTCODE,
             "PhoneNumber": phone,
-            "CallBackURL": "https://yourdomain.com/api/v1/fees/mpesa-webhook/",
+            "CallBackURL": settings.MPESA_CALLBACK_URL,
             "AccountReference": f"INV-{invoice_id}",
             "TransactionDesc": "School Fees Payment"
         }

@@ -1,20 +1,35 @@
-# Stage 1: Build
-FROM node:20-slim as build
+# Build stage
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
+# Copy package files
 COPY package*.json ./
-RUN npm install
 
+# Install dependencies
+RUN npm ci 
+
+# Copy source code
 COPY . .
+
+# Build application
 RUN npm run build
 
-# Stage 2: Serve
-FROM nginx:stable-alpine
+# Production stage
+FROM nginx:alpine
 
-COPY --from=build /app/dist /usr/share/nginx/html
+# Copy built application
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
+# Expose port
 EXPOSE 80
 
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost/health || exit 1
+
+# Start nginx
 CMD ["nginx", "-g", "daemon off;"]

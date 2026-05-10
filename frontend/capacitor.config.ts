@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.bidiielimu.app',
-  appName: 'Scholara',
+  appName: 'ElimuHub',
   webDir: 'dist'
 };
 

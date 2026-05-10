@@ -23,7 +23,19 @@ class AIReportService:
 
         # 3. LLM API Call (Mocked for now)
         # In production: response = openai.ChatCompletion.create(model="gpt-4", messages=[...])
-        ai_draft = f"AI PREVIEW: {student.first_name} has shown steady progress this term, particularly in subjects like {marks[0].subject.name if marks else 'General Studies'}. While academic performance is stable, more focus on consistent review would yield even better results. Keep up the effort!"
+        
+        # Enhanced Simulation: Create a nuanced comment based on marks
+        avg_score = sum([float(m.score) for m in marks]) / len(marks) if marks else 0
+        strength_subjects = [m.subject.name for m in marks if float(m.score) >= 80]
+        improvement_subjects = [m.subject.name for m in marks if float(m.score) < 50]
+        
+        strength_text = f" particularly excelling in {', '.join(strength_subjects)}" if strength_subjects else ""
+        improvement_text = f" However, {student.first_name} should focus more on {', '.join(improvement_subjects)} to improve the overall grade." if improvement_subjects else " Maintain this level of dedication across all units."
+        
+        ai_draft = (
+            f"{student.first_name} has achieved an average of {avg_score:.1f}% this term{strength_text}."
+            f"{improvement_text} Overall, {student.first_name} is a {'diligent' if avg_score > 70 else 'capable'} student with potential for further growth."
+        )
         
         # 4. Save Draft
         report.ai_comment_draft = ai_draft

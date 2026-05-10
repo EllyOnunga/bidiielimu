@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { BookOpen, Plus, Users, ChevronRight, GraduationCap, Trash2, Search } from 'lucide-react';
+import { BookOpen, Plus, Users, ChevronRight, GraduationCap, Trash2, Search, Settings } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { classesService, type GradeLevel } from '../api/services/classesService';
+import { classesService, type GradeLevel, type Stream } from '../api/services/classesService';
+import { teachersService } from '../api/services/teachersService';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Modal } from '../components/ui/Modal';
@@ -25,6 +26,8 @@ export const ClassesPage = () => {
 
   const [gradeToDelete, setGradeToDelete] = useState<GradeLevel | null>(null);
   const [streamToDelete, setStreamToDelete] = useState<{id: number, name: string} | null>(null);
+  const [editingStream, setEditingStream] = useState<Stream | null>(null);
+  const [editStreamData, setEditStreamData] = useState({ name: '', teacher: '' });
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
@@ -86,6 +89,24 @@ export const ClassesPage = () => {
     }
   });
 
+  const updateStreamMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: any }) => classesService.updateStream(id, data),
+    onSuccess: () => {
+      toast.success('Stream updated successfully!');
+      setEditingStream(null);
+      queryClient.invalidateQueries({ queryKey: ['grades'] });
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.detail || 'Failed to update stream');
+    }
+  });
+
+  const { data: teachers = [] } = useQuery({
+    queryKey: ['teachers'],
+    queryFn: () => teachersService.getAll(),
+    select: (data) => Array.isArray(data) ? data : (data.results || []),
+  });
+
   const handleAddGrade = async (e: React.FormEvent) => {
     e.preventDefault();
     createGradeMutation.mutate({ name: gradeName });
@@ -103,6 +124,14 @@ export const ClassesPage = () => {
     if (targetGradeId) {
       createStreamMutation.mutate({ grade_level: targetGradeId, name: streamName });
     }
+  };
+
+  const handleEditStream = (stream: Stream) => {
+    setEditingStream(stream);
+    setEditStreamData({ 
+      name: stream.name, 
+      teacher: stream.teacher ? stream.teacher.toString() : ''
+    });
   };
   const [showSubjectModal, setShowSubjectModal] = useState(false);
   const [subjectData, setSubjectData] = useState({ name: '', code: '' });
@@ -268,15 +297,26 @@ export const ClassesPage = () => {
                           <div className="text-[9px] font-black text-primary-200/30 uppercase tracking-widest truncate max-w-[120px]">
                             Lead: {stream.teacher_name || 'Unassigned'}
                           </div>
-                          <button 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setStreamToDelete({id: stream.id, name: `${grade.name} ${stream.name}`});
-                            }}
-                            className="p-2 hover:bg-rose-500/10 text-primary-200/20 hover:text-rose-400 rounded-xl transition-all"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                          <div className="flex items-center gap-1">
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditStream(stream);
+                              }}
+                              className="p-2 hover:bg-primary-500/10 text-primary-200/20 hover:text-primary-400 rounded-xl transition-all"
+                            >
+                              <Settings className="w-3.5 h-3.5" />
+                            </button>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setStreamToDelete({id: stream.id, name: `${grade.name} ${stream.name}`});
+                              }}
+                              className="p-2 hover:bg-rose-500/10 text-primary-200/20 hover:text-rose-400 rounded-xl transition-all"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </div>
                       </button>
                     ))}
@@ -404,6 +444,63 @@ export const ClassesPage = () => {
             </Button>
             <Button type="submit" className="flex-[2] h-14 rounded-2xl font-black uppercase tracking-widest text-xs shadow-premium" disabled={createStreamMutation.isPending}>
               {createStreamMutation.isPending ? 'Deploying...' : 'Execute Deployment'}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal
+        isOpen={editingStream !== null}
+        onClose={() => setEditingStream(null)}
+        title="Operational Unit Modification"
+        description="Optimize the stream's configuration and leadership assignment."
+        className="max-w-md glass border-white/10"
+      >
+        <form 
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (editingStream) {
+              updateStreamMutation.mutate({ 
+                id: editingStream.id, 
+                data: { 
+                  name: editStreamData.name,
+                  teacher: editStreamData.teacher ? parseInt(editStreamData.teacher) : null
+                } 
+              });
+            }
+          }} 
+          className="space-y-8 mt-6 pb-2"
+        >
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">Stream Title</label>
+              <Input
+                required
+                value={editStreamData.name}
+                onChange={e => setEditStreamData(prev => ({ ...prev, name: e.target.value }))}
+                className="bg-white/5 border-white/5 rounded-xl h-14"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">Commanding Officer (Class Teacher)</label>
+              <select 
+                value={editStreamData.teacher}
+                onChange={e => setEditStreamData(prev => ({ ...prev, teacher: e.target.value }))}
+                className="w-full h-14 bg-white/5 border border-white/5 rounded-xl px-4 text-white text-sm outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+              >
+                <option value="">Unassigned</option>
+                {teachers.map((t: any) => (
+                  <option key={t.id} value={t.id}>{t.first_name} {t.last_name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="flex gap-4">
+            <Button type="button" variant="outline" className="flex-1 h-14 bg-white/5 border-white/5 text-primary-200/50 rounded-2xl font-black uppercase tracking-widest text-xs" onClick={() => setEditingStream(null)}>
+              Abort
+            </Button>
+            <Button type="submit" className="flex-[2] h-14 rounded-2xl font-black uppercase tracking-widest text-xs shadow-premium" disabled={updateStreamMutation.isPending}>
+              {updateStreamMutation.isPending ? 'Syncing...' : 'Commit Changes'}
             </Button>
           </div>
         </form>

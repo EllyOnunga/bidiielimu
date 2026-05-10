@@ -19,16 +19,24 @@ class PortalService:
             # 1. Performance
             latest_avg = ExamRanking.objects.filter(student=student).order_by('-exam__date').first()
             
-            # 2. Financials
+            # 2. Financials — look up expected fees from FeeStructure for student's grade
             total_paid = FeePayment.objects.filter(student=student).aggregate(Sum('amount'))['amount__sum'] or 0
-            # Assuming a simple logic for balance for now
-            total_payable = 50000 # Placeholder for actual structure lookup
+            total_payable = 0
+            if student.stream and student.stream.grade_level_id:
+                grade_fee = FeeStructure.objects.filter(
+                    grade_level_id=student.stream.grade_level_id
+                ).aggregate(total=Sum('amount'))['total'] or 0
+                total_payable = grade_fee
             balance = total_payable - total_paid
             
             # 3. Attendance
             total_days = DailyAttendance.objects.filter(student=student).count()
             present_days = DailyAttendance.objects.filter(student=student, status='PRESENT').count()
             attendance_rate = (present_days / total_days * 100) if total_days > 0 else 100
+
+            # 4. Library Books
+            from inventory.models import BookIssue
+            books_on_loan = BookIssue.objects.filter(student=student, status='ISSUED').count()
 
             children_data.append({
                 "student_id": student.id,
@@ -43,7 +51,8 @@ class PortalService:
                     "paid": total_paid,
                     "balance": balance
                 },
-                "attendance_rate": round(attendance_rate, 2)
+                "attendance_rate": round(attendance_rate, 2),
+                "books_on_loan": books_on_loan
             })
             
         return children_data

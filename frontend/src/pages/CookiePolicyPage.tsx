@@ -22,7 +22,7 @@ export const CookiePolicyPage = () => (
           <p>Cookies are small text files stored on your device when you visit a website. They help websites remember your preferences and improve your experience.</p>
         </Section>
         <Section title="2. How We Use Cookies">
-          <p>BidiiElimu SYSTEM uses the following types of cookies:</p>
+          <p>ElimuHub SYSTEM uses the following types of cookies:</p>
           <ul className="list-disc list-inside space-y-2">
             <li><strong className="text-white">Essential Cookies:</strong> Required for authentication and session management (e.g., JWT tokens stored in memory).</li>
             <li><strong className="text-white">Preference Cookies:</strong> Remember your theme (dark/light) and sidebar state.</li>
@@ -43,7 +43,7 @@ export const CookiePolicyPage = () => (
           <p>We may update this Cookie Policy periodically. Changes will be reflected with an updated date above.</p>
         </Section>
         <Section title="6. Contact">
-          <p>For questions about cookies, contact <a href="mailto:privacy@school.edu" className="text-primary-400 hover:underline">privacy@school.edu</a>.</p>
+          <p>For questions about cookies, contact <a href="mailto:support@elimuhub.app" className="text-primary-400 hover:underline">support@elimuhub.app</a>.</p>
         </Section>
       </div>
 

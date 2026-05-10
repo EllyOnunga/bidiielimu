@@ -14,8 +14,7 @@ interface Student {
   first_name: string;
   last_name: string;
   gender: string;
-  parent_name: string;
-  parent_phone: string;
+  guardians?: { first_name: string; last_name: string; phone_number: string }[];
   is_active: boolean;
   stream_name: string;
   grade_name: string;
@@ -40,8 +39,8 @@ export const ClassDetailPage = () => {
   const fetchData = async () => {
     try {
       const [streamRes, studentsRes] = await Promise.all([
-        client.get(`/classes/streams/${streamId}/`),
-        client.get(`/students/?stream=${streamId}`),
+        client.get(`classes/streams/${streamId}/`),
+        client.get(`students/?stream=${streamId}`),
       ]);
       setStreamInfo(streamRes.data);
       const studentData = Array.isArray(studentsRes.data) ? studentsRes.data : (studentsRes.data.results || []);
@@ -143,7 +142,7 @@ export const ClassDetailPage = () => {
                 <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Adm No</th>
                 <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Student</th>
                 <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Gender</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Parent Contact</th>
+                <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Guardian Contact</th>
                 <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right">Actions</th>
               </tr>
@@ -181,8 +180,10 @@ export const ClassDetailPage = () => {
                     </td>
                     <td className="px-6 py-4 text-sm text-slate-400">{student.gender === 'M' ? 'Male' : student.gender === 'F' ? 'Female' : 'Other'}</td>
                     <td className="px-6 py-4">
-                      <div className="text-sm text-slate-300">{student.parent_name}</div>
-                      <div className="text-xs text-slate-500">{student.parent_phone}</div>
+                      <div className="text-sm text-slate-300">
+                        {student.guardians?.[0] ? `${student.guardians[0].first_name} ${student.guardians[0].last_name}`.trim() : '—'}
+                      </div>
+                      <div className="text-xs text-slate-500">{student.guardians?.[0]?.phone_number || '—'}</div>
                     </td>
                     <td className="px-6 py-4">
                       <span className={`px-2 py-1 rounded-lg text-xs font-medium border ${student.is_active ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-700 text-slate-400 border-slate-600'}`}>

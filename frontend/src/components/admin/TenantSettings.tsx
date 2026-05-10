@@ -105,7 +105,7 @@ export const TenantSettings = () => {
                 </div>
                 <div>
                   <p className="text-white font-bold text-sm">SSL Certificate</p>
-                  <p className="text-primary-200/40 text-[10px] font-black uppercase">Auto-Renewed by Scholara</p>
+                  <p className="text-primary-200/40 text-[10px] font-black uppercase">Auto-Renewed by ElimuHub</p>
                 </div>
               </div>
               <button className="px-6 py-2 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black text-white uppercase tracking-widest hover:bg-white/10">Renew Early</button>

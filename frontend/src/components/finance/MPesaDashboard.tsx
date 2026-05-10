@@ -78,7 +78,7 @@ export const MPesaDashboard = () => {
       <div className="glass rounded-[48px] border border-white/5 overflow-hidden p-10 space-y-10">
         <h3 className="text-2xl font-black text-white tracking-tight">Collection Trends (Last 7 Days)</h3>
         <div className="h-[400px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
             <BarChart data={mockDailyData}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
               <XAxis 

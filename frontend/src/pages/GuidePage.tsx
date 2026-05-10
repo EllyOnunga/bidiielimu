@@ -68,7 +68,7 @@ export const GuidePage = () => {
               <GraduationCap className="w-5 h-5 text-white" />
             </div>
             <span className="text-xl font-black tracking-tighter uppercase">
-              Bidii<span className="text-primary-400">Elimu</span>
+              ElimuHub
               <span className="ml-2 text-xs font-bold text-slate-500 tracking-widest">GUIDE</span>
             </span>
           </Link>
@@ -122,7 +122,7 @@ export const GuidePage = () => {
             <section id="getting-started" className="mb-24 scroll-mt-32">
               <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tight text-white mb-6">Getting Started</h1>
               <p className="text-slate-400 text-lg leading-relaxed mb-8">
-                Welcome to BidiiElimu, the premier SaaS School Management System. This guide will walk you through the core features 
+                Welcome to ElimuHub, the premier SaaS School Management System. This guide will walk you through the core features 
                 designed to streamline your institution's daily operations.
               </p>
               <div className="bg-primary-500/10 border border-primary-500/20 p-6 rounded-2xl mb-8">
@@ -192,7 +192,7 @@ export const GuidePage = () => {
             <section id="exams" className="mb-24 scroll-mt-32">
               <h2 className="text-3xl font-black uppercase tracking-tight text-white mb-6">Exams & Grading</h2>
               <p className="text-slate-400 mb-6">
-                BidiiElimu offers an elite grading system capable of handling standard and custom grading curves.
+                ElimuHub offers an elite grading system capable of handling standard and custom grading curves.
               </p>
               <ul className="list-disc list-inside space-y-4 text-sm text-slate-300">
                 <li><strong className="text-white">Setup:</strong> Create an Exam (e.g., "Mid-Term 1") and assign subjects.</li>

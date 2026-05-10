@@ -1,37 +1,47 @@
-# Stage 1: Build dependencies
-FROM python:3.12-slim as builder
-
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-
-WORKDIR /app
-
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-COPY requirements.txt .
-RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt
-
-# Stage 2: Final image
+# Use Python 3.12 slim image
 FROM python:3.12-slim
 
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV DJANGO_SETTINGS_MODULE=config.settings
+
+# Create app directory
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y \
+# Install system dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    gcc \
+    postgresql-client \
     libpq-dev \
-    netcat-openbsd \
+    redis-tools \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /app/wheels /wheels
-COPY --from=builder /app/requirements.txt .
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
-RUN pip install --no-cache /wheels/*
-
+# Copy project files
 COPY . .
 
-# Execution script
-RUN chmod +x /app/entrypoint.sh
+# Create non-root user
+RUN useradd --create-home --shell /bin/bash app \
+    && chown -R app:app /app
+USER app
 
-ENTRYPOINT ["/app/entrypoint.sh"]
+# Create media and logs directories with correct permissions
+RUN mkdir -p media logs \
+    && chown -R app:app /app/media /app/logs \
+    && chmod -R 775 /app/media /app/logs
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health/ || exit 1
+
+# Expose port
+EXPOSE 8000
+
+# Run the application
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "4", "config.wsgi:application"]
