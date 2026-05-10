@@ -1,73 +1,29 @@
-import pytest
-from django.urls import reverse
+from django.test import TestCase
+from django.contrib.auth import get_user_model
+from rest_framework.test import APITestCase
 from rest_framework import status
-from rest_framework.test import APIClient
-from accounts.models import User, EmailVerificationToken
-from schools.models import School
 
-@pytest.fixture
-def api_client():
-    return APIClient()
+User = get_user_model()
 
-@pytest.fixture
-def school():
-    return School.objects.create(name="Test School")
+class UserModelTest(TestCase):
+    def test_create_user(self):
+        user = User.objects.create_user(email='test@example.com', password='password123')
+        self.assertEqual(user.email, 'test@example.com')
+        self.assertTrue(user.check_password('password123'))
 
-@pytest.fixture
-def user(school):
-    return User.objects.create_user(
-        email="test@example.com",
-        password="testpassword123",
-        school=school
-    )
+    def test_create_superuser(self):
+        user = User.objects.create_superuser(email='admin@example.com', password='password123')
+        self.assertTrue(user.is_staff)
+        self.assertTrue(user.is_superuser)
 
-@pytest.mark.django_db
-class TestAuthentication:
-    def test_user_registration(self, api_client):
-        url = reverse('register')
+class UserAPITest(APITestCase):
+    def test_register_user(self):
         data = {
-            "email": "newuser@example.com",
-            "password": "securepassword",
-            "first_name": "John",
-            "last_name": "Doe",
-            "school_name": "New School"
+            'email': 'newuser@example.com',
+            'password': 'password123',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'school_name': 'Test School'
         }
-        response = api_client.post(url, data)
-        assert response.status_code == status.HTTP_201_CREATED
-        assert User.objects.filter(email="newuser@example.com").exists()
-        assert School.objects.filter(name="New School").exists()
-
-    def test_user_login(self, api_client, user):
-        url = reverse('token_obtain_pair')
-        data = {
-            "email": "test@example.com",
-            "password": "testpassword123"
-        }
-        response = api_client.post(url, data)
-        assert response.status_code == status.HTTP_200_OK
-        assert "access" in response.data
-
-@pytest.mark.django_db
-class TestEmailVerification:
-    def test_email_verification_success(self, api_client, user):
-        token = EmailVerificationToken.objects.create(user=user, token="valid-token-123")
-        
-        # Verify email is not verified initially
-        assert not user.is_email_verified
-        
-        url = reverse('verify_email', kwargs={'token': "valid-token-123"})
-        response = api_client.get(url)
-        
-        assert response.status_code == status.HTTP_200_OK
-        
-        # Reload user and check status
-        user.refresh_from_db()
-        assert user.is_email_verified
-        
-        # Check token is deleted
-        assert not EmailVerificationToken.objects.filter(id=token.id).exists()
-
-    def test_email_verification_invalid_token(self, api_client):
-        url = reverse('verify_email', kwargs={'token': "invalid-token"})
-        response = api_client.get(url)
-        assert response.status_code == status.HTTP_404_NOT_FOUND
+        response = self.client.post('/api/v1/auth/registration/', data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)

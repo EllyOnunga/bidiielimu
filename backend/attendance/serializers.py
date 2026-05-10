@@ -17,7 +17,7 @@ class DailyAttendanceSerializer(TenantSerializerMixin, serializers.ModelSerializ
             return data
             
         user = request.user
-        if user.role == 'TEACHER':
+        if user.role_name == 'TEACHER':
             from classes.models import ScheduleSlot
             student = data.get('student')
             

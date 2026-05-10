@@ -1,16 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { GraduationCap, Lock, Mail, ArrowRight, Loader2, ChevronLeft, Fingerprint } from 'lucide-react';
+import { Mail, Lock, Loader2, ArrowRight, ChevronLeft, Fingerprint } from 'lucide-react';
+import { PasswordInput } from '../components/ui/PasswordInput';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import client from '../api/client';
+import { authService } from '../api/services/authService';
 import { useAuthStore } from '../store/authStore';
 import { mobileService } from '../services/mobileService';
 import { useTheme } from '../contexts/ThemeContext';
+import { ElimuHubLogo } from '../components/ui/Logo';
 
 declare global {
   interface Window {
     google: any;
+    google_initialized?: boolean;
   }
 }
 
@@ -25,17 +29,28 @@ export const LoginPage = () => {
 
   useEffect(() => {
     mobileService.checkBiometrics().then(setBiometricAvailable);
-    
-    // Initialize Google Login
-    if (window.google) {
-      window.google.accounts.id.initialize({
-        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-        callback: handleGoogleLogin,
-      });
-      window.google.accounts.id.renderButton(
-        document.getElementById("googleBtn"),
-        { theme: "filled_blue", size: "large", width: "400", shape: "pill" }
-      );
+
+    // Initialize Google Login only if Client ID exists
+    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+    if (window.google && googleClientId && !window.google_initialized) {
+      try {
+        window.google.accounts.id.initialize({
+          client_id: googleClientId,
+          callback: handleGoogleLogin,
+        });
+        window.google_initialized = true;
+
+        const btnElement = document.getElementById("googleBtn");
+        if (btnElement) {
+          window.google.accounts.id.renderButton(
+            btnElement,
+            { theme: "filled_blue", size: "large", width: "400", shape: "pill" }
+          );
+        }
+      } catch (err) {
+        console.warn("Google Login failed to initialize:", err);
+      }
     }
   }, []);
 
@@ -45,8 +60,8 @@ export const LoginPage = () => {
       const res = await client.post('accounts/google/', {
         access_token: response.credential,
       });
-      const { access, user } = res.data;
-      setAuth(user, access);
+      const { access, refresh, user } = res.data;
+      setAuth(user, access, refresh);
       toast.success(`Welcome, ${user.first_name}!`);
       navigate(user.role === 'STUDENT' || user.role === 'PARENT' ? '/portal' : '/dashboard');
     } catch (error: any) {
@@ -65,13 +80,12 @@ export const LoginPage = () => {
 
     const loginToast = toast.loading('Signing you in...');
     try {
-      const response = await client.post('accounts/login/', { email: loginEmail, password: loginPass });
-      const { access, user } = response.data;
-      setAuth(user, access);
-      
+      const { access, refresh, user } = await authService.login(loginEmail, loginPass);
+      setAuth(user, access, refresh);
+
       toast.success(`Welcome back, ${user.first_name}!`, { id: loginToast });
       await mobileService.hapticNotification('SUCCESS' as any);
-      
+
       // Save for future biometrics if on mobile
       if (mobileService.isNative()) {
         await mobileService.saveCredentials(loginEmail, loginPass);
@@ -84,7 +98,54 @@ export const LoginPage = () => {
       }
     } catch (error: any) {
       console.error('Login failed', error);
-      const msg = error.response?.data?.detail || error.message || 'Check your connection and credentials';
+      const errorData = error.response?.data;
+      let msg = error.message || 'Check your connection and credentials';
+
+      if (errorData) {
+        if (errorData.email_verified === false) {
+          msg = 'Please verify your email address before logging in.';
+          // Show resend verification option
+          setTimeout(() => {
+            toast.custom((t) => (
+              <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg max-w-md">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <Mail className="h-6 w-6 text-blue-400" />
+                  </div>
+                  <div className="ml-3 w-0 flex-1">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      Email Verification Required
+                    </p>
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">
+                      Check your inbox for a verification link or request a new one.
+                    </p>
+                    <div className="mt-4 flex">
+                      <button
+                        onClick={() => {
+                          toast.dismiss(t.id);
+                          navigate('/verify-email');
+                        }}
+                        className="inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      >
+                        Resend Email
+                      </button>
+                      <button
+                        onClick={() => toast.dismiss(t.id)}
+                        className="ml-3 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      >
+                        Dismiss
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ), { duration: 10000 });
+          }, 1000);
+        } else {
+          msg = errorData.detail || msg;
+        }
+      }
+
       toast.error(`Login failed: ${msg}`, { id: loginToast });
       await mobileService.hapticNotification('ERROR' as any);
     } finally {
@@ -110,8 +171,8 @@ export const LoginPage = () => {
       {/* Background Orbs */}
       <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-primary-500/10 rounded-full blur-[120px] animate-pulse-slow" />
       <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-accent-500/10 rounded-full blur-[120px] animate-pulse-slow" />
-      
-      <motion.div 
+
+      <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
@@ -123,16 +184,16 @@ export const LoginPage = () => {
 
         <div className="glass p-8 md:p-12 rounded-[40px]">
           <div className="text-center mb-10">
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="inline-flex w-20 h-20 bg-primary-600 rounded-3xl mb-6 shadow-premium items-center justify-center overflow-hidden border border-white/10"
+              className={`inline-flex w-20 h-20 rounded-3xl mb-6 shadow-premium items-center justify-center overflow-hidden border border-white/10 ${logoUrl ? 'bg-primary-600' : 'bg-transparent'}`}
             >
               {logoUrl ? (
                 <img src={logoUrl} alt={schoolName} className="w-full h-full object-cover" />
               ) : (
-                <GraduationCap className="w-10 h-10 text-white" />
+                <ElimuHubLogo className="w-16 h-16" showText={false} />
               )}
             </motion.div>
             <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight mb-3">Welcome Back</h1>
@@ -162,12 +223,11 @@ export const LoginPage = () => {
               </div>
               <div className="relative group">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-400/50 group-focus-within:text-primary-400 transition-colors" />
-                <input
-                  type="password"
+                <PasswordInput
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-white/5 border border-white/10 text-white pl-12 pr-4 py-4 rounded-2xl outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all placeholder:text-primary-400/30 text-base"
+                  className="w-full bg-white/5 border border-white/10 text-white pl-12 pr-12 py-4 rounded-2xl outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all placeholder:text-primary-400/30 text-base"
                   required
                 />
               </div>

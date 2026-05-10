@@ -46,7 +46,7 @@ class SubStrand(models.Model):
 
 class SubjectAssignment(models.Model):
     teacher = models.ForeignKey('teachers.Teacher', on_delete=models.CASCADE, related_name='subject_assignments')
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='assignments')
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='subject_assignments')
     stream = models.ForeignKey(Stream, on_delete=models.CASCADE, related_name='subject_assignments')
 
     class Meta:
@@ -83,6 +83,13 @@ class ScheduleSlot(models.Model):
 
     def __str__(self):
         return f"{self.stream} - {self.subject} ({self.get_day_of_week_display()})"
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['teacher', 'day_of_week', 'start_time', 'end_time']),
+            models.Index(fields=['stream', 'day_of_week', 'start_time', 'end_time']),
+            models.Index(fields=['classroom', 'day_of_week', 'start_time', 'end_time']),
+        ]
 
     def clean(self):
         from django.core.exceptions import ValidationError

@@ -1,16 +1,17 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Lock, Loader2, CheckCircle2 } from 'lucide-react';
+import { Lock, CheckCircle2, Loader2 } from 'lucide-react';
+import { PasswordInput } from '../components/ui/PasswordInput';
+import { PasswordHint } from '../components/ui/PasswordHint';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import client from '../api/client';
 import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
 
 export const ResetPasswordConfirmPage = () => {
   const { uid, token } = useParams<{ uid: string; token: string }>();
   const navigate = useNavigate();
-  
+
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,7 +19,7 @@ export const ResetPasswordConfirmPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (password !== confirmPassword) {
       toast.error('Passwords do not match');
       return;
@@ -30,7 +31,8 @@ export const ResetPasswordConfirmPage = () => {
       await client.post('auth/password/reset/confirm/', {
         uid,
         token,
-        new_password: password,
+        new_password1: password,
+        new_password2: password,
       });
       setSuccess(true);
       toast.success('Password reset successfully!');
@@ -75,14 +77,14 @@ export const ResetPasswordConfirmPage = () => {
                       <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">New Password</label>
                       <div className="relative group">
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-primary-400 transition-colors" />
-                        <Input
-                          type="password"
+                        <PasswordInput
                           required
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="••••••••"
                           className="pl-12 bg-white/5 border-white/10 focus:border-primary-500/50 h-14"
                         />
+                        <PasswordHint />
                       </div>
                     </div>
 
@@ -90,8 +92,7 @@ export const ResetPasswordConfirmPage = () => {
                       <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Confirm New Password</label>
                       <div className="relative group">
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-primary-400 transition-colors" />
-                        <Input
-                          type="password"
+                        <PasswordInput
                           required
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
@@ -102,8 +103,8 @@ export const ResetPasswordConfirmPage = () => {
                     </div>
                   </div>
 
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     disabled={loading}
                     className="w-full h-14 text-lg font-black shadow-xl shadow-primary-900/20"
                   >
@@ -133,7 +134,7 @@ export const ResetPasswordConfirmPage = () => {
                   </p>
                 </div>
                 <div className="w-full bg-white/5 rounded-2xl h-2 overflow-hidden">
-                  <motion.div 
+                  <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: '100%' }}
                     transition={{ duration: 3 }}

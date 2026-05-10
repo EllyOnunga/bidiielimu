@@ -1,90 +1,68 @@
-.PHONY: help build up down restart logs shell-backend shell-db migrate collectstatic superuser clean ps
+# ElimuHub Development Makefile
 
-# ─────────────────────────────────────────────
-# Help
-# ─────────────────────────────────────────────
+.PHONY: help install clean test lint format docker-build docker-up docker-down migrate collectstatic
+
+# Default target
 help:
-	@echo ""
-	@echo "  Scholara Platform — Docker Management"
-	@echo "  ──────────────────────────────────────────"
-	@echo "  make build           Build all Docker images"
-	@echo "  make up              Start all services (detached)"
-	@echo "  make down            Stop and remove containers"
-	@echo "  make restart         Restart all services"
-	@echo "  make logs            Tail logs from all services"
-	@echo "  make logs-backend    Tail backend logs only"
-	@echo "  make logs-worker     Tail celery worker logs only"
-	@echo "  make shell-backend   Open a shell in the backend container"
-	@echo "  make shell-db        Open psql in the database container"
-	@echo "  make migrate         Run Django schema migrations"
-	@echo "  make collectstatic   Collect Django static files"
-	@echo "  make superuser       Create a Django superuser"
-	@echo "  make test            Run backend test suite"
-	@echo "  make clean           Remove containers, volumes, and images"
-	@echo "  make ps              Show running container status"
-	@echo ""
+	@echo "Available commands:"
+	@echo "  install       Install all dependencies"
+	@echo "  clean         Clean up cache files and dependencies"
+	@echo "  test          Run all tests"
+	@echo "  lint          Run linting and formatting checks"
+	@echo "  format        Format code"
+	@echo "  docker-build  Build Docker images"
+	@echo "  docker-up     Start all services with Docker Compose"
+	@echo "  docker-down   Stop all services"
+	@echo "  migrate       Run database migrations"
+	@echo "  collectstatic Collect static files"
+	@echo "  setup         Initial project setup"
 
-# ─────────────────────────────────────────────
-# Core Lifecycle
-# ─────────────────────────────────────────────
-build:
-	docker compose build --no-cache
+# Installation
+install:
+	cd backend && pip install -r requirements.txt
+	cd frontend && npm install
 
-up:
-	docker compose up -d
+# Cleanup
+clean:
+	find . -type d -name __pycache__ -exec rm -rf {} +
+	find . -type d -name node_modules -exec rm -rf {} +
+	find . -type f -name "*.pyc" -delete
+	find . -type f -name "*.pyo" -delete
+	find . -type f -name "*.pyd" -delete
+	find . -type d -name "*.egg-info" -exec rm -rf {} +
 
-down:
-	docker compose down
+# Testing
+test:
+	cd backend && python manage.py test
+	cd frontend && npm run test
 
-restart:
-	docker compose down && docker compose up -d
+# Linting and formatting
+lint:
+	cd backend && flake8 . && black --check . && isort --check-only .
+	cd frontend && npm run lint
 
-ps:
-	docker compose ps
+format:
+	cd backend && black . && isort .
+	cd frontend && npm run format
 
-# ─────────────────────────────────────────────
-# Logs
-# ─────────────────────────────────────────────
-logs:
-	docker compose logs -f
+# Docker commands
+docker-build:
+	docker-compose build
 
-logs-backend:
-	docker compose logs -f backend
+docker-up:
+	docker-compose up -d
 
-logs-worker:
-	docker compose logs -f celery_worker
+docker-down:
+	docker-compose down
 
-# ─────────────────────────────────────────────
-# Shell Access
-# ─────────────────────────────────────────────
-shell-backend:
-	docker compose exec backend bash
-
-shell-db:
-	docker compose exec db psql -U ${POSTGRES_USER:-scholara_user} -d ${POSTGRES_DB:-scholara}
-
-# ─────────────────────────────────────────────
-# Django Management
-# ─────────────────────────────────────────────
+# Django commands
 migrate:
-	docker compose exec backend python manage.py migrate_schemas --shared --noinput
-	docker compose exec backend python manage.py migrate_schemas --tenant --noinput
+	cd backend && python manage.py migrate_schemas --noinput
 
 collectstatic:
-	docker compose exec backend python manage.py collectstatic --noinput
+	cd backend && python manage.py collectstatic --noinput
 
-superuser:
-	docker compose exec backend python manage.py createsuperuser
-
-# ─────────────────────────────────────────────
-# Testing
-# ─────────────────────────────────────────────
-test:
-	docker compose exec backend python -m pytest --tb=short -q
-
-# ─────────────────────────────────────────────
-# Cleanup
-# ─────────────────────────────────────────────
-clean:
-	docker compose down -v --rmi local
-	docker system prune -f
+# Initial setup
+setup: install migrate collectstatic
+	cd backend && python manage.py createsuperuser --noinput || true
+	cd frontend && npm run build

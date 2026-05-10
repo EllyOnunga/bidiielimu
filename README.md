@@ -1,4 +1,4 @@
-# Scholara — Enterprise School Management SaaS
+# ElimuHub — Enterprise School Management SaaS
 
 > A world-class, AI-powered, multi-tenant School Information System built for East & West Africa.
 
@@ -43,8 +43,8 @@ Client (React PWA / React Native)
 
 ### 1. Clone & Configure
 ```bash
-git clone https://github.com/your-org/scholara.git
-cd scholara
+git clone https://github.com/your-org/ElimuHub.git
+cd ElimuHub
 cp .env.example .env
 # Edit .env with your credentials
 ```
@@ -95,9 +95,9 @@ make clean          # Full teardown
 Each school gets its own PostgreSQL schema:
 
 ```
-public (shared)        → scholara.app
-pg_school_greenwood    → greenwood.scholara.app
-pg_school_stmarys      → stmarys.scholara.app
+public (shared)        → ElimuHub.app
+pg_school_greenwood    → greenwood.ElimuHub.app
+pg_school_stmarys      → stmarys.ElimuHub.app
 ```
 
 To onboard a new school:
@@ -105,7 +105,7 @@ To onboard a new school:
 docker compose exec backend python manage.py create_tenant \
   --schema_name=greenwood \
   --name="Greenwood Academy" \
-  --domain=greenwood.scholara.app
+  --domain=greenwood.ElimuHub.app
 ```
 
 ---
@@ -128,4 +128,4 @@ docker compose exec backend python manage.py create_tenant \
 
 ## 📄 License
 
-Proprietary — All Rights Reserved © Scholara 2024
+Proprietary — All Rights Reserved © ElimuHub 2024

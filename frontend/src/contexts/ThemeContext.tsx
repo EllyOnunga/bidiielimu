@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import axios from 'axios';
+import client from '../api/client';
 
 interface ThemeContextType {
   schoolName: string;
@@ -9,7 +9,7 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType>({
-  schoolName: 'Scholara',
+  schoolName: 'ElimuHub',
   logoUrl: null,
   primaryColor: '#2DD4BF',
   isLoading: true,
@@ -19,7 +19,7 @@ export const useTheme = () => useContext(ThemeContext);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setTheme] = useState<Omit<ThemeContextType, 'isLoading'>>({
-    schoolName: 'Scholara',
+    schoolName: 'ElimuHub',
     logoUrl: null,
     primaryColor: '#2DD4BF',
   });
@@ -29,13 +29,12 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const fetchTheme = async () => {
       try {
         // Assume API is served on the same domain or configured via base URL
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-        const response = await axios.get(`${apiUrl}/api/v1/theme/`);
+        const response = await client.get('theme/');
         
         const { school_name, logo_url, primary_color } = response.data;
         
         setTheme({
-          schoolName: school_name || 'Scholara',
+          schoolName: school_name || 'ElimuHub',
           logoUrl: logo_url || null,
           primaryColor: primary_color || '#2DD4BF',
         });

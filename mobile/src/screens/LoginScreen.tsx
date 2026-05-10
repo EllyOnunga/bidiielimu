@@ -17,7 +17,7 @@ export const LoginScreen = ({ navigation }: any) => {
           <View style={tw`w-20 h-20 bg-primary-500 rounded-3xl items-center justify-center mb-6 shadow-lg`}>
             <Sparkles color="white" size={40} />
           </View>
-          <Text style={tw`text-4xl font-black text-white tracking-tighter`}>Scholara</Text>
+          <Text style={tw`text-4xl font-black text-white tracking-tighter`}>ElimuHub</Text>
           <Text style={tw`text-primary-200/40 font-bold uppercase tracking-widest mt-2 text-xs`}>Mobile Intelligence</Text>
         </View>
 

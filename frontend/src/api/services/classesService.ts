@@ -5,6 +5,7 @@ export interface Stream {
   name: string;
   grade_level: number;
   grade_level_name: string;
+  teacher: number | null;
   teacher_name: string | null;
   student_count: number;
 }
@@ -29,6 +30,11 @@ export const classesService = {
 
   createStream: async (data: { grade_level: number; name: string }) => {
     const response = await client.post('classes/streams/', data);
+    return response.data;
+  },
+
+  updateStream: async (id: number, data: Partial<{ name: string; teacher: number | null }>) => {
+    const response = await client.patch(`classes/streams/${id}/`, data);
     return response.data;
   },
   

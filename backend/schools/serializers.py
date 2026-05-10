@@ -21,8 +21,32 @@ class SchoolSettingSerializer(serializers.ModelSerializer):
 class SchoolSerializer(serializers.ModelSerializer):
     subscription = SubscriptionSerializer(read_only=True)
     settings = SchoolSettingSerializer(read_only=True)
-    student_count = serializers.IntegerField(read_only=True)
-    total_revenue = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
+    student_count = serializers.SerializerMethodField()
+    total_revenue = serializers.SerializerMethodField()
+
+    def get_student_count(self, obj):
+        from django_tenants.utils import tenant_context
+        from students.models import Student
+        if obj.schema_name == 'public':
+            return 0
+        try:
+            with tenant_context(obj):
+                return Student.objects.count()
+        except Exception:
+            return 0
+
+    def get_total_revenue(self, obj):
+        from django_tenants.utils import tenant_context
+        from fees.models import FeePayment
+        from django.db.models import Sum
+        if obj.schema_name == 'public':
+            return 0.00
+        try:
+            with tenant_context(obj):
+                total = FeePayment.objects.aggregate(total=Sum('amount'))['total']
+                return float(total) if total else 0.00
+        except Exception:
+            return 0.00
 
     domain_url = serializers.CharField(write_only=True, required=False)
 

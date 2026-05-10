@@ -41,12 +41,17 @@ export const examsService = {
   },
 
   createThreshold: async (data: any) => {
-    const response = await client.post('exams/thresholds/', data);
+    const response = await client.post('exams/grade-thresholds/', data);
     return response.data;
   },
 
   deleteThreshold: async (id: number) => {
-    const response = await client.delete(`exams/thresholds/${id}/`);
+    const response = await client.delete(`exams/grade-thresholds/${id}/`);
+    return response.data;
+  },
+  
+  computeRanks: async (id: number) => {
+    const response = await client.post(`exams/exams/${id}/compute_ranks/`);
     return response.data;
   }
 };

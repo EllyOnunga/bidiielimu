@@ -2,7 +2,7 @@ from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import RegisterSerializer, UserSerializer, MyTokenObtainPairSerializer
-from .models import EmailVerificationToken
+from .models import EmailVerificationToken, User
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from students.models import Student
@@ -40,7 +40,40 @@ class VerifyEmailView(generics.GenericAPIView):
         user.save()
         verification_token.delete()
         
+        # Send Welcome Email
+        from django.conf import settings
+        domain_name = user.school.domains.filter(is_primary=True).first().domain if user.school else "elimuhub.com"
+        protocol = "http://" if "localhost" in domain_name else "https://"
+        login_url = f"{protocol}{domain_name}/login"
+        
+        from .services import EmailService
+        EmailService.send_welcome_email(user, login_url=login_url)
+
         return Response({"detail": "Email successfully verified."}, status=status.HTTP_200_OK)
+
+class ResendVerificationView(generics.GenericAPIView):
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+
+    def post(self, request):
+        email = request.data.get('email')
+        if not email:
+            return Response({"detail": "Email is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            # Don't reveal if email exists for security
+            return Response({"detail": "If the email exists, a verification link has been sent."}, status=status.HTTP_200_OK)
+
+        if user.is_email_verified:
+            return Response({"detail": "Email is already verified."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Send verification email
+        from .services import EmailService
+        if EmailService.send_verification_email(user):
+            return Response({"detail": "Verification email sent successfully."}, status=status.HTTP_200_OK)
+        return Response({"detail": "Failed to send verification email."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class GDPRExportView(generics.GenericAPIView):
     """

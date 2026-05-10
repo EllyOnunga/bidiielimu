@@ -86,7 +86,7 @@ export const SubjectDetailView = () => {
             </div>
           </div>
           <div className="h-[400px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <AreaChart data={mockTrendData}>
                 <defs>
                   <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
@@ -131,7 +131,7 @@ export const SubjectDetailView = () => {
         <div className="glass rounded-[48px] border border-white/5 overflow-hidden p-10 space-y-10">
           <h3 className="text-2xl font-black text-white tracking-tight">Grade Spread</h3>
           <div className="h-[400px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <BarChart data={mockDistribution} layout="vertical">
                 <XAxis type="number" hide />
                 <YAxis 

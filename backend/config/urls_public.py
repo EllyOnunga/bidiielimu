@@ -1,19 +1,38 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.http import JsonResponse
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
+from schools.views_theme import TenantThemeView
+
 def health_check(request):
     return JsonResponse({"status": "ok", "version": "1.0.0", "schema": "public"})
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('test-ping/', lambda r: JsonResponse({"status": "super-public"}), name='super-public'),
     path('health/', health_check, name='health_check'),
+    re_path(r'ping', lambda r: JsonResponse({"status": "ping-regex"}), name='ping-regex'),
     
     path('api/v1/accounts/', include('accounts.urls')),
-    path('api/v1/schools/', include('schools.urls')), # Public endpoints for onboarding tenants
+    path('api/v1/schools/', include('schools.urls')),
+    path('api/v1/theme/', TenantThemeView.as_view(), name='public-theme'),
+    
+    # These routes are now dynamically switched by Middleware if accessed on public domain
+    path('api/v1/notifications/', include('notifications.urls')),
+    path('api/v1/analytics/', include('analytics.urls')),
+    path('api/v1/students/', include('students.urls')),
+    path('api/v1/teachers/', include('teachers.urls')),
+    path('api/v1/classes/', include('classes.urls')),
+    path('api/v1/exams/', include('exams.urls')),
+    path('api/v1/attendance/', include('attendance.urls')),
+    path('api/v1/fees/', include('fees.urls')),
+    path('api/v1/audit/', include('audit.urls')),
+    path('api/v1/lms/', include('lms.urls')),
+    path('api/v1/inventory/', include('inventory.urls')),
+    path('api/v1/reports/', include('reports.urls')),
+    path('api/v1/hr/', include('hr.urls')),
     
     # Auth endpoints
     path('api/v1/auth/', include('dj_rest_auth.urls')),

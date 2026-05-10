@@ -21,6 +21,12 @@ class AuditLog(models.Model):
 
     class Meta:
         ordering = ['-timestamp']
+        indexes = [
+            models.Index(fields=['timestamp']),
+            models.Index(fields=['user', 'timestamp']),
+            models.Index(fields=['model_name', 'timestamp']),
+            models.Index(fields=['action', 'timestamp']),
+        ]
 
     def __str__(self):
         return f"{self.user} - {self.action} {self.model_name} at {self.timestamp}"

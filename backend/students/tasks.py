@@ -45,11 +45,14 @@ def process_bulk_upload(csv_content, school_id, user_id):
                     errors.append(f"Row {row_idx}: User with email {email} already exists.")
                     continue
 
+                from accounts.models import Role
+                role_obj, _ = Role.objects.get_or_create(name='STUDENT')
+                
                 # Create User
                 user = User.objects.create_user(
                     email=email,
                     password=password,
-                    role='STUDENT',
+                    role=role_obj,
                     first_name=first_name,
                     last_name=last_name,
                     school=school

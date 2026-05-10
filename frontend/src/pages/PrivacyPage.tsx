@@ -25,7 +25,7 @@ export const PrivacyPage = () => (
         <Section title="2. How We Use Your Data">
           <p>Your data is used exclusively to:</p>
           <ul className="list-disc list-inside space-y-1">
-            <li>Provide and improve the BidiiElimu SYSTEM service</li>
+            <li>Provide and improve the ElimuHub SYSTEM service</li>
             <li>Send service-related notifications (billing, downtime alerts)</li>
             <li>Generate aggregated, anonymized product analytics</li>
           </ul>
@@ -44,10 +44,10 @@ export const PrivacyPage = () => (
           <p>We use industry-standard encryption (HTTPS/TLS) for all data in transit and AES-256 for data at rest. Access is protected by JWT-based authentication.</p>
         </Section>
         <Section title="7. Your Rights">
-          <p>You have the right to access, correct, or delete your data at any time. Contact us at <a href="mailto:privacy@school.edu" className="text-primary-400 hover:underline">privacy@school.edu</a> for any requests.</p>
+          <p>You have the right to access, correct, or delete your data at any time. Contact us at <a href="mailto:support@elimuhub.app" className="text-primary-400 hover:underline">support@elimuhub.app</a> for any requests.</p>
         </Section>
         <Section title="8. Contact">
-          <p>For privacy-related enquiries, email <a href="mailto:privacy@school.edu" className="text-primary-400 hover:underline">privacy@school.edu</a>.</p>
+          <p>For privacy-related enquiries, email <a href="mailto:support@elimuhub.app" className="text-primary-400 hover:underline">support@elimuhub.app</a>.</p>
         </Section>
       </div>
 

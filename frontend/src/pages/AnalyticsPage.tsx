@@ -78,7 +78,7 @@ export const AnalyticsPage = () => {
             {isLoading ? (
               <Skeleton className="w-full h-full rounded-[32px]" />
             ) : (
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                 <BarChart data={analytics?.subject_performance}>
                   <defs>
                     <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
@@ -117,7 +117,7 @@ export const AnalyticsPage = () => {
             {isLoading ? (
               <Skeleton className="w-72 h-72 rounded-full mx-auto" />
             ) : (
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                 <PieChart>
                   <Pie
                     data={analytics?.class_distribution}
@@ -164,7 +164,7 @@ export const AnalyticsPage = () => {
             {isLoading ? (
               <Skeleton className="w-full h-full rounded-[32px]" />
             ) : (
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                 <AreaChart data={analytics?.attendance_trend}>
                   <defs>
                     <linearGradient id="presentGradient" x1="0" y1="0" x2="0" y2="1">

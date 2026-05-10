@@ -12,6 +12,7 @@ interface StudentData {
   name: string;
   admission: string;
   score: number;
+  grade?: string;
 }
 
 export const ExamMarksEntryPage = () => {
@@ -25,6 +26,7 @@ export const ExamMarksEntryPage = () => {
   const [selectedExam, setSelectedExam] = useState<string>('');
   const [selectedSubject, setSelectedSubject] = useState<string>('');
   const [selectedStream, setSelectedStream] = useState<string>('');
+  const [selectedAssignmentName, setSelectedAssignmentName] = useState<string>('');
 
   const updateScore = (id: number, score: string) => {
     const val = parseFloat(score) || 0;
@@ -34,6 +36,7 @@ export const ExamMarksEntryPage = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
+      console.log('[ExamMarksEntry] Initializing page data...');
       const [examsDataRaw, assignmentsRes] = await Promise.all([
         examsService.getExams(),
         client.get('classes/subject-assignments/')
@@ -42,6 +45,8 @@ export const ExamMarksEntryPage = () => {
       const examsData = Array.isArray(examsDataRaw) ? examsDataRaw : (examsDataRaw.results || []);
       const assData = Array.isArray(assignmentsRes.data) ? assignmentsRes.data : (assignmentsRes.data.results || []);
       
+      console.log(`[ExamMarksEntry] Loaded ${examsData.length} exams and ${assData.length} assignments.`);
+      
       setExams(examsData);
       setAssignments(assData);
       
@@ -49,8 +54,10 @@ export const ExamMarksEntryPage = () => {
       if (assData.length > 0) {
         setSelectedSubject(assData[0].subject.toString());
         setSelectedStream(assData[0].stream.toString());
+        setSelectedAssignmentName(`${assData[0].subject_name} - ${assData[0].grade_name} ${assData[0].stream_name}`);
       }
     } catch (error) {
+      console.error('[ExamMarksEntry] Failed to initialize:', error);
       toast.error('Failed to initialize page');
     } finally {
       setLoading(false);
@@ -62,8 +69,9 @@ export const ExamMarksEntryPage = () => {
     
     try {
       setFetchingStudents(true);
+      console.log(`[ExamMarksEntry] Fetching students for stream ${selectedStream} and marks for subject ${selectedSubject}...`);
       const [studentsRes, marksRes] = await Promise.all([
-        client.get(`/students/?stream=${selectedStream}`),
+        client.get(`students/?stream=${selectedStream}`),
         client.get(`exams/marks/?exam=${selectedExam}&subject=${selectedSubject}`)
       ]);
       
@@ -76,9 +84,11 @@ export const ExamMarksEntryPage = () => {
           id: s.id,
           name: `${s.first_name} ${s.last_name}`,
           admission: s.admission_number,
-          score: mark ? parseFloat(mark.score) : 0
+          score: mark ? parseFloat(mark.score) : 0,
+          grade: mark ? mark.grade : '-'
         };
       });
+      console.log(`[ExamMarksEntry] Found ${studentsData.length} students and ${existingMarks.length} existing marks.`);
       setStudents(mapped);
     } catch (error) {
       toast.error('Failed to load students');
@@ -123,7 +133,9 @@ export const ExamMarksEntryPage = () => {
         </Link>
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Record Marks</h1>
-          <p className="text-slate-400 text-sm md:text-base">Subject: {selectedSubject}</p>
+          <p className="text-slate-400 text-sm md:text-base">
+            {selectedAssignmentName || 'Select a class and subject below'}
+          </p>
         </div>
       </div>
 
@@ -158,6 +170,12 @@ export const ExamMarksEntryPage = () => {
               const [subjectId, streamId] = e.target.value.split('-');
               setSelectedSubject(subjectId);
               setSelectedStream(streamId);
+              
+              // Update readable name
+              const selected = assignments.find(a => a.subject.toString() === subjectId && a.stream.toString() === streamId);
+              if (selected) {
+                setSelectedAssignmentName(`${selected.subject_name} - ${selected.grade_name} ${selected.stream_name}`);
+              }
             }}
             className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 md:py-3 text-white text-sm outline-none focus:ring-2 focus:ring-primary-500"
           >
@@ -243,13 +261,15 @@ export const ExamMarksEntryPage = () => {
                     </td>
                     <td className="px-6 md:px-8 py-4">
                       <span className={`px-2 md:px-3 py-1 rounded-lg text-[10px] md:text-xs font-bold border ${
-                        student.score >= 80 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                        student.score >= 60 ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-                        'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                        student.grade === 'A' || student.grade === 'A-' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                        student.grade?.startsWith('B') ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                        student.grade?.startsWith('C') ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                        'bg-rose-500/10 text-rose-400 border-rose-500/20'
                       }`}>
-                        {student.score >= 80 ? 'A' : student.score >= 70 ? 'B+' : student.score >= 60 ? 'B' : 'C'}
+                        {student.grade || '-'}
                       </span>
                     </td>
+
                   </motion.tr>
                 ))
               )}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Mail, Send, Phone, Users, CheckCircle2, Loader2, AlertTriangle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import client from '../api/client';
@@ -8,6 +8,9 @@ import { Input } from '../components/ui/Input';
 export const CommunicationPage = () => {
   const [activeTab, setActiveTab] = useState<'email' | 'sms'>('email');
   const [sending, setSending] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<any>(null);
+  const [groups, setGroups] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     subject: '',
     message: '',
@@ -15,13 +18,32 @@ export const CommunicationPage = () => {
     phones: '', // Comma separated phones
   });
 
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const [statsRes, groupsRes] = await Promise.all([
+        client.get('notifications/communication_stats/'),
+        client.get('notifications/recipient_groups/')
+      ]);
+      setStats(statsRes.data);
+      setGroups(groupsRes.data);
+    } catch (error) {
+      console.error('Failed to fetch communication data', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     setSending(true);
 
     try {
       if (activeTab === 'email') {
-        const emailList = formData.recipients.split(',').map(e => e.trim());
+        const emailList = formData.recipients.split(',').map(e => e.trim()).filter(Boolean);
         await client.post('notifications/bulk_email/', {
           subject: formData.subject,
           message: formData.message,
@@ -29,7 +51,7 @@ export const CommunicationPage = () => {
         });
         toast.success(`Email sent to ${emailList.length} recipients`);
       } else {
-        const phoneList = formData.phones.split(',').map(p => p.trim());
+        const phoneList = formData.phones.split(',').map(p => p.trim()).filter(Boolean);
         await client.post('notifications/bulk_sms/', {
           message: formData.message,
           phones: phoneList
@@ -44,9 +66,34 @@ export const CommunicationPage = () => {
     }
   };
 
+  const handleSelectGroup = async (groupId: string) => {
+    try {
+      toast.loading('Fetching recipients...', { id: 'group-fetch' });
+      const res = await client.get(`notifications/${groupId}/group-recipients/`, {
+        params: { type: activeTab }
+      });
+      const recipients = res.data.recipients.join(', ');
+      
+      setFormData(prev => ({
+        ...prev,
+        [activeTab === 'email' ? 'recipients' : 'phones']: recipients
+      }));
+      toast.success('Recipients loaded', { id: 'group-fetch' });
+    } catch (error) {
+      toast.error('Failed to load group recipients', { id: 'group-fetch' });
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8 pb-20">
-
       <div>
         <h1 className="text-3xl font-bold text-white tracking-tight">Communication Center</h1>
         <p className="text-slate-400">Broadcast messages to parents, students, and staff via Email or SMS.</p>
@@ -150,18 +197,16 @@ export const CommunicationPage = () => {
               Quick Select Groups
             </h3>
             <div className="space-y-3">
-              <button className="w-full p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all text-left group">
-                <p className="text-sm font-bold text-white group-hover:text-primary-400">All Parents</p>
-                <p className="text-[10px] text-slate-500">Approx. 450 contacts</p>
-              </button>
-              <button className="w-full p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all text-left group">
-                <p className="text-sm font-bold text-white group-hover:text-primary-400">Class Teachers</p>
-                <p className="text-[10px] text-slate-500">12 staff members</p>
-              </button>
-              <button className="w-full p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all text-left group">
-                <p className="text-sm font-bold text-white group-hover:text-primary-400">Board of Management</p>
-                <p className="text-[10px] text-slate-500">8 members</p>
-              </button>
+              {groups.map((group) => (
+                <button 
+                  key={group.id}
+                  onClick={() => handleSelectGroup(group.id)}
+                  className="w-full p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all text-left group"
+                >
+                  <p className="text-sm font-bold text-white group-hover:text-primary-400">{group.name}</p>
+                  <p className="text-[10px] text-slate-500">Approx. {group.count} contacts</p>
+                </button>
+              ))}
             </div>
           </div>
 
@@ -173,17 +218,28 @@ export const CommunicationPage = () => {
             <div className="space-y-4">
               <div>
                 <div className="flex justify-between text-xs mb-1.5">
-                  <span className="text-slate-400">Monthly SMS Limit</span>
-                  <span className="text-white font-bold">1,240 / 5,000</span>
+                  <span className="text-slate-400">Monthly {activeTab === 'email' ? 'Email' : 'SMS'} Limit</span>
+                  <span className="text-white font-bold">
+                    {activeTab === 'email' ? stats?.email_used : stats?.sms_used} / {activeTab === 'email' ? stats?.email_limit : stats?.sms_limit}
+                  </span>
                 </div>
                 <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
-                  <div className="h-full bg-primary-500" style={{ width: '25%' }}></div>
+                  <div 
+                    className="h-full bg-primary-500 transition-all duration-500" 
+                    style={{ 
+                      width: `${activeTab === 'email' 
+                        ? (stats?.email_used / stats?.email_limit) * 100 
+                        : (stats?.sms_used / stats?.sms_limit) * 100}%` 
+                    }}
+                  ></div>
                 </div>
               </div>
               <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 flex gap-3">
                 <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
                 <p className="text-[10px] text-amber-300/80">
-                  You are using the standard email relay. Deliverability might be limited for high volume broadcasts.
+                  {stats?.is_premium 
+                    ? "You are using a premium relay for maximum deliverability." 
+                    : "You are using the standard relay. Deliverability might be limited for high volume broadcasts."}
                 </p>
               </div>
             </div>

@@ -12,8 +12,11 @@ class StudentReportViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def generate_ai_draft(self, request, pk=None):
         try:
-            draft = AIReportService.generate_narrative_draft(pk)
-            return Response({"draft": draft})
+            from .tasks import generate_ai_draft_async
+            from django.db import connection
+            # Trigger celery task
+            generate_ai_draft_async.delay(connection.schema_name, pk)
+            return Response({"detail": "AI narrative generation started in the background. It will be available shortly."})
         except Exception as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -25,3 +28,14 @@ class StudentReportViewSet(viewsets.ModelViewSet):
         
         report = AIReportService.approve_comment(pk, request.user, comment)
         return Response(StudentReportSerializer(report).data)
+
+    @action(detail=False, methods=['get'])
+    def card(self, request):
+        student_id = request.query_params.get('student')
+        exam_id = request.query_params.get('exam')
+        if not all([student_id, exam_id]):
+            return Response({"detail": "student and exam IDs are required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        from .services import ReportCardService
+        data = ReportCardService.get_report_card_data(student_id, exam_id)
+        return Response(data)

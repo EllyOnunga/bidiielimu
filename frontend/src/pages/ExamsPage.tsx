@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ClipboardList, Calendar, Award, ChevronRight, Edit3, Trash2, Search } from 'lucide-react';
+import { ClipboardList, Calendar, Award, ChevronRight, Edit3, Trash2, Search, Layers } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import toast from 'react-hot-toast';
@@ -10,7 +10,7 @@ import { Input } from '../components/ui/Input';
 import { Modal } from '../components/ui/Modal';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { Skeleton } from '../components/ui/Skeleton';
-
+import { motion } from 'framer-motion';
 interface ExamCardProps {
   id: number;
   name: string;
@@ -19,55 +19,66 @@ interface ExamCardProps {
   is_published: boolean;
   term: string;
   onDelete?: () => void;
+  onRank?: () => void;
 }
 
-const ExamCard = ({ id, name, start_date, end_date, is_published, term, onDelete }: ExamCardProps) => (
-  <div className="glass-dark p-6 rounded-3xl border border-white/5 hover:bg-white/[0.02] transition-all group">
-    <div className="flex items-center gap-4">
-      <div className="p-4 bg-primary-500/10 rounded-2xl">
-        <ClipboardList className="w-6 h-6 text-primary-400" />
+const ExamCard = ({ id, name, start_date, end_date, is_published, term, onDelete, onRank }: ExamCardProps) => (
+  <div className="premium-card group hover:bg-white/[0.03]">
+    <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+      <div className="w-16 h-16 rounded-2xl bg-primary-600/10 flex items-center justify-center text-primary-400 group-hover:bg-primary-600 group-hover:text-white transition-all duration-500 shadow-glow shrink-0">
+        <ClipboardList className="w-8 h-8" />
       </div>
-      <div className="flex-1">
-        <div className="flex items-center justify-between mb-1">
-          <h3 className="text-lg font-bold text-white">{name}</h3>
-          <div className="flex items-center gap-3">
-            <span className={`px-3 py-1 rounded-full text-xs font-medium ${is_published
-                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+      <div className="flex-1 min-w-0">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
+          <h3 className="text-xl font-black text-white uppercase tracking-tight truncate">{name}</h3>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${is_published
+              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+              : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
               }`}>
-              {is_published ? 'Published' : 'Draft'}
+              {is_published ? 'Live' : 'Draft'}
             </span>
-            <Link
-              to={`/exams/entry?exam=${id}`}
-              className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-all opacity-0 group-hover:opacity-100 flex items-center gap-2 text-xs font-medium"
-            >
-              <Edit3 className="w-3.5 h-3.5" />
-              Enter Marks
-            </Link>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                onDelete?.();
-              }}
-              className="p-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-lg transition-all opacity-0 group-hover:opacity-100"
-              title="Delete Exam"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-            </button>
+            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300">
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  onRank?.();
+                }}
+                className="p-2.5 bg-primary-500/10 hover:bg-primary-600 hover:text-white text-primary-400 rounded-xl transition-all"
+                title="Compute Rankings"
+              >
+                <Award className="w-4 h-4" />
+              </button>
+              <Link
+                to={`/exams/entry?exam=${id}`}
+                className="p-2.5 bg-white/5 hover:bg-white/20 text-white rounded-xl transition-all"
+              >
+                <Edit3 className="w-4 h-4" />
+              </Link>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  onDelete?.();
+                }}
+                className="p-2.5 bg-rose-500/10 hover:bg-rose-600 hover:text-white text-rose-400 rounded-xl transition-all"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
-        <div className="flex items-center gap-4 text-sm text-slate-400">
-          <div className="flex items-center gap-1.5">
-            <Calendar className="w-4 h-4" />
-            {start_date} to {end_date}
+        <div className="flex flex-wrap items-center gap-4 text-[10px] font-black text-primary-200/20 uppercase tracking-widest">
+          <div className="flex items-center gap-2">
+            <Calendar className="w-3.5 h-3.5 text-primary-500" />
+            {start_date} — {end_date}
           </div>
-          <div className="flex items-center gap-1.5">
-            <Award className="w-4 h-4" />
-            {term}
+          <div className="flex items-center gap-2">
+            <Layers className="w-3.5 h-3.5 text-indigo-500" />
+            {term.replace('_', ' ')}
           </div>
         </div>
       </div>
-      <ChevronRight className="w-5 h-5 text-slate-600 group-hover:text-primary-400 group-hover:translate-x-1 transition-all" />
+      <ChevronRight className="w-6 h-6 text-primary-200/10 group-hover:text-primary-400 group-hover:translate-x-2 transition-all hidden sm:block" />
     </div>
   </div>
 );
@@ -78,6 +89,7 @@ export const ExamsPage = () => {
   const [formData, setFormData] = useState({
     name: '',
     term: 'TERM_1',
+    exam_type: 'END_TERM',
     start_date: '',
     end_date: '',
     grading_system: '',
@@ -85,6 +97,7 @@ export const ExamsPage = () => {
   const [examToDelete, setExamToDelete] = useState<Exam | null>(null);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(search), 500);
@@ -113,7 +126,7 @@ export const ExamsPage = () => {
     onSuccess: () => {
       toast.success('Examination scheduled successfully!');
       setIsModalOpen(false);
-      setFormData({ name: '', term: 'TERM_1', start_date: '', end_date: '', grading_system: '' });
+      setFormData({ name: '', term: 'TERM_1', exam_type: 'END_TERM', start_date: '', end_date: '', grading_system: '' });
       queryClient.invalidateQueries({ queryKey: ['exams'] });
       queryClient.invalidateQueries({ queryKey: ['exams_analytics'] });
     },
@@ -133,6 +146,16 @@ export const ExamsPage = () => {
     }
   });
 
+  const computeRanksMutation = useMutation({
+    mutationFn: (id: number) => examsService.computeRanks(id),
+    onSuccess: (data) => {
+      toast.success(data.detail || 'Rankings computed successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.detail || 'Failed to compute rankings');
+    }
+  });
+
   const handleScheduleExam = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!isModalOpen) {
@@ -143,157 +166,192 @@ export const ExamsPage = () => {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">Examinations</h1>
-          <p className="text-slate-400">Schedule exams, record results and track performance.</p>
+    <div className="space-y-8 md:space-y-12 pb-20">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+        <div className="space-y-2">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-none">Assessment <span className="text-gradient">Control</span></h1>
+          <p className="text-primary-200/40 text-sm md:text-base font-medium max-w-xl">Comprehensive evaluation framework and performance analytics for all modules.</p>
         </div>
-        <div className="flex items-center gap-3 w-full md:w-auto">
-          <div className="relative w-full md:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-            <input
-              placeholder="Search exams..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-800/50 border border-slate-700/50 rounded-xl text-white text-sm outline-none focus:ring-2 focus:ring-primary-500 h-12"
-            />
-          </div>
-          <Button onClick={handleScheduleExam} className="gap-2 w-full md:w-auto h-12 shrink-0">
-            <Calendar className="w-5 h-5" />
-            Schedule Exam
+        <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+          <Link to="/grading" className="flex-1 sm:flex-none">
+            <Button variant="outline" className="w-full gap-2">
+              <Layers className="w-4 h-4" /> Systems
+            </Button>
+          </Link>
+          <Button onClick={handleScheduleExam} className="flex-1 sm:flex-none gap-2">
+            <Calendar className="w-4 h-4" /> Schedule Exam
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
-        <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">Upcoming & Recent</h2>
-        {examsLoading ? (
-          <div className="space-y-4">
-            {[1, 2].map(i => (
-              <div key={i} className="glass-dark p-6 rounded-3xl border border-white/5 flex items-center gap-4">
-                <Skeleton className="w-14 h-14 rounded-2xl" />
-                <div className="flex-1 space-y-2">
-                  <Skeleton className="w-48 h-6" />
-                  <Skeleton className="w-64 h-4" />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12">
+        <div className="lg:col-span-2 space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">Operational Queue</h2>
+            <div className="relative w-48 sm:w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-primary-200/20" />
+              <Input
+                placeholder="Filter exams..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-10 h-10 text-[10px] bg-white/5 border-white/5"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-4">
+            {examsLoading ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="premium-card flex items-center gap-6">
+                  <Skeleton className="w-16 h-16 rounded-2xl shrink-0" />
+                  <div className="flex-1 space-y-3">
+                    <Skeleton className="w-48 h-4" />
+                    <Skeleton className="w-32 h-2" />
+                  </div>
                 </div>
+              ))
+            ) : exams.length > 0 ? (
+              exams.map((exam: Exam) => (
+                <ExamCard
+                  key={exam.id}
+                  {...exam}
+                  onDelete={() => setExamToDelete(exam)}
+                  onRank={() => computeRanksMutation.mutate(exam.id)}
+                />
+              ))
+            ) : (
+              <div className="premium-card text-center py-20 text-primary-200/10 italic text-[10px] font-black uppercase tracking-widest">
+                No active assessment protocols found.
               </div>
-            ))}
+            )}
           </div>
-        ) : exams.length > 0 ? (
-          exams.map((exam: Exam) => (
-            <ExamCard key={exam.id} {...exam} onDelete={() => setExamToDelete(exam)} />
-          ))
-        ) : (
-          <div className="py-12 text-center text-slate-500">No exams found.</div>
-        )}
-      </div>
-
-      <div className="glass-dark p-8 rounded-3xl border border-white/5">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="text-xl font-bold text-white">Performance Analytics</h2>
-            <p className="text-sm text-slate-400">Overall school performance trend across subjects.</p>
-          </div>
-          <select className="bg-slate-800 border border-slate-700 text-white text-sm rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-primary-500 h-10">
-            <option>All Classes</option>
-            <option>Grade 6</option>
-            <option>Grade 5</option>
-          </select>
         </div>
 
-        <div className="h-64 mt-6">
-          {chartData.length > 0 ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
-                <XAxis dataKey="name" stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} domain={[0, 100]} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '12px', color: '#f8fafc' }}
-                  itemStyle={{ color: '#38bdf8' }}
-                />
-                <Area type="monotone" dataKey="score" stroke="#38bdf8" strokeWidth={3} fillOpacity={1} fill="url(#colorScore)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="h-full flex items-center justify-center text-slate-500 border-2 border-dashed border-slate-800 rounded-2xl">
-              Not enough data for performance charts
+        <div className="space-y-6">
+          <h2 className="text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">Performance Matrix</h2>
+          <div className="premium-card">
+            <div className="h-64 md:h-80 w-full">
+              {chartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -30, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#14b8a6" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.03)" vertical={false} />
+                    <XAxis dataKey="name" stroke="rgba(255, 255, 255, 0.1)" fontSize={9} tickLine={false} axisLine={false} fontWeight="800" />
+                    <YAxis stroke="rgba(255, 255, 255, 0.1)" fontSize={9} tickLine={false} axisLine={false} domain={[0, 100]} fontWeight="800" />
+                    <Tooltip
+                      contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.95)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '12px' }}
+                      itemStyle={{ color: '#14b8a6', fontWeight: '900', fontSize: '11px' }}
+                    />
+                    <Area type="monotone" dataKey="score" stroke="#14b8a6" strokeWidth={4} fillOpacity={1} fill="url(#colorScore)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center text-primary-200/10 border-2 border-dashed border-white/5 rounded-[32px]">
+                  <Layers className="w-10 h-10 mb-4 opacity-10" />
+                  <p className="text-[9px] font-black uppercase tracking-widest">Insufficient Data</p>
+                </div>
+              )}
             </div>
-          )}
+            <div className="mt-8 pt-8 border-t border-white/5">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">Average Proficiency</span>
+                <span className="text-xl font-black text-white">74.2%</span>
+              </div>
+              <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: '74.2%' }}
+                  className="h-full bg-gradient-to-r from-primary-600 to-indigo-600 shadow-glow"
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Schedule Examination"
-        className="max-w-lg bg-slate-900 border-white/10"
+        title="Assessment Initialization"
+        className="max-w-xl glass border-white/10 !rounded-[32px]"
       >
-        <form onSubmit={handleScheduleExam} className="space-y-6 mt-4">
-          <div className="space-y-4">
+        <form onSubmit={handleScheduleExam} className="space-y-8 mt-6">
+          <div className="space-y-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-400">Examination Name</label>
+              <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pl-1">Protocol Name</label>
               <Input
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="e.g. End of Term 1 Exams"
-                className="bg-slate-800/50 border-slate-700"
+                placeholder="e.g. End of Phase 01 Evaluation"
+                className="h-12 text-sm"
               />
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-400">Academic Term</label>
-              <select
-                value={formData.term}
-                onChange={(e) => setFormData({ ...formData, term: e.target.value })}
-                className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 transition-all"
-              >
-                <option value="TERM_1">Term 1</option>
-                <option value="TERM_2">Term 2</option>
-                <option value="TERM_3">Term 3</option>
-              </select>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-400">Start Date</label>
+                <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pl-1">Academic Cycle</label>
+                <select
+                  value={formData.term}
+                  onChange={(e) => setFormData({ ...formData, term: e.target.value })}
+                  className="flex h-12 w-full rounded-xl border border-white/5 bg-white/5 px-4 text-sm text-white outline-none focus:border-primary-500 transition-all"
+                >
+                  <option value="TERM_1">Term 01</option>
+                  <option value="TERM_2">Term 02</option>
+                  <option value="TERM_3">Term 03</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pl-1">Assessment Class</label>
+                <select
+                  value={formData.exam_type}
+                  onChange={(e) => setFormData({ ...formData, exam_type: e.target.value })}
+                  className="flex h-12 w-full rounded-xl border border-white/5 bg-white/5 px-4 text-sm text-white outline-none focus:border-primary-500 transition-all"
+                >
+                  <option value="CAT">CAT</option>
+                  <option value="MID_TERM">Mid-Term</option>
+                  <option value="END_TERM">End-Term</option>
+                  <option value="MOCK">Mock</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pl-1">Start Phase</label>
                 <Input
                   required
                   type="date"
                   value={formData.start_date}
                   onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                  className="bg-slate-800/50 border-slate-700"
+                  className="h-12 text-sm"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-400">End Date</label>
+                <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pl-1">End Phase</label>
                 <Input
                   required
                   type="date"
                   value={formData.end_date}
                   onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-                  className="bg-slate-800/50 border-slate-700"
+                  className="h-12 text-sm"
                 />
               </div>
             </div>
-            
+
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-400">Grading System</label>
+              <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pl-1">Grading Matrix</label>
               <select
                 required
                 value={formData.grading_system}
                 onChange={(e) => setFormData({ ...formData, grading_system: e.target.value })}
-                className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 transition-all"
+                className="flex h-12 w-full rounded-xl border border-white/5 bg-white/5 px-4 text-sm text-white outline-none focus:border-primary-500 transition-all"
               >
-                <option value="">Select Grading System...</option>
+                <option value="">Select Protocol System...</option>
                 {gradingSystems.map((gs: any) => (
                   <option key={gs.id} value={gs.id}>{gs.name}</option>
                 ))}
@@ -301,25 +359,25 @@ export const ExamsPage = () => {
             </div>
           </div>
 
-          <div className="flex gap-3 pt-4">
-            <Button type="button" variant="outline" className="flex-1 bg-slate-800 border-slate-700 text-white hover:bg-slate-700" onClick={() => setIsModalOpen(false)}>
-              Cancel
+          <div className="flex gap-4 pt-4 pb-2">
+            <Button type="button" variant="ghost" className="flex-1 h-12 text-[10px]" onClick={() => setIsModalOpen(false)}>
+              Discard
             </Button>
-            <Button type="submit" className="flex-[2]" disabled={createExamMutation.isPending}>
-              {createExamMutation.isPending ? 'Scheduling...' : 'Schedule Exam'}
+            <Button type="submit" className="flex-[2] h-12 text-[10px]" disabled={createExamMutation.isPending}>
+              {createExamMutation.isPending ? 'Synchronizing...' : 'Initialize Assessment'}
             </Button>
           </div>
         </form>
       </Modal>
 
-      <ConfirmModal 
+      <ConfirmModal
         isOpen={examToDelete !== null}
         onClose={() => setExamToDelete(null)}
         onConfirm={() => {
           if (examToDelete) deleteExamMutation.mutate(examToDelete.id);
         }}
-        title="Delete Examination"
-        description={`Are you sure you want to delete "${examToDelete?.name}"? This will remove all recorded marks for this exam.`}
+        title="Protocol Termination"
+        description={`Execute permanent purge of "${examToDelete?.name}"? All associated data will be terminated.`}
       />
     </div>
   );

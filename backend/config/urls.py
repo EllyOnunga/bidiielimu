@@ -20,13 +20,25 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.http import JsonResponse
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from schools.views_theme import TenantThemeView
+from config.views_health import HealthCheckView, ReadinessCheckView, LivenessCheckView, MetricsView
+from graphene_django.views import GraphQLView
 
 def health_check(request):
     return JsonResponse({"status": "ok", "version": "1.0.0"})
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('health/', health_check, name='health_check'),
+    path('health/', HealthCheckView.as_view(), name='health_check'),
+    path('ready/', ReadinessCheckView.as_view(), name='readiness_check'),
+    path('live/', LivenessCheckView.as_view(), name='liveness_check'),
+    path('metrics/', MetricsView.as_view(), name='metrics'),
+
+    # GraphQL API
+    path('graphql/', GraphQLView.as_view(graphiql=True)),
+    
+    path('api/v1/ping/', lambda r: JsonResponse({"status": "ping-main"}), name='ping-main'),
+    path('api/v1/theme/', TenantThemeView.as_view(), name='theme'),
     
     path('api/v1/accounts/', include('accounts.urls')),
     path('api/v1/students/', include('students.urls')),
@@ -40,6 +52,7 @@ urlpatterns = [
     path('api/v1/notifications/', include('notifications.urls')),
     path('api/v1/hr/', include('hr.urls')),
     path('api/v1/inventory/', include('inventory.urls')),
+    path('api/v1/lms/', include('lms.urls')),
     
     # Auth endpoints
     path('api/v1/auth/', include('dj_rest_auth.urls')),

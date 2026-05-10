@@ -37,6 +37,14 @@ class Exam(models.Model):
     def __str__(self):
         return f"{self.name} ({self.academic_year})"
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['start_date']),
+            models.Index(fields=['end_date']),
+            models.Index(fields=['academic_year', 'term']),
+            models.Index(fields=['is_published', 'start_date']),
+        ]
+
 class Mark(models.Model):
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE, related_name='marks')
     student = models.ForeignKey('students.Student', on_delete=models.CASCADE, related_name='marks')
@@ -51,6 +59,12 @@ class Mark(models.Model):
 
     class Meta:
         unique_together = ('exam', 'student', 'subject')
+        indexes = [
+            models.Index(fields=['exam', 'subject']),
+            models.Index(fields=['student', 'exam']),
+            models.Index(fields=['subject', 'score']),
+            models.Index(fields=['exam', 'score']),
+        ]
 
     def __str__(self):
         if self.is_absent:

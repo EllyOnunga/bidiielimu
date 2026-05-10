@@ -5,14 +5,18 @@ class IsSuperAdmin(permissions.BasePermission):
     Allows access only to Platform Super Admins.
     """
     def has_permission(self, request, view):
-        return bool(request.user and request.user.is_authenticated and request.user.role == 'SUPER_ADMIN')
+        return bool(request.user and request.user.is_authenticated and request.user.role_name == 'SUPER_ADMIN')
 
 class IsSchoolAdmin(permissions.BasePermission):
     """
     Allows access only to School Admins.
     """
     def has_permission(self, request, view):
-        return bool(request.user and request.user.is_authenticated and request.user.role == 'ADMIN')
+        return bool(
+            request.user and 
+            request.user.is_authenticated and 
+            request.user.role_name in ('ADMIN', 'SUPER_ADMIN')
+        )
 
 class IsPrincipal(permissions.BasePermission):
     """
@@ -22,7 +26,7 @@ class IsPrincipal(permissions.BasePermission):
         return bool(
             request.user and 
             request.user.is_authenticated and 
-            request.user.role in ['SUPER_ADMIN', 'ADMIN', 'PRINCIPAL']
+            request.user.role_name in ['SUPER_ADMIN', 'ADMIN', 'PRINCIPAL']
         )
 
 class IsHOD(permissions.BasePermission):
@@ -33,7 +37,7 @@ class IsHOD(permissions.BasePermission):
         return bool(
             request.user and 
             request.user.is_authenticated and 
-            request.user.role in ['SUPER_ADMIN', 'ADMIN', 'PRINCIPAL', 'HOD']
+            request.user.role_name in ['SUPER_ADMIN', 'ADMIN', 'PRINCIPAL', 'HOD']
         )
 
 class IsTeacher(permissions.BasePermission):
@@ -44,7 +48,7 @@ class IsTeacher(permissions.BasePermission):
         return bool(
             request.user and 
             request.user.is_authenticated and 
-            request.user.role in ['SUPER_ADMIN', 'ADMIN', 'PRINCIPAL', 'HOD', 'TEACHER']
+            request.user.role_name in ['SUPER_ADMIN', 'ADMIN', 'PRINCIPAL', 'HOD', 'TEACHER']
         )
 
 class IsParent(permissions.BasePermission):
@@ -52,11 +56,11 @@ class IsParent(permissions.BasePermission):
     Allows access to Parents.
     """
     def has_permission(self, request, view):
-        return bool(request.user and request.user.is_authenticated and request.user.role == 'PARENT')
+        return bool(request.user and request.user.is_authenticated and request.user.role_name == 'PARENT')
 
 class IsStudent(permissions.BasePermission):
     """
     Allows access to Students.
     """
     def has_permission(self, request, view):
-        return bool(request.user and request.user.is_authenticated and request.user.role == 'STUDENT')
+        return bool(request.user and request.user.is_authenticated and request.user.role_name == 'STUDENT')

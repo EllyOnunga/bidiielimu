@@ -12,12 +12,17 @@ class DailyAttendance(models.Model):
     date = models.DateField(db_index=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PRESENT', db_index=True)
     remarks = models.TextField(null=True, blank=True)
-    marked_by = models.ForeignKey('accounts.User', on_delete=models.SET_NULL, null=True)
+    marked_by = models.ForeignKey('accounts.User', on_delete=models.SET_NULL, null=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('student', 'date')
         verbose_name_plural = 'Daily Attendance'
+        indexes = [
+            models.Index(fields=['date', 'status']),
+            models.Index(fields=['student', 'date']),
+            models.Index(fields=['marked_by', 'date']),
+        ]
 
     def __str__(self):
         return f"{self.student} - {self.date} ({self.status})"
@@ -36,7 +41,7 @@ class PeriodAttendance(models.Model):
     date = models.DateField(db_index=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PRESENT', db_index=True)
     remarks = models.TextField(null=True, blank=True)
-    marked_by = models.ForeignKey('accounts.User', on_delete=models.SET_NULL, null=True)
+    marked_by = models.ForeignKey('accounts.User', on_delete=models.SET_NULL, null=True, db_index=True)
     marked_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

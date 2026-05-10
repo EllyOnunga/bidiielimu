@@ -17,17 +17,13 @@ class TeacherViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, IsSchoolAdmin]
 
     def get_queryset(self):
-        return Teacher.objects.filter(school=self.request.user.school).select_related('user')
+        return Teacher.objects.all().select_related('user')
 
     search_fields = ['first_name', 'last_name', 'employee_id', 'specialization', 'user__email']
     ordering_fields = ['created_at', 'first_name', 'last_name', 'joining_date']
 
     def perform_create(self, serializer):
-        school = self.request.user.school
-        if not school:
-            from rest_framework.exceptions import ValidationError
-            raise ValidationError({"detail": "User must be assigned to a school to add teachers."})
-        serializer.save(school=school)
+        serializer.save()
 
     @action(detail=False, methods=['post'])
     def bulk_upload(self, request):
@@ -60,10 +56,12 @@ class TeacherViewSet(viewsets.ModelViewSet):
                             errors.append(f"Row {row_idx}: Missing required fields (email, names, or employee ID).")
                             continue
 
+                        from accounts.models import Role
+                        teacher_role = Role.objects.get(name='TEACHER')
                         user = User.objects.create_user(
                             email=email,
                             password=f"teacher@{emp_id}",
-                            role='TEACHER',
+                            role=teacher_role,
                             first_name=first_name,
                             last_name=last_name,
                             phone_number=phone,
@@ -72,7 +70,6 @@ class TeacherViewSet(viewsets.ModelViewSet):
 
                         teacher = Teacher.objects.create(
                             user=user, 
-                            school=school,
                             employee_id=emp_id,
                             first_name=first_name,
                             last_name=last_name,
@@ -80,6 +77,15 @@ class TeacherViewSet(viewsets.ModelViewSet):
                             phone_number=phone,
                             joining_date=joining_date if joining_date else None
                         )
+                        
+                        # Send Welcome Email
+                        from django.conf import settings
+                        domain_name = school.domains.filter(is_primary=True).first().domain if school else "elimuhub.com"
+                        protocol = "http://" if "localhost" in domain_name else "https://"
+                        login_url = f"{protocol}{domain_name}/login"
+                        
+                        from accounts.services import EmailService
+                        EmailService.send_welcome_email(user, login_url=login_url, plain_password=f"teacher@{emp_id}")
 
                         # Assign as class teacher if class_id provided
                         if class_id:

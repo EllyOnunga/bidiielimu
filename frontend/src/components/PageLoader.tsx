@@ -15,7 +15,7 @@ export const PageLoader = () => {
           <Loader2 className="w-12 h-12 text-primary-400 animate-spin relative z-10" />
         </div>
         <div className="text-center">
-          <h3 className="text-white font-black text-lg uppercase tracking-tight">Bidii<span className="text-primary-400">Elimu</span></h3>
+          <h3 className="text-white font-black text-lg uppercase tracking-tight">ElimuHub</h3>
           <p className="text-primary-200/50 text-[10px] font-black uppercase tracking-[0.2em] mt-1">Loading Assets...</p>
         </div>
       </motion.div>

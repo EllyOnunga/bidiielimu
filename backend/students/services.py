@@ -12,7 +12,7 @@ class StudentImportService:
         Processes a CSV file and creates students.
         Expected headers: admission_number, first_name, last_name, gender, date_of_birth, 
                           enrollment_date, stream_name, grade_name, curriculum, 
-                          parent_name, parent_phone
+                          guardian_name, guardian_phone, guardian_email, guardian_relationship
         """
         decoded_file = file_obj.read().decode('utf-8')
         io_string = io.StringIO(decoded_file)
@@ -48,12 +48,19 @@ class StudentImportService:
 
                 # Create basic guardian if provided
                 if row.get('parent_name') and row.get('parent_phone'):
+                    # Guardian data
+                    g_name = row.get('guardian_name') or row.get('parent_name', 'Guardian')
+                    g_phone = row.get('guardian_phone') or row.get('parent_phone', '')
+                    g_email = row.get('guardian_email') or row.get('parent_email', '')
+                    g_relationship = row.get('guardian_relationship', 'LEGAL_GUARDIAN')
+                    
                     Guardian.objects.create(
                         student=student,
-                        first_name=row['parent_name'].split(' ')[0],
-                        last_name=' '.join(row['parent_name'].split(' ')[1:]) or 'Unknown',
-                        relationship='LEGAL_GUARDIAN',
-                        phone_number=row['parent_phone']
+                        first_name=g_name.split(' ')[0],
+                        last_name=' '.join(g_name.split(' ')[1:]) or 'Unknown',
+                        relationship=g_relationship,
+                        phone_number=g_phone,
+                        email=g_email
                     )
 
                 results['success_count'] += 1
@@ -71,6 +78,6 @@ class StudentImportService:
         headers = [
             'admission_number', 'first_name', 'last_name', 'gender', 'date_of_birth',
             'enrollment_date', 'stream_name', 'grade_name', 'curriculum',
-            'parent_name', 'parent_phone'
+            'guardian_name', 'guardian_phone', 'guardian_email', 'guardian_relationship'
         ]
-        return ','.join(headers) + '\n' + 'ADM001,John,Doe,M,2015-05-20,2024-01-10,West,Grade 4,CBC,Jane Doe,+254700000000'
+        return ','.join(headers) + '\n' + 'ADM001,John,Doe,M,2015-05-20,2024-01-10,West,Grade 4,CBC,Jane Doe,+254700000000,jane@example.com,MOTHER'

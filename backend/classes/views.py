@@ -14,9 +14,12 @@ class SubjectAssignmentViewSet(viewsets.ModelViewSet):
     search_fields = ['teacher__user__first_name', 'teacher__user__last_name', 'subject__name', 'stream__name']
 
     def get_queryset(self):
-        qs = SubjectAssignment.objects.filter(
-            school=self.request.user.school
-        ).select_related('teacher', 'subject', 'stream', 'stream__grade_level')
+        user = self.request.user
+        qs = SubjectAssignment.objects.all().select_related('teacher', 'subject', 'stream', 'stream__grade_level').order_by('id')
+        
+        # If user is a teacher, only show their assignments by default
+        if hasattr(user, 'role_name') and user.role_name == 'TEACHER':
+            qs = qs.filter(teacher__user=user)
         
         teacher_id = self.request.query_params.get('teacher')
         if teacher_id and teacher_id != 'undefined':
@@ -25,10 +28,7 @@ class SubjectAssignmentViewSet(viewsets.ModelViewSet):
         return qs
 
     def perform_create(self, serializer):
-        school = self.request.user.school
-        if not school:
-            raise ValidationError({"detail": "User must be assigned to a school."})
-        serializer.save(school=school)
+        serializer.save()
 
 class GradeLevelViewSet(viewsets.ModelViewSet):
     serializer_class = GradeLevelSerializer
@@ -36,17 +36,12 @@ class GradeLevelViewSet(viewsets.ModelViewSet):
     search_fields = ['name']
 
     def get_queryset(self):
-        return GradeLevel.objects.filter(
-            school=self.request.user.school
-        ).prefetch_related('streams').annotate(
+        return GradeLevel.objects.all().prefetch_related('streams').annotate(
             student_count=Count('streams__students', distinct=True)
-        )
+        ).order_by('id')
 
     def perform_create(self, serializer):
-        school = self.request.user.school
-        if not school:
-            raise ValidationError({"detail": "User must be assigned to a school to perform this action."})
-        serializer.save(school=school)
+        serializer.save()
 
 class StreamViewSet(viewsets.ModelViewSet):
     serializer_class = StreamSerializer
@@ -54,11 +49,9 @@ class StreamViewSet(viewsets.ModelViewSet):
     search_fields = ['name', 'grade_level__name', 'teacher__user__first_name', 'teacher__user__last_name']
 
     def get_queryset(self):
-        qs = Stream.objects.filter(
-            grade_level__school=self.request.user.school
-        ).select_related('grade_level', 'teacher').annotate(
+        qs = Stream.objects.all().select_related('grade_level', 'teacher').annotate(
             student_count=Count('students', distinct=True)
-        )
+        ).order_by('id')
 
         grade_id = self.request.query_params.get('grade')
         if grade_id:
@@ -71,13 +64,10 @@ class SubjectViewSet(viewsets.ModelViewSet):
     search_fields = ['name', 'code']
 
     def get_queryset(self):
-        return Subject.objects.filter(school=self.request.user.school)
+        return Subject.objects.all().order_by('id')
 
     def perform_create(self, serializer):
-        school = self.request.user.school
-        if not school:
-            raise ValidationError({"detail": "User must be assigned to a school to perform this action."})
-        serializer.save(school=school)
+        serializer.save()
 
 class ClassroomViewSet(viewsets.ModelViewSet):
     serializer_class = ClassroomSerializer
@@ -85,13 +75,10 @@ class ClassroomViewSet(viewsets.ModelViewSet):
     search_fields = ['name']
 
     def get_queryset(self):
-        return Classroom.objects.filter(school=self.request.user.school)
+        return Classroom.objects.all().order_by('id')
 
     def perform_create(self, serializer):
-        school = self.request.user.school
-        if not school:
-            raise ValidationError({"detail": "User must be assigned to a school to perform this action."})
-        serializer.save(school=school)
+        serializer.save()
 
 class ScheduleSlotViewSet(viewsets.ModelViewSet):
     serializer_class = ScheduleSlotSerializer
@@ -99,10 +86,10 @@ class ScheduleSlotViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        qs = ScheduleSlot.objects.filter(stream__grade_level__school=user.school).select_related(
+        qs = ScheduleSlot.objects.all().select_related(
             'stream', 'stream__grade_level', 'subject', 'teacher', 'classroom'
-        )
-        if user.role == 'STUDENT':
+        ).order_by('day_of_week', 'start_time')
+        if user.role_name == 'STUDENT':
             # Students only see slots for their own stream
             qs = qs.filter(stream__students__user=user)
         return qs
