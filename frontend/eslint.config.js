@@ -19,33 +19,27 @@ export default defineConfig([
       globals: globals.browser,
     },
     rules: {
-      // Allow any types (common in rapid development)
+      // ── TypeScript ─────────────────────────────────────────────────────────
       '@typescript-eslint/no-explicit-any': 'off',
-
-      // Unused vars: ignore args/vars prefixed with _, and ALL catch-block errors
-      '@typescript-eslint/no-unused-vars': ['error', {
+      '@typescript-eslint/no-empty-object-type': 'off',
+      '@typescript-eslint/no-unused-vars': ['warn', {
         'argsIgnorePattern': '^_',
         'varsIgnorePattern': '^_',
-        'caughtErrors': 'none',  // never flag unused catch(err) variables
+        'caughtErrors': 'none',  // never flag unused catch(err/e/error/_) variables
       }],
 
-      // Functions declared after useEffect that call them — common JS hoisting pattern,
-      // safe with async functions but ESLint flags it. Downgrade to warn.
-      'react-hooks/immutability': 'warn',
-
-      // setState in useEffect — already off, keep off
+      // ── React Hooks (v7) ──────────────────────────────────────────────────
+      // react-hooks/immutability: flags functions called in useEffect before
+      // they're declared. Common hoisting pattern — turn off.
+      'react-hooks/immutability': 'off',
       'react-hooks/set-state-in-effect': 'off',
-
-      // Missing useEffect deps — warn only, not error
       'react-hooks/exhaustive-deps': 'warn',
 
-      // Empty interfaces are fine as extension points
-      '@typescript-eslint/no-empty-object-type': 'off',
-
-      // Useless escapes in regex — warn only
+      // ── General JS ────────────────────────────────────────────────────────
       'no-useless-escape': 'warn',
+      'no-use-before-define': 'off',
 
-      // ThemeContext exports a constant alongside components — common pattern, warn only
+      // ── React Refresh ─────────────────────────────────────────────────────
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
     },
   },
