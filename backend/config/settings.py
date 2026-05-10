@@ -729,40 +729,42 @@ if not IS_RENDER:
     LOGS_DIR = BASE_DIR / "logs"
     LOGS_DIR.mkdir(parents=True, exist_ok=True)
 
-    LOGGING["handlers"].update({
-        "file": {
-            "level": "INFO",
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": LOGS_DIR / "django.log",
-            "maxBytes": 10 * 1024 * 1024,
-            "backupCount": 5,
-            "formatter": "verbose",
-        },
-        "json_file": {
-            "level": "INFO",
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": LOGS_DIR / "django.json",
-            "maxBytes": 10 * 1024 * 1024,
-            "backupCount": 5,
-            "formatter": "json",
-        },
-        "error_file": {
-            "level": "ERROR",
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": LOGS_DIR / "errors.log",
-            "maxBytes": 10 * 1024 * 1024,
-            "backupCount": 5,
-            "formatter": "verbose",
-        },
-        "security_file": {
-            "level": "INFO",
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": LOGS_DIR / "security.log",
-            "maxBytes": 10 * 1024 * 1024,
-            "backupCount": 5,
-            "formatter": "verbose",
-        },
-    })
+    LOGGING["handlers"].update(
+        {
+            "file": {
+                "level": "INFO",
+                "class": "logging.handlers.RotatingFileHandler",
+                "filename": LOGS_DIR / "django.log",
+                "maxBytes": 10 * 1024 * 1024,
+                "backupCount": 5,
+                "formatter": "verbose",
+            },
+            "json_file": {
+                "level": "INFO",
+                "class": "logging.handlers.RotatingFileHandler",
+                "filename": LOGS_DIR / "django.json",
+                "maxBytes": 10 * 1024 * 1024,
+                "backupCount": 5,
+                "formatter": "json",
+            },
+            "error_file": {
+                "level": "ERROR",
+                "class": "logging.handlers.RotatingFileHandler",
+                "filename": LOGS_DIR / "errors.log",
+                "maxBytes": 10 * 1024 * 1024,
+                "backupCount": 5,
+                "formatter": "verbose",
+            },
+            "security_file": {
+                "level": "INFO",
+                "class": "logging.handlers.RotatingFileHandler",
+                "filename": LOGS_DIR / "security.log",
+                "maxBytes": 10 * 1024 * 1024,
+                "backupCount": 5,
+                "formatter": "verbose",
+            },
+        }
+    )
     LOGGING["root"]["handlers"].extend(["file", "json_file", "error_file"])
     LOGGING["loggers"]["django"]["handlers"].extend(["file", "json_file"])
     LOGGING["loggers"]["django.request"]["handlers"] = ["error_file"]
@@ -770,8 +772,17 @@ if not IS_RENDER:
     LOGGING["loggers"]["accounts"]["handlers"].extend(["file", "json_file"])
 
     # Add file handlers to all other loggers
-    for logger_name in ["schools", "students", "teachers", "classes", "exams",
-                       "attendance", "fees", "audit", "notifications"]:
+    for logger_name in [
+        "schools",
+        "students",
+        "teachers",
+        "classes",
+        "exams",
+        "attendance",
+        "fees",
+        "audit",
+        "notifications",
+    ]:
         LOGGING["loggers"][logger_name] = {
             "handlers": ["console", "file", "json_file"],
             "level": "INFO",
