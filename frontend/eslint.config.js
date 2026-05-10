@@ -25,7 +25,9 @@ export default defineConfig([
       '@typescript-eslint/no-unused-vars': ['warn', {
         'argsIgnorePattern': '^_',
         'varsIgnorePattern': '^_',
-        'caughtErrors': 'none',  // never flag unused catch(err/e/error/_) variables
+        'caughtErrors': 'none',
+        'destructuredArrayIgnorePattern': '^_',
+        'ignoreRestSiblings': true,
       }],
 
       // ── React Hooks (v7) ──────────────────────────────────────────────────
