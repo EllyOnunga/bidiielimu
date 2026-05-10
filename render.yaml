@@ -5,7 +5,7 @@ services:
     region: oregon
     plan: free
     buildCommand: "cd backend && pip install -r requirements.txt && python manage.py collectstatic --no-input"
-    startCommand: "cd backend && python manage.py migrate --noinput && python manage.py create_public_tenant && gunicorn config.wsgi:application"
+    startCommand: "cd backend && python manage.py migrate --noinput && python manage.py create_public_tenant && gunicorn config.wsgi:application -b 0.0.0.0:$PORT --timeout 120 --workers 1 --threads 2"
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.13
@@ -20,7 +20,7 @@ services:
       - key: DEBUG
         value: "True"
       - key: WEB_CONCURRENCY
-        value: 2
+        value: 1
 
 databases:
   - name: elimuhub-db
