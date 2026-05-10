@@ -23,7 +23,7 @@ export const NotificationBell = () => {
   }, []);
 
   const connectWS = () => {
-    let wsUrl = '';
+    let wsUrl: string;
     const envURL = import.meta.env.VITE_API_URL;
     
     if (envURL) {
