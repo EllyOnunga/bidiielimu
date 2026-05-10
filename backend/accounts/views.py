@@ -8,8 +8,7 @@ from students.models import Student
 from teachers.models import Teacher
 
 from .models import EmailVerificationToken, User
-from .serializers import (MyTokenObtainPairSerializer, RegisterSerializer,
-                          UserSerializer)
+from .serializers import MyTokenObtainPairSerializer, RegisterSerializer, UserSerializer
 
 
 class RegisterView(generics.CreateAPIView):

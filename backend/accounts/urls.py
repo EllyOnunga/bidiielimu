@@ -1,9 +1,15 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from .views import (GDPRDeleteView, GDPRExportView, MyTokenObtainPairView,
-                    RegisterView, ResendVerificationView, UserDetailView,
-                    VerifyEmailView)
+from .views import (
+    GDPRDeleteView,
+    GDPRExportView,
+    MyTokenObtainPairView,
+    RegisterView,
+    ResendVerificationView,
+    UserDetailView,
+    VerifyEmailView,
+)
 from .views_api import APIKeyViewSet
 from .views_social import GitHubLogin, GoogleLogin, MicrosoftLogin
 

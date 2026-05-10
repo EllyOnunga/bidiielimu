@@ -20,12 +20,19 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import include, path
-from drf_spectacular.views import (SpectacularAPIView, SpectacularRedocView,
-                                   SpectacularSwaggerView)
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularRedocView,
+    SpectacularSwaggerView,
+)
 from graphene_django.views import GraphQLView
 
-from config.views_health import (HealthCheckView, LivenessCheckView,
-                                 MetricsView, ReadinessCheckView)
+from config.views_health import (
+    HealthCheckView,
+    LivenessCheckView,
+    MetricsView,
+    ReadinessCheckView,
+)
 from schools.views_theme import TenantThemeView
 
 

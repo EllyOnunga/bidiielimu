@@ -1,8 +1,7 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from .views import (ExamViewSet, GradeThresholdViewSet, GradingSystemViewSet,
-                    MarkViewSet)
+from .views import ExamViewSet, GradeThresholdViewSet, GradingSystemViewSet, MarkViewSet
 
 router = DefaultRouter()
 router.register(r"grading-systems", GradingSystemViewSet, basename="gradingsystem")

@@ -130,8 +130,11 @@ class TeacherViewSet(viewsets.ModelViewSet):
 
                         # Assign subjects if subject_ids provided
                         if subject_ids_str and class_id:
-                            from classes.models import (Stream, Subject,
-                                                        SubjectAssignment)
+                            from classes.models import (
+                                Stream,
+                                Subject,
+                                SubjectAssignment,
+                            )
 
                             stream = Stream.objects.get(id=class_id)
                             subject_ids = [
