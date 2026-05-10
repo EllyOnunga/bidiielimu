@@ -132,7 +132,9 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         try:
             Domain.objects.create(
-                domain=f"{domain_name}.localhost", tenant=school, is_primary=True
+                domain=f"{domain_name}.{settings.TENANT_DOMAIN_SUFFIX}",
+                tenant=school,
+                is_primary=True,
             )
         except IntegrityError:
             school.delete()
