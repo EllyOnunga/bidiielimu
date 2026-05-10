@@ -25,16 +25,16 @@ DATABASES = {
 DATABASE_ROUTERS = ("django_tenants.routers.TenantSyncRouter",)
 
 
-# Disable migrations for faster tests
-class DisableMigrations:
-    def __contains__(self, item):
-        return True
-
-    def __getitem__(self, item):
-        return None
-
-
-MIGRATION_MODULES = DisableMigrations()
+# Disable migrations for faster tests - RE-ENABLED to fix schema issues with django-tenants
+# class DisableMigrations:
+#     def __contains__(self, item):
+#         return True
+#
+#     def __getitem__(self, item):
+#         return None
+#
+#
+# MIGRATION_MODULES = DisableMigrations()
 
 # Use console logging for CI
 LOGGING = {
