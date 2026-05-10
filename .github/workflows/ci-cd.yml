@@ -61,6 +61,7 @@ jobs:
       - name: Run tests
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+          SECRET_KEY: ci-secret-key-for-testing-only
         run: |
           cd backend
           python manage.py test --settings=config.settings_ci --verbosity=2
