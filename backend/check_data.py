@@ -1,16 +1,18 @@
 import os
+
 import django
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
 from django_tenants.utils import schema_context
-from teachers.models import Teacher
-from classes.models import Subject, Stream, SubjectAssignment
+
+from classes.models import Stream, Subject, SubjectAssignment
 from exams.models import Exam, Mark
 from students.models import Student
+from teachers.models import Teacher
 
-with schema_context('makini_school'):
+with schema_context("makini_school"):
     print(f"--- Schema: makini_school ---")
     print(f"Teachers: {Teacher.objects.count()}")
     print(f"Streams: {Stream.objects.count()}")
@@ -21,8 +23,12 @@ with schema_context('makini_school'):
     print(f"Students: {Student.objects.count()}")
 
     print("\n--- Subject Assignments Details ---")
-    for sa in SubjectAssignment.objects.all().select_related('teacher', 'subject', 'stream'):
-        print(f"Teacher: {sa.teacher.first_name} {sa.teacher.last_name}, Subject: {sa.subject.name}, Stream: {sa.stream}")
+    for sa in SubjectAssignment.objects.all().select_related(
+        "teacher", "subject", "stream"
+    ):
+        print(
+            f"Teacher: {sa.teacher.first_name} {sa.teacher.last_name}, Subject: {sa.subject.name}, Stream: {sa.stream}"
+        )
 
     print("\n--- Exams Details ---")
     for ex in Exam.objects.all():

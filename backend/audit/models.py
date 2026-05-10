@@ -1,16 +1,22 @@
-from django.db import models
 from django.conf import settings
+from django.db import models
+
 
 class AuditLog(models.Model):
     ACTIONS = (
-        ('CREATE', 'Created'),
-        ('UPDATE', 'Updated'),
-        ('DELETE', 'Deleted'),
-        ('LOGIN', 'Logged In'),
-        ('LOGOUT', 'Logged Out'),
+        ("CREATE", "Created"),
+        ("UPDATE", "Updated"),
+        ("DELETE", "Deleted"),
+        ("LOGIN", "Logged In"),
+        ("LOGOUT", "Logged Out"),
     )
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='audit_logs')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="audit_logs",
+    )
     action = models.CharField(max_length=10, choices=ACTIONS)
     model_name = models.CharField(max_length=100)
     object_id = models.CharField(max_length=50, null=True, blank=True)
@@ -20,12 +26,12 @@ class AuditLog(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-timestamp']
+        ordering = ["-timestamp"]
         indexes = [
-            models.Index(fields=['timestamp']),
-            models.Index(fields=['user', 'timestamp']),
-            models.Index(fields=['model_name', 'timestamp']),
-            models.Index(fields=['action', 'timestamp']),
+            models.Index(fields=["timestamp"]),
+            models.Index(fields=["user", "timestamp"]),
+            models.Index(fields=["model_name", "timestamp"]),
+            models.Index(fields=["action", "timestamp"]),
         ]
 
     def __str__(self):

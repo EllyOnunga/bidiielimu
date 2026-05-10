@@ -9,13 +9,13 @@ class DatabaseRouter:
         """
         # For now, use default database
         # In production with replication, this would route to read replicas
-        return 'read'
+        return "read"
 
     def db_for_write(self, model, **hints):
         """
         Direct write operations to write database
         """
-        return 'default'
+        return "default"
 
     def allow_relation(self, obj1, obj2, **hints):
         """
@@ -30,9 +30,9 @@ class DatabaseRouter:
         Allow migrations on all databases for tenant models
         For shared apps, only allow on default database
         """
-        if app_label in ['schools', 'accounts', 'audit']:
+        if app_label in ["schools", "accounts", "audit"]:
             # Shared apps across tenants - only migrate on default
-            return db == 'default'
+            return db == "default"
         else:
             # Tenant-specific apps - migrate on all databases
             return True

@@ -10,93 +10,249 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('classes', '0001_initial'),
-        ('students', '0001_initial'),
-        ('teachers', '0001_initial'),
+        ("classes", "0001_initial"),
+        ("students", "0001_initial"),
+        ("teachers", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='GradingSystem',
+            name="GradingSystem",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
             ],
         ),
         migrations.CreateModel(
-            name='GradeThreshold',
+            name="GradeThreshold",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('grade', models.CharField(max_length=5)),
-                ('min_score', models.IntegerField()),
-                ('max_score', models.IntegerField()),
-                ('points', models.IntegerField()),
-                ('remarks', models.CharField(max_length=100)),
-                ('grading_system', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='thresholds', to='exams.gradingsystem')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("grade", models.CharField(max_length=5)),
+                ("min_score", models.IntegerField()),
+                ("max_score", models.IntegerField()),
+                ("points", models.IntegerField()),
+                ("remarks", models.CharField(max_length=100)),
+                (
+                    "grading_system",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="thresholds",
+                        to="exams.gradingsystem",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Exam',
+            name="Exam",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=200)),
-                ('term', models.CharField(max_length=50)),
-                ('academic_year', models.CharField(max_length=10)),
-                ('exam_type', models.CharField(choices=[('CAT', 'Continuous Assessment Test'), ('OPENER', 'Opener Exam'), ('MID_TERM', 'Mid-Term Exam'), ('END_TERM', 'End-Term Exam'), ('MOCK', 'National Mock Simulation'), ('NATIONAL', 'National Exam (Final)')], default='END_TERM', max_length=20)),
-                ('start_date', models.DateField()),
-                ('end_date', models.DateField()),
-                ('is_published', models.BooleanField(default=False)),
-                ('grading_system', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='exams', to='exams.gradingsystem')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=200)),
+                ("term", models.CharField(max_length=50)),
+                ("academic_year", models.CharField(max_length=10)),
+                (
+                    "exam_type",
+                    models.CharField(
+                        choices=[
+                            ("CAT", "Continuous Assessment Test"),
+                            ("OPENER", "Opener Exam"),
+                            ("MID_TERM", "Mid-Term Exam"),
+                            ("END_TERM", "End-Term Exam"),
+                            ("MOCK", "National Mock Simulation"),
+                            ("NATIONAL", "National Exam (Final)"),
+                        ],
+                        default="END_TERM",
+                        max_length=20,
+                    ),
+                ),
+                ("start_date", models.DateField()),
+                ("end_date", models.DateField()),
+                ("is_published", models.BooleanField(default=False)),
+                (
+                    "grading_system",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="exams",
+                        to="exams.gradingsystem",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='CBCAssessment',
+            name="CBCAssessment",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('rating', models.IntegerField(choices=[(4, 'Exceeding Expectation (EE)'), (3, 'Meeting Expectation (ME)'), (2, 'Approaching Expectation (AE)'), (1, 'Below Expectation (BE)')])),
-                ('remarks', models.TextField(blank=True, null=True)),
-                ('date', models.DateField(auto_now_add=True)),
-                ('assessed_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='teachers.teacher')),
-                ('student', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='cbc_assessments', to='students.student')),
-                ('sub_strand', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='assessments', to='classes.substrand')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "rating",
+                    models.IntegerField(
+                        choices=[
+                            (4, "Exceeding Expectation (EE)"),
+                            (3, "Meeting Expectation (ME)"),
+                            (2, "Approaching Expectation (AE)"),
+                            (1, "Below Expectation (BE)"),
+                        ]
+                    ),
+                ),
+                ("remarks", models.TextField(blank=True, null=True)),
+                ("date", models.DateField(auto_now_add=True)),
+                (
+                    "assessed_by",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="teachers.teacher",
+                    ),
+                ),
+                (
+                    "student",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="cbc_assessments",
+                        to="students.student",
+                    ),
+                ),
+                (
+                    "sub_strand",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="assessments",
+                        to="classes.substrand",
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('student', 'sub_strand', 'date')},
+                "unique_together": {("student", "sub_strand", "date")},
             },
         ),
         migrations.CreateModel(
-            name='ExamRanking',
+            name="ExamRanking",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('total_marks', models.DecimalField(decimal_places=2, max_digits=7)),
-                ('mean_score', models.DecimalField(decimal_places=2, max_digits=5)),
-                ('mean_grade', models.CharField(blank=True, max_length=5, null=True)),
-                ('class_position', models.IntegerField(blank=True, null=True)),
-                ('stream_position', models.IntegerField(blank=True, null=True)),
-                ('total_students_in_stream', models.IntegerField(blank=True, null=True)),
-                ('total_students_in_class', models.IntegerField(blank=True, null=True)),
-                ('computed_at', models.DateTimeField(auto_now=True)),
-                ('exam', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='rankings', to='exams.exam')),
-                ('student', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='rankings', to='students.student')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("total_marks", models.DecimalField(decimal_places=2, max_digits=7)),
+                ("mean_score", models.DecimalField(decimal_places=2, max_digits=5)),
+                ("mean_grade", models.CharField(blank=True, max_length=5, null=True)),
+                ("class_position", models.IntegerField(blank=True, null=True)),
+                ("stream_position", models.IntegerField(blank=True, null=True)),
+                (
+                    "total_students_in_stream",
+                    models.IntegerField(blank=True, null=True),
+                ),
+                ("total_students_in_class", models.IntegerField(blank=True, null=True)),
+                ("computed_at", models.DateTimeField(auto_now=True)),
+                (
+                    "exam",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="rankings",
+                        to="exams.exam",
+                    ),
+                ),
+                (
+                    "student",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="rankings",
+                        to="students.student",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-total_marks'],
-                'unique_together': {('student', 'exam')},
+                "ordering": ["-total_marks"],
+                "unique_together": {("student", "exam")},
             },
         ),
         migrations.CreateModel(
-            name='Mark',
+            name="Mark",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('score', models.DecimalField(decimal_places=2, max_digits=5, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(100)])),
-                ('is_absent', models.BooleanField(default=False)),
-                ('teacher_remarks', models.TextField(blank=True, null=True)),
-                ('exam', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='marks', to='exams.exam')),
-                ('student', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='marks', to='students.student')),
-                ('subject', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='classes.subject')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "score",
+                    models.DecimalField(
+                        decimal_places=2,
+                        max_digits=5,
+                        validators=[
+                            django.core.validators.MinValueValidator(0),
+                            django.core.validators.MaxValueValidator(100),
+                        ],
+                    ),
+                ),
+                ("is_absent", models.BooleanField(default=False)),
+                ("teacher_remarks", models.TextField(blank=True, null=True)),
+                (
+                    "exam",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="marks",
+                        to="exams.exam",
+                    ),
+                ),
+                (
+                    "student",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="marks",
+                        to="students.student",
+                    ),
+                ),
+                (
+                    "subject",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="classes.subject",
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('exam', 'student', 'subject')},
+                "unique_together": {("exam", "student", "subject")},
             },
         ),
     ]

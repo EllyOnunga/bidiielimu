@@ -11,74 +11,251 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('classes', '0001_initial'),
+        ("classes", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Student',
+            name="Student",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('deleted_at', models.DateTimeField(blank=True, db_index=True, null=True)),
-                ('admission_number', models.CharField(max_length=50, unique=True)),
-                ('first_name', models.CharField(max_length=100)),
-                ('last_name', models.CharField(max_length=100)),
-                ('date_of_birth', models.DateField()),
-                ('gender', models.CharField(choices=[('M', 'Male'), ('F', 'Female'), ('O', 'Other')], max_length=1)),
-                ('photo', models.ImageField(blank=True, null=True, upload_to='student_photos/')),
-                ('enrollment_date', models.DateField()),
-                ('curriculum', models.CharField(choices=[('CBC', 'Kenya CBC'), ('KCSE', 'Kenya KCSE (8-4-4)'), ('IGCSE', 'Pearson Edexcel IGCSE')], default='CBC', max_length=10)),
-                ('status', models.CharField(choices=[('ACTIVE', 'Active'), ('TRANSFERRED', 'Transferred'), ('GRADUATED', 'Graduated'), ('DROPPED', 'Dropped Out')], default='ACTIVE', max_length=20)),
-                ('index_number', models.CharField(blank=True, max_length=50, null=True)),
-                ('upi_number', models.CharField(blank=True, max_length=50, null=True, verbose_name='Nemis UPI')),
-                ('is_active', models.BooleanField(db_index=True, default=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('stream', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='students', to='classes.stream')),
-                ('user', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='student_profile', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "deleted_at",
+                    models.DateTimeField(blank=True, db_index=True, null=True),
+                ),
+                ("admission_number", models.CharField(max_length=50, unique=True)),
+                ("first_name", models.CharField(max_length=100)),
+                ("last_name", models.CharField(max_length=100)),
+                ("date_of_birth", models.DateField()),
+                (
+                    "gender",
+                    models.CharField(
+                        choices=[("M", "Male"), ("F", "Female"), ("O", "Other")],
+                        max_length=1,
+                    ),
+                ),
+                (
+                    "photo",
+                    models.ImageField(
+                        blank=True, null=True, upload_to="student_photos/"
+                    ),
+                ),
+                ("enrollment_date", models.DateField()),
+                (
+                    "curriculum",
+                    models.CharField(
+                        choices=[
+                            ("CBC", "Kenya CBC"),
+                            ("KCSE", "Kenya KCSE (8-4-4)"),
+                            ("IGCSE", "Pearson Edexcel IGCSE"),
+                        ],
+                        default="CBC",
+                        max_length=10,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("ACTIVE", "Active"),
+                            ("TRANSFERRED", "Transferred"),
+                            ("GRADUATED", "Graduated"),
+                            ("DROPPED", "Dropped Out"),
+                        ],
+                        default="ACTIVE",
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "index_number",
+                    models.CharField(blank=True, max_length=50, null=True),
+                ),
+                (
+                    "upi_number",
+                    models.CharField(
+                        blank=True, max_length=50, null=True, verbose_name="Nemis UPI"
+                    ),
+                ),
+                ("is_active", models.BooleanField(db_index=True, default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "stream",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="students",
+                        to="classes.stream",
+                    ),
+                ),
+                (
+                    "user",
+                    models.OneToOneField(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="student_profile",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
+                "ordering": ["-created_at"],
             },
         ),
         migrations.CreateModel(
-            name='MedicalRecord',
+            name="MedicalRecord",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('blood_group', models.CharField(blank=True, choices=[('A+', 'A+'), ('A-', 'A-'), ('B+', 'B+'), ('B-', 'B-'), ('AB+', 'AB+'), ('AB-', 'AB-'), ('O+', 'O+'), ('O-', 'O-')], max_length=3, null=True)),
-                ('allergies', models.TextField(blank=True, null=True)),
-                ('chronic_conditions', models.TextField(blank=True, null=True)),
-                ('medications', models.TextField(blank=True, null=True)),
-                ('emergency_notes', models.TextField(blank=True, null=True)),
-                ('student', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='medical_record', to='students.student')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "blood_group",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("A+", "A+"),
+                            ("A-", "A-"),
+                            ("B+", "B+"),
+                            ("B-", "B-"),
+                            ("AB+", "AB+"),
+                            ("AB-", "AB-"),
+                            ("O+", "O+"),
+                            ("O-", "O-"),
+                        ],
+                        max_length=3,
+                        null=True,
+                    ),
+                ),
+                ("allergies", models.TextField(blank=True, null=True)),
+                ("chronic_conditions", models.TextField(blank=True, null=True)),
+                ("medications", models.TextField(blank=True, null=True)),
+                ("emergency_notes", models.TextField(blank=True, null=True)),
+                (
+                    "student",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="medical_record",
+                        to="students.student",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Guardian',
+            name="Guardian",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('first_name', models.CharField(max_length=100)),
-                ('last_name', models.CharField(max_length=100)),
-                ('relationship', models.CharField(choices=[('FATHER', 'Father'), ('MOTHER', 'Mother'), ('STEP_FATHER', 'Step Father'), ('STEP_MOTHER', 'Step Mother'), ('LEGAL_GUARDIAN', 'Legal Guardian'), ('SPONSOR', 'Sponsor')], max_length=20)),
-                ('phone_number', models.CharField(max_length=17, validators=[django.core.validators.RegexValidator(message="Phone number format: '+999999999'.", regex='^\\+?1?\\d{9,15}$')])),
-                ('email', models.EmailField(blank=True, max_length=254, null=True)),
-                ('occupation', models.CharField(blank=True, max_length=100, null=True)),
-                ('is_emergency_contact', models.BooleanField(default=False)),
-                ('user', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='guardian_profile', to=settings.AUTH_USER_MODEL)),
-                ('student', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='guardians', to='students.student')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("first_name", models.CharField(max_length=100)),
+                ("last_name", models.CharField(max_length=100)),
+                (
+                    "relationship",
+                    models.CharField(
+                        choices=[
+                            ("FATHER", "Father"),
+                            ("MOTHER", "Mother"),
+                            ("STEP_FATHER", "Step Father"),
+                            ("STEP_MOTHER", "Step Mother"),
+                            ("LEGAL_GUARDIAN", "Legal Guardian"),
+                            ("SPONSOR", "Sponsor"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "phone_number",
+                    models.CharField(
+                        max_length=17,
+                        validators=[
+                            django.core.validators.RegexValidator(
+                                message="Phone number format: '+999999999'.",
+                                regex="^\\+?1?\\d{9,15}$",
+                            )
+                        ],
+                    ),
+                ),
+                ("email", models.EmailField(blank=True, max_length=254, null=True)),
+                ("occupation", models.CharField(blank=True, max_length=100, null=True)),
+                ("is_emergency_contact", models.BooleanField(default=False)),
+                (
+                    "user",
+                    models.OneToOneField(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="guardian_profile",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "student",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="guardians",
+                        to="students.student",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='StudentTransfer',
+            name="StudentTransfer",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('transfer_type', models.CharField(choices=[('IN', 'Transfer In'), ('OUT', 'Transfer Out')], max_length=3)),
-                ('school_name', models.CharField(max_length=200)),
-                ('reason', models.TextField()),
-                ('date', models.DateField()),
-                ('transfer_letter', models.FileField(blank=True, null=True, upload_to='transfer_letters/')),
-                ('student', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='transfers', to='students.student')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "transfer_type",
+                    models.CharField(
+                        choices=[("IN", "Transfer In"), ("OUT", "Transfer Out")],
+                        max_length=3,
+                    ),
+                ),
+                ("school_name", models.CharField(max_length=200)),
+                ("reason", models.TextField()),
+                ("date", models.DateField()),
+                (
+                    "transfer_letter",
+                    models.FileField(
+                        blank=True, null=True, upload_to="transfer_letters/"
+                    ),
+                ),
+                (
+                    "student",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="transfers",
+                        to="students.student",
+                    ),
+                ),
             ],
         ),
     ]

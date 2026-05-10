@@ -1,6 +1,8 @@
+import os
+
 import africastalking
 from django.conf import settings
-import os
+
 
 class SMSService:
     def __init__(self):
@@ -24,8 +26,9 @@ class SMSService:
     @staticmethod
     def broadcast_to_parents(message):
         from students.models import Guardian
-        guardians = Guardian.objects.all().values_list('phone_number', flat=True)
-        phone_numbers = list(set(guardians)) # Unique numbers
-        
+
+        guardians = Guardian.objects.all().values_list("phone_number", flat=True)
+        phone_numbers = list(set(guardians))  # Unique numbers
+
         service = SMSService()
         return service.send_bulk_sms(phone_numbers, message)

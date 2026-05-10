@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 
 User = get_user_model()
 
+
 class SocialAccountAdapter(DefaultSocialAccountAdapter):
     """
     Custom social account adapter for ElimuHub
@@ -20,7 +21,9 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
             try:
                 existing_user = User.objects.get(email=email)
                 # If user exists but not linked to this social account
-                if not SocialAccount.objects.filter(user=existing_user, provider=sociallogin.account.provider).exists():
+                if not SocialAccount.objects.filter(
+                    user=existing_user, provider=sociallogin.account.provider
+                ).exists():
                     # Link the social account to existing user
                     sociallogin.connect(request, existing_user)
                     return
@@ -41,10 +44,11 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         user.save()
 
         # Set default role if not set
-        if not hasattr(user, 'role') or not user.role:
+        if not hasattr(user, "role") or not user.role:
             from accounts.models import Role
+
             try:
-                default_role = Role.objects.get(name='STUDENT')
+                default_role = Role.objects.get(name="STUDENT")
                 user.role = default_role
                 user.save()
             except Role.DoesNotExist:
@@ -61,22 +65,22 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         # Extract additional data from social providers
         extra_data = sociallogin.account.extra_data
 
-        if sociallogin.account.provider == 'google':
+        if sociallogin.account.provider == "google":
             # Google provides profile picture
-            if 'picture' in extra_data:
-                user.profile_picture_url = extra_data['picture']
+            if "picture" in extra_data:
+                user.profile_picture_url = extra_data["picture"]
 
-        elif sociallogin.account.provider == 'microsoft':
+        elif sociallogin.account.provider == "microsoft":
             # Microsoft provides additional profile info
-            if 'jobTitle' in extra_data:
-                user.job_title = extra_data['jobTitle']
+            if "jobTitle" in extra_data:
+                user.job_title = extra_data["jobTitle"]
 
-        elif sociallogin.account.provider == 'github':
+        elif sociallogin.account.provider == "github":
             # GitHub provides username and bio
-            if 'login' in extra_data:
-                user.github_username = extra_data['login']
-            if 'bio' in extra_data:
-                user.bio = extra_data['bio']
+            if "login" in extra_data:
+                user.github_username = extra_data["login"]
+            if "bio" in extra_data:
+                user.bio = extra_data["bio"]
 
         return user
 
@@ -84,7 +88,7 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         """
         Redirect URL after connecting social account
         """
-        return '/dashboard'
+        return "/dashboard"
 
     def is_auto_signup_allowed(self, request, sociallogin):
         """

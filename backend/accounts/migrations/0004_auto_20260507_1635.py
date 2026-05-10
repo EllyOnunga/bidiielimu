@@ -4,26 +4,25 @@ from django.db import migrations
 
 
 def create_roles(apps, schema_editor):
-    Role = apps.get_model('accounts', 'Role')
-    User = apps.get_model('accounts', 'User')
-    
+    Role = apps.get_model("accounts", "Role")
+    User = apps.get_model("accounts", "User")
+
     roles_data = [
-        ('SUPER_ADMIN', 'Platform Super Admin', {"all": True}),
-        ('ADMIN', 'School Admin', {"manage_school": True, "manage_users": True}),
-        ('PRINCIPAL', 'Principal', {"view_reports": True, "manage_staff": True}),
-        ('HOD', 'Head of Department', {"manage_subjects": True}),
-        ('TEACHER', 'Teacher', {"mark_attendance": True, "manage_exams": True}),
-        ('LIBRARIAN', 'Librarian', {"manage_library": True}),
-        ('FINANCE', 'Finance / Bursar', {"manage_fees": True, "manage_payments": True}),
-        ('STUDENT', 'Student', {"view_results": True}),
-        ('PARENT', 'Parent', {"view_child_results": True}),
+        ("SUPER_ADMIN", "Platform Super Admin", {"all": True}),
+        ("ADMIN", "School Admin", {"manage_school": True, "manage_users": True}),
+        ("PRINCIPAL", "Principal", {"view_reports": True, "manage_staff": True}),
+        ("HOD", "Head of Department", {"manage_subjects": True}),
+        ("TEACHER", "Teacher", {"mark_attendance": True, "manage_exams": True}),
+        ("LIBRARIAN", "Librarian", {"manage_library": True}),
+        ("FINANCE", "Finance / Bursar", {"manage_fees": True, "manage_payments": True}),
+        ("STUDENT", "Student", {"view_results": True}),
+        ("PARENT", "Parent", {"view_child_results": True}),
     ]
-    
+
     role_objs = {}
     for name, desc, perms in roles_data:
         role, created = Role.objects.get_or_create(
-            name=name,
-            defaults={'description': desc, 'permissions': perms}
+            name=name, defaults={"description": desc, "permissions": perms}
         )
         role_objs[name] = role
 
@@ -33,10 +32,11 @@ def create_roles(apps, schema_editor):
             user.role_name = role_objs[user.role_old]
             user.save()
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0003_role_user_role_old_alter_user_role'),
+        ("accounts", "0003_role_user_role_old_alter_user_role"),
     ]
 
     operations = [

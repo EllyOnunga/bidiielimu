@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('attendance', '0001_initial'),
+        ("attendance", "0001_initial"),
     ]
 
     operations = [
@@ -66,6 +66,6 @@ class Migration(migrations.Migration):
             INSERT INTO attendance_dailyattendance (date, status, remarks, created_at, marked_by_id, student_id)
             SELECT date, status, remarks, created_at, marked_by_id, student_id FROM attendance_dailyattendance_partitioned;
             DROP TABLE attendance_dailyattendance_partitioned;
-            """
+            """,
         )
     ]

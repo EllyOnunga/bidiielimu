@@ -15,45 +15,104 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='StaffProfile',
+            name="StaffProfile",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('employee_id', models.CharField(max_length=50, unique=True)),
-                ('department', models.CharField(max_length=100)),
-                ('job_title', models.CharField(max_length=100)),
-                ('joining_date', models.DateField()),
-                ('basic_salary', models.DecimalField(decimal_places=2, max_digits=12)),
-                ('status', models.CharField(choices=[('ACTIVE', 'Active'), ('ON_LEAVE', 'On Leave'), ('TERMINATED', 'Terminated')], default='ACTIVE', max_length=20)),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='hr_staff_profile', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("employee_id", models.CharField(max_length=50, unique=True)),
+                ("department", models.CharField(max_length=100)),
+                ("job_title", models.CharField(max_length=100)),
+                ("joining_date", models.DateField()),
+                ("basic_salary", models.DecimalField(decimal_places=2, max_digits=12)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("ACTIVE", "Active"),
+                            ("ON_LEAVE", "On Leave"),
+                            ("TERMINATED", "Terminated"),
+                        ],
+                        default="ACTIVE",
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="hr_staff_profile",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='LeaveRequest',
+            name="LeaveRequest",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('start_date', models.DateField()),
-                ('end_date', models.DateField()),
-                ('leave_type', models.CharField(max_length=50)),
-                ('status', models.CharField(default='PENDING', max_length=20)),
-                ('reason', models.TextField()),
-                ('staff', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='leave_requests', to='hr.staffprofile')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("start_date", models.DateField()),
+                ("end_date", models.DateField()),
+                ("leave_type", models.CharField(max_length=50)),
+                ("status", models.CharField(default="PENDING", max_length=20)),
+                ("reason", models.TextField()),
+                (
+                    "staff",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="leave_requests",
+                        to="hr.staffprofile",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='PayrollRecord',
+            name="PayrollRecord",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('month', models.IntegerField()),
-                ('year', models.IntegerField()),
-                ('gross_salary', models.DecimalField(decimal_places=2, max_digits=12)),
-                ('deductions', models.DecimalField(decimal_places=2, default=0, max_digits=12)),
-                ('net_salary', models.DecimalField(decimal_places=2, max_digits=12)),
-                ('is_paid', models.BooleanField(default=False)),
-                ('paid_at', models.DateTimeField(blank=True, null=True)),
-                ('staff', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='payroll_records', to='hr.staffprofile')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("month", models.IntegerField()),
+                ("year", models.IntegerField()),
+                ("gross_salary", models.DecimalField(decimal_places=2, max_digits=12)),
+                (
+                    "deductions",
+                    models.DecimalField(decimal_places=2, default=0, max_digits=12),
+                ),
+                ("net_salary", models.DecimalField(decimal_places=2, max_digits=12)),
+                ("is_paid", models.BooleanField(default=False)),
+                ("paid_at", models.DateTimeField(blank=True, null=True)),
+                (
+                    "staff",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="payroll_records",
+                        to="hr.staffprofile",
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('staff', 'month', 'year')},
+                "unique_together": {("staff", "month", "year")},
             },
         ),
     ]

@@ -7,33 +7,69 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0002_alter_user_role'),
+        ("accounts", "0002_alter_user_role"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Role',
+            name="Role",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50, unique=True)),
-                ('permissions', models.JSONField(default=dict, help_text='JSON object mapping permissions to boolean values or structures.')),
-                ('description', models.TextField(blank=True, null=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=50, unique=True)),
+                (
+                    "permissions",
+                    models.JSONField(
+                        default=dict,
+                        help_text="JSON object mapping permissions to boolean values or structures.",
+                    ),
+                ),
+                ("description", models.TextField(blank=True, null=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
             ],
         ),
         migrations.RenameField(
-            model_name='user',
-            old_name='role',
-            new_name='role_old',
+            model_name="user",
+            old_name="role",
+            new_name="role_old",
         ),
         migrations.AddField(
-            model_name='user',
-            name='role',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='users', to='accounts.role'),
+            model_name="user",
+            name="role",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="users",
+                to="accounts.role",
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='role_old',
-            field=models.CharField(blank=True, choices=[('SUPER_ADMIN', 'Platform Super Admin'), ('ADMIN', 'School Admin'), ('PRINCIPAL', 'Principal'), ('HOD', 'Head of Department'), ('TEACHER', 'Teacher'), ('LIBRARIAN', 'Librarian'), ('FINANCE', 'Finance / Bursar'), ('STUDENT', 'Student'), ('PARENT', 'Parent')], default='ADMIN', max_length=20, null=True),
+            model_name="user",
+            name="role_old",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("SUPER_ADMIN", "Platform Super Admin"),
+                    ("ADMIN", "School Admin"),
+                    ("PRINCIPAL", "Principal"),
+                    ("HOD", "Head of Department"),
+                    ("TEACHER", "Teacher"),
+                    ("LIBRARIAN", "Librarian"),
+                    ("FINANCE", "Finance / Bursar"),
+                    ("STUDENT", "Student"),
+                    ("PARENT", "Parent"),
+                ],
+                default="ADMIN",
+                max_length=20,
+                null=True,
+            ),
         ),
     ]

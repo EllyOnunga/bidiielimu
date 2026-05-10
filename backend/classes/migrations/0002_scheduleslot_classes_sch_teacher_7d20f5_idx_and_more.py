@@ -6,21 +6,30 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('classes', '0001_initial'),
-        ('teachers', '0001_initial'),
+        ("classes", "0001_initial"),
+        ("teachers", "0001_initial"),
     ]
 
     operations = [
         migrations.AddIndex(
-            model_name='scheduleslot',
-            index=models.Index(fields=['teacher', 'day_of_week', 'start_time', 'end_time'], name='classes_sch_teacher_7d20f5_idx'),
+            model_name="scheduleslot",
+            index=models.Index(
+                fields=["teacher", "day_of_week", "start_time", "end_time"],
+                name="classes_sch_teacher_7d20f5_idx",
+            ),
         ),
         migrations.AddIndex(
-            model_name='scheduleslot',
-            index=models.Index(fields=['stream', 'day_of_week', 'start_time', 'end_time'], name='classes_sch_stream__87ef5e_idx'),
+            model_name="scheduleslot",
+            index=models.Index(
+                fields=["stream", "day_of_week", "start_time", "end_time"],
+                name="classes_sch_stream__87ef5e_idx",
+            ),
         ),
         migrations.AddIndex(
-            model_name='scheduleslot',
-            index=models.Index(fields=['classroom', 'day_of_week', 'start_time', 'end_time'], name='classes_sch_classro_f2012c_idx'),
+            model_name="scheduleslot",
+            index=models.Index(
+                fields=["classroom", "day_of_week", "start_time", "end_time"],
+                name="classes_sch_classro_f2012c_idx",
+            ),
         ),
     ]

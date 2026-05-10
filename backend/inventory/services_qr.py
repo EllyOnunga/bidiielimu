@@ -1,7 +1,9 @@
 import uuid
-import qrcode
 from io import BytesIO
+
+import qrcode
 from django.core.files.base import ContentFile
+
 
 class AssetQRService:
     @staticmethod

@@ -6,20 +6,26 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('attendance', '0002_partitioning'),
+        ("attendance", "0002_partitioning"),
     ]
 
     operations = [
         migrations.AddIndex(
-            model_name='dailyattendance',
-            index=models.Index(fields=['date', 'status'], name='attendance__date_a41095_idx'),
+            model_name="dailyattendance",
+            index=models.Index(
+                fields=["date", "status"], name="attendance__date_a41095_idx"
+            ),
         ),
         migrations.AddIndex(
-            model_name='dailyattendance',
-            index=models.Index(fields=['student', 'date'], name='attendance__student_ed8b4b_idx'),
+            model_name="dailyattendance",
+            index=models.Index(
+                fields=["student", "date"], name="attendance__student_ed8b4b_idx"
+            ),
         ),
         migrations.AddIndex(
-            model_name='dailyattendance',
-            index=models.Index(fields=['marked_by', 'date'], name='attendance__marked__81c9cf_idx'),
+            model_name="dailyattendance",
+            index=models.Index(
+                fields=["marked_by", "date"], name="attendance__marked__81c9cf_idx"
+            ),
         ),
     ]

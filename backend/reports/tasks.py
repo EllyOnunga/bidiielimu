@@ -1,7 +1,9 @@
 from celery import shared_task
 from django_tenants.utils import schema_context
+
 from .models import StudentReport
 from .services_ai import AIReportService
+
 
 @shared_task
 def generate_ai_draft_async(schema_name, report_id):

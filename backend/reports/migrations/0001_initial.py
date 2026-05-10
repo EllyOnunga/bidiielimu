@@ -10,29 +10,69 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('exams', '0001_initial'),
-        ('students', '0001_initial'),
+        ("exams", "0001_initial"),
+        ("students", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='StudentReport',
+            name="StudentReport",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('term', models.IntegerField(default=1)),
-                ('academic_year', models.IntegerField(default=2024)),
-                ('ai_comment_draft', models.TextField(blank=True, null=True)),
-                ('teacher_comment', models.TextField(blank=True, null=True)),
-                ('status', models.CharField(choices=[('DRAFT', 'AI Draft'), ('REVIEWED', 'Teacher Reviewed'), ('APPROVED', 'Principal Approved'), ('PUBLISHED', 'Published to Parent')], default='DRAFT', max_length=20)),
-                ('is_ai_generated', models.BooleanField(default=False)),
-                ('generated_at', models.DateTimeField(blank=True, null=True)),
-                ('exam', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='exams.exam')),
-                ('reviewed_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
-                ('student', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='terminal_reports', to='students.student')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("term", models.IntegerField(default=1)),
+                ("academic_year", models.IntegerField(default=2024)),
+                ("ai_comment_draft", models.TextField(blank=True, null=True)),
+                ("teacher_comment", models.TextField(blank=True, null=True)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("DRAFT", "AI Draft"),
+                            ("REVIEWED", "Teacher Reviewed"),
+                            ("APPROVED", "Principal Approved"),
+                            ("PUBLISHED", "Published to Parent"),
+                        ],
+                        default="DRAFT",
+                        max_length=20,
+                    ),
+                ),
+                ("is_ai_generated", models.BooleanField(default=False)),
+                ("generated_at", models.DateTimeField(blank=True, null=True)),
+                (
+                    "exam",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="exams.exam"
+                    ),
+                ),
+                (
+                    "reviewed_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "student",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="terminal_reports",
+                        to="students.student",
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('student', 'exam')},
+                "unique_together": {("student", "exam")},
             },
         ),
     ]

@@ -10,43 +10,120 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('classes', '0001_initial'),
-        ('students', '0001_initial'),
+        ("classes", "0001_initial"),
+        ("students", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='DailyAttendance',
+            name="DailyAttendance",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date', models.DateField(db_index=True)),
-                ('status', models.CharField(choices=[('PRESENT', 'Present'), ('ABSENT', 'Absent'), ('LATE', 'Late'), ('EXCUSED', 'Excused')], db_index=True, default='PRESENT', max_length=10)),
-                ('remarks', models.TextField(blank=True, null=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('marked_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
-                ('student', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='daily_attendance', to='students.student')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("date", models.DateField(db_index=True)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("PRESENT", "Present"),
+                            ("ABSENT", "Absent"),
+                            ("LATE", "Late"),
+                            ("EXCUSED", "Excused"),
+                        ],
+                        db_index=True,
+                        default="PRESENT",
+                        max_length=10,
+                    ),
+                ),
+                ("remarks", models.TextField(blank=True, null=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "marked_by",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "student",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="daily_attendance",
+                        to="students.student",
+                    ),
+                ),
             ],
             options={
-                'verbose_name_plural': 'Daily Attendance',
-                'unique_together': {('student', 'date')},
+                "verbose_name_plural": "Daily Attendance",
+                "unique_together": {("student", "date")},
             },
         ),
         migrations.CreateModel(
-            name='PeriodAttendance',
+            name="PeriodAttendance",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date', models.DateField(db_index=True)),
-                ('status', models.CharField(choices=[('PRESENT', 'Present'), ('ABSENT', 'Absent'), ('LATE', 'Late'), ('EXCUSED', 'Excused')], db_index=True, default='PRESENT', max_length=10)),
-                ('remarks', models.TextField(blank=True, null=True)),
-                ('marked_at', models.DateTimeField(auto_now_add=True)),
-                ('marked_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
-                ('slot', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='attendance', to='classes.scheduleslot')),
-                ('student', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='period_attendance', to='students.student')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("date", models.DateField(db_index=True)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("PRESENT", "Present"),
+                            ("ABSENT", "Absent"),
+                            ("LATE", "Late"),
+                            ("EXCUSED", "Excused"),
+                        ],
+                        db_index=True,
+                        default="PRESENT",
+                        max_length=10,
+                    ),
+                ),
+                ("remarks", models.TextField(blank=True, null=True)),
+                ("marked_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "marked_by",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "slot",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="attendance",
+                        to="classes.scheduleslot",
+                    ),
+                ),
+                (
+                    "student",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="period_attendance",
+                        to="students.student",
+                    ),
+                ),
             ],
             options={
-                'verbose_name_plural': 'Period Attendance',
-                'unique_together': {('student', 'slot', 'date')},
+                "verbose_name_plural": "Period Attendance",
+                "unique_together": {("student", "slot", "date")},
             },
         ),
     ]

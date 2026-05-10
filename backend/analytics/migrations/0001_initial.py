@@ -9,21 +9,51 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('students', '0001_initial'),
+        ("students", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='PredictiveRisk',
+            name="PredictiveRisk",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('risk_level', models.CharField(choices=[('LOW', 'Low Risk'), ('MEDIUM', 'Medium Risk'), ('HIGH', 'High Risk'), ('CRITICAL', 'Critical Risk')], default='LOW', max_length=10)),
-                ('confidence_score', models.FloatField(default=0.0)),
-                ('reason_summary', models.JSONField(default=list)),
-                ('last_updated', models.DateTimeField(auto_now=True)),
-                ('intervention_status', models.CharField(default='NONE', max_length=20)),
-                ('intervention_notes', models.TextField(blank=True, null=True)),
-                ('student', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='risk_profile', to='students.student')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "risk_level",
+                    models.CharField(
+                        choices=[
+                            ("LOW", "Low Risk"),
+                            ("MEDIUM", "Medium Risk"),
+                            ("HIGH", "High Risk"),
+                            ("CRITICAL", "Critical Risk"),
+                        ],
+                        default="LOW",
+                        max_length=10,
+                    ),
+                ),
+                ("confidence_score", models.FloatField(default=0.0)),
+                ("reason_summary", models.JSONField(default=list)),
+                ("last_updated", models.DateTimeField(auto_now=True)),
+                (
+                    "intervention_status",
+                    models.CharField(default="NONE", max_length=20),
+                ),
+                ("intervention_notes", models.TextField(blank=True, null=True)),
+                (
+                    "student",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="risk_profile",
+                        to="students.student",
+                    ),
+                ),
             ],
         ),
     ]

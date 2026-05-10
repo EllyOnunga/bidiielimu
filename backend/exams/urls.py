@@ -1,16 +1,15 @@
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from .views import (
-    GradingSystemViewSet, GradeThresholdViewSet, 
-    ExamViewSet, MarkViewSet
-)
+
+from .views import (ExamViewSet, GradeThresholdViewSet, GradingSystemViewSet,
+                    MarkViewSet)
 
 router = DefaultRouter()
-router.register(r'grading-systems', GradingSystemViewSet, basename='gradingsystem')
-router.register(r'grade-thresholds', GradeThresholdViewSet, basename='gradethreshold')
-router.register(r'exams', ExamViewSet, basename='exam')
-router.register(r'marks', MarkViewSet, basename='mark')
+router.register(r"grading-systems", GradingSystemViewSet, basename="gradingsystem")
+router.register(r"grade-thresholds", GradeThresholdViewSet, basename="gradethreshold")
+router.register(r"exams", ExamViewSet, basename="exam")
+router.register(r"marks", MarkViewSet, basename="mark")
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path("", include(router.urls)),
 ]

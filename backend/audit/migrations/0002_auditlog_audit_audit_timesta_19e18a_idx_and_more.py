@@ -6,24 +6,33 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('audit', '0001_initial'),
+        ("audit", "0001_initial"),
     ]
 
     operations = [
         migrations.AddIndex(
-            model_name='auditlog',
-            index=models.Index(fields=['timestamp'], name='audit_audit_timesta_19e18a_idx'),
+            model_name="auditlog",
+            index=models.Index(
+                fields=["timestamp"], name="audit_audit_timesta_19e18a_idx"
+            ),
         ),
         migrations.AddIndex(
-            model_name='auditlog',
-            index=models.Index(fields=['user', 'timestamp'], name='audit_audit_user_id_e8be02_idx'),
+            model_name="auditlog",
+            index=models.Index(
+                fields=["user", "timestamp"], name="audit_audit_user_id_e8be02_idx"
+            ),
         ),
         migrations.AddIndex(
-            model_name='auditlog',
-            index=models.Index(fields=['model_name', 'timestamp'], name='audit_audit_model_n_8d2a32_idx'),
+            model_name="auditlog",
+            index=models.Index(
+                fields=["model_name", "timestamp"],
+                name="audit_audit_model_n_8d2a32_idx",
+            ),
         ),
         migrations.AddIndex(
-            model_name='auditlog',
-            index=models.Index(fields=['action', 'timestamp'], name='audit_audit_action_2a1328_idx'),
+            model_name="auditlog",
+            index=models.Index(
+                fields=["action", "timestamp"], name="audit_audit_action_2a1328_idx"
+            ),
         ),
     ]

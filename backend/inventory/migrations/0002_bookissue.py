@@ -8,26 +8,84 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('inventory', '0001_initial'),
-        ('students', '0001_initial'),
+        ("inventory", "0001_initial"),
+        ("students", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='BookIssue',
+            name="BookIssue",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('issue_date', models.DateField(auto_now_add=True)),
-                ('due_date', models.DateField()),
-                ('return_date', models.DateField(blank=True, null=True)),
-                ('status', models.CharField(choices=[('ISSUED', 'Issued'), ('RETURNED', 'Returned'), ('OVERDUE', 'Overdue'), ('LOST', 'Lost')], default='ISSUED', max_length=10)),
-                ('condition_on_return', models.CharField(blank=True, choices=[('GOOD', 'Good'), ('DAMAGED', 'Damaged'), ('LOST', 'Lost')], max_length=10, null=True)),
-                ('fine_amount', models.DecimalField(decimal_places=2, default=0, max_digits=8)),
-                ('notes', models.TextField(blank=True, null=True)),
-                ('issued_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='issued_books', to=settings.AUTH_USER_MODEL)),
-                ('item', models.ForeignKey(limit_choices_to={'category': 'LIBRARY'}, on_delete=django.db.models.deletion.CASCADE, related_name='issues', to='inventory.inventoryitem')),
-                ('student', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='book_issues', to='students.student')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("issue_date", models.DateField(auto_now_add=True)),
+                ("due_date", models.DateField()),
+                ("return_date", models.DateField(blank=True, null=True)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("ISSUED", "Issued"),
+                            ("RETURNED", "Returned"),
+                            ("OVERDUE", "Overdue"),
+                            ("LOST", "Lost"),
+                        ],
+                        default="ISSUED",
+                        max_length=10,
+                    ),
+                ),
+                (
+                    "condition_on_return",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("GOOD", "Good"),
+                            ("DAMAGED", "Damaged"),
+                            ("LOST", "Lost"),
+                        ],
+                        max_length=10,
+                        null=True,
+                    ),
+                ),
+                (
+                    "fine_amount",
+                    models.DecimalField(decimal_places=2, default=0, max_digits=8),
+                ),
+                ("notes", models.TextField(blank=True, null=True)),
+                (
+                    "issued_by",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="issued_books",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "item",
+                    models.ForeignKey(
+                        limit_choices_to={"category": "LIBRARY"},
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="issues",
+                        to="inventory.inventoryitem",
+                    ),
+                ),
+                (
+                    "student",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="book_issues",
+                        to="students.student",
+                    ),
+                ),
             ],
         ),
     ]

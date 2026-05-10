@@ -1,15 +1,16 @@
 import os
-import django
-from django.urls import resolve, get_resolver
-from django.test import RequestFactory
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+import django
+from django.test import RequestFactory
+from django.urls import get_resolver, resolve
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
 paths = [
-    '/api/v1/accounts/register/',
-    '/api/v1/accounts/login/',
-    '/api/v1/theme/',
+    "/api/v1/accounts/register/",
+    "/api/v1/accounts/login/",
+    "/api/v1/theme/",
 ]
 
 for path in paths:

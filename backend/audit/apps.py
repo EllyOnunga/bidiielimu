@@ -2,7 +2,7 @@ from django.apps import AppConfig
 
 
 class AuditConfig(AppConfig):
-    name = 'audit'
+    name = "audit"
 
     def ready(self):
         import audit.signals
