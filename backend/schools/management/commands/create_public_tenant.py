@@ -1,3 +1,4 @@
+from accounts.models import User
 from django.core.management.base import BaseCommand
 from schools.models import Domain, School
 
@@ -25,8 +26,6 @@ class Command(BaseCommand):
             self.stdout.write("Public tenant already exists.")
 
         # Create superuser if it doesn't exist
-        from accounts.models import User
-
         if not User.objects.filter(is_superuser=True).exists():
             self.stdout.write("Creating superuser...")
             User.objects.create_superuser(
