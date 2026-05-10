@@ -5,6 +5,7 @@ Service interfaces and contracts for microservices architecture
 from abc import ABC, abstractmethod
 from typing import Dict, Any, List, Optional
 from dataclasses import dataclass
+from django.utils import timezone
 
 @dataclass
 class ServiceResponse:
