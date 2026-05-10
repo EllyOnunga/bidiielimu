@@ -1,54 +1,26 @@
 from django.core.management.base import BaseCommand
-
-from schools.models import Domain, School
-
+from schools.models import School, Domain
 
 class Command(BaseCommand):
-    help = "Creates the public tenant and maps localhost to it (required for django-tenants to work locally)"
+    help = 'Creates the public tenant and domain if they do not exist'
 
-    def handle(self, *args, **kwargs):
-        # Create or retrieve the public tenant
-        tenant, created = School.objects.get_or_create(
-            schema_name="public",
-            defaults={
-                "name": "ElimuHub Platform",
-                "contact_email": "support@elimuhub.com",
-            },
-        )
-
-        if created:
-            self.stdout.write(
-                self.style.SUCCESS('✅ Public tenant "ElimuHub Platform" created.')
+    def handle(self, *args, **options):
+        if not School.objects.filter(schema_name='public').exists():
+            self.stdout.write('Creating public tenant...')
+            public_tenant = School.objects.create(
+                schema_name='public',
+                name='ElimuHub Public',
+                curriculum='CBC'
             )
+            
+            # Add localhost and common domains
+            domains = ['localhost', '127.0.0.1', 'elimuhub-backend.onrender.com']
+            for domain_name in domains:
+                Domain.objects.get_or_create(
+                    domain=domain_name,
+                    tenant=public_tenant,
+                    is_primary=(domain_name == 'elimuhub-backend.onrender.com')
+                )
+            self.stdout.write(self.style.SUCCESS('Public tenant created successfully!'))
         else:
-            self.stdout.write(
-                self.style.WARNING(
-                    "ℹ️  Public tenant already exists, skipping creation."
-                )
-            )
-
-        # Map localhost to the public tenant
-        for hostname in ["localhost", "127.0.0.1"]:
-            domain, dom_created = Domain.objects.get_or_create(
-                domain=hostname,
-                defaults={
-                    "tenant": tenant,
-                    "is_primary": hostname == "localhost",
-                },
-            )
-            if dom_created:
-                self.stdout.write(
-                    self.style.SUCCESS(
-                        f'✅ Domain "{hostname}" mapped to public tenant.'
-                    )
-                )
-            else:
-                self.stdout.write(
-                    self.style.WARNING(f'ℹ️  Domain "{hostname}" already mapped.')
-                )
-
-        self.stdout.write(
-            self.style.SUCCESS(
-                "\n🚀 Public tenant setup complete! API is now accessible at localhost:8000"
-            )
-        )
+            self.stdout.write('Public tenant already exists.')
