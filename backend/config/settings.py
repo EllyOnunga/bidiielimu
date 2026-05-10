@@ -671,12 +671,14 @@ if os.getenv("AWS_ACCESS_KEY_ID"):
     DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
 # Logging Configuration
+IS_RENDER = os.environ.get("RENDER", "False") == "true"
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
         "verbose": {
-            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {pathname}:{lineno} {message}",
+            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
             "style": "{",
         },
         "json": {
@@ -693,111 +695,89 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "simple",
         },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "django.request": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "django.security": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "accounts": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}
+
+if not IS_RENDER:
+    # Add file handlers only when not on Render
+    LOGS_DIR = BASE_DIR / "logs"
+    LOGS_DIR.mkdir(parents=True, exist_ok=True)
+
+    LOGGING["handlers"].update({
         "file": {
             "level": "INFO",
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": BASE_DIR / "logs" / "django.log",
-            "maxBytes": 10 * 1024 * 1024,  # 10MB
+            "filename": LOGS_DIR / "django.log",
+            "maxBytes": 10 * 1024 * 1024,
             "backupCount": 5,
             "formatter": "verbose",
         },
         "json_file": {
             "level": "INFO",
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": BASE_DIR / "logs" / "django.json",
-            "maxBytes": 10 * 1024 * 1024,  # 10MB
+            "filename": LOGS_DIR / "django.json",
+            "maxBytes": 10 * 1024 * 1024,
             "backupCount": 5,
             "formatter": "json",
         },
         "error_file": {
             "level": "ERROR",
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": BASE_DIR / "logs" / "errors.log",
-            "maxBytes": 10 * 1024 * 1024,  # 10MB
+            "filename": LOGS_DIR / "errors.log",
+            "maxBytes": 10 * 1024 * 1024,
             "backupCount": 5,
             "formatter": "verbose",
         },
         "security_file": {
             "level": "INFO",
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": BASE_DIR / "logs" / "security.log",
-            "maxBytes": 10 * 1024 * 1024,  # 10MB
+            "filename": LOGS_DIR / "security.log",
+            "maxBytes": 10 * 1024 * 1024,
             "backupCount": 5,
             "formatter": "verbose",
         },
-    },
-    "root": {
-        "handlers": ["console", "file", "json_file", "error_file"],
-        "level": "INFO",
-    },
-    "loggers": {
-        "django": {
+    })
+    LOGGING["root"]["handlers"].extend(["file", "json_file", "error_file"])
+    LOGGING["loggers"]["django"]["handlers"].extend(["file", "json_file"])
+    LOGGING["loggers"]["django.request"]["handlers"] = ["error_file"]
+    LOGGING["loggers"]["django.security"]["handlers"] = ["security_file"]
+    LOGGING["loggers"]["accounts"]["handlers"].extend(["file", "json_file"])
+
+    # Add file handlers to all other loggers
+    for logger_name in ["schools", "students", "teachers", "classes", "exams",
+                       "attendance", "fees", "audit", "notifications"]:
+        LOGGING["loggers"][logger_name] = {
             "handlers": ["console", "file", "json_file"],
             "level": "INFO",
             "propagate": False,
-        },
-        "django.request": {
-            "handlers": ["error_file"],
-            "level": "ERROR",
-            "propagate": False,
-        },
-        "django.security": {
-            "handlers": ["security_file"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "accounts": {
-            "handlers": ["console", "file", "json_file"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "schools": {
-            "handlers": ["console", "file", "json_file"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "students": {
-            "handlers": ["console", "file", "json_file"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "teachers": {
-            "handlers": ["console", "file", "json_file"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "classes": {
-            "handlers": ["console", "file", "json_file"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "exams": {
-            "handlers": ["console", "file", "json_file"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "attendance": {
-            "handlers": ["console", "file", "json_file"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "fees": {
-            "handlers": ["console", "file", "json_file"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "audit": {
-            "handlers": ["console", "file", "json_file"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "notifications": {
-            "handlers": ["console", "file", "json_file"],
-            "level": "INFO",
-            "propagate": False,
-        },
-    },
-}
+        }
+
 
 # File Upload Settings (100MB limit for videos)
 DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600
