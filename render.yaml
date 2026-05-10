@@ -5,7 +5,7 @@ services:
     region: oregon
     plan: free
     buildCommand: "cd backend && pip install -r requirements.txt && python manage.py collectstatic --no-input"
-    startCommand: "cd backend && python manage.py migrate --no-input && gunicorn config.wsgi:application"
+    startCommand: "cd backend && python manage.py migrate --noinput && gunicorn config.wsgi:application"
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.13
