@@ -1,175 +1,113 @@
-version: '3.9'
 
 services:
-
-  # ─────────────────────────────────────────────
-  # PostgreSQL 16
-  # ─────────────────────────────────────────────
   db:
-    image: postgres:16-alpine
-    container_name: scholara_db
-    restart: unless-stopped
+    image: postgres:17
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - postgres_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-scholara}
-      POSTGRES_USER: ${POSTGRES_USER:-scholara_user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-scholara_pass}
-    ports:
-      - "5432:5432"
+      - POSTGRES_DB=elimuhub
+      - POSTGRES_USER=elimuhub_admin
+      - POSTGRES_PASSWORD=elimuhub_pass
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-scholara_user} -d ${POSTGRES_DB:-scholara}"]
+      test: ["CMD-SHELL", "pg_isready -U elimuhub_admin -d elimuhub"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  # ─────────────────────────────────────────────
-  # Redis 7
-  # ─────────────────────────────────────────────
   redis:
     image: redis:7-alpine
-    container_name: scholara_redis
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  # ─────────────────────────────────────────────
-  # Django Backend (Daphne ASGI)
-  # ─────────────────────────────────────────────
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: scholara_backend
-    restart: unless-stopped
-    env_file:
-      - .env
-    environment:
-      DB_HOST: db
-      DB_PORT: 5432
-      DATABASE_URL: postgres://${POSTGRES_USER:-scholara_user}:${POSTGRES_PASSWORD:-scholara_pass}@db:5432/${POSTGRES_DB:-scholara}
-      REDIS_URL: redis://redis:6379/0
+    build: ./backend
+    user: root
+    command: >
+      bash -c "python manage.py migrate_schemas --shared --noinput &&
+               python manage.py migrate_schemas --tenant --noinput &&
+               python manage.py create_public_tenant &&
+               python manage.py runserver 0.0.0.0:8000"
     volumes:
-      - static_volume:/app/staticfiles
-      - media_volume:/app/media
+      - ./backend:/app
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=dev-secret-key-123
+      - DATABASE_URL=postgres://elimuhub_admin:elimuhub_pass@db:5432/elimuhub
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=elimuhub
+      - DB_USER=elimuhub_admin
+      - DB_PASSWORD=elimuhub_pass
+      - REDIS_URL=redis://redis:6379/0
+      - FRONTEND_URL=http://localhost
+      - ALLOWED_HOSTS=localhost,.localhost,127.0.0.1
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     ports:
       - "8000:8000"
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
 
-  # ─────────────────────────────────────────────
-  # Celery Worker (SMS, emails, reports)
-  # ─────────────────────────────────────────────
-  celery_worker:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: scholara_celery_worker
-    restart: unless-stopped
-    command: celery -A config worker --loglevel=info --concurrency=4 -Q default,reports,sms
-    env_file:
-      - .env
-    environment:
-      DB_HOST: db
-      DB_PORT: 5432
-      DATABASE_URL: postgres://${POSTGRES_USER:-scholara_user}:${POSTGRES_PASSWORD:-scholara_pass}@db:5432/${POSTGRES_DB:-scholara}
-      REDIS_URL: redis://redis:6379/0
+  celery:
+    build: ./backend
+    user: root
+    command: celery -A config worker -l info
     volumes:
-      - media_volume:/app/media
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-
-  # ─────────────────────────────────────────────
-  # Celery Beat (Scheduled tasks)
-  # ─────────────────────────────────────────────
-  celery_beat:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: scholara_celery_beat
-    restart: unless-stopped
-    command: celery -A config beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
-    env_file:
-      - .env
+      - ./backend:/app
     environment:
-      DB_HOST: db
-      DB_PORT: 5432
-      DATABASE_URL: postgres://${POSTGRES_USER:-scholara_user}:${POSTGRES_PASSWORD:-scholara_pass}@db:5432/${POSTGRES_DB:-scholara}
-      REDIS_URL: redis://redis:6379/0
+      - DEBUG=True
+      - SECRET_KEY=dev-secret-key-123
+      - DATABASE_URL=postgres://elimuhub_admin:elimuhub_pass@db:5432/elimuhub
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=elimuhub
+      - DB_USER=elimuhub_admin
+      - DB_PASSWORD=elimuhub_pass
+      - REDIS_URL=redis://redis:6379/0
+      - ALLOWED_HOSTS=localhost,.localhost,127.0.0.1
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
 
-  # ─────────────────────────────────────────────
-  # React Frontend (Nginx static server)
-  # ─────────────────────────────────────────────
+  celery-beat:
+    build: ./backend
+    user: root
+    command: celery -A config beat -l info
+    volumes:
+      - ./backend:/app
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=dev-secret-key-123
+      - DATABASE_URL=postgres://elimuhub_admin:elimuhub_pass@db:5432/elimuhub
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=elimuhub
+      - DB_USER=elimuhub_admin
+      - DB_PASSWORD=elimuhub_pass
+      - REDIS_URL=redis://redis:6379/0
+      - ALLOWED_HOSTS=localhost,.localhost,127.0.0.1
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: scholara_frontend
-    restart: unless-stopped
-    expose:
-      - "80"
-    depends_on:
-      - backend
-
-  # ─────────────────────────────────────────────
-  # Nginx — Production Reverse Proxy
-  # Handles SSL termination + subdomain routing
-  # ─────────────────────────────────────────────
-  nginx:
-    image: nginx:stable-alpine
-    container_name: scholara_nginx
-    restart: unless-stopped
     ports:
       - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/scholara.conf:/etc/nginx/conf.d/default.conf:ro
-      - static_volume:/vol/staticfiles:ro
-      - media_volume:/vol/media:ro
-      - certbot_certs:/etc/letsencrypt:ro
-      - certbot_www:/var/www/certbot:ro
+    environment:
+      - VITE_API_URL=/api/v1/
     depends_on:
       - backend
-      - frontend
 
-  # ─────────────────────────────────────────────
-  # Certbot — Auto SSL Certificate Renewal
-  # ─────────────────────────────────────────────
-  certbot:
-    image: certbot/certbot:latest
-    container_name: scholara_certbot
-    restart: unless-stopped
-    volumes:
-      - certbot_certs:/etc/letsencrypt
-      - certbot_www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
-
-# ─────────────────────────────────────────────
-# Named Volumes
-# ─────────────────────────────────────────────
 volumes:
   postgres_data:
-  redis_data:
-  static_volume:
-  media_volume:
-  certbot_certs:
-  certbot_www:
-
