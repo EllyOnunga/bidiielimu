@@ -49,7 +49,7 @@ jobs:
       - name: Security Scan (Bandit)
         run: |
           cd backend
-          bandit -r . -x ./tests,./migrations
+          bandit -c bandit.yaml -r .
 
       - name: Run linting
         run: |

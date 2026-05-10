@@ -1,0 +1,19 @@
+exclude_dirs:
+  - 'tests'
+  - 'migrations'
+  - 'management'
+  - '*/tests.py'
+  - '*/migrations/*'
+  - '*/management/*'
+  - 'settings_ci.py'
+
+skips:
+  - B105  # Possible hardcoded password string (false positives on serializer paths, test keys)
+  - B106  # Possible hardcoded password funcarg
+  - B110  # try, except, pass detected
+  - B112  # try, except, continue detected
+  - B113  # Call to requests without timeout
+  - B311  # Standard pseudo-random generators (used in seed data, not crypto)
+  - B324  # Use of weak MD5 hash (used for cache keys, not crypto)
+  - B404  # Import subprocess
+  - B603  # subprocess call without shell=True
