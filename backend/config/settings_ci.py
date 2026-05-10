@@ -1,28 +1,29 @@
 """
 Django settings for CI/CD environment.
 """
+
 import os
+
 from .settings import *
 
 # CI/CD specific settings
 DEBUG = False
-SECRET_KEY = 'ci-secret-key-for-testing-only'
+SECRET_KEY = "ci-secret-key-for-testing-only"
 
 # Use PostgreSQL for tests (required for django-tenants)
 DATABASES = {
-    'default': {
-        'ENGINE': 'django_tenants.postgresql_backend',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'localhost',
-        'PORT': '5432',
+    "default": {
+        "ENGINE": "django_tenants.postgresql_backend",
+        "NAME": "postgres",
+        "USER": "postgres",
+        "PASSWORD": "postgres",
+        "HOST": "localhost",
+        "PORT": "5432",
     }
 }
 
-DATABASE_ROUTERS = (
-    'django_tenants.routers.TenantSyncRouter',
-)
+DATABASE_ROUTERS = ("django_tenants.routers.TenantSyncRouter",)
+
 
 # Disable migrations for faster tests
 class DisableMigrations:
@@ -32,25 +33,26 @@ class DisableMigrations:
     def __getitem__(self, item):
         return None
 
+
 MIGRATION_MODULES = DisableMigrations()
 
 # Use console logging for CI
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
         },
     },
-    'root': {
-        'handlers': ['console'],
-        'level': 'WARNING',
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING",
     },
 }
 
 # Disable email sending in tests
-EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
 # Disable Celery in tests
 CELERY_TASK_ALWAYS_EAGER = True

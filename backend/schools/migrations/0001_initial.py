@@ -9,63 +9,162 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='School',
+            name="School",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('schema_name', models.CharField(db_index=True, max_length=63, unique=True, validators=[django_tenants.postgresql_backend.base._check_schema_name])),
-                ('name', models.CharField(max_length=255)),
-                ('address', models.TextField(blank=True, null=True)),
-                ('contact_email', models.EmailField(blank=True, max_length=254, null=True)),
-                ('contact_phone', models.CharField(blank=True, max_length=20, null=True)),
-                ('logo', models.ImageField(blank=True, null=True, upload_to='school_logos/')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "schema_name",
+                    models.CharField(
+                        db_index=True,
+                        max_length=63,
+                        unique=True,
+                        validators=[
+                            django_tenants.postgresql_backend.base._check_schema_name
+                        ],
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("address", models.TextField(blank=True, null=True)),
+                (
+                    "contact_email",
+                    models.EmailField(blank=True, max_length=254, null=True),
+                ),
+                (
+                    "contact_phone",
+                    models.CharField(blank=True, max_length=20, null=True),
+                ),
+                (
+                    "logo",
+                    models.ImageField(blank=True, null=True, upload_to="school_logos/"),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='SchoolSetting',
+            name="SchoolSetting",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('current_term', models.CharField(default='Term 1', max_length=50)),
-                ('academic_year', models.CharField(default='2026', max_length=20)),
-                ('currency', models.CharField(default='KES', max_length=10)),
-                ('tax_percentage', models.DecimalField(decimal_places=2, default=0.0, max_digits=5)),
-                ('enable_email_notifications', models.BooleanField(default=True)),
-                ('enable_sms_notifications', models.BooleanField(default=False)),
-                ('principal_name', models.CharField(blank=True, default='', max_length=100)),
-                ('school_motto', models.CharField(blank=True, default='', max_length=255)),
-                ('accent_color', models.CharField(default='#6366f1', max_length=20)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("current_term", models.CharField(default="Term 1", max_length=50)),
+                ("academic_year", models.CharField(default="2026", max_length=20)),
+                ("currency", models.CharField(default="KES", max_length=10)),
+                (
+                    "tax_percentage",
+                    models.DecimalField(decimal_places=2, default=0.0, max_digits=5),
+                ),
+                ("enable_email_notifications", models.BooleanField(default=True)),
+                ("enable_sms_notifications", models.BooleanField(default=False)),
+                (
+                    "principal_name",
+                    models.CharField(blank=True, default="", max_length=100),
+                ),
+                (
+                    "school_motto",
+                    models.CharField(blank=True, default="", max_length=255),
+                ),
+                ("accent_color", models.CharField(default="#6366f1", max_length=20)),
             ],
         ),
         migrations.CreateModel(
-            name='Domain',
+            name="Domain",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('domain', models.CharField(db_index=True, max_length=253, unique=True)),
-                ('is_primary', models.BooleanField(db_index=True, default=True)),
-                ('tenant', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='domains', to='schools.school')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "domain",
+                    models.CharField(db_index=True, max_length=253, unique=True),
+                ),
+                ("is_primary", models.BooleanField(db_index=True, default=True)),
+                (
+                    "tenant",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="domains",
+                        to="schools.school",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Subscription',
+            name="Subscription",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('plan', models.CharField(choices=[('BASIC', 'Basic'), ('PREMIUM', 'Premium'), ('ENTERPRISE', 'Enterprise')], default='BASIC', max_length=20)),
-                ('status', models.CharField(choices=[('ACTIVE', 'Active'), ('EXPIRED', 'Expired'), ('CANCELLED', 'Cancelled')], db_index=True, default='ACTIVE', max_length=20)),
-                ('start_date', models.DateField(auto_now_add=True)),
-                ('expiry_date', models.DateField()),
-                ('school', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='subscription', to='schools.school')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "plan",
+                    models.CharField(
+                        choices=[
+                            ("BASIC", "Basic"),
+                            ("PREMIUM", "Premium"),
+                            ("ENTERPRISE", "Enterprise"),
+                        ],
+                        default="BASIC",
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("ACTIVE", "Active"),
+                            ("EXPIRED", "Expired"),
+                            ("CANCELLED", "Cancelled"),
+                        ],
+                        db_index=True,
+                        default="ACTIVE",
+                        max_length=20,
+                    ),
+                ),
+                ("start_date", models.DateField(auto_now_add=True)),
+                ("expiry_date", models.DateField()),
+                (
+                    "school",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="subscription",
+                        to="schools.school",
+                    ),
+                ),
             ],
         ),
     ]

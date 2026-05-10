@@ -8,31 +8,64 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='InventoryItem',
+            name="InventoryItem",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('category', models.CharField(choices=[('STATIONERY', 'Stationery'), ('LAB', 'Laboratory'), ('LIBRARY', 'Library'), ('GENERAL', 'General')], max_length=20)),
-                ('quantity', models.IntegerField(default=0)),
-                ('unit', models.CharField(max_length=20)),
-                ('min_threshold', models.IntegerField(default=5)),
-                ('last_restock', models.DateField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                (
+                    "category",
+                    models.CharField(
+                        choices=[
+                            ("STATIONERY", "Stationery"),
+                            ("LAB", "Laboratory"),
+                            ("LIBRARY", "Library"),
+                            ("GENERAL", "General"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                ("quantity", models.IntegerField(default=0)),
+                ("unit", models.CharField(max_length=20)),
+                ("min_threshold", models.IntegerField(default=5)),
+                ("last_restock", models.DateField(auto_now=True)),
             ],
         ),
         migrations.CreateModel(
-            name='ProcurementLog',
+            name="ProcurementLog",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('quantity_added', models.IntegerField()),
-                ('cost', models.DecimalField(decimal_places=2, max_digits=12)),
-                ('supplier', models.CharField(max_length=255)),
-                ('date', models.DateField(auto_now_add=True)),
-                ('item', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='logs', to='inventory.inventoryitem')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("quantity_added", models.IntegerField()),
+                ("cost", models.DecimalField(decimal_places=2, max_digits=12)),
+                ("supplier", models.CharField(max_length=255)),
+                ("date", models.DateField(auto_now_add=True)),
+                (
+                    "item",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="logs",
+                        to="inventory.inventoryitem",
+                    ),
+                ),
             ],
         ),
     ]

@@ -1,5 +1,7 @@
 from decimal import Decimal
+
 from .models import HRSettings
+
 
 class PayrollEngine:
     @staticmethod
@@ -11,10 +13,10 @@ class PayrollEngine:
         nssf = PayrollEngine.calculate_nssf(gross_pay)
         housing_levy = gross_pay * settings.housing_levy_rate
         shif = gross_pay * settings.shif_rate
-        
+
         # 2. Taxable Pay
         taxable_pay = gross_pay - nssf
-        
+
         # 3. PAYE (Kenyan Bands 2024)
         paye = PayrollEngine.calculate_paye(taxable_pay)
         # Personal Relief (Fixed at 2,400)
@@ -30,7 +32,7 @@ class PayrollEngine:
             "shif": round(shif, 2),
             "housing_levy": round(housing_levy, 2),
             "paye": round(net_paye, 2),
-            "net_pay": round(net_pay, 2)
+            "net_pay": round(net_pay, 2),
         }
 
     @staticmethod
@@ -47,5 +49,9 @@ class PayrollEngine:
         elif taxable <= 32333:
             tax = (24000 * Decimal(0.1)) + (taxable - 24000) * Decimal(0.25)
         else:
-            tax = (24000 * Decimal(0.1)) + (8333 * Decimal(0.25)) + (taxable - 32333) * Decimal(0.3)
+            tax = (
+                (24000 * Decimal(0.1))
+                + (8333 * Decimal(0.25))
+                + (taxable - 32333) * Decimal(0.3)
+            )
         return tax

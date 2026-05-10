@@ -7,18 +7,24 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('fees', '0001_initial'),
-        ('students', '0001_initial'),
+        ("fees", "0001_initial"),
+        ("students", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddIndex(
-            model_name='feepayment',
-            index=models.Index(fields=['student', 'payment_date'], name='fees_feepay_student_198476_idx'),
+            model_name="feepayment",
+            index=models.Index(
+                fields=["student", "payment_date"],
+                name="fees_feepay_student_198476_idx",
+            ),
         ),
         migrations.AddIndex(
-            model_name='feepayment',
-            index=models.Index(fields=['payment_method', 'is_confirmed'], name='fees_feepay_payment_7463c6_idx'),
+            model_name="feepayment",
+            index=models.Index(
+                fields=["payment_method", "is_confirmed"],
+                name="fees_feepay_payment_7463c6_idx",
+            ),
         ),
     ]

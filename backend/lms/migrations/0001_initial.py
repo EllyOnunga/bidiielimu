@@ -9,110 +9,305 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('classes', '0001_initial'),
-        ('students', '0001_initial'),
-        ('teachers', '0001_initial'),
+        ("classes", "0001_initial"),
+        ("students", "0001_initial"),
+        ("teachers", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Assignment',
+            name="Assignment",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=200)),
-                ('description', models.TextField()),
-                ('due_date', models.DateTimeField()),
-                ('max_score', models.IntegerField(default=100)),
-                ('file', models.FileField(blank=True, null=True, upload_to='lms/assignments/')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('subject', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='assignments', to='classes.subject')),
-                ('teacher', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='assignments', to='teachers.teacher')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=200)),
+                ("description", models.TextField()),
+                ("due_date", models.DateTimeField()),
+                ("max_score", models.IntegerField(default=100)),
+                (
+                    "file",
+                    models.FileField(
+                        blank=True, null=True, upload_to="lms/assignments/"
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "subject",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="assignments",
+                        to="classes.subject",
+                    ),
+                ),
+                (
+                    "teacher",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="assignments",
+                        to="teachers.teacher",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='LessonNote',
+            name="LessonNote",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=200)),
-                ('content', models.TextField()),
-                ('file', models.FileField(blank=True, null=True, upload_to='lms/notes/')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('subject', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='notes', to='classes.subject')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=200)),
+                ("content", models.TextField()),
+                (
+                    "file",
+                    models.FileField(blank=True, null=True, upload_to="lms/notes/"),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "subject",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="notes",
+                        to="classes.subject",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Quiz',
+            name="Quiz",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=200)),
-                ('description', models.TextField(blank=True, null=True)),
-                ('duration_minutes', models.IntegerField(default=30)),
-                ('is_active', models.BooleanField(default=True)),
-                ('subject', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='quizzes', to='classes.subject')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=200)),
+                ("description", models.TextField(blank=True, null=True)),
+                ("duration_minutes", models.IntegerField(default=30)),
+                ("is_active", models.BooleanField(default=True)),
+                (
+                    "subject",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="quizzes",
+                        to="classes.subject",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Question',
+            name="Question",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('text', models.TextField()),
-                ('question_type', models.CharField(choices=[('MCQ', 'Multiple Choice'), ('TEXT', 'Short Text')], default='MCQ', max_length=5)),
-                ('points', models.IntegerField(default=1)),
-                ('correct_answer', models.CharField(max_length=255)),
-                ('options', models.JSONField(blank=True, null=True)),
-                ('quiz', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='questions', to='lms.quiz')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("text", models.TextField()),
+                (
+                    "question_type",
+                    models.CharField(
+                        choices=[("MCQ", "Multiple Choice"), ("TEXT", "Short Text")],
+                        default="MCQ",
+                        max_length=5,
+                    ),
+                ),
+                ("points", models.IntegerField(default=1)),
+                ("correct_answer", models.CharField(max_length=255)),
+                ("options", models.JSONField(blank=True, null=True)),
+                (
+                    "quiz",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="questions",
+                        to="lms.quiz",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='QuizAttempt',
+            name="QuizAttempt",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('score', models.DecimalField(decimal_places=2, default=0, max_digits=5)),
-                ('completed_at', models.DateTimeField(auto_now_add=True)),
-                ('quiz', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='attempts', to='lms.quiz')),
-                ('student', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='quiz_attempts', to='students.student')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "score",
+                    models.DecimalField(decimal_places=2, default=0, max_digits=5),
+                ),
+                ("completed_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "quiz",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="attempts",
+                        to="lms.quiz",
+                    ),
+                ),
+                (
+                    "student",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="quiz_attempts",
+                        to="students.student",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Resource',
+            name="Resource",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=200)),
-                ('file', models.FileField(upload_to='lms/resources/')),
-                ('category', models.CharField(choices=[('NOTE', 'Lesson Note'), ('VIDEO', 'Video Lecture'), ('BOOK', 'E-Book'), ('OTHER', 'Other Resource')], default='NOTE', max_length=10)),
-                ('version', models.IntegerField(default=1)),
-                ('uploaded_at', models.DateTimeField(auto_now_add=True)),
-                ('subject', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='resources', to='classes.subject')),
-                ('uploaded_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='teachers.teacher')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=200)),
+                ("file", models.FileField(upload_to="lms/resources/")),
+                (
+                    "category",
+                    models.CharField(
+                        choices=[
+                            ("NOTE", "Lesson Note"),
+                            ("VIDEO", "Video Lecture"),
+                            ("BOOK", "E-Book"),
+                            ("OTHER", "Other Resource"),
+                        ],
+                        default="NOTE",
+                        max_length=10,
+                    ),
+                ),
+                ("version", models.IntegerField(default=1)),
+                ("uploaded_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "subject",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="resources",
+                        to="classes.subject",
+                    ),
+                ),
+                (
+                    "uploaded_by",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="teachers.teacher",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='NoteConfirmation',
+            name="NoteConfirmation",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('read_at', models.DateTimeField(auto_now_add=True)),
-                ('note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='confirmations', to='lms.lessonnote')),
-                ('student', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='note_readings', to='students.student')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("read_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "note",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="confirmations",
+                        to="lms.lessonnote",
+                    ),
+                ),
+                (
+                    "student",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="note_readings",
+                        to="students.student",
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('note', 'student')},
+                "unique_together": {("note", "student")},
             },
         ),
         migrations.CreateModel(
-            name='Submission',
+            name="Submission",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('submitted_at', models.DateTimeField(auto_now_add=True)),
-                ('file', models.FileField(blank=True, null=True, upload_to='lms/submissions/')),
-                ('text_content', models.TextField(blank=True, null=True)),
-                ('grade', models.DecimalField(blank=True, decimal_places=2, max_digits=5, null=True)),
-                ('feedback', models.TextField(blank=True, null=True)),
-                ('graded_at', models.DateTimeField(blank=True, null=True)),
-                ('assignment', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='submissions', to='lms.assignment')),
-                ('student', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='submissions', to='students.student')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("submitted_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "file",
+                    models.FileField(
+                        blank=True, null=True, upload_to="lms/submissions/"
+                    ),
+                ),
+                ("text_content", models.TextField(blank=True, null=True)),
+                (
+                    "grade",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=5, null=True
+                    ),
+                ),
+                ("feedback", models.TextField(blank=True, null=True)),
+                ("graded_at", models.DateTimeField(blank=True, null=True)),
+                (
+                    "assignment",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="submissions",
+                        to="lms.assignment",
+                    ),
+                ),
+                (
+                    "student",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="submissions",
+                        to="students.student",
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('assignment', 'student')},
+                "unique_together": {("assignment", "student")},
             },
         ),
     ]

@@ -17,76 +17,232 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='HRSettings',
+            name="HRSettings",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('shif_rate', models.DecimalField(decimal_places=4, default=0.0275, max_digits=5)),
-                ('housing_levy_rate', models.DecimalField(decimal_places=4, default=0.015, max_digits=5)),
-                ('nssf_tier_1_max', models.DecimalField(decimal_places=2, default=7000.0, max_digits=10)),
-                ('nssf_tier_2_max', models.DecimalField(decimal_places=2, default=36000.0, max_digits=10)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "shif_rate",
+                    models.DecimalField(decimal_places=4, default=0.0275, max_digits=5),
+                ),
+                (
+                    "housing_levy_rate",
+                    models.DecimalField(decimal_places=4, default=0.015, max_digits=5),
+                ),
+                (
+                    "nssf_tier_1_max",
+                    models.DecimalField(
+                        decimal_places=2, default=7000.0, max_digits=10
+                    ),
+                ),
+                (
+                    "nssf_tier_2_max",
+                    models.DecimalField(
+                        decimal_places=2, default=36000.0, max_digits=10
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'HR & Payroll Setting',
-                'verbose_name_plural': 'HR & Payroll Settings',
+                "verbose_name": "HR & Payroll Setting",
+                "verbose_name_plural": "HR & Payroll Settings",
             },
         ),
         migrations.CreateModel(
-            name='TeacherAvailability',
+            name="TeacherAvailability",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='LeaveRequest',
+            name="LeaveRequest",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('leave_type', models.CharField(choices=[('SICK', 'Sick Leave'), ('ANNUAL', 'Annual Leave'), ('MATERNITY', 'Maternity'), ('PATERNITY', 'Paternity'), ('COMPASSIONATE', 'Compassionate')], max_length=20)),
-                ('start_date', models.DateField()),
-                ('end_date', models.DateField()),
-                ('reason', models.TextField()),
-                ('status', models.CharField(choices=[('PENDING', 'Pending Approval'), ('APPROVED', 'Approved'), ('REJECTED', 'Rejected'), ('CANCELLED', 'Cancelled')], default='PENDING', max_length=15)),
-                ('applied_at', models.DateTimeField(auto_now_add=True)),
-                ('approved_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='approved_leaves', to=settings.AUTH_USER_MODEL)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='leave_requests', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "leave_type",
+                    models.CharField(
+                        choices=[
+                            ("SICK", "Sick Leave"),
+                            ("ANNUAL", "Annual Leave"),
+                            ("MATERNITY", "Maternity"),
+                            ("PATERNITY", "Paternity"),
+                            ("COMPASSIONATE", "Compassionate"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                ("start_date", models.DateField()),
+                ("end_date", models.DateField()),
+                ("reason", models.TextField()),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("PENDING", "Pending Approval"),
+                            ("APPROVED", "Approved"),
+                            ("REJECTED", "Rejected"),
+                            ("CANCELLED", "Cancelled"),
+                        ],
+                        default="PENDING",
+                        max_length=15,
+                    ),
+                ),
+                ("applied_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "approved_by",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="approved_leaves",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="leave_requests",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='StaffProfile',
+            name="StaffProfile",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('employee_id', models.CharField(max_length=50, unique=True)),
-                ('national_id', models.CharField(blank=True, max_length=20, null=True, unique=True)),
-                ('designation', models.CharField(max_length=100)),
-                ('department', models.CharField(max_length=100)),
-                ('basic_salary', models.DecimalField(decimal_places=2, default=0, max_digits=12)),
-                ('joining_date', models.DateField()),
-                ('is_active', models.BooleanField(default=True)),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='teacher_staff_profile', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("employee_id", models.CharField(max_length=50, unique=True)),
+                (
+                    "national_id",
+                    models.CharField(blank=True, max_length=20, null=True, unique=True),
+                ),
+                ("designation", models.CharField(max_length=100)),
+                ("department", models.CharField(max_length=100)),
+                (
+                    "basic_salary",
+                    models.DecimalField(decimal_places=2, default=0, max_digits=12),
+                ),
+                ("joining_date", models.DateField()),
+                ("is_active", models.BooleanField(default=True)),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="teacher_staff_profile",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Teacher',
+            name="Teacher",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('deleted_at', models.DateTimeField(blank=True, db_index=True, null=True)),
-                ('employee_id', models.CharField(max_length=50, unique=True)),
-                ('tsc_number', models.CharField(blank=True, max_length=50, null=True, unique=True)),
-                ('national_id', models.CharField(blank=True, max_length=20, null=True, unique=True)),
-                ('first_name', models.CharField(max_length=100)),
-                ('last_name', models.CharField(max_length=100)),
-                ('designation', models.CharField(blank=True, max_length=100, null=True)),
-                ('phone_number', models.CharField(max_length=17, validators=[django.core.validators.RegexValidator(message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.", regex='^\\+?1?\\d{9,15}$')])),
-                ('specialization', models.CharField(blank=True, max_length=200, null=True)),
-                ('qualifications', models.JSONField(blank=True, default=list)),
-                ('contract_type', models.CharField(choices=[('PERMANENT', 'Permanent & Pensionable'), ('BOM', 'BOM Contract'), ('INTERN', 'Internship'), ('PART_TIME', 'Part-time / Relief')], default='PERMANENT', max_length=20)),
-                ('basic_salary', models.DecimalField(decimal_places=2, default=0, max_digits=12)),
-                ('joining_date', models.DateField()),
-                ('is_active', models.BooleanField(db_index=True, default=True)),
-                ('created_at', models.DateTimeField(default=django.utils.timezone.now)),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='teacher_profile', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "deleted_at",
+                    models.DateTimeField(blank=True, db_index=True, null=True),
+                ),
+                ("employee_id", models.CharField(max_length=50, unique=True)),
+                (
+                    "tsc_number",
+                    models.CharField(blank=True, max_length=50, null=True, unique=True),
+                ),
+                (
+                    "national_id",
+                    models.CharField(blank=True, max_length=20, null=True, unique=True),
+                ),
+                ("first_name", models.CharField(max_length=100)),
+                ("last_name", models.CharField(max_length=100)),
+                (
+                    "designation",
+                    models.CharField(blank=True, max_length=100, null=True),
+                ),
+                (
+                    "phone_number",
+                    models.CharField(
+                        max_length=17,
+                        validators=[
+                            django.core.validators.RegexValidator(
+                                message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.",
+                                regex="^\\+?1?\\d{9,15}$",
+                            )
+                        ],
+                    ),
+                ),
+                (
+                    "specialization",
+                    models.CharField(blank=True, max_length=200, null=True),
+                ),
+                ("qualifications", models.JSONField(blank=True, default=list)),
+                (
+                    "contract_type",
+                    models.CharField(
+                        choices=[
+                            ("PERMANENT", "Permanent & Pensionable"),
+                            ("BOM", "BOM Contract"),
+                            ("INTERN", "Internship"),
+                            ("PART_TIME", "Part-time / Relief"),
+                        ],
+                        default="PERMANENT",
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "basic_salary",
+                    models.DecimalField(decimal_places=2, default=0, max_digits=12),
+                ),
+                ("joining_date", models.DateField()),
+                ("is_active", models.BooleanField(db_index=True, default=True)),
+                ("created_at", models.DateTimeField(default=django.utils.timezone.now)),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="teacher_profile",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
+                "ordering": ["-created_at"],
             },
         ),
     ]

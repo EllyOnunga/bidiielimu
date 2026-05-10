@@ -11,9 +11,10 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 import os
-import dj_database_url
-from pathlib import Path
 from datetime import timedelta
+from pathlib import Path
+
+import dj_database_url
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -26,16 +27,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ['SECRET_KEY']  # Required - no default for security
+SECRET_KEY = os.environ["SECRET_KEY"]  # Required - no default for security
 
 # Force Debug and Allowed Hosts for Local Dev
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,.localhost,127.0.0.1,.elimuhub.com').split(',')
+DEBUG = os.getenv("DEBUG", "False") == "True"
+ALLOWED_HOSTS = os.getenv(
+    "ALLOWED_HOSTS", "localhost,.localhost,127.0.0.1,.elimuhub.com"
+).split(",")
 
 # CORS Settings
 CORS_ALLOW_ALL_ORIGINS = DEBUG
 CORS_ALLOW_CREDENTIALS = True
-FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 
 CORS_ALLOWED_ORIGINS = [
     FRONTEND_URL,
@@ -61,7 +64,7 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http://localhost:5173$",
 ]
 
-CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken', 'Authorization']
+CORS_EXPOSE_HEADERS = ["Content-Type", "X-CSRFToken", "Authorization"]
 
 CORS_ALLOW_HEADERS = [
     "accept",
@@ -89,81 +92,77 @@ CORS_ALLOW_METHODS = [
 APPEND_SLASH = True
 
 
-
 # Application definition
 
 SHARED_APPS = [
-    'django_tenants',
-    'daphne',
-    'schools',
-    
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    
+    "django_tenants",
+    "daphne",
+    "schools",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
     # Third party apps
-    'rest_framework',
-    'rest_framework.authtoken',
-    'corsheaders',
-    'django_filters',
-    'django.contrib.sites',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
-    'dj_rest_auth',
-    'dj_rest_auth.registration',
-    'django_otp',
-    'django_otp.plugins.otp_totp',
-    'allauth_2fa',
-    
+    "rest_framework",
+    "rest_framework.authtoken",
+    "corsheaders",
+    "django_filters",
+    "django.contrib.sites",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    "dj_rest_auth",
+    "dj_rest_auth.registration",
+    "django_otp",
+    "django_otp.plugins.otp_totp",
+    "allauth_2fa",
     # Local apps
-    'accounts',
-    'drf_spectacular',
-    'channels',
-    'graphene_django',
-    'storages',
+    "accounts",
+    "drf_spectacular",
+    "channels",
+    "graphene_django",
+    "storages",
 ]
 
 TENANT_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'channels',
-    
-    'rest_framework',
-    'corsheaders',
-    
-    'students',
-    'teachers',
-    'classes',
-    'fees',
-    'exams',
-    'attendance',
-    'audit',
-    'notifications',
-    'lms',
-    'inventory',
-    'hr',
-    'analytics',
-    'reports',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "channels",
+    "rest_framework",
+    "corsheaders",
+    "students",
+    "teachers",
+    "classes",
+    "fees",
+    "exams",
+    "attendance",
+    "audit",
+    "notifications",
+    "lms",
+    "inventory",
+    "hr",
+    "analytics",
+    "reports",
 ]
 
-INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
+INSTALLED_APPS = list(SHARED_APPS) + [
+    app for app in TENANT_APPS if app not in SHARED_APPS
+]
 
-ASGI_APPLICATION = 'config.asgi.application'
+ASGI_APPLICATION = "config.asgi.application"
 
 CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/0')],
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [os.getenv("REDIS_URL", "redis://127.0.0.1:6379/0")],
         },
     },
 }
@@ -175,52 +174,52 @@ TENANT_DOMAIN_MODEL = "schools.Domain"
 SITE_ID = 1
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
-    'django_tenants.middleware.main.TenantMainMiddleware',
-    'config.middleware.RequestCorrelationMiddleware',
-    'config.middleware.RequestLoggingMiddleware',
-    'config.middleware_security.APIKeyAuthenticationMiddleware',
-    'config.middleware_security.SecurityHeadersMiddleware',
-    'config.middleware_security.RequestEncryptionMiddleware',
-    'config.middleware_security.InputValidationMiddleware',
-    'config.middleware_monitoring.PerformanceMonitoringMiddleware',
-    'config.middleware_monitoring.ErrorTrackingMiddleware',
-    'audit.middleware.RequestTrackingMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'config.caching.APICacheMiddleware',
-    'config.middleware.TenantAccessMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware',
-    'django_otp.middleware.OTPMiddleware',
-    'allauth_2fa.middleware.AllauthTwoFactorMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
+    "django_tenants.middleware.main.TenantMainMiddleware",
+    "config.middleware.RequestCorrelationMiddleware",
+    "config.middleware.RequestLoggingMiddleware",
+    "config.middleware_security.APIKeyAuthenticationMiddleware",
+    "config.middleware_security.SecurityHeadersMiddleware",
+    "config.middleware_security.RequestEncryptionMiddleware",
+    "config.middleware_security.InputValidationMiddleware",
+    "config.middleware_monitoring.PerformanceMonitoringMiddleware",
+    "config.middleware_monitoring.ErrorTrackingMiddleware",
+    "audit.middleware.RequestTrackingMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "config.caching.APICacheMiddleware",
+    "config.middleware.TenantAccessMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
+    "django_otp.middleware.OTPMiddleware",
+    "allauth_2fa.middleware.AllauthTwoFactorMiddleware",
 ]
 
-ROOT_URLCONF = 'config.urls_public'
-TENANT_URLCONF = 'config.urls_tenant'
-PUBLIC_SCHEMA_URLCONF = 'config.urls_public'
+ROOT_URLCONF = "config.urls_public"
+TENANT_URLCONF = "config.urls_tenant"
+PUBLIC_SCHEMA_URLCONF = "config.urls_public"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
+WSGI_APPLICATION = "config.wsgi.application"
 
 
 # Database
@@ -232,31 +231,31 @@ db_config = dj_database_url.config(
     conn_max_age=600,
     conn_health_checks=True,
 )
-db_config['ENGINE'] = 'django_tenants.postgresql_backend'
+db_config["ENGINE"] = "django_tenants.postgresql_backend"
 
 # Read database configuration (for future replication)
 read_db_config = dj_database_url.config(
-    default=os.getenv('DATABASE_READ_URL', db_config['NAME']),
+    default=os.getenv("DATABASE_READ_URL", db_config["NAME"]),
     conn_max_age=600,
     conn_health_checks=True,
 )
-read_db_config['ENGINE'] = 'django_tenants.postgresql_backend'
+read_db_config["ENGINE"] = "django_tenants.postgresql_backend"
 
 DATABASES = {
-    'default': db_config,  # Write database
-    'read': read_db_config,  # Read database (can be same as default for now)
+    "default": db_config,  # Write database
+    "read": read_db_config,  # Read database (can be same as default for now)
 }
 
 # Database Optimization Settings
 DATABASE_OPTIONS = {
-    'default': {
-        'CONN_MAX_AGE': 0,
-        'CONN_HEALTH_CHECKS': False,
+    "default": {
+        "CONN_MAX_AGE": 0,
+        "CONN_HEALTH_CHECKS": False,
     },
-    'read': {
-        'CONN_MAX_AGE': 0,
-        'CONN_HEALTH_CHECKS': False,
-    }
+    "read": {
+        "CONN_MAX_AGE": 0,
+        "CONN_HEALTH_CHECKS": False,
+    },
 }
 
 # Update database configurations with options
@@ -266,7 +265,7 @@ for db_name, options in DATABASE_OPTIONS.items():
 
 # Database routing for read/write splitting and tenant isolation
 DATABASE_ROUTERS = [
-    'django_tenants.routers.TenantSyncRouter',
+    "django_tenants.routers.TenantSyncRouter",
     # 'config.database_router.DatabaseRouter', # Disabled to fix tenant schema isolation on reads
 ]
 
@@ -276,38 +275,38 @@ DATABASE_ROUTERS = [
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
 # Password Hashers
 PASSWORD_HASHERS = [
-    'django.contrib.auth.hashers.Argon2PasswordHasher',
-    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
-    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
-    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+    "django.contrib.auth.hashers.Argon2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
 ]
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
 # Allauth Settings
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 7
 ACCOUNT_EMAIL_CONFIRMATION_HMAC = True
 ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 5
@@ -318,74 +317,76 @@ ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
 ACCOUNT_UNIQUE_EMAIL = True
 
 # Social Account Settings
-SOCIALACCOUNT_ADAPTER = 'accounts.adapters.SocialAccountAdapter'
+SOCIALACCOUNT_ADAPTER = "accounts.adapters.SocialAccountAdapter"
 SOCIALACCOUNT_AUTO_SIGNUP = True
-SOCIALACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+SOCIALACCOUNT_EMAIL_VERIFICATION = "mandatory"
 SOCIALACCOUNT_QUERY_EMAIL = True
 SOCIALACCOUNT_STORE_TOKENS = True
 
 # Social Providers Configuration
 SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': ['profile', 'email'],
-        'AUTH_PARAMS': {'access_type': 'online'},
-        'APP': {
-            'client_id': os.getenv('GOOGLE_CLIENT_ID'),
-            'secret': os.getenv('GOOGLE_CLIENT_SECRET'),
-            'key': ''
-        }
+    "google": {
+        "SCOPE": ["profile", "email"],
+        "AUTH_PARAMS": {"access_type": "online"},
+        "APP": {
+            "client_id": os.getenv("GOOGLE_CLIENT_ID"),
+            "secret": os.getenv("GOOGLE_CLIENT_SECRET"),
+            "key": "",
+        },
     },
-    'microsoft': {
-        'SCOPE': ['openid', 'profile', 'email', 'User.Read'],
-        'AUTH_PARAMS': {'access_type': 'online'},
-        'APP': {
-            'client_id': os.getenv('MICROSOFT_CLIENT_ID'),
-            'secret': os.getenv('MICROSOFT_CLIENT_SECRET'),
-            'key': ''
-        }
+    "microsoft": {
+        "SCOPE": ["openid", "profile", "email", "User.Read"],
+        "AUTH_PARAMS": {"access_type": "online"},
+        "APP": {
+            "client_id": os.getenv("MICROSOFT_CLIENT_ID"),
+            "secret": os.getenv("MICROSOFT_CLIENT_SECRET"),
+            "key": "",
+        },
     },
-    'github': {
-        'SCOPE': ['user:email', 'read:user'],
-        'APP': {
-            'client_id': os.getenv('GITHUB_CLIENT_ID'),
-            'secret': os.getenv('GITHUB_CLIENT_SECRET'),
-            'key': ''
-        }
-    }
+    "github": {
+        "SCOPE": ["user:email", "read:user"],
+        "APP": {
+            "client_id": os.getenv("GITHUB_CLIENT_ID"),
+            "secret": os.getenv("GITHUB_CLIENT_SECRET"),
+            "key": "",
+        },
+    },
 }
 
 # REST Auth Settings
 REST_AUTH = {
-    'USE_JWT': True,
-    'JWT_AUTH_COOKIE': 'jwt-auth',
-    'JWT_AUTH_REFRESH_COOKIE': 'jwt-refresh-token',
-    'JWT_AUTH_HTTPONLY': False,
-    'USER_DETAILS_SERIALIZER': 'accounts.serializers.UserSerializer',
-    'REGISTER_SERIALIZER': 'accounts.serializers.RegisterSerializer',
-    'PASSWORD_RESET_SERIALIZER': 'accounts.serializers.CustomPasswordResetSerializer',
-    'PASSWORD_RESET_CONFIRM_URL': 'reset-password/{uid}/{token}',
+    "USE_JWT": True,
+    "JWT_AUTH_COOKIE": "jwt-auth",
+    "JWT_AUTH_REFRESH_COOKIE": "jwt-refresh-token",
+    "JWT_AUTH_HTTPONLY": False,
+    "USER_DETAILS_SERIALIZER": "accounts.serializers.UserSerializer",
+    "REGISTER_SERIALIZER": "accounts.serializers.RegisterSerializer",
+    "PASSWORD_RESET_SERIALIZER": "accounts.serializers.CustomPasswordResetSerializer",
+    "PASSWORD_RESET_CONFIRM_URL": "reset-password/{uid}/{token}",
 }
 
 # Email Settings
-if DEBUG and not os.getenv('EMAIL_HOST_USER'):
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+if DEBUG and not os.getenv("EMAIL_HOST_USER"):
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 else:
-    EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+    EMAIL_BACKEND = os.getenv(
+        "EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend"
+    )
 
-EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
-EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'support@elimuhub.com')
+EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "support@elimuhub.com")
 
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -395,8 +396,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -406,355 +407,394 @@ STORAGES = {
     },
 }
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Custom User Model
-AUTH_USER_MODEL = 'accounts.User'
+AUTH_USER_MODEL = "accounts.User"
 
 # REST Framework Settings
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
     ),
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
     ],
-    'DEFAULT_FILTER_BACKENDS': (
-        'django_filters.rest_framework.DjangoFilterBackend',
-        'rest_framework.filters.SearchFilter',
-        'rest_framework.filters.OrderingFilter',
+    "DEFAULT_FILTER_BACKENDS": (
+        "django_filters.rest_framework.DjangoFilterBackend",
+        "rest_framework.filters.SearchFilter",
+        "rest_framework.filters.OrderingFilter",
     ),
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 50,
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle',
-        'config.throttling.APIKeyRateThrottle',
-        'config.throttling.BurstRateThrottle',
-        'config.throttling.ScopedRateThrottle',
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 50,
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+        "config.throttling.APIKeyRateThrottle",
+        "config.throttling.BurstRateThrottle",
+        "config.throttling.ScopedRateThrottle",
     ],
-    'DEFAULT_THROTTLE_RATES': {
-        'anon': '100/hour',
-        'user': '5000/hour',
-        'api_key': '1000/hour',
-        'burst': '200/minute',
-        'login': '100/hour',
-        'register': '50/hour',
-    }
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "100/hour",
+        "user": "5000/hour",
+        "api_key": "1000/hour",
+        "burst": "200/minute",
+        "login": "100/hour",
+        "register": "50/hour",
+    },
 }
 
 # GraphQL Settings
 GRAPHENE = {
-    'SCHEMA': 'config.schema.schema',
-    'MIDDLEWARE': [
-        'graphql_jwt.middleware.JSONWebTokenMiddleware',
+    "SCHEMA": "config.schema.schema",
+    "MIDDLEWARE": [
+        "graphql_jwt.middleware.JSONWebTokenMiddleware",
     ],
 }
 
 AUTHENTICATION_BACKENDS += [
-    'graphql_jwt.backends.JSONWebTokenBackend',
-    'django.contrib.auth.backends.ModelBackend',
+    "graphql_jwt.backends.JSONWebTokenBackend",
+    "django.contrib.auth.backends.ModelBackend",
 ]
 
 
 # JWT Settings
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'ROTATE_REFRESH_TOKENS': False,
-    'ALGORITHM': 'HS256',
-    'AUTH_HEADER_TYPES': ('Bearer', 'JWT'),
-    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
-    'USER_ID_FIELD': 'id',
-    'USER_ID_CLAIM': 'user_id',
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": False,
+    "ALGORITHM": "HS256",
+    "AUTH_HEADER_TYPES": ("Bearer", "JWT"),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
 }
 
 # Multi-Level Caching Configuration
 CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache' if not DEBUG else 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/1') if not DEBUG else 'unique-snowflake',
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            'CONNECTION_POOL_KWARGS': {
-                'max_connections': 20,
-                'decode_responses': True,
-            },
-            'SERIALIZER': 'django_redis.serializers.json.JSONSerializer',
-        } if not DEBUG else {},
-        'KEY_PREFIX': 'elimuhub',
-        'TIMEOUT': 3600,  # 1 hour default
+    "default": {
+        "BACKEND": (
+            "django_redis.cache.RedisCache"
+            if not DEBUG
+            else "django.core.cache.backends.locmem.LocMemCache"
+        ),
+        "LOCATION": (
+            os.getenv("REDIS_URL", "redis://127.0.0.1:6379/1")
+            if not DEBUG
+            else "unique-snowflake"
+        ),
+        "OPTIONS": (
+            {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                "CONNECTION_POOL_KWARGS": {
+                    "max_connections": 20,
+                    "decode_responses": True,
+                },
+                "SERIALIZER": "django_redis.serializers.json.JSONSerializer",
+            }
+            if not DEBUG
+            else {}
+        ),
+        "KEY_PREFIX": "elimuhub",
+        "TIMEOUT": 3600,  # 1 hour default
     },
-    'session': {
-        'BACKEND': 'django_redis.cache.RedisCache' if not DEBUG else 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/2') if not DEBUG else 'session-cache',
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-        } if not DEBUG else {},
-        'KEY_PREFIX': 'session',
-        'TIMEOUT': 86400,  # 24 hours
+    "session": {
+        "BACKEND": (
+            "django_redis.cache.RedisCache"
+            if not DEBUG
+            else "django.core.cache.backends.locmem.LocMemCache"
+        ),
+        "LOCATION": (
+            os.getenv("REDIS_URL", "redis://127.0.0.1:6379/2")
+            if not DEBUG
+            else "session-cache"
+        ),
+        "OPTIONS": (
+            {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            }
+            if not DEBUG
+            else {}
+        ),
+        "KEY_PREFIX": "session",
+        "TIMEOUT": 86400,  # 24 hours
     },
-    'api_cache': {
-        'BACKEND': 'django_redis.cache.RedisCache' if not DEBUG else 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/3') if not DEBUG else 'api-cache',
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            'COMPRESSOR': 'django_redis.compressors.zlib.ZlibCompressor',
-        } if not DEBUG else {},
-        'KEY_PREFIX': 'api',
-        'TIMEOUT': 1800,  # 30 minutes
+    "api_cache": {
+        "BACKEND": (
+            "django_redis.cache.RedisCache"
+            if not DEBUG
+            else "django.core.cache.backends.locmem.LocMemCache"
+        ),
+        "LOCATION": (
+            os.getenv("REDIS_URL", "redis://127.0.0.1:6379/3")
+            if not DEBUG
+            else "api-cache"
+        ),
+        "OPTIONS": (
+            {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
+            }
+            if not DEBUG
+            else {}
+        ),
+        "KEY_PREFIX": "api",
+        "TIMEOUT": 1800,  # 30 minutes
     },
 }
 
 # Session Caching
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-SESSION_CACHE_ALIAS = 'session'
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "session"
 
 # Celery Settings
-CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/0'))
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/1'))
+CELERY_BROKER_URL = os.getenv(
+    "CELERY_BROKER_URL", os.getenv("REDIS_URL", "redis://127.0.0.1:6379/0")
+)
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_BACKEND = os.getenv(
+    "CELERY_RESULT_BACKEND", os.getenv("REDIS_URL", "redis://127.0.0.1:6379/1")
+)
 
 
 # API Documentation Settings
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'ElimuHub API',
-    'DESCRIPTION': 'Official API for ElimuHub School Management Platform',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
+    "TITLE": "ElimuHub API",
+    "DESCRIPTION": "Official API for ElimuHub School Management Platform",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
 }
 
 
 # AWS S3 Configuration
-USE_S3 = os.getenv('USE_S3', 'False') == 'True'
+USE_S3 = os.getenv("USE_S3", "False") == "True"
 
 if USE_S3:
     # AWS Credentials
-    AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
-    AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
-    AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME', 'elimuhub-media-storage')
-    AWS_S3_REGION_NAME = os.getenv('AWS_REGION', 'us-east-1')
-    
+    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+    AWS_STORAGE_BUCKET_NAME = os.getenv(
+        "AWS_STORAGE_BUCKET_NAME", "elimuhub-media-storage"
+    )
+    AWS_S3_REGION_NAME = os.getenv("AWS_REGION", "us-east-1")
+
     # S3 Settings
-    AWS_S3_SIGNATURE_VERSION = 's3v4'
+    AWS_S3_SIGNATURE_VERSION = "s3v4"
     AWS_S3_FILE_OVERWRITE = False
     AWS_DEFAULT_ACL = None
     AWS_S3_VERIFY = True
-    
+
     # Custom Domain (CloudFront or ALB)
-    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-    
+    AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
+
     # Static files settings
-    STATIC_LOCATION = 'static'
-    STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{STATIC_LOCATION}/'
-    STATICFILES_STORAGE = 'config.storage_backends.StaticStorage'
-    
+    STATIC_LOCATION = "static"
+    STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{STATIC_LOCATION}/"
+    STATICFILES_STORAGE = "config.storage_backends.StaticStorage"
+
     # Media files settings
-    PUBLIC_MEDIA_LOCATION = 'media'
-    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
-    DEFAULT_FILE_STORAGE = 'config.storage_backends.MediaStorage'
+    PUBLIC_MEDIA_LOCATION = "media"
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/"
+    DEFAULT_FILE_STORAGE = "config.storage_backends.MediaStorage"
 else:
-    STATIC_URL = '/static/'
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-    MEDIA_URL = '/media/'
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+    STATIC_URL = "/static/"
+    STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+    MEDIA_URL = "/media/"
+    MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # M-Pesa Settings
-MPESA_CONSUMER_KEY = os.getenv('MPESA_CONSUMER_KEY')
-MPESA_CONSUMER_SECRET = os.getenv('MPESA_CONSUMER_SECRET')
-MPESA_SHORTCODE = os.getenv('MPESA_SHORTCODE', '174379')
-MPESA_PASSKEY = os.getenv('MPESA_PASSKEY')
-MPESA_CALLBACK_URL = os.getenv('MPESA_CALLBACK_URL')
+MPESA_CONSUMER_KEY = os.getenv("MPESA_CONSUMER_KEY")
+MPESA_CONSUMER_SECRET = os.getenv("MPESA_CONSUMER_SECRET")
+MPESA_SHORTCODE = os.getenv("MPESA_SHORTCODE", "174379")
+MPESA_PASSKEY = os.getenv("MPESA_PASSKEY")
+MPESA_CALLBACK_URL = os.getenv("MPESA_CALLBACK_URL")
 
 # Africa's Talking Settings
-AT_USERNAME = os.getenv('AT_USERNAME', 'sandbox')
-AT_API_KEY = os.getenv('AT_API_KEY')
+AT_USERNAME = os.getenv("AT_USERNAME", "sandbox")
+AT_API_KEY = os.getenv("AT_API_KEY")
 
 # Celery Beat Schedule
 CELERY_BEAT_SCHEDULE = {
     # System maintenance
-    'cleanup-expired-data': {
-        'task': 'config.tasks_processing.cleanup_expired_data',
-        'schedule': 86400.0, # Every 24 hours
+    "cleanup-expired-data": {
+        "task": "config.tasks_processing.cleanup_expired_data",
+        "schedule": 86400.0,  # Every 24 hours
     },
-
     # Backup tasks
-    'create-daily-database-backup': {
-        'task': 'config.tasks_backup.create_automated_backup',
-        'schedule': 86400.0, # Every 24 hours
-        'args': ('db',),
+    "create-daily-database-backup": {
+        "task": "config.tasks_backup.create_automated_backup",
+        "schedule": 86400.0,  # Every 24 hours
+        "args": ("db",),
     },
-    'create-weekly-full-backup': {
-        'task': 'config.tasks_backup.create_automated_backup',
-        'schedule': 604800.0, # Every 7 days
-        'args': ('full',),
+    "create-weekly-full-backup": {
+        "task": "config.tasks_backup.create_automated_backup",
+        "schedule": 604800.0,  # Every 7 days
+        "args": ("full",),
     },
-    'cleanup-old-backups': {
-        'task': 'config.tasks_backup.cleanup_old_backups',
-        'schedule': 86400.0, # Every 24 hours
-        'args': (30,), # Keep 30 days of backups
+    "cleanup-old-backups": {
+        "task": "config.tasks_backup.cleanup_old_backups",
+        "schedule": 86400.0,  # Every 24 hours
+        "args": (30,),  # Keep 30 days of backups
     },
-
     # Analytics and reporting
-    'generate-monthly-analytics': {
-        'task': 'config.tasks_processing.generate_analytics_report',
-        'schedule': 2592000.0, # Every 30 days
-        'args': (1, 'monthly'), # school_id, period
+    "generate-monthly-analytics": {
+        "task": "config.tasks_processing.generate_analytics_report",
+        "schedule": 2592000.0,  # Every 30 days
+        "args": (1, "monthly"),  # school_id, period
     },
-
     # Legacy tasks (can be removed if not needed)
-    'run-nightly-risk-assessment': {
-        'task': 'analytics.tasks.run_nightly_risk_assessment',
-        'schedule': 86400.0, # Every 24 hours
+    "run-nightly-risk-assessment": {
+        "task": "analytics.tasks.run_nightly_risk_assessment",
+        "schedule": 86400.0,  # Every 24 hours
     },
 }
 
 # AWS S3 Storage (optional)
-if os.getenv('AWS_ACCESS_KEY_ID'):
-    AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
-    AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
-    AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
-    AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'us-east-1')
-    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-    AWS_DEFAULT_ACL = 'public-read'
-    AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
-    AWS_LOCATION = 'static'
-    STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
-    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+if os.getenv("AWS_ACCESS_KEY_ID"):
+    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+    AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
+    AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME", "us-east-1")
+    AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
+    AWS_DEFAULT_ACL = "public-read"
+    AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
+    AWS_LOCATION = "static"
+    STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/"
+    STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
 # Logging Configuration
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {pathname}:{lineno} {message}',
-            'style': '{',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {pathname}:{lineno} {message}",
+            "style": "{",
         },
-        'json': {
-            'format': '{"timestamp": "%(asctime)s", "level": "%(levelname)s", "logger": "%(name)s", "message": "%(message)s"}',
+        "json": {
+            "format": '{"timestamp": "%(asctime)s", "level": "%(levelname)s", "logger": "%(name)s", "message": "%(message)s"}',
         },
-        'simple': {
-            'format': '{levelname} {asctime} {name} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'console': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple',
-        },
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': BASE_DIR / 'logs' / 'django.log',
-            'maxBytes': 10 * 1024 * 1024,  # 10MB
-            'backupCount': 5,
-            'formatter': 'verbose',
-        },
-        'json_file': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': BASE_DIR / 'logs' / 'django.json',
-            'maxBytes': 10 * 1024 * 1024,  # 10MB
-            'backupCount': 5,
-            'formatter': 'json',
-        },
-        'error_file': {
-            'level': 'ERROR',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': BASE_DIR / 'logs' / 'errors.log',
-            'maxBytes': 10 * 1024 * 1024,  # 10MB
-            'backupCount': 5,
-            'formatter': 'verbose',
-        },
-        'security_file': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': BASE_DIR / 'logs' / 'security.log',
-            'maxBytes': 10 * 1024 * 1024,  # 10MB
-            'backupCount': 5,
-            'formatter': 'verbose',
+        "simple": {
+            "format": "{levelname} {asctime} {name} {message}",
+            "style": "{",
         },
     },
-    'root': {
-        'handlers': ['console', 'file', 'json_file', 'error_file'],
-        'level': 'INFO',
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+        "file": {
+            "level": "INFO",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": BASE_DIR / "logs" / "django.log",
+            "maxBytes": 10 * 1024 * 1024,  # 10MB
+            "backupCount": 5,
+            "formatter": "verbose",
+        },
+        "json_file": {
+            "level": "INFO",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": BASE_DIR / "logs" / "django.json",
+            "maxBytes": 10 * 1024 * 1024,  # 10MB
+            "backupCount": 5,
+            "formatter": "json",
+        },
+        "error_file": {
+            "level": "ERROR",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": BASE_DIR / "logs" / "errors.log",
+            "maxBytes": 10 * 1024 * 1024,  # 10MB
+            "backupCount": 5,
+            "formatter": "verbose",
+        },
+        "security_file": {
+            "level": "INFO",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": BASE_DIR / "logs" / "security.log",
+            "maxBytes": 10 * 1024 * 1024,  # 10MB
+            "backupCount": 5,
+            "formatter": "verbose",
+        },
     },
-    'loggers': {
-        'django': {
-            'handlers': ['console', 'file', 'json_file'],
-            'level': 'INFO',
-            'propagate': False,
+    "root": {
+        "handlers": ["console", "file", "json_file", "error_file"],
+        "level": "INFO",
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console", "file", "json_file"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'django.request': {
-            'handlers': ['error_file'],
-            'level': 'ERROR',
-            'propagate': False,
+        "django.request": {
+            "handlers": ["error_file"],
+            "level": "ERROR",
+            "propagate": False,
         },
-        'django.security': {
-            'handlers': ['security_file'],
-            'level': 'INFO',
-            'propagate': False,
+        "django.security": {
+            "handlers": ["security_file"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'accounts': {
-            'handlers': ['console', 'file', 'json_file'],
-            'level': 'INFO',
-            'propagate': False,
+        "accounts": {
+            "handlers": ["console", "file", "json_file"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'schools': {
-            'handlers': ['console', 'file', 'json_file'],
-            'level': 'INFO',
-            'propagate': False,
+        "schools": {
+            "handlers": ["console", "file", "json_file"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'students': {
-            'handlers': ['console', 'file', 'json_file'],
-            'level': 'INFO',
-            'propagate': False,
+        "students": {
+            "handlers": ["console", "file", "json_file"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'teachers': {
-            'handlers': ['console', 'file', 'json_file'],
-            'level': 'INFO',
-            'propagate': False,
+        "teachers": {
+            "handlers": ["console", "file", "json_file"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'classes': {
-            'handlers': ['console', 'file', 'json_file'],
-            'level': 'INFO',
-            'propagate': False,
+        "classes": {
+            "handlers": ["console", "file", "json_file"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'exams': {
-            'handlers': ['console', 'file', 'json_file'],
-            'level': 'INFO',
-            'propagate': False,
+        "exams": {
+            "handlers": ["console", "file", "json_file"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'attendance': {
-            'handlers': ['console', 'file', 'json_file'],
-            'level': 'INFO',
-            'propagate': False,
+        "attendance": {
+            "handlers": ["console", "file", "json_file"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'fees': {
-            'handlers': ['console', 'file', 'json_file'],
-            'level': 'INFO',
-            'propagate': False,
+        "fees": {
+            "handlers": ["console", "file", "json_file"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'audit': {
-            'handlers': ['console', 'file', 'json_file'],
-            'level': 'INFO',
-            'propagate': False,
+        "audit": {
+            "handlers": ["console", "file", "json_file"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'notifications': {
-            'handlers': ['console', 'file', 'json_file'],
-            'level': 'INFO',
-            'propagate': False,
+        "notifications": {
+            "handlers": ["console", "file", "json_file"],
+            "level": "INFO",
+            "propagate": False,
         },
     },
 }
@@ -762,5 +802,3 @@ LOGGING = {
 # File Upload Settings (100MB limit for videos)
 DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600
 FILE_UPLOAD_MAX_MEMORY_SIZE = 104857600
-
-

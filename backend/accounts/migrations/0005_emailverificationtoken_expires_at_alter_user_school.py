@@ -7,19 +7,25 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0004_auto_20260507_1635'),
-        ('schools', '0002_school_curriculum_school_status'),
+        ("accounts", "0004_auto_20260507_1635"),
+        ("schools", "0002_school_curriculum_school_status"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='emailverificationtoken',
-            name='expires_at',
+            model_name="emailverificationtoken",
+            name="expires_at",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='school',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='users', to='schools.school'),
+            model_name="user",
+            name="school",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="users",
+                to="schools.school",
+            ),
         ),
     ]

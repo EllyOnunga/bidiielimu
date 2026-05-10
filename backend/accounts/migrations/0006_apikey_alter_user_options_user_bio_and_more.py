@@ -8,90 +8,140 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0005_emailverificationtoken_expires_at_alter_user_school'),
-        ('auth', '0012_alter_user_first_name_max_length'),
-        ('schools', '0002_school_curriculum_school_status'),
+        ("accounts", "0005_emailverificationtoken_expires_at_alter_user_school"),
+        ("auth", "0012_alter_user_first_name_max_length"),
+        ("schools", "0002_school_curriculum_school_status"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='APIKey',
+            name="APIKey",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(help_text='Name for this API key', max_length=100)),
-                ('key', models.CharField(editable=False, max_length=64, unique=True)),
-                ('key_type', models.CharField(choices=[('READ', 'Read Only'), ('WRITE', 'Read Write'), ('ADMIN', 'Full Access')], default='READ', max_length=10)),
-                ('is_active', models.BooleanField(default=True)),
-                ('expires_at', models.DateTimeField(blank=True, null=True)),
-                ('last_used_at', models.DateTimeField(blank=True, null=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('rate_limit_requests', models.IntegerField(default=1000, help_text='Requests per hour')),
-                ('rate_limit_burst', models.IntegerField(default=100, help_text='Burst requests')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(help_text="Name for this API key", max_length=100),
+                ),
+                ("key", models.CharField(editable=False, max_length=64, unique=True)),
+                (
+                    "key_type",
+                    models.CharField(
+                        choices=[
+                            ("READ", "Read Only"),
+                            ("WRITE", "Read Write"),
+                            ("ADMIN", "Full Access"),
+                        ],
+                        default="READ",
+                        max_length=10,
+                    ),
+                ),
+                ("is_active", models.BooleanField(default=True)),
+                ("expires_at", models.DateTimeField(blank=True, null=True)),
+                ("last_used_at", models.DateTimeField(blank=True, null=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "rate_limit_requests",
+                    models.IntegerField(default=1000, help_text="Requests per hour"),
+                ),
+                (
+                    "rate_limit_burst",
+                    models.IntegerField(default=100, help_text="Burst requests"),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
+                "ordering": ["-created_at"],
             },
         ),
         migrations.AlterModelOptions(
-            name='user',
+            name="user",
             options={},
         ),
         migrations.AddField(
-            model_name='user',
-            name='bio',
+            model_name="user",
+            name="bio",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='user',
-            name='github_username',
+            model_name="user",
+            name="github_username",
             field=models.CharField(blank=True, max_length=100, null=True),
         ),
         migrations.AddField(
-            model_name='user',
-            name='job_title',
+            model_name="user",
+            name="job_title",
             field=models.CharField(blank=True, max_length=100, null=True),
         ),
         migrations.AddField(
-            model_name='user',
-            name='profile_picture_url',
+            model_name="user",
+            name="profile_picture_url",
             field=models.URLField(blank=True, null=True),
         ),
         migrations.AddIndex(
-            model_name='user',
-            index=models.Index(fields=['email'], name='accounts_us_email_74c8d6_idx'),
+            model_name="user",
+            index=models.Index(fields=["email"], name="accounts_us_email_74c8d6_idx"),
         ),
         migrations.AddIndex(
-            model_name='user',
-            index=models.Index(fields=['role', 'is_email_verified'], name='accounts_us_role_id_11e88b_idx'),
+            model_name="user",
+            index=models.Index(
+                fields=["role", "is_email_verified"],
+                name="accounts_us_role_id_11e88b_idx",
+            ),
         ),
         migrations.AddIndex(
-            model_name='user',
-            index=models.Index(fields=['school', 'role'], name='accounts_us_school__cfbaa3_idx'),
+            model_name="user",
+            index=models.Index(
+                fields=["school", "role"], name="accounts_us_school__cfbaa3_idx"
+            ),
         ),
         migrations.AddIndex(
-            model_name='user',
-            index=models.Index(fields=['is_active', 'is_email_verified'], name='accounts_us_is_acti_cfc41a_idx'),
+            model_name="user",
+            index=models.Index(
+                fields=["is_active", "is_email_verified"],
+                name="accounts_us_is_acti_cfc41a_idx",
+            ),
         ),
         migrations.AddField(
-            model_name='apikey',
-            name='school',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='api_keys', to='schools.school'),
+            model_name="apikey",
+            name="school",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="api_keys",
+                to="schools.school",
+            ),
         ),
         migrations.AddField(
-            model_name='apikey',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='api_keys', to=settings.AUTH_USER_MODEL),
+            model_name="apikey",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="api_keys",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddIndex(
-            model_name='apikey',
-            index=models.Index(fields=['key'], name='accounts_ap_key_d955e0_idx'),
+            model_name="apikey",
+            index=models.Index(fields=["key"], name="accounts_ap_key_d955e0_idx"),
         ),
         migrations.AddIndex(
-            model_name='apikey',
-            index=models.Index(fields=['user', 'is_active'], name='accounts_ap_user_id_ec9140_idx'),
+            model_name="apikey",
+            index=models.Index(
+                fields=["user", "is_active"], name="accounts_ap_user_id_ec9140_idx"
+            ),
         ),
         migrations.AddIndex(
-            model_name='apikey',
-            index=models.Index(fields=['school', 'is_active'], name='accounts_ap_school__546891_idx'),
+            model_name="apikey",
+            index=models.Index(
+                fields=["school", "is_active"], name="accounts_ap_school__546891_idx"
+            ),
         ),
     ]

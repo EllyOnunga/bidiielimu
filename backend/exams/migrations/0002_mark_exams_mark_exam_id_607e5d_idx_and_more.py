@@ -6,18 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('classes', '0002_scheduleslot_classes_sch_teacher_7d20f5_idx_and_more'),
-        ('exams', '0001_initial'),
-        ('students', '0001_initial'),
+        ("classes", "0002_scheduleslot_classes_sch_teacher_7d20f5_idx_and_more"),
+        ("exams", "0001_initial"),
+        ("students", "0001_initial"),
     ]
 
     operations = [
         migrations.AddIndex(
-            model_name='mark',
-            index=models.Index(fields=['exam', 'subject'], name='exams_mark_exam_id_607e5d_idx'),
+            model_name="mark",
+            index=models.Index(
+                fields=["exam", "subject"], name="exams_mark_exam_id_607e5d_idx"
+            ),
         ),
         migrations.AddIndex(
-            model_name='mark',
-            index=models.Index(fields=['student', 'exam'], name='exams_mark_student_3080fb_idx'),
+            model_name="mark",
+            index=models.Index(
+                fields=["student", "exam"], name="exams_mark_student_3080fb_idx"
+            ),
         ),
     ]

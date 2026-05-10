@@ -10,68 +10,208 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('classes', '0001_initial'),
-        ('students', '0001_initial'),
+        ("classes", "0001_initial"),
+        ("students", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='FeeStructure',
+            name="FeeStructure",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('term', models.CharField(max_length=50)),
-                ('academic_year', models.CharField(max_length=10)),
-                ('amount', models.DecimalField(decimal_places=2, max_digits=12)),
-                ('currency', models.CharField(choices=[('KES', 'Kenya Shillings'), ('USD', 'US Dollars')], default='KES', max_length=3)),
-                ('description', models.TextField(blank=True, null=True)),
-                ('grade_level', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='classes.gradelevel')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("term", models.CharField(max_length=50)),
+                ("academic_year", models.CharField(max_length=10)),
+                ("amount", models.DecimalField(decimal_places=2, max_digits=12)),
+                (
+                    "currency",
+                    models.CharField(
+                        choices=[("KES", "Kenya Shillings"), ("USD", "US Dollars")],
+                        default="KES",
+                        max_length=3,
+                    ),
+                ),
+                ("description", models.TextField(blank=True, null=True)),
+                (
+                    "grade_level",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="classes.gradelevel",
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('grade_level', 'term', 'academic_year')},
+                "unique_together": {("grade_level", "term", "academic_year")},
             },
         ),
         migrations.CreateModel(
-            name='Invoice',
+            name="Invoice",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('total_amount', models.DecimalField(decimal_places=2, max_digits=12)),
-                ('paid_amount', models.DecimalField(decimal_places=2, default=0, max_digits=12)),
-                ('balance', models.DecimalField(decimal_places=2, max_digits=12)),
-                ('due_date', models.DateField()),
-                ('status', models.CharField(choices=[('PAID', 'Fully Paid'), ('PARTIAL', 'Partially Paid'), ('UNPAID', 'Unpaid'), ('OVERDUE', 'Overdue')], default='UNPAID', max_length=10)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('fee_structure', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='fees.feestructure')),
-                ('student', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='invoices', to='students.student')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("total_amount", models.DecimalField(decimal_places=2, max_digits=12)),
+                (
+                    "paid_amount",
+                    models.DecimalField(decimal_places=2, default=0, max_digits=12),
+                ),
+                ("balance", models.DecimalField(decimal_places=2, max_digits=12)),
+                ("due_date", models.DateField()),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("PAID", "Fully Paid"),
+                            ("PARTIAL", "Partially Paid"),
+                            ("UNPAID", "Unpaid"),
+                            ("OVERDUE", "Overdue"),
+                        ],
+                        default="UNPAID",
+                        max_length=10,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "fee_structure",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="fees.feestructure",
+                    ),
+                ),
+                (
+                    "student",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="invoices",
+                        to="students.student",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='FinancialAid',
+            name="FinancialAid",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('amount', models.DecimalField(decimal_places=2, max_digits=12)),
-                ('aid_type', models.CharField(choices=[('BURSARY', 'Bursary'), ('WAIVER', 'Fee Waiver'), ('SCHOLARSHIP', 'Scholarship')], max_length=20)),
-                ('source', models.CharField(max_length=200)),
-                ('granted_at', models.DateField(auto_now_add=True)),
-                ('approved_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
-                ('student', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='financial_aid', to='students.student')),
-                ('invoice', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='aid_applications', to='fees.invoice')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("amount", models.DecimalField(decimal_places=2, max_digits=12)),
+                (
+                    "aid_type",
+                    models.CharField(
+                        choices=[
+                            ("BURSARY", "Bursary"),
+                            ("WAIVER", "Fee Waiver"),
+                            ("SCHOLARSHIP", "Scholarship"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                ("source", models.CharField(max_length=200)),
+                ("granted_at", models.DateField(auto_now_add=True)),
+                (
+                    "approved_by",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "student",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="financial_aid",
+                        to="students.student",
+                    ),
+                ),
+                (
+                    "invoice",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="aid_applications",
+                        to="fees.invoice",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='FeePayment',
+            name="FeePayment",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('amount', models.DecimalField(decimal_places=2, max_digits=12)),
-                ('currency', models.CharField(default='KES', max_length=3)),
-                ('payment_date', models.DateField(auto_now_add=True)),
-                ('payment_method', models.CharField(choices=[('MPESA', 'M-Pesa STK'), ('STRIPE', 'Card (Stripe)'), ('BANK', 'Bank Transfer'), ('CASH', 'Cash'), ('CHEQUE', 'Cheque')], max_length=20)),
-                ('transaction_id', models.CharField(max_length=100, unique=True)),
-                ('is_confirmed', models.BooleanField(default=True)),
-                ('notes', models.TextField(blank=True, null=True)),
-                ('received_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
-                ('student', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='payments', to='students.student')),
-                ('invoice', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='payments', to='fees.invoice')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("amount", models.DecimalField(decimal_places=2, max_digits=12)),
+                ("currency", models.CharField(default="KES", max_length=3)),
+                ("payment_date", models.DateField(auto_now_add=True)),
+                (
+                    "payment_method",
+                    models.CharField(
+                        choices=[
+                            ("MPESA", "M-Pesa STK"),
+                            ("STRIPE", "Card (Stripe)"),
+                            ("BANK", "Bank Transfer"),
+                            ("CASH", "Cash"),
+                            ("CHEQUE", "Cheque"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                ("transaction_id", models.CharField(max_length=100, unique=True)),
+                ("is_confirmed", models.BooleanField(default=True)),
+                ("notes", models.TextField(blank=True, null=True)),
+                (
+                    "received_by",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "student",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="payments",
+                        to="students.student",
+                    ),
+                ),
+                (
+                    "invoice",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="payments",
+                        to="fees.invoice",
+                    ),
+                ),
             ],
         ),
     ]

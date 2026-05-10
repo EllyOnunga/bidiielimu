@@ -6,18 +6,35 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('schools', '0001_initial'),
+        ("schools", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='school',
-            name='curriculum',
-            field=models.CharField(choices=[('CBC', 'Kenya CBC'), ('844', 'Kenya 8-4-4'), ('IGCSE_EDEXCEL', 'Pearson Edexcel IGCSE'), ('IGCSE_CAMBRIDGE', 'Cambridge IGCSE')], default='CBC', max_length=20),
+            model_name="school",
+            name="curriculum",
+            field=models.CharField(
+                choices=[
+                    ("CBC", "Kenya CBC"),
+                    ("844", "Kenya 8-4-4"),
+                    ("IGCSE_EDEXCEL", "Pearson Edexcel IGCSE"),
+                    ("IGCSE_CAMBRIDGE", "Cambridge IGCSE"),
+                ],
+                default="CBC",
+                max_length=20,
+            ),
         ),
         migrations.AddField(
-            model_name='school',
-            name='status',
-            field=models.CharField(choices=[('ACTIVE', 'Active'), ('INACTIVE', 'Inactive'), ('SUSPENDED', 'Suspended')], default='ACTIVE', max_length=20),
+            model_name="school",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("ACTIVE", "Active"),
+                    ("INACTIVE", "Inactive"),
+                    ("SUSPENDED", "Suspended"),
+                ],
+                default="ACTIVE",
+                max_length=20,
+            ),
         ),
     ]

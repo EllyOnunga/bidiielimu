@@ -9,108 +9,324 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('teachers', '0001_initial'),
+        ("teachers", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Classroom',
+            name="Classroom",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50)),
-                ('capacity', models.IntegerField(default=40)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=50)),
+                ("capacity", models.IntegerField(default=40)),
             ],
         ),
         migrations.CreateModel(
-            name='GradeLevel',
+            name="GradeLevel",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=50)),
             ],
         ),
         migrations.CreateModel(
-            name='Subject',
+            name="Subject",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('code', models.CharField(blank=True, max_length=20, null=True)),
-                ('curriculum', models.CharField(choices=[('CBC', 'Kenya CBC'), ('KCSE', 'Kenya KCSE'), ('IGCSE', 'Pearson Edexcel IGCSE')], default='CBC', max_length=10)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("code", models.CharField(blank=True, max_length=20, null=True)),
+                (
+                    "curriculum",
+                    models.CharField(
+                        choices=[
+                            ("CBC", "Kenya CBC"),
+                            ("KCSE", "Kenya KCSE"),
+                            ("IGCSE", "Pearson Edexcel IGCSE"),
+                        ],
+                        default="CBC",
+                        max_length=10,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Stream',
+            name="Stream",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50)),
-                ('grade_level', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='streams', to='classes.gradelevel')),
-                ('teacher', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='managed_streams', to='teachers.teacher')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=50)),
+                (
+                    "grade_level",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="streams",
+                        to="classes.gradelevel",
+                    ),
+                ),
+                (
+                    "teacher",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="managed_streams",
+                        to="teachers.teacher",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Strand',
+            name="Strand",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=200)),
-                ('description', models.TextField(blank=True, null=True)),
-                ('subject', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='strands', to='classes.subject')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=200)),
+                ("description", models.TextField(blank=True, null=True)),
+                (
+                    "subject",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="strands",
+                        to="classes.subject",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='ScheduleSlot',
+            name="ScheduleSlot",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('day_of_week', models.IntegerField(choices=[(0, 'Monday'), (1, 'Tuesday'), (2, 'Wednesday'), (3, 'Thursday'), (4, 'Friday'), (5, 'Saturday'), (6, 'Sunday')])),
-                ('start_time', models.TimeField()),
-                ('end_time', models.TimeField()),
-                ('classroom', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='classes.classroom')),
-                ('teacher', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='teachers.teacher')),
-                ('stream', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='schedule', to='classes.stream')),
-                ('subject', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='classes.subject')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "day_of_week",
+                    models.IntegerField(
+                        choices=[
+                            (0, "Monday"),
+                            (1, "Tuesday"),
+                            (2, "Wednesday"),
+                            (3, "Thursday"),
+                            (4, "Friday"),
+                            (5, "Saturday"),
+                            (6, "Sunday"),
+                        ]
+                    ),
+                ),
+                ("start_time", models.TimeField()),
+                ("end_time", models.TimeField()),
+                (
+                    "classroom",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="classes.classroom",
+                    ),
+                ),
+                (
+                    "teacher",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="teachers.teacher",
+                    ),
+                ),
+                (
+                    "stream",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="schedule",
+                        to="classes.stream",
+                    ),
+                ),
+                (
+                    "subject",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="classes.subject",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Substitution',
+            name="Substitution",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date', models.DateField()),
-                ('reason', models.CharField(blank=True, max_length=255, null=True)),
-                ('is_confirmed', models.BooleanField(default=False)),
-                ('original_teacher', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='substitutions_given', to='teachers.teacher')),
-                ('schedule_slot', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='substitutions', to='classes.scheduleslot')),
-                ('substitute_teacher', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='substitutions_taken', to='teachers.teacher')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("date", models.DateField()),
+                ("reason", models.CharField(blank=True, max_length=255, null=True)),
+                ("is_confirmed", models.BooleanField(default=False)),
+                (
+                    "original_teacher",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="substitutions_given",
+                        to="teachers.teacher",
+                    ),
+                ),
+                (
+                    "schedule_slot",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="substitutions",
+                        to="classes.scheduleslot",
+                    ),
+                ),
+                (
+                    "substitute_teacher",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="substitutions_taken",
+                        to="teachers.teacher",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='SubStrand',
+            name="SubStrand",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=200)),
-                ('learning_outcome', models.TextField(blank=True, null=True)),
-                ('strand', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='sub_strands', to='classes.strand')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=200)),
+                ("learning_outcome", models.TextField(blank=True, null=True)),
+                (
+                    "strand",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="sub_strands",
+                        to="classes.strand",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='CurriculumRequirement',
+            name="CurriculumRequirement",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('weekly_periods', models.IntegerField(default=5)),
-                ('grade_level', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='requirements', to='classes.gradelevel')),
-                ('subject', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='classes.subject')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("weekly_periods", models.IntegerField(default=5)),
+                (
+                    "grade_level",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="requirements",
+                        to="classes.gradelevel",
+                    ),
+                ),
+                (
+                    "subject",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="classes.subject",
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('grade_level', 'subject')},
+                "unique_together": {("grade_level", "subject")},
             },
         ),
         migrations.CreateModel(
-            name='SubjectAssignment',
+            name="SubjectAssignment",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('stream', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='subject_assignments', to='classes.stream')),
-                ('subject', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='subject_assignments', to='classes.subject')),
-                ('teacher', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='subject_assignments', to='teachers.teacher')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "stream",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="subject_assignments",
+                        to="classes.stream",
+                    ),
+                ),
+                (
+                    "subject",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="subject_assignments",
+                        to="classes.subject",
+                    ),
+                ),
+                (
+                    "teacher",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="subject_assignments",
+                        to="teachers.teacher",
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('stream', 'subject')},
+                "unique_together": {("stream", "subject")},
             },
         ),
     ]

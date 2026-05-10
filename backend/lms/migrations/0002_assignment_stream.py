@@ -7,14 +7,20 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('classes', '0001_initial'),
-        ('lms', '0001_initial'),
+        ("classes", "0001_initial"),
+        ("lms", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='assignment',
-            name='stream',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='assignments', to='classes.stream'),
+            model_name="assignment",
+            name="stream",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="assignments",
+                to="classes.stream",
+            ),
         ),
     ]

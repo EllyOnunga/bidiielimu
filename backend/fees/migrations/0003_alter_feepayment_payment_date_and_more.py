@@ -6,25 +6,32 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('fees', '0002_feepayment_fees_feepay_student_198476_idx_and_more'),
+        ("fees", "0002_feepayment_fees_feepay_student_198476_idx_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='feepayment',
-            name='payment_date',
+            model_name="feepayment",
+            name="payment_date",
             field=models.DateField(auto_now_add=True, db_index=True),
         ),
         migrations.AddIndex(
-            model_name='feepayment',
-            index=models.Index(fields=['payment_date'], name='fees_feepay_payment_71212d_idx'),
+            model_name="feepayment",
+            index=models.Index(
+                fields=["payment_date"], name="fees_feepay_payment_71212d_idx"
+            ),
         ),
         migrations.AddIndex(
-            model_name='feepayment',
-            index=models.Index(fields=['transaction_id'], name='fees_feepay_transac_7c6dca_idx'),
+            model_name="feepayment",
+            index=models.Index(
+                fields=["transaction_id"], name="fees_feepay_transac_7c6dca_idx"
+            ),
         ),
         migrations.AddIndex(
-            model_name='feepayment',
-            index=models.Index(fields=['received_by', 'payment_date'], name='fees_feepay_receive_abb9eb_idx'),
+            model_name="feepayment",
+            index=models.Index(
+                fields=["received_by", "payment_date"],
+                name="fees_feepay_receive_abb9eb_idx",
+            ),
         ),
     ]

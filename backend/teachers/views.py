@@ -1,63 +1,77 @@
-from rest_framework import viewsets, permissions, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from django.db import transaction
-from django.contrib.auth import get_user_model
 import csv
 import io
 
-from .models import Teacher
-from .serializers import TeacherSerializer
+from django.contrib.auth import get_user_model
+from django.db import transaction
+from rest_framework import permissions, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
 from accounts.permissions import IsSchoolAdmin
 
+from .models import Teacher
+from .serializers import TeacherSerializer
+
 User = get_user_model()
+
 
 class TeacherViewSet(viewsets.ModelViewSet):
     serializer_class = TeacherSerializer
     permission_classes = [permissions.IsAuthenticated, IsSchoolAdmin]
 
     def get_queryset(self):
-        return Teacher.objects.all().select_related('user')
+        return Teacher.objects.all().select_related("user")
 
-    search_fields = ['first_name', 'last_name', 'employee_id', 'specialization', 'user__email']
-    ordering_fields = ['created_at', 'first_name', 'last_name', 'joining_date']
+    search_fields = [
+        "first_name",
+        "last_name",
+        "employee_id",
+        "specialization",
+        "user__email",
+    ]
+    ordering_fields = ["created_at", "first_name", "last_name", "joining_date"]
 
     def perform_create(self, serializer):
         serializer.save()
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=["post"])
     def bulk_upload(self, request):
-        if 'file' not in request.FILES:
-            return Response({"detail": "No file provided."}, status=status.HTTP_400_BAD_REQUEST)
+        if "file" not in request.FILES:
+            return Response(
+                {"detail": "No file provided."}, status=status.HTTP_400_BAD_REQUEST
+            )
 
-        file = request.FILES['file']
+        file = request.FILES["file"]
         school = request.user.school
-        
+
         try:
-            content = file.read().decode('utf-8')
+            content = file.read().decode("utf-8")
             reader = csv.DictReader(io.StringIO(content))
             created_count = 0
             errors = []
-            
+
             with transaction.atomic():
                 for row_idx, row in enumerate(reader, start=2):
                     try:
-                        email = row.get('email', '').strip()
-                        first_name = row.get('first_name', '').strip()
-                        last_name = row.get('last_name', '').strip()
-                        emp_id = row.get('employee_id', '').strip()
-                        specialization = row.get('specialization', '').strip()
-                        phone = row.get('phone_number', '').strip()
-                        joining_date = row.get('joining_date', '').strip()
-                        class_id = row.get('class_id', '').strip()
-                        subject_ids_str = row.get('subject_ids', '').strip()
+                        email = row.get("email", "").strip()
+                        first_name = row.get("first_name", "").strip()
+                        last_name = row.get("last_name", "").strip()
+                        emp_id = row.get("employee_id", "").strip()
+                        specialization = row.get("specialization", "").strip()
+                        phone = row.get("phone_number", "").strip()
+                        joining_date = row.get("joining_date", "").strip()
+                        class_id = row.get("class_id", "").strip()
+                        subject_ids_str = row.get("subject_ids", "").strip()
 
                         if not all([email, first_name, last_name, emp_id]):
-                            errors.append(f"Row {row_idx}: Missing required fields (email, names, or employee ID).")
+                            errors.append(
+                                f"Row {row_idx}: Missing required fields (email, names, or employee ID)."
+                            )
                             continue
 
                         from accounts.models import Role
-                        teacher_role = Role.objects.get(name='TEACHER')
+
+                        teacher_role = Role.objects.get(name="TEACHER")
                         user = User.objects.create_user(
                             email=email,
                             password=f"teacher@{emp_id}",
@@ -65,62 +79,95 @@ class TeacherViewSet(viewsets.ModelViewSet):
                             first_name=first_name,
                             last_name=last_name,
                             phone_number=phone,
-                            school=school
+                            school=school,
                         )
 
                         teacher = Teacher.objects.create(
-                            user=user, 
+                            user=user,
                             employee_id=emp_id,
                             first_name=first_name,
                             last_name=last_name,
                             specialization=specialization,
                             phone_number=phone,
-                            joining_date=joining_date if joining_date else None
+                            joining_date=joining_date if joining_date else None,
                         )
-                        
+
                         # Send Welcome Email
                         from django.conf import settings
-                        domain_name = school.domains.filter(is_primary=True).first().domain if school else "elimuhub.com"
-                        protocol = "http://" if "localhost" in domain_name else "https://"
+
+                        domain_name = (
+                            school.domains.filter(is_primary=True).first().domain
+                            if school
+                            else "elimuhub.com"
+                        )
+                        protocol = (
+                            "http://" if "localhost" in domain_name else "https://"
+                        )
                         login_url = f"{protocol}{domain_name}/login"
-                        
+
                         from accounts.services import EmailService
-                        EmailService.send_welcome_email(user, login_url=login_url, plain_password=f"teacher@{emp_id}")
+
+                        EmailService.send_welcome_email(
+                            user,
+                            login_url=login_url,
+                            plain_password=f"teacher@{emp_id}",
+                        )
 
                         # Assign as class teacher if class_id provided
                         if class_id:
                             from classes.models import Stream
+
                             try:
-                                stream = Stream.objects.get(id=class_id, grade_level__school=school)
+                                stream = Stream.objects.get(
+                                    id=class_id, grade_level__school=school
+                                )
                                 stream.teacher = teacher
                                 stream.save()
                             except Stream.DoesNotExist:
-                                errors.append(f"Row {row_idx}: Class ID {class_id} not found.")
+                                errors.append(
+                                    f"Row {row_idx}: Class ID {class_id} not found."
+                                )
 
                         # Assign subjects if subject_ids provided
                         if subject_ids_str and class_id:
-                            from classes.models import Subject, SubjectAssignment, Stream
+                            from classes.models import (Stream, Subject,
+                                                        SubjectAssignment)
+
                             stream = Stream.objects.get(id=class_id)
-                            subject_ids = [s.strip() for s in subject_ids_str.split(',') if s.strip()]
+                            subject_ids = [
+                                s.strip()
+                                for s in subject_ids_str.split(",")
+                                if s.strip()
+                            ]
                             for sub_id in subject_ids:
                                 try:
-                                    subject = Subject.objects.get(id=sub_id, school=school)
+                                    subject = Subject.objects.get(
+                                        id=sub_id, school=school
+                                    )
                                     SubjectAssignment.objects.update_or_create(
                                         stream=stream,
                                         subject=subject,
-                                        defaults={'school': school, 'teacher': teacher}
+                                        defaults={"school": school, "teacher": teacher},
                                     )
                                 except Subject.DoesNotExist:
-                                    errors.append(f"Row {row_idx}: Subject ID {sub_id} not found.")
+                                    errors.append(
+                                        f"Row {row_idx}: Subject ID {sub_id} not found."
+                                    )
 
                         created_count += 1
                     except Exception as e:
                         errors.append(f"Row {row_idx}: {str(e)}")
 
-            return Response({
-                "detail": f"Successfully imported {created_count} teachers.",
-                "errors": errors if errors else None
-            }, status=status.HTTP_200_OK)
+            return Response(
+                {
+                    "detail": f"Successfully imported {created_count} teachers.",
+                    "errors": errors if errors else None,
+                },
+                status=status.HTTP_200_OK,
+            )
 
         except Exception as e:
-            return Response({"detail": f"Error processing file: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": f"Error processing file: {str(e)}"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )

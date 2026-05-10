@@ -1,22 +1,24 @@
 from celery import shared_task
-from config.backup_manager import BackupManager
 from django.conf import settings
 
+from config.backup_manager import BackupManager
+
+
 @shared_task
-def create_automated_backup(backup_type='full', tenant_schema=None):
+def create_automated_backup(backup_type="full", tenant_schema=None):
     """
     Celery task to create automated backups
     """
     try:
         backup_manager = BackupManager()
 
-        if backup_type in ['db', 'full']:
+        if backup_type in ["db", "full"]:
             backup_manager.create_database_backup(tenant_schema)
 
-        if backup_type in ['media', 'full']:
+        if backup_type in ["media", "full"]:
             backup_manager.create_media_backup()
 
-        if backup_type in ['config', 'full']:
+        if backup_type in ["config", "full"]:
             backup_manager.create_config_backup()
 
         # Cleanup old backups
@@ -27,9 +29,11 @@ def create_automated_backup(backup_type='full', tenant_schema=None):
     except Exception as e:
         # Log error and re-raise for Celery error handling
         import logging
+
         logger = logging.getLogger(__name__)
         logger.error(f"Automated backup failed: {e}")
         raise
+
 
 @shared_task
 def cleanup_old_backups(days_to_keep=30):
@@ -43,6 +47,7 @@ def cleanup_old_backups(days_to_keep=30):
 
     except Exception as e:
         import logging
+
         logger = logging.getLogger(__name__)
         logger.error(f"Backup cleanup failed: {e}")
         raise

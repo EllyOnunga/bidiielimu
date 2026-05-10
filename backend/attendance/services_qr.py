@@ -1,18 +1,25 @@
 import uuid
+
 from django.core.cache import cache
 from django.utils import timezone
+
 from .models import PeriodAttendance
+
 
 class AttendanceQRService:
     @staticmethod
     def generate_token(slot_id, teacher_id):
         token = str(uuid.uuid4())
         # Store token for 5 minutes
-        cache.set(f"attendance_qr_{token}", {
-            "slot_id": slot_id,
-            "teacher_id": teacher_id,
-            "created_at": timezone.now().isoformat()
-        }, timeout=300)
+        cache.set(
+            f"attendance_qr_{token}",
+            {
+                "slot_id": slot_id,
+                "teacher_id": teacher_id,
+                "created_at": timezone.now().isoformat(),
+            },
+            timeout=300,
+        )
         return token
 
     @staticmethod
@@ -31,11 +38,8 @@ class AttendanceQRService:
         # 2. Create Attendance Record
         PeriodAttendance.objects.update_or_create(
             student=student,
-            slot_id=data['slot_id'],
+            slot_id=data["slot_id"],
             date=timezone.now().date(),
-            defaults={
-                'status': 'PRESENT',
-                'marked_by_id': data['teacher_id']
-            }
+            defaults={"status": "PRESENT", "marked_by_id": data["teacher_id"]},
         )
         return True, "Check-in successful"
