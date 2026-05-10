@@ -44,10 +44,10 @@ urlpatterns = [
     path("api/v1/reports/", include("reports.urls")),
     path("api/v1/hr/", include("hr.urls")),
     # Auth endpoints
-    path("api/v1/auth/", include("dj_rest_auth.urls")),
     path("api/v1/auth/registration/", include("dj_rest_auth.registration.urls")),
     path("api/v1/auth/social/", include("allauth.socialaccount.urls")),
     path("api/v1/auth/2fa/", include("allauth_2fa.urls")),
+    path("api/v1/auth/", include("dj_rest_auth.urls")),
     # API Documentation
     path("api/v1/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(

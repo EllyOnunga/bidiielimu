@@ -42,10 +42,10 @@ urlpatterns = [
     path("api/v1/hr/", include("hr.urls")),
     path("api/v1/schools/", include("schools.urls")),
     # Auth endpoints
-    path("api/v1/auth/", include("dj_rest_auth.urls")),
     path("api/v1/auth/registration/", include("dj_rest_auth.registration.urls")),
     path("api/v1/auth/social/", include("allauth.socialaccount.urls")),
     path("api/v1/auth/2fa/", include("allauth_2fa.urls")),
+    path("api/v1/auth/", include("dj_rest_auth.urls")),
     # Unauthenticated Theme Endpoint
     path("api/v1/theme/", TenantThemeView.as_view(), name="tenant-theme"),
     # API Documentation
