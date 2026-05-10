@@ -616,6 +616,20 @@ MPESA_SHORTCODE = os.getenv("MPESA_SHORTCODE", "174379")
 MPESA_PASSKEY = os.getenv("MPESA_PASSKEY")
 MPESA_CALLBACK_URL = os.getenv("MPESA_CALLBACK_URL")
 
+# Email Settings
+if DEBUG or IS_RENDER:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+else:
+    # Use real SMTP for production (when credentials are added)
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
+    EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
+    EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
+    EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+    EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@elimuhub.com")
+
 # Africa's Talking Settings
 AT_USERNAME = os.getenv("AT_USERNAME", "sandbox")
 AT_API_KEY = os.getenv("AT_API_KEY")
