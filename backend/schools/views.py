@@ -17,8 +17,11 @@ from students.models import Student
 from teachers.models import Teacher
 
 from .models import School, SchoolSetting, Subscription
-from .serializers import (SchoolSerializer, SchoolSettingSerializer,
-                          SubscriptionSerializer)
+from .serializers import (
+    SchoolSerializer,
+    SchoolSettingSerializer,
+    SubscriptionSerializer,
+)
 
 
 class SchoolViewSet(viewsets.ModelViewSet):

@@ -3,8 +3,16 @@ from rest_framework import serializers
 
 from teachers.models import Teacher
 
-from .models import (Assignment, LessonNote, NoteConfirmation, Question, Quiz,
-                     QuizAttempt, Resource, Submission)
+from .models import (
+    Assignment,
+    LessonNote,
+    NoteConfirmation,
+    Question,
+    Quiz,
+    QuizAttempt,
+    Resource,
+    Submission,
+)
 
 
 class ResourceSerializer(serializers.ModelSerializer):

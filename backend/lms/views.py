@@ -8,11 +8,24 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from teachers.models import Teacher
 
-from .models import (Assignment, LessonNote, NoteConfirmation, Question, Quiz,
-                     QuizAttempt, Resource, Submission)
-from .serializers import (AssignmentSerializer, LessonNoteSerializer,
-                          QuizAttemptSerializer, QuizSerializer,
-                          ResourceSerializer, SubmissionSerializer)
+from .models import (
+    Assignment,
+    LessonNote,
+    NoteConfirmation,
+    Question,
+    Quiz,
+    QuizAttempt,
+    Resource,
+    Submission,
+)
+from .serializers import (
+    AssignmentSerializer,
+    LessonNoteSerializer,
+    QuizAttemptSerializer,
+    QuizSerializer,
+    ResourceSerializer,
+    SubmissionSerializer,
+)
 
 
 class AssignmentViewSet(viewsets.ModelViewSet):

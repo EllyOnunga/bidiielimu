@@ -6,8 +6,12 @@ from rest_framework.response import Response
 from config.caching import cache_tenant_page
 
 from .models import Exam, GradeThreshold, GradingSystem, Mark
-from .serializers import (ExamSerializer, GradeThresholdSerializer,
-                          GradingSystemSerializer, MarkSerializer)
+from .serializers import (
+    ExamSerializer,
+    GradeThresholdSerializer,
+    GradingSystemSerializer,
+    MarkSerializer,
+)
 
 
 class GradingSystemViewSet(viewsets.ModelViewSet):

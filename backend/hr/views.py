@@ -5,8 +5,11 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from .models import LeaveRequest, PayrollRecord, StaffProfile
-from .serializers import (LeaveRequestSerializer, PayrollRecordSerializer,
-                          StaffProfileSerializer)
+from .serializers import (
+    LeaveRequestSerializer,
+    PayrollRecordSerializer,
+    StaffProfileSerializer,
+)
 
 
 class StaffProfileViewSet(viewsets.ModelViewSet):

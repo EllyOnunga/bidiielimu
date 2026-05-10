@@ -1,8 +1,14 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from .views import (ClassroomViewSet, GradeLevelViewSet, ScheduleSlotViewSet,
-                    StreamViewSet, SubjectAssignmentViewSet, SubjectViewSet)
+from .views import (
+    ClassroomViewSet,
+    GradeLevelViewSet,
+    ScheduleSlotViewSet,
+    StreamViewSet,
+    SubjectAssignmentViewSet,
+    SubjectViewSet,
+)
 from .views_timetable import TimetableAutoGenerateView, TimetableConflictView
 
 router = DefaultRouter()
