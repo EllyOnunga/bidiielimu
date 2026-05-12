@@ -1,0 +1,738 @@
+{"timestamp": "2026-05-12 11:03:24,419", "level": "INFO", "logger": "django.utils.autoreload", "message": "Watching for file changes with StatReloader"}
+{"timestamp": "2026-05-12 11:03:25,104", "level": "INFO", "logger": "daphne.server", "message": "HTTP/2 support not enabled (install the http2 and tls Twisted extras)"}
+{"timestamp": "2026-05-12 11:03:25,104", "level": "INFO", "logger": "daphne.server", "message": "Configuring endpoint tcp:port=8000:interface=0.0.0.0"}
+{"timestamp": "2026-05-12 11:03:25,106", "level": "INFO", "logger": "daphne.server", "message": "Listening on TCP address 0.0.0.0:8000"}
+{"timestamp": "2026-05-12 11:03:43,768", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:03:43,772", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:03:43,773", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.03, 127.0.0.1:41782]"}
+{"timestamp": "2026-05-12 11:04:13,856", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:04:13,858", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:04:13,859", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:37850]"}
+{"timestamp": "2026-05-12 11:04:43,942", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:04:43,945", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:04:43,945", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:55604]"}
+{"timestamp": "2026-05-12 11:05:14,013", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:05:14,016", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:05:14,016", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:49054]"}
+{"timestamp": "2026-05-12 11:05:44,086", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:05:44,088", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:05:44,089", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:43632]"}
+{"timestamp": "2026-05-12 11:06:14,183", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:06:14,185", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:06:14,186", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:52500]"}
+{"timestamp": "2026-05-12 11:06:44,277", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:06:44,279", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:06:44,280", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:43942]"}
+{"timestamp": "2026-05-12 11:07:14,407", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:07:14,411", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:07:14,412", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.03, 127.0.0.1:33048]"}
+{"timestamp": "2026-05-12 11:07:44,499", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:07:44,502", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:07:44,503", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:60406]"}
+{"timestamp": "2026-05-12 11:08:14,591", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:08:14,593", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:08:14,594", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:42502]"}
+{"timestamp": "2026-05-12 11:08:44,663", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:08:44,665", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:08:44,666", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:52662]"}
+{"timestamp": "2026-05-12 11:09:14,779", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:09:14,781", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:09:14,782", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.03, 127.0.0.1:36230]"}
+{"timestamp": "2026-05-12 11:09:29,042", "level": "INFO", "logger": "django.utils.autoreload", "message": "/app/config/settings.py changed, reloading."}
+{"timestamp": "2026-05-12 11:09:31,659", "level": "INFO", "logger": "django.utils.autoreload", "message": "Watching for file changes with StatReloader"}
+{"timestamp": "2026-05-12 11:09:32,285", "level": "INFO", "logger": "daphne.server", "message": "HTTP/2 support not enabled (install the http2 and tls Twisted extras)"}
+{"timestamp": "2026-05-12 11:09:32,286", "level": "INFO", "logger": "daphne.server", "message": "Configuring endpoint tcp:port=8000:interface=0.0.0.0"}
+{"timestamp": "2026-05-12 11:09:32,287", "level": "INFO", "logger": "daphne.server", "message": "Listening on TCP address 0.0.0.0:8000"}
+{"timestamp": "2026-05-12 11:09:39,962", "level": "INFO", "logger": "django.utils.autoreload", "message": "/app/accounts/models.py changed, reloading."}
+{"timestamp": "2026-05-12 11:09:42,463", "level": "INFO", "logger": "django.utils.autoreload", "message": "Watching for file changes with StatReloader"}
+{"timestamp": "2026-05-12 11:09:43,257", "level": "INFO", "logger": "daphne.server", "message": "HTTP/2 support not enabled (install the http2 and tls Twisted extras)"}
+{"timestamp": "2026-05-12 11:09:43,258", "level": "INFO", "logger": "daphne.server", "message": "Configuring endpoint tcp:port=8000:interface=0.0.0.0"}
+{"timestamp": "2026-05-12 11:09:43,260", "level": "INFO", "logger": "daphne.server", "message": "Listening on TCP address 0.0.0.0:8000"}
+{"timestamp": "2026-05-12 11:09:44,852", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:09:44,856", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:09:44,857", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:49130]"}
+{"timestamp": "2026-05-12 11:09:49,066", "level": "INFO", "logger": "django.utils.autoreload", "message": "/app/config/tasks_processing.py changed, reloading."}
+{"timestamp": "2026-05-12 11:09:51,817", "level": "INFO", "logger": "django.utils.autoreload", "message": "Watching for file changes with StatReloader"}
+{"timestamp": "2026-05-12 11:09:52,476", "level": "INFO", "logger": "daphne.server", "message": "HTTP/2 support not enabled (install the http2 and tls Twisted extras)"}
+{"timestamp": "2026-05-12 11:09:52,477", "level": "INFO", "logger": "daphne.server", "message": "Configuring endpoint tcp:port=8000:interface=0.0.0.0"}
+{"timestamp": "2026-05-12 11:09:52,479", "level": "INFO", "logger": "daphne.server", "message": "Listening on TCP address 0.0.0.0:8000"}
+{"timestamp": "2026-05-12 11:10:14,982", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:10:14,994", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:10:14,995", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.07, 127.0.0.1:42378]"}
+{"timestamp": "2026-05-12 11:10:45,067", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:10:45,072", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:10:45,073", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.03, 127.0.0.1:51660]"}
+{"timestamp": "2026-05-12 11:11:15,143", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:11:15,145", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:11:15,146", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:34944]"}
+{"timestamp": "2026-05-12 11:11:45,216", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:11:45,219", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:11:45,220", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:33572]"}
+{"timestamp": "2026-05-12 11:12:15,310", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:12:15,312", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:12:15,313", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:47656]"}
+{"timestamp": "2026-05-12 11:12:45,382", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:12:45,385", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:12:45,386", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:41026]"}
+{"timestamp": "2026-05-12 11:13:15,503", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:13:15,505", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:13:15,506", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:34020]"}
+{"timestamp": "2026-05-12 11:13:45,606", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:13:45,609", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:13:45,609", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:44570]"}
+{"timestamp": "2026-05-12 11:14:15,703", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:14:15,705", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:14:15,706", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:36238]"}
+{"timestamp": "2026-05-12 11:14:45,816", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:14:45,818", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:14:45,819", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:47536]"}
+{"timestamp": "2026-05-12 11:15:15,916", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:15:15,918", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:15:15,919", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:43976]"}
+{"timestamp": "2026-05-12 11:15:45,991", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:15:45,993", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:15:45,994", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:59578]"}
+{"timestamp": "2026-05-12 11:16:16,074", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:16:16,076", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:16:16,077", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:34422]"}
+{"timestamp": "2026-05-12 11:16:46,155", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:16:46,159", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:16:46,161", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:53812]"}
+{"timestamp": "2026-05-12 11:17:16,232", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:17:16,234", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:17:16,235", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:39194]"}
+{"timestamp": "2026-05-12 11:17:46,327", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:17:46,330", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:17:46,330", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:43198]"}
+{"timestamp": "2026-05-12 11:18:16,406", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:18:16,408", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:18:16,409", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:58634]"}
+{"timestamp": "2026-05-12 11:18:46,486", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:18:46,488", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:18:46,489", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:37668]"}
+{"timestamp": "2026-05-12 11:19:16,561", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:19:16,563", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:19:16,564", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:33214]"}
+{"timestamp": "2026-05-12 11:19:46,668", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:19:46,670", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:19:46,671", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:54522]"}
+{"timestamp": "2026-05-12 11:20:16,770", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:20:16,772", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:20:16,773", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:47422]"}
+{"timestamp": "2026-05-12 11:20:46,881", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:20:46,883", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:20:46,884", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:60160]"}
+{"timestamp": "2026-05-12 11:21:16,950", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:21:16,953", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:21:16,954", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:37442]"}
+{"timestamp": "2026-05-12 11:21:47,053", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:21:47,056", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:21:47,057", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:39042]"}
+{"timestamp": "2026-05-12 11:22:17,160", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:22:17,162", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:22:17,163", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:54204]"}
+{"timestamp": "2026-05-12 11:22:47,229", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:22:47,231", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:22:47,232", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:55978]"}
+{"timestamp": "2026-05-12 11:23:17,333", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:23:17,335", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:23:17,336", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:58352]"}
+{"timestamp": "2026-05-12 11:23:47,433", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:23:47,436", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:23:47,437", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:55822]"}
+{"timestamp": "2026-05-12 11:24:17,518", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:24:17,521", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:24:17,521", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:34406]"}
+{"timestamp": "2026-05-12 11:24:47,589", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:24:47,591", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:24:47,592", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:36216]"}
+{"timestamp": "2026-05-12 11:25:17,677", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:25:17,680", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:25:17,680", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:33072]"}
+{"timestamp": "2026-05-12 11:25:47,775", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:25:47,778", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:25:47,778", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:45410]"}
+{"timestamp": "2026-05-12 11:26:17,863", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:26:17,867", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:26:17,868", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:41100]"}
+{"timestamp": "2026-05-12 11:26:47,967", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:26:47,969", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:26:47,969", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:40648]"}
+{"timestamp": "2026-05-12 11:27:18,074", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:27:18,077", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:27:18,077", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:36814]"}
+{"timestamp": "2026-05-12 11:27:48,165", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:27:48,167", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:27:48,168", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:52596]"}
+{"timestamp": "2026-05-12 11:28:18,266", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:28:18,268", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:28:18,269", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:56458]"}
+{"timestamp": "2026-05-12 11:28:48,353", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:28:48,356", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:28:48,356", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:56838]"}
+{"timestamp": "2026-05-12 11:29:18,433", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:29:18,435", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:29:18,436", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:58834]"}
+{"timestamp": "2026-05-12 11:29:48,528", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:29:48,531", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:29:48,532", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:35200]"}
+{"timestamp": "2026-05-12 11:30:18,600", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:30:18,602", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:30:18,603", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:57088]"}
+{"timestamp": "2026-05-12 11:30:48,704", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:30:48,706", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:30:48,707", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:43442]"}
+{"timestamp": "2026-05-12 11:31:18,795", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:31:18,797", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:31:18,798", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:54338]"}
+{"timestamp": "2026-05-12 11:31:48,894", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:31:48,896", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:31:48,897", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:55960]"}
+{"timestamp": "2026-05-12 11:32:18,986", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:32:18,989", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:32:18,989", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:36126]"}
+{"timestamp": "2026-05-12 11:32:49,102", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:32:49,105", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:32:49,105", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:35558]"}
+{"timestamp": "2026-05-12 11:33:19,228", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:33:19,231", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:33:19,232", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:41786]"}
+{"timestamp": "2026-05-12 11:33:49,318", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:33:49,321", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:33:49,322", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:33900]"}
+{"timestamp": "2026-05-12 11:34:19,401", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:34:19,403", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:34:19,404", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:49188]"}
+{"timestamp": "2026-05-12 11:34:49,483", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:34:49,485", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:34:49,486", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:49932]"}
+{"timestamp": "2026-05-12 11:35:19,556", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:35:19,560", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:35:19,561", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:60494]"}
+{"timestamp": "2026-05-12 11:35:49,639", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:35:49,642", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:35:49,643", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:54566]"}
+{"timestamp": "2026-05-12 11:36:19,769", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:36:19,772", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:36:19,773", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:54988]"}
+{"timestamp": "2026-05-12 11:36:49,864", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:36:49,866", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:36:49,867", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:45412]"}
+{"timestamp": "2026-05-12 11:37:19,976", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:37:19,978", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:37:19,978", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:48156]"}
+{"timestamp": "2026-05-12 11:37:50,047", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:37:50,050", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:37:50,052", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:55770]"}
+{"timestamp": "2026-05-12 11:38:20,145", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:38:20,147", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:38:20,148", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:43190]"}
+{"timestamp": "2026-05-12 11:38:50,229", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:38:50,232", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:38:50,232", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:34538]"}
+{"timestamp": "2026-05-12 11:39:20,322", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:39:20,326", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:39:20,327", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:39392]"}
+{"timestamp": "2026-05-12 11:39:50,407", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:39:50,409", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:39:50,409", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:52976]"}
+{"timestamp": "2026-05-12 11:40:20,502", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:40:20,504", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:40:20,505", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:51034]"}
+{"timestamp": "2026-05-12 11:40:50,610", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:40:50,613", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:40:50,614", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:42390]"}
+{"timestamp": "2026-05-12 11:41:20,710", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:41:20,712", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:41:20,713", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:59604]"}
+{"timestamp": "2026-05-12 11:41:50,797", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:41:50,799", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:41:50,800", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:38378]"}
+{"timestamp": "2026-05-12 11:42:20,876", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:42:20,878", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:42:20,879", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:52412]"}
+{"timestamp": "2026-05-12 11:42:50,949", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:42:50,951", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:42:50,952", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:47448]"}
+{"timestamp": "2026-05-12 11:43:21,027", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:43:21,029", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:43:21,030", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:50684]"}
+{"timestamp": "2026-05-12 11:43:51,153", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:43:51,155", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:43:51,156", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:44066]"}
+{"timestamp": "2026-05-12 11:44:21,260", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:44:21,263", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:44:21,264", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:54466]"}
+{"timestamp": "2026-05-12 11:44:51,355", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:44:51,358", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:44:51,359", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:45540]"}
+{"timestamp": "2026-05-12 11:45:21,444", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:45:21,446", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:45:21,447", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:48832]"}
+{"timestamp": "2026-05-12 11:45:51,517", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:45:51,519", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:45:51,520", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:47148]"}
+{"timestamp": "2026-05-12 11:46:21,600", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:46:21,602", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:46:21,603", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:59022]"}
+{"timestamp": "2026-05-12 11:46:51,694", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:46:51,696", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:46:51,697", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:37518]"}
+{"timestamp": "2026-05-12 11:47:21,779", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:47:21,781", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:47:21,782", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:49092]"}
+{"timestamp": "2026-05-12 11:47:51,885", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:47:51,888", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:47:51,889", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:45966]"}
+{"timestamp": "2026-05-12 11:48:21,983", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:48:21,985", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:48:21,986", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:37812]"}
+{"timestamp": "2026-05-12 11:48:52,054", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:48:52,057", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:48:52,057", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:51970]"}
+{"timestamp": "2026-05-12 11:49:22,163", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:49:22,167", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:49:22,168", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.03, 127.0.0.1:42736]"}
+{"timestamp": "2026-05-12 11:49:52,252", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:49:52,254", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:49:52,255", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:54220]"}
+{"timestamp": "2026-05-12 11:50:22,355", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:50:22,358", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:50:22,358", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:39528]"}
+{"timestamp": "2026-05-12 11:50:52,449", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:50:52,451", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:50:52,452", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:52812]"}
+{"timestamp": "2026-05-12 11:51:22,526", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:51:22,529", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:51:22,529", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:44440]"}
+{"timestamp": "2026-05-12 11:51:52,608", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:51:52,610", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:51:52,610", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:57564]"}
+{"timestamp": "2026-05-12 11:52:22,712", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:52:22,714", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:52:22,715", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:50158]"}
+{"timestamp": "2026-05-12 11:52:52,814", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:52:52,817", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:52:52,818", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:39424]"}
+{"timestamp": "2026-05-12 11:53:22,909", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:53:22,911", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:53:22,912", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:42228]"}
+{"timestamp": "2026-05-12 11:53:52,986", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:53:52,990", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:53:52,991", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:41258]"}
+{"timestamp": "2026-05-12 11:54:23,086", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:54:23,089", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:54:23,089", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:55896]"}
+{"timestamp": "2026-05-12 11:54:53,218", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:54:53,220", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:54:53,221", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:57596]"}
+{"timestamp": "2026-05-12 11:55:23,303", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:55:23,305", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:55:23,306", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:54878]"}
+{"timestamp": "2026-05-12 11:55:53,387", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:55:53,390", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:55:53,390", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:43948]"}
+{"timestamp": "2026-05-12 11:56:23,468", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:56:23,471", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:56:23,472", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:42480]"}
+{"timestamp": "2026-05-12 11:56:53,564", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:56:53,566", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:56:53,567", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:41396]"}
+{"timestamp": "2026-05-12 11:57:23,643", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:57:23,645", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:57:23,646", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:53242]"}
+{"timestamp": "2026-05-12 11:57:53,730", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:57:53,733", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:57:53,733", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:43896]"}
+{"timestamp": "2026-05-12 11:58:23,820", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:58:23,822", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:58:23,823", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:56290]"}
+{"timestamp": "2026-05-12 11:58:53,899", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:58:53,901", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:58:53,902", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:50604]"}
+{"timestamp": "2026-05-12 11:59:24,031", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:59:24,034", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:59:24,034", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:60422]"}
+{"timestamp": "2026-05-12 11:59:54,106", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 11:59:54,110", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 11:59:54,111", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:59876]"}
+{"timestamp": "2026-05-12 12:00:24,197", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:00:24,199", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:00:24,200", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:49540]"}
+{"timestamp": "2026-05-12 12:00:54,264", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:00:54,266", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:00:54,267", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:51344]"}
+{"timestamp": "2026-05-12 12:01:24,366", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:01:24,369", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:01:24,370", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:46316]"}
+{"timestamp": "2026-05-12 12:01:54,435", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:01:54,438", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:01:54,439", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:51082]"}
+{"timestamp": "2026-05-12 12:02:24,533", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:02:24,535", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:02:24,535", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:38682]"}
+{"timestamp": "2026-05-12 12:02:54,612", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:02:54,614", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:02:54,614", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:43370]"}
+{"timestamp": "2026-05-12 12:03:24,705", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:03:24,707", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:03:24,708", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:48616]"}
+{"timestamp": "2026-05-12 12:03:54,819", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:03:54,821", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:03:54,821", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:56974]"}
+{"timestamp": "2026-05-12 12:04:24,896", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:04:24,898", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:04:24,899", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:39702]"}
+{"timestamp": "2026-05-12 12:04:55,002", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:04:55,004", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:04:55,005", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:37462]"}
+{"timestamp": "2026-05-12 12:05:25,092", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:05:25,095", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:05:25,095", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:40976]"}
+{"timestamp": "2026-05-12 12:05:55,184", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:05:55,186", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:05:55,187", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:45268]"}
+{"timestamp": "2026-05-12 12:06:25,269", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:06:25,271", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:06:25,272", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:44960]"}
+{"timestamp": "2026-05-12 12:06:55,360", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:06:55,362", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:06:55,363", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:50690]"}
+{"timestamp": "2026-05-12 12:07:25,440", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:07:25,442", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:07:25,442", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:43276]"}
+{"timestamp": "2026-05-12 12:07:55,512", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:07:55,515", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:07:55,516", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:33268]"}
+{"timestamp": "2026-05-12 12:08:25,629", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:08:25,631", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:08:25,632", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:39832]"}
+{"timestamp": "2026-05-12 12:08:55,703", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:08:55,705", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:08:55,706", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:60244]"}
+{"timestamp": "2026-05-12 12:09:25,776", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:09:25,778", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:09:25,779", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:46704]"}
+{"timestamp": "2026-05-12 12:09:55,901", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:09:55,904", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:09:55,905", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:60230]"}
+{"timestamp": "2026-05-12 12:10:25,983", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:10:25,985", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:10:25,985", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:44622]"}
+{"timestamp": "2026-05-12 12:10:56,087", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:10:56,090", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:10:56,091", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:55366]"}
+{"timestamp": "2026-05-12 12:11:26,162", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:11:26,165", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:11:26,165", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:43938]"}
+{"timestamp": "2026-05-12 12:11:56,265", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:11:56,267", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:11:56,268", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:55482]"}
+{"timestamp": "2026-05-12 12:12:26,357", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:12:26,359", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:12:26,360", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:55668]"}
+{"timestamp": "2026-05-12 12:12:56,453", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:12:56,455", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:12:56,456", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:42954]"}
+{"timestamp": "2026-05-12 12:13:26,546", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:13:26,548", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:13:26,549", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:58036]"}
+{"timestamp": "2026-05-12 12:13:56,642", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:13:56,647", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:13:56,648", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:50650]"}
+{"timestamp": "2026-05-12 12:14:26,729", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:14:26,732", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:14:26,732", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:39984]"}
+{"timestamp": "2026-05-12 12:14:56,812", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:14:56,815", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:14:56,815", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:33638]"}
+{"timestamp": "2026-05-12 12:15:26,914", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:15:26,917", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:15:26,918", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:54712]"}
+{"timestamp": "2026-05-12 12:15:57,016", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:15:57,018", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:15:57,018", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:48668]"}
+{"timestamp": "2026-05-12 12:16:27,102", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:16:27,104", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:16:27,105", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:37300]"}
+{"timestamp": "2026-05-12 12:16:57,209", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:16:57,211", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:16:57,212", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:45792]"}
+{"timestamp": "2026-05-12 12:17:27,302", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:17:27,305", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:17:27,306", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:43520]"}
+{"timestamp": "2026-05-12 12:17:57,378", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:17:57,380", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:17:57,381", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:41492]"}
+{"timestamp": "2026-05-12 12:18:27,452", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:18:27,455", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:18:27,456", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:59146]"}
+{"timestamp": "2026-05-12 12:18:57,574", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:18:57,576", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:18:57,577", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:56394]"}
+{"timestamp": "2026-05-12 12:19:27,648", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:19:27,650", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:19:27,650", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:57516]"}
+{"timestamp": "2026-05-12 12:19:57,737", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:19:57,740", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:19:57,741", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:38572]"}
+{"timestamp": "2026-05-12 12:20:27,839", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:20:27,841", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:20:27,842", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:56054]"}
+{"timestamp": "2026-05-12 12:20:57,928", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:20:57,930", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:20:57,931", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:59042]"}
+{"timestamp": "2026-05-12 12:21:28,041", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:21:28,043", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:21:28,044", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:42626]"}
+{"timestamp": "2026-05-12 12:21:58,130", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:21:58,134", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:21:58,135", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:46458]"}
+{"timestamp": "2026-05-12 12:22:28,244", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:22:28,247", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:22:28,248", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:59430]"}
+{"timestamp": "2026-05-12 12:22:58,338", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:22:58,340", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:22:58,341", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:44412]"}
+{"timestamp": "2026-05-12 12:23:28,426", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:23:28,428", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:23:28,429", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:54164]"}
+{"timestamp": "2026-05-12 12:23:58,524", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:23:58,526", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:23:58,527", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:58700]"}
+{"timestamp": "2026-05-12 12:24:28,592", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:24:28,595", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:24:28,595", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:50548]"}
+{"timestamp": "2026-05-12 12:24:58,669", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:24:58,671", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:24:58,672", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:42172]"}
+{"timestamp": "2026-05-12 12:25:28,757", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:25:28,759", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:25:28,760", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:47452]"}
+{"timestamp": "2026-05-12 12:25:58,835", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:25:58,838", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:25:58,838", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:40326]"}
+{"timestamp": "2026-05-12 12:26:28,912", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:26:28,914", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:26:28,915", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:46602]"}
+{"timestamp": "2026-05-12 12:26:58,998", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:26:59,001", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:26:59,001", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:51064]"}
+{"timestamp": "2026-05-12 12:27:29,100", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:27:29,102", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:27:29,103", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:47404]"}
+{"timestamp": "2026-05-12 12:27:59,190", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:27:59,193", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:27:59,194", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:50840]"}
+{"timestamp": "2026-05-12 12:28:29,260", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:28:29,263", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:28:29,264", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:52768]"}
+{"timestamp": "2026-05-12 12:28:59,373", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:28:59,376", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:28:59,376", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:53716]"}
+{"timestamp": "2026-05-12 12:29:29,455", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:29:29,457", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:29:29,458", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:38654]"}
+{"timestamp": "2026-05-12 12:29:59,596", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:29:59,598", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:29:59,599", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:38756]"}
+{"timestamp": "2026-05-12 12:30:29,669", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:30:29,671", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:30:29,672", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:35550]"}
+{"timestamp": "2026-05-12 12:30:59,788", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:30:59,790", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:30:59,791", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:34956]"}
+{"timestamp": "2026-05-12 12:31:29,870", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:31:29,872", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:31:29,873", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:47496]"}
+{"timestamp": "2026-05-12 12:31:59,958", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:31:59,960", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:31:59,961", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:42692]"}
+{"timestamp": "2026-05-12 12:32:30,052", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:32:30,054", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:32:30,054", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:43258]"}
+{"timestamp": "2026-05-12 12:33:00,143", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:33:00,147", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:33:00,148", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:54946]"}
+{"timestamp": "2026-05-12 12:33:30,239", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:33:30,242", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:33:30,242", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:57176]"}
+{"timestamp": "2026-05-12 12:34:00,320", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:34:00,323", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:34:00,324", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:47038]"}
+{"timestamp": "2026-05-12 12:34:30,411", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:34:30,413", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:34:30,414", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:56510]"}
+{"timestamp": "2026-05-12 12:35:00,485", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:35:00,488", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:35:00,488", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:47382]"}
+{"timestamp": "2026-05-12 12:35:30,592", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:35:30,595", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:35:30,596", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:36812]"}
+{"timestamp": "2026-05-12 12:36:00,697", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:36:00,699", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:36:00,700", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:58820]"}
+{"timestamp": "2026-05-12 12:36:30,777", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:36:30,779", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:36:30,780", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:48874]"}
+{"timestamp": "2026-05-12 12:37:00,850", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:37:00,852", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:37:00,853", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:59888]"}
+{"timestamp": "2026-05-12 12:37:30,974", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:37:30,976", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:37:30,977", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:43048]"}
+{"timestamp": "2026-05-12 12:38:01,072", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:38:01,074", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:38:01,074", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:33066]"}
+{"timestamp": "2026-05-12 12:38:31,170", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:38:31,172", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:38:31,173", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:58884]"}
+{"timestamp": "2026-05-12 12:39:01,238", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:39:01,240", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:39:01,241", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:37000]"}
+{"timestamp": "2026-05-12 12:39:31,353", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:39:31,355", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:39:31,356", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:50130]"}
+{"timestamp": "2026-05-12 12:40:01,479", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:40:01,481", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:40:01,481", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:50282]"}
+{"timestamp": "2026-05-12 12:40:31,563", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:40:31,568", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:40:31,569", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:56280]"}
+{"timestamp": "2026-05-12 12:41:01,672", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:41:01,674", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:41:01,675", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:56446]"}
+{"timestamp": "2026-05-12 12:41:31,755", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:41:31,757", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:41:31,758", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:58270]"}
+{"timestamp": "2026-05-12 12:42:01,852", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:42:01,854", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:42:01,854", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:44676]"}
+{"timestamp": "2026-05-12 12:42:31,955", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:42:31,957", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:42:31,958", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:39734]"}
+{"timestamp": "2026-05-12 12:43:02,047", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:43:02,049", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:43:02,050", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:35524]"}
+{"timestamp": "2026-05-12 12:43:32,130", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:43:32,132", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:43:32,133", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:45752]"}
+{"timestamp": "2026-05-12 12:44:02,223", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:44:02,226", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:44:02,226", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:35594]"}
+{"timestamp": "2026-05-12 12:44:32,317", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:44:32,320", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:44:32,322", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:57372]"}
+{"timestamp": "2026-05-12 12:45:02,409", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:45:02,411", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:45:02,412", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:49940]"}
+{"timestamp": "2026-05-12 12:45:32,495", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:45:32,498", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:45:32,498", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:44422]"}
+{"timestamp": "2026-05-12 12:46:02,593", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:46:02,596", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:46:02,596", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:51946]"}
+{"timestamp": "2026-05-12 12:46:32,685", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:46:32,688", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:46:32,689", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:58674]"}
+{"timestamp": "2026-05-12 12:47:02,802", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:47:02,805", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:47:02,806", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:41982]"}
+{"timestamp": "2026-05-12 12:47:32,877", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:47:32,879", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:47:32,880", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:42002]"}
+{"timestamp": "2026-05-12 12:48:02,962", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:48:02,964", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:48:02,965", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:35728]"}
+{"timestamp": "2026-05-12 12:48:33,055", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:48:33,059", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:48:33,060", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:45378]"}
+{"timestamp": "2026-05-12 12:49:03,141", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:49:03,143", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:49:03,144", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:57700]"}
+{"timestamp": "2026-05-12 12:49:33,526", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:49:33,546", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:49:33,547", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.10, 127.0.0.1:43306]"}
+{"timestamp": "2026-05-12 12:50:03,663", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:50:03,665", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:50:03,666", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:49392]"}
+{"timestamp": "2026-05-12 12:50:33,801", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:50:33,804", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:50:33,804", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:52868]"}
+{"timestamp": "2026-05-12 12:51:03,891", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:51:03,894", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:51:03,895", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:46644]"}
+{"timestamp": "2026-05-12 12:51:33,969", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:51:33,973", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:51:33,974", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:55826]"}
+{"timestamp": "2026-05-12 12:52:04,100", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:52:04,102", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:52:04,107", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:45110]"}
+{"timestamp": "2026-05-12 12:52:34,211", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:52:34,213", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:52:34,214", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:59674]"}
+{"timestamp": "2026-05-12 12:53:04,286", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:53:04,290", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:53:04,291", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:38868]"}
+{"timestamp": "2026-05-12 12:53:34,381", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:53:34,383", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:53:34,385", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:33074]"}
+{"timestamp": "2026-05-12 12:54:04,480", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:54:04,482", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:54:04,483", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:48334]"}
+{"timestamp": "2026-05-12 12:54:34,572", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:54:34,574", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:54:34,574", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:48292]"}
+{"timestamp": "2026-05-12 12:55:04,660", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:55:04,662", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:55:04,663", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:35284]"}
+{"timestamp": "2026-05-12 12:55:34,730", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:55:34,733", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:55:34,733", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:54488]"}
+{"timestamp": "2026-05-12 12:56:04,847", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:56:04,850", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:56:04,851", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.03, 127.0.0.1:37806]"}
+{"timestamp": "2026-05-12 12:56:34,956", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:56:34,958", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:56:34,959", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:33314]"}
+{"timestamp": "2026-05-12 12:57:05,058", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:57:05,062", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:57:05,062", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:40278]"}
+{"timestamp": "2026-05-12 12:57:35,198", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:57:35,202", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:57:35,203", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:48630]"}
+{"timestamp": "2026-05-12 12:58:05,299", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:58:05,301", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:58:05,302", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:52738]"}
+{"timestamp": "2026-05-12 12:58:35,417", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:58:35,419", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:58:35,420", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:53528]"}
+{"timestamp": "2026-05-12 12:59:05,515", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:59:05,517", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:59:05,518", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:48824]"}
+{"timestamp": "2026-05-12 12:59:35,658", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 12:59:35,661", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 12:59:35,661", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:39726]"}
+{"timestamp": "2026-05-12 13:00:05,757", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 13:00:05,760", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 13:00:05,761", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:50540]"}
+{"timestamp": "2026-05-12 13:00:35,878", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 13:00:35,881", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 13:00:35,881", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:46998]"}
+{"timestamp": "2026-05-12 13:01:05,953", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 13:01:05,955", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 13:01:05,956", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:58744]"}
+{"timestamp": "2026-05-12 13:01:36,056", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 13:01:36,058", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 13:01:36,060", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:39818]"}
+{"timestamp": "2026-05-12 13:02:06,180", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 13:02:06,182", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 13:02:06,182", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:58360]"}
+{"timestamp": "2026-05-12 13:02:19,383", "level": "INFO", "logger": "django.utils.autoreload", "message": "/app/config/settings.py changed, reloading."}
+{"timestamp": "2026-05-12 13:02:21,810", "level": "INFO", "logger": "django.utils.autoreload", "message": "Watching for file changes with StatReloader"}
+{"timestamp": "2026-05-12 13:02:22,604", "level": "INFO", "logger": "daphne.server", "message": "HTTP/2 support not enabled (install the http2 and tls Twisted extras)"}
+{"timestamp": "2026-05-12 13:02:22,606", "level": "INFO", "logger": "daphne.server", "message": "Configuring endpoint tcp:port=8000:interface=0.0.0.0"}
+{"timestamp": "2026-05-12 13:02:22,609", "level": "INFO", "logger": "daphne.server", "message": "Listening on TCP address 0.0.0.0:8000"}
+{"timestamp": "2026-05-12 13:02:36,282", "level": "INFO", "logger": "config.middleware", "message": "Request started: GET /health/"}
+{"timestamp": "2026-05-12 13:02:36,286", "level": "INFO", "logger": "config.middleware", "message": "Request completed: GET /health/ - 200"}
+{"timestamp": "2026-05-12 13:02:36,286", "level": "INFO", "logger": "django.channels.server", "message": "HTTP GET /health/ 200 [0.02, 127.0.0.1:58370]"}
