@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 import os
+import sys
 from datetime import timedelta
 from pathlib import Path
 
@@ -51,9 +52,9 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 # HTTPS/SSL Security Settings
-SECURE_SSL_REDIRECT = not DEBUG
-SESSION_COOKIE_SECURE = not DEBUG
-CSRF_COOKIE_SECURE = not DEBUG
+SECURE_SSL_REDIRECT = not DEBUG and "test" not in sys.argv
+SESSION_COOKIE_SECURE = not DEBUG and "test" not in sys.argv
+CSRF_COOKIE_SECURE = not DEBUG and "test" not in sys.argv
 SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
 SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
 SECURE_HSTS_PRELOAD = not DEBUG

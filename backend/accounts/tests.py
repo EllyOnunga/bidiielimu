@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -24,6 +24,7 @@ class UserModelTest(TestCase):
         self.assertTrue(user.is_superuser)
 
 
+@override_settings(SECURE_SSL_REDIRECT=False)
 class UserAPITest(APITestCase):
     def setUp(self):
         # Create required roles for registration
