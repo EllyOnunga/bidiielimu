@@ -128,6 +128,7 @@ def bulk_import_students(self, csv_data: str, school_id: int):
                     password="temp_password_123",  # Should be changed by user
                     first_name=row["first_name"],
                     last_name=row["last_name"],
+                    must_change_password=True,
                 )
 
                 # Create student profile

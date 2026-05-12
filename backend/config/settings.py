@@ -34,9 +34,9 @@ SECRET_KEY = os.environ["SECRET_KEY"]  # Required - no default for security
 
 # Force Debug and Allowed Hosts for Local Dev
 DEBUG = os.getenv("DEBUG", "False") == "True"
-ALLOWED_HOSTS = os.getenv(
-    "ALLOWED_HOSTS", "localhost,.localhost,127.0.0.1,.elimuhub.com"
-).split(",")
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,.elimuhub.com").split(
+    ","
+)
 
 # CORS Settings
 CORS_ALLOW_ALL_ORIGINS = DEBUG
@@ -50,16 +50,16 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
 ]
 
-# HTTPS/SSL Security Settings - Force Disabled for Local Development
-SECURE_SSL_REDIRECT = False
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
-SECURE_HSTS_SECONDS = 0
-SECURE_HSTS_INCLUDE_SUBDOMAINS = False
-SECURE_HSTS_PRELOAD = False
+# HTTPS/SSL Security Settings
+SECURE_SSL_REDIRECT = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+SECURE_HSTS_PRELOAD = not DEBUG
 
-# Ensure Django knows it's behind a proxy but ignore SSL requirement
-SECURE_PROXY_SSL_HEADER = None
+# Ensure Django knows it's behind a proxy
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Allow any subdomain of localhost in dev
 CORS_ALLOWED_ORIGIN_REGEXES = [
@@ -231,7 +231,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 # Database Configuration with Read/Write Splitting
 db_config = dj_database_url.config(
-    default="postgres://elly:elimuhub@127.0.0.1:5432/elimuhubdb",
+    default="postgres://localhost/elimuhubdb",
     conn_max_age=600,
     conn_health_checks=True,
 )

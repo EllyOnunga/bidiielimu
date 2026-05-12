@@ -81,6 +81,7 @@ class User(AbstractUser):
     username = None
     email = models.EmailField(unique=True)
     is_email_verified = models.BooleanField(default=False)
+    must_change_password = models.BooleanField(default=False)
     role = models.ForeignKey(
         Role, on_delete=models.SET_NULL, null=True, blank=True, related_name="users"
     )
