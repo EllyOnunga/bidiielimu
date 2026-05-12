@@ -5,16 +5,21 @@ const getBaseURL = () => {
   const envURL = import.meta.env.VITE_API_URL;
   if (envURL) return envURL.endsWith("/") ? envURL : `${envURL}/`;
 
-  const { protocol, hostname, port } = window.location;
+  const { protocol, hostname, port, pathname } = window.location;
 
-  // In production (Nginx), API is served from the same host under /api/v1/
-  if (port === "" || port === "80" || port === "443") {
-    return `${protocol}//${hostname}/api/v1/`;
+  // Detect if we are in a tenant subfolder (e.g., /school/tenant1/)
+  // Path parts: ["", "school", "tenant1", "dashboard"] -> ["school", "tenant1", "dashboard"]
+  const pathParts = pathname.split("/").filter(Boolean);
+  let tenantPrefix = "";
+
+  if (pathParts[0] === "school" && pathParts.length >= 2) {
+    tenantPrefix = `/school/${pathParts[1]}`;
   }
 
-  // Use the same host and port as the current page
-  // Nginx will handle routing /api/v1/ to the backend
-  return `${protocol}//${hostname}${port ? `:${port}` : ""}/api/v1/`;
+  const host = `${protocol}//${hostname}${
+    port && port !== "80" && port !== "443" ? `:${port}` : ""
+  }`;
+  return `${host}${tenantPrefix}/api/v1/`;
 };
 
 const baseURL = getBaseURL();

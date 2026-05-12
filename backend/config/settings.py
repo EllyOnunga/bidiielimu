@@ -43,6 +43,7 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,.elimuhub.com").
 CORS_ALLOW_ALL_ORIGINS = DEBUG
 CORS_ALLOW_CREDENTIALS = True
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+TENANT_SUBFOLDER_PREFIX = os.getenv("TENANT_SUBFOLDER_PREFIX", "school")
 TENANT_DOMAIN_SUFFIX = os.getenv("TENANT_DOMAIN_SUFFIX", "localhost")
 
 CORS_ALLOWED_ORIGINS = [
@@ -180,7 +181,7 @@ SITE_ID = 1
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
-    "django_tenants.middleware.main.TenantMainMiddleware",
+    "django_tenants.middleware.TenantSubfolderMiddleware",
     "config.middleware.RequestCorrelationMiddleware",
     "config.middleware.RequestLoggingMiddleware",
     "config.middleware_security.APIKeyAuthenticationMiddleware",
@@ -205,8 +206,7 @@ MIDDLEWARE = [
     "allauth_2fa.middleware.AllauthTwoFactorMiddleware",
 ]
 
-ROOT_URLCONF = "config.urls_public"
-TENANT_URLCONF = "config.urls_tenant"
+ROOT_URLCONF = "config.urls_tenant"
 PUBLIC_SCHEMA_URLCONF = "config.urls_public"
 
 TEMPLATES = [
