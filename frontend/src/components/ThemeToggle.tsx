@@ -1,6 +1,6 @@
-import { Sun, Moon } from 'lucide-react';
-import { useAppearance } from '../context/AppearanceContext';
-import { motion } from 'framer-motion';
+import { Sun, Moon } from "lucide-react";
+import { useAppearance } from "../context/AppearanceContext";
+import { motion } from "framer-motion";
 
 export const ThemeToggle = () => {
   const { appearance, toggleAppearance } = useAppearance();
@@ -12,15 +12,15 @@ export const ThemeToggle = () => {
       aria-label="Toggle theme"
     >
       <motion.div
-        animate={{ y: appearance === 'dark' ? 0 : 40 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+        animate={{ y: appearance === "dark" ? 0 : 40 }}
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
       >
         <Moon className="w-5 h-5" />
       </motion.div>
       <motion.div
         initial={{ y: -40 }}
-        animate={{ y: appearance === 'light' ? -20 : -40 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+        animate={{ y: appearance === "light" ? -20 : -40 }}
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
         className="absolute top-5 left-2.5"
       >
         <Sun className="w-5 h-5" />

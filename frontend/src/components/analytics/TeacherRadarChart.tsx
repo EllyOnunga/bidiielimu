@@ -1,7 +1,11 @@
-import { 
-  Radar, RadarChart, PolarGrid, 
-  PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer 
-} from 'recharts';
+import {
+  Radar,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  ResponsiveContainer,
+} from "recharts";
 
 interface Props {
   data: {
@@ -14,20 +18,29 @@ interface Props {
 export const TeacherRadarChart = ({ data }: Props) => {
   return (
     <div className="glass p-10 rounded-[48px] border border-white/5 h-full">
-      <h3 className="text-2xl font-black text-white mb-2">Teacher Effectiveness</h3>
-      <p className="text-primary-200/40 text-sm mb-10">Cross-dimensional performance metrics</p>
-      
+      <h3 className="text-2xl font-black text-white mb-2">
+        Teacher Effectiveness
+      </h3>
+      <p className="text-primary-200/40 text-sm mb-10">
+        Cross-dimensional performance metrics
+      </p>
+
       <div className="h-[350px]">
-        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+        <ResponsiveContainer
+          width="100%"
+          height="100%"
+          minWidth={0}
+          minHeight={0}
+        >
           <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
             <PolarGrid stroke="#ffffff10" />
-            <PolarAngleAxis 
-              dataKey="subject" 
-              tick={{ fill: '#ffffff40', fontSize: 10, fontWeight: 900 }}
+            <PolarAngleAxis
+              dataKey="subject"
+              tick={{ fill: "#ffffff40", fontSize: 10, fontWeight: 900 }}
             />
-            <PolarRadiusAxis 
-              angle={30} 
-              domain={[0, 100]} 
+            <PolarRadiusAxis
+              angle={30}
+              domain={[0, 100]}
               tick={false}
               axisLine={false}
             />

@@ -1,12 +1,19 @@
-import { useState, useEffect } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import {
-  ChevronLeft, Users, UserPlus, FileText, MoreHorizontal,
-  BookOpen, CheckCircle2, XCircle, Search,
-} from 'lucide-react';
-import { motion } from 'framer-motion';
-import client from '../api/client';
-import toast from 'react-hot-toast';
+  ChevronLeft,
+  Users,
+  UserPlus,
+  FileText,
+  MoreHorizontal,
+  BookOpen,
+  CheckCircle2,
+  XCircle,
+  Search,
+} from "lucide-react";
+import { motion } from "framer-motion";
+import client from "../api/client";
+import toast from "react-hot-toast";
 
 interface Student {
   id: number;
@@ -34,7 +41,7 @@ export const ClassDetailPage = () => {
   const [students, setStudents] = useState<Student[]>([]);
   const [streamInfo, setStreamInfo] = useState<StreamInfo | null>(null);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
 
   const fetchData = async () => {
     try {
@@ -43,11 +50,13 @@ export const ClassDetailPage = () => {
         client.get(`students/?stream=${streamId}`),
       ]);
       setStreamInfo(streamRes.data);
-      const studentData = Array.isArray(studentsRes.data) ? studentsRes.data : (studentsRes.data.results || []);
+      const studentData = Array.isArray(studentsRes.data)
+        ? studentsRes.data
+        : studentsRes.data.results || [];
       setStudents(studentData);
     } catch (error) {
-      console.error('Failed to load class data', error);
-      toast.error('Failed to load class data');
+      console.error("Failed to load class data", error);
+      toast.error("Failed to load class data");
     } finally {
       setLoading(false);
     }
@@ -57,36 +66,53 @@ export const ClassDetailPage = () => {
     fetchData();
   }, [streamId]);
 
-  const filtered = students.filter(s =>
-    `${s.first_name} ${s.last_name}`.toLowerCase().includes(search.toLowerCase()) ||
-    s.admission_number.toLowerCase().includes(search.toLowerCase())
+  const filtered = students.filter(
+    (s) =>
+      `${s.first_name} ${s.last_name}`
+        .toLowerCase()
+        .includes(search.toLowerCase()) ||
+      s.admission_number.toLowerCase().includes(search.toLowerCase()),
   );
 
   const breadcrumb = streamInfo
     ? `${streamInfo.grade_level_name} — ${streamInfo.name}`
-    : 'Loading...';
+    : "Loading...";
 
   return (
     <div className="space-y-8 pb-20">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate('/classes')} className="p-2 hover:bg-white/10 rounded-xl transition-all">
+          <button
+            onClick={() => navigate("/classes")}
+            className="p-2 hover:bg-white/10 rounded-xl transition-all"
+          >
             <ChevronLeft className="w-6 h-6 text-muted" />
           </button>
           <div>
             <div className="flex items-center gap-2 text-xs text-dim font-bold mb-1">
-              <span className="hover:text-primary-400 cursor-pointer" onClick={() => navigate('/classes')}>Classes</span>
+              <span
+                className="hover:text-primary-400 cursor-pointer"
+                onClick={() => navigate("/classes")}
+              >
+                Classes
+              </span>
               <span>›</span>
               <span className="text-primary-400">{breadcrumb}</span>
             </div>
             <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-primary tracking-tight">
-              {streamInfo ? `${streamInfo.grade_level_name} ${streamInfo.name}` : 'Loading...'}
+              {streamInfo
+                ? `${streamInfo.grade_level_name} ${streamInfo.name}`
+                : "Loading..."}
             </h1>
             <p className="text-muted text-sm mt-0.5">
-              {streamInfo?.teacher_name ? `Class Teacher: ${streamInfo.teacher_name}` : 'No class teacher assigned'}
-              {' · '}
-              <span className="text-primary-400 font-bold">{streamInfo?.student_count ?? 0} students</span>
+              {streamInfo?.teacher_name
+                ? `Class Teacher: ${streamInfo.teacher_name}`
+                : "No class teacher assigned"}
+              {" · "}
+              <span className="text-primary-400 font-bold">
+                {streamInfo?.student_count ?? 0} students
+              </span>
             </p>
           </div>
         </div>
@@ -103,12 +129,35 @@ export const ClassDetailPage = () => {
       {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'Total Students', value: students.length, icon: Users, color: 'bg-primary-500/10 text-primary-400' },
-          { label: 'Active', value: students.filter(s => s.is_active).length, icon: CheckCircle2, color: 'bg-emerald-500/10 text-emerald-400' },
-          { label: 'Inactive', value: students.filter(s => !s.is_active).length, icon: XCircle, color: 'bg-rose-500/10 text-rose-400' },
-          { label: 'Subjects', value: '—', icon: BookOpen, color: 'bg-amber-500/10 text-amber-400' },
-        ].map(stat => (
-          <div key={stat.label} className="glass p-5 rounded-2xl border border-white/5 flex items-center gap-4">
+          {
+            label: "Total Students",
+            value: students.length,
+            icon: Users,
+            color: "bg-primary-500/10 text-primary-400",
+          },
+          {
+            label: "Active",
+            value: students.filter((s) => s.is_active).length,
+            icon: CheckCircle2,
+            color: "bg-emerald-500/10 text-emerald-400",
+          },
+          {
+            label: "Inactive",
+            value: students.filter((s) => !s.is_active).length,
+            icon: XCircle,
+            color: "bg-rose-500/10 text-rose-400",
+          },
+          {
+            label: "Subjects",
+            value: "—",
+            icon: BookOpen,
+            color: "bg-amber-500/10 text-amber-400",
+          },
+        ].map((stat) => (
+          <div
+            key={stat.label}
+            className="glass p-5 rounded-2xl border border-white/5 flex items-center gap-4"
+          >
             <div className={`p-3 rounded-xl ${stat.color}`}>
               <stat.icon className="w-5 h-5" />
             </div>
@@ -128,7 +177,7 @@ export const ClassDetailPage = () => {
             <input
               type="text"
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by name or admission no..."
               className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-xl text-primary text-sm outline-none focus:ring-2 focus:ring-primary-500"
             />
@@ -139,23 +188,44 @@ export const ClassDetailPage = () => {
           <table className="w-full text-left min-w-[700px]">
             <thead>
               <tr className="bg-white/5">
-                <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">Adm No</th>
-                <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">Student</th>
-                <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">Gender</th>
-                <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">Guardian Contact</th>
-                <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider text-right">Actions</th>
+                <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">
+                  Adm No
+                </th>
+                <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">
+                  Student
+                </th>
+                <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">
+                  Gender
+                </th>
+                <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">
+                  Guardian Contact
+                </th>
+                <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider text-right">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {loading ? (
-                <tr><td colSpan={6} className="px-6 py-12 text-center text-muted">Loading students...</td></tr>
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center text-muted">
+                    Loading students...
+                  </td>
+                </tr>
               ) : filtered.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-16 text-center">
                     <Users className="w-12 h-12 text-dim mx-auto mb-4" />
-                    <p className="text-muted font-medium">No students in this class yet.</p>
-                    <Link to="/students" className="text-primary-400 text-sm hover:underline mt-2 inline-block">
+                    <p className="text-muted font-medium">
+                      No students in this class yet.
+                    </p>
+                    <Link
+                      to="/students"
+                      className="text-primary-400 text-sm hover:underline mt-2 inline-block"
+                    >
                       Add the first student →
                     </Link>
                   </td>
@@ -169,25 +239,42 @@ export const ClassDetailPage = () => {
                     transition={{ delay: idx * 0.03 }}
                     className="hover:bg-white/[0.02] transition-all group"
                   >
-                    <td className="px-6 py-4 text-sm font-mono text-primary-400">{student.admission_number}</td>
+                    <td className="px-6 py-4 text-sm font-mono text-primary-400">
+                      {student.admission_number}
+                    </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-white/5 border border-white/5 flex items-center justify-center text-xs font-bold text-muted shrink-0">
-                          {student.first_name[0]}{student.last_name[0]}
+                          {student.first_name[0]}
+                          {student.last_name[0]}
                         </div>
-                        <span className="text-sm font-semibold text-primary">{student.first_name} {student.last_name}</span>
+                        <span className="text-sm font-semibold text-primary">
+                          {student.first_name} {student.last_name}
+                        </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-muted">{student.gender === 'M' ? 'Male' : student.gender === 'F' ? 'Female' : 'Other'}</td>
+                    <td className="px-6 py-4 text-sm text-muted">
+                      {student.gender === "M"
+                        ? "Male"
+                        : student.gender === "F"
+                          ? "Female"
+                          : "Other"}
+                    </td>
                     <td className="px-6 py-4">
                       <div className="text-sm text-primary">
-                        {student.guardians?.[0] ? `${student.guardians[0].first_name} ${student.guardians[0].last_name}`.trim() : '—'}
+                        {student.guardians?.[0]
+                          ? `${student.guardians[0].first_name} ${student.guardians[0].last_name}`.trim()
+                          : "—"}
                       </div>
-                      <div className="text-xs text-muted">{student.guardians?.[0]?.phone_number || '—'}</div>
+                      <div className="text-xs text-muted">
+                        {student.guardians?.[0]?.phone_number || "—"}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-2 py-1 rounded-lg text-xs font-medium border ${student.is_active ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-white/5 text-muted border-white/10'}`}>
-                        {student.is_active ? 'Active' : 'Inactive'}
+                      <span
+                        className={`px-2 py-1 rounded-lg text-xs font-medium border ${student.is_active ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-white/5 text-muted border-white/10"}`}
+                      >
+                        {student.is_active ? "Active" : "Inactive"}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">

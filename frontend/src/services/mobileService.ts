@@ -1,6 +1,6 @@
-import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
-import { NativeBiometric } from '@capgo/capacitor-native-biometric';
-import { Capacitor } from '@capacitor/core';
+import { Haptics, ImpactStyle, NotificationType } from "@capacitor/haptics";
+import { NativeBiometric } from "@capgo/capacitor-native-biometric";
+import { Capacitor } from "@capacitor/core";
 
 export const mobileService = {
   isNative: () => Capacitor.isNativePlatform(),
@@ -29,14 +29,14 @@ export const mobileService = {
     }
   },
 
-  authenticateBiometric: async (reason: string = 'Log in to your account') => {
+  authenticateBiometric: async (reason: string = "Log in to your account") => {
     if (!Capacitor.isNativePlatform()) return false;
     try {
       await NativeBiometric.verifyIdentity({
         reason,
-        title: 'Biometric Login',
-        subtitle: 'ElimuHub Secure Access',
-        description: 'Use your fingerprint or face to log in',
+        title: "Biometric Login",
+        subtitle: "ElimuHub Secure Access",
+        description: "Use your fingerprint or face to log in",
       });
       return true;
     } catch (_) {
@@ -53,7 +53,7 @@ export const mobileService = {
         server: window.location.hostname,
       });
     } catch (e) {
-      console.error('Failed to save credentials for biometrics', e);
+      console.error("Failed to save credentials for biometrics", e);
     }
   },
 
@@ -66,5 +66,5 @@ export const mobileService = {
     } catch (_) {
       return null;
     }
-  }
+  },
 };

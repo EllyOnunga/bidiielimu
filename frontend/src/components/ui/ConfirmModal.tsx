@@ -24,15 +24,12 @@ export function ConfirmModal({
   variant = "destructive",
 }: ConfirmModalProps) {
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={title}
-      className="max-w-md"
-    >
+    <Modal isOpen={isOpen} onClose={onClose} title={title} className="max-w-md">
       <div className="space-y-6">
         <div className="flex items-start gap-4 p-5 rounded-2xl bg-primary-500/5 border border-primary-500/10">
-          <div className={`p-2.5 rounded-xl shrink-0 ${variant === 'destructive' ? 'bg-rose-500/20 text-rose-500' : 'bg-primary-500/20 text-primary-500'}`}>
+          <div
+            className={`p-2.5 rounded-xl shrink-0 ${variant === "destructive" ? "bg-rose-500/20 text-rose-500" : "bg-primary-500/20 text-primary-500"}`}
+          >
             <AlertTriangle className="w-5 h-5" />
           </div>
           <p className="text-sm font-medium text-muted leading-relaxed">
@@ -49,7 +46,7 @@ export function ConfirmModal({
             {cancelText}
           </Button>
           <Button
-            className={`flex-1 order-1 sm:order-2 ${variant === 'destructive' ? 'bg-rose-600 hover:bg-rose-500 shadow-rose-500/20' : ''}`}
+            className={`flex-1 order-1 sm:order-2 ${variant === "destructive" ? "bg-rose-600 hover:bg-rose-500 shadow-rose-500/20" : ""}`}
             onClick={() => {
               onConfirm();
               onClose();

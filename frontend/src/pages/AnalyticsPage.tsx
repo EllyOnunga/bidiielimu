@@ -1,20 +1,31 @@
-import { useQuery } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
-import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
-  PieChart, Pie, Cell, Legend, AreaChart, Area 
-} from 'recharts';
-import { Users, Calendar, Award, FileDown } from 'lucide-react';
-import client from '../api/client';
-import { Skeleton } from '../components/ui/Skeleton';
+import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+  AreaChart,
+  Area,
+} from "recharts";
+import { Users, Calendar, Award, FileDown } from "lucide-react";
+import client from "../api/client";
+import { Skeleton } from "../components/ui/Skeleton";
 
-const COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
+const COLORS = ["#3b82f6", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981"];
 
 export const AnalyticsPage = () => {
   const { data: analytics, isLoading } = useQuery({
-    queryKey: ['analytics_detailed'],
+    queryKey: ["analytics_detailed"],
     queryFn: async () => {
-      const res = await client.get('schools/analytics_detailed/');
+      const res = await client.get("schools/analytics_detailed/");
       return res.data;
     },
   });
@@ -28,18 +39,18 @@ export const AnalyticsPage = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1
-      }
-    }
+        staggerChildren: 0.1,
+      },
+    },
   };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
+    visible: { opacity: 1, y: 0 },
   };
 
   return (
-    <motion.div 
+    <motion.div
       variants={containerVariants}
       initial="hidden"
       animate="visible"
@@ -47,10 +58,15 @@ export const AnalyticsPage = () => {
     >
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-primary tracking-tight mb-2">Institutional <span className="text-gradient">Intelligence</span></h1>
-          <p className="text-muted text-xs sm:text-sm md:text-base font-medium">Deep-spectrum analysis of academic performance and operational efficiency.</p>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-primary tracking-tight mb-2">
+            Institutional <span className="text-gradient">Intelligence</span>
+          </h1>
+          <p className="text-muted text-xs sm:text-sm md:text-base font-medium">
+            Deep-spectrum analysis of academic performance and operational
+            efficiency.
+          </p>
         </div>
-        <button 
+        <button
           onClick={handleExport}
           className="w-full sm:w-auto flex items-center justify-center gap-3 h-12 sm:h-14 px-6 sm:px-8 bg-white/5 text-primary rounded-2xl font-black uppercase tracking-widest text-xs border border-white/5 hover:bg-white/10 transition-all shadow-premium shrink-0"
         >
@@ -61,40 +77,97 @@ export const AnalyticsPage = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Subject Performance */}
-        <motion.div variants={itemVariants} className="glass p-10 rounded-[40px] border-white/5 relative overflow-hidden group">
+        <motion.div
+          variants={itemVariants}
+          className="glass p-10 rounded-[40px] border-white/5 relative overflow-hidden group"
+        >
           <div className="flex items-center justify-between mb-10">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-primary-600/20 rounded-2xl flex items-center justify-center border border-primary-500/20">
                 <Award className="w-6 h-6 text-primary-400" />
               </div>
               <div>
-                <h2 className="text-xl font-black text-primary uppercase tracking-tight">Academic Domain Mastery</h2>
-                <p className="text-[10px] font-black text-muted uppercase tracking-widest">Aggregate performance across core subjects</p>
+                <h2 className="text-xl font-black text-primary uppercase tracking-tight">
+                  Academic Domain Mastery
+                </h2>
+                <p className="text-[10px] font-black text-muted uppercase tracking-widest">
+                  Aggregate performance across core subjects
+                </p>
               </div>
             </div>
           </div>
-          
+
           <div className="h-52 sm:h-64 md:h-80 w-full">
             {isLoading ? (
               <Skeleton className="w-full h-full rounded-[32px]" />
             ) : (
-              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
+                minWidth={0}
+                minHeight={0}
+              >
                 <BarChart data={analytics?.subject_performance}>
                   <defs>
-                    <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                    <linearGradient
+                      id="barGradient"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
                       <stop offset="0%" stopColor="#3b82f6" stopOpacity={1} />
-                      <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.3} />
+                      <stop
+                        offset="100%"
+                        stopColor="#3b82f6"
+                        stopOpacity={0.3}
+                      />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--text-color), 0.05)" vertical={false} />
-                  <XAxis dataKey="subject" stroke="var(--text-muted)" fontSize={10} tickLine={false} axisLine={false} tick={{ fill: 'var(--text-muted)', fontWeight: 900 }} />
-                  <YAxis stroke="var(--text-muted)" fontSize={10} tickLine={false} axisLine={false} domain={[0, 100]} tick={{ fill: 'var(--text-muted)', fontWeight: 900 }} />
-                  <Tooltip 
-                    cursor={{ fill: 'rgba(var(--text-color),0.03)' }}
-                    contentStyle={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-color)', borderRadius: '24px', backdropFilter: 'blur(10px)', border: '1px solid var(--border-color)', padding: '16px' }}
-                    itemStyle={{ color: '#3b82f6', fontWeight: 900, textTransform: 'uppercase', fontSize: '10px' }}
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="rgba(var(--text-color), 0.05)"
+                    vertical={false}
                   />
-                  <Bar dataKey="average" fill="url(#barGradient)" radius={[12, 12, 4, 4]} barSize={32} />
+                  <XAxis
+                    dataKey="subject"
+                    stroke="var(--text-muted)"
+                    fontSize={10}
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fill: "var(--text-muted)", fontWeight: 900 }}
+                  />
+                  <YAxis
+                    stroke="var(--text-muted)"
+                    fontSize={10}
+                    tickLine={false}
+                    axisLine={false}
+                    domain={[0, 100]}
+                    tick={{ fill: "var(--text-muted)", fontWeight: 900 }}
+                  />
+                  <Tooltip
+                    cursor={{ fill: "rgba(var(--text-color),0.03)" }}
+                    contentStyle={{
+                      backgroundColor: "var(--bg-surface)",
+                      borderColor: "var(--border-color)",
+                      borderRadius: "24px",
+                      backdropFilter: "blur(10px)",
+                      border: "1px solid var(--border-color)",
+                      padding: "16px",
+                    }}
+                    itemStyle={{
+                      color: "#3b82f6",
+                      fontWeight: 900,
+                      textTransform: "uppercase",
+                      fontSize: "10px",
+                    }}
+                  />
+                  <Bar
+                    dataKey="average"
+                    fill="url(#barGradient)"
+                    radius={[12, 12, 4, 4]}
+                    barSize={32}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -102,14 +175,21 @@ export const AnalyticsPage = () => {
         </motion.div>
 
         {/* Class Distribution */}
-        <motion.div variants={itemVariants} className="glass p-10 rounded-[40px] border-white/5 relative overflow-hidden group">
+        <motion.div
+          variants={itemVariants}
+          className="glass p-10 rounded-[40px] border-white/5 relative overflow-hidden group"
+        >
           <div className="flex items-center gap-4 mb-10">
             <div className="w-12 h-12 bg-purple-600/20 rounded-2xl flex items-center justify-center border border-purple-500/20">
               <Users className="w-6 h-6 text-purple-400" />
             </div>
             <div>
-              <h2 className="text-xl font-black text-primary uppercase tracking-tight">Operational Density</h2>
-              <p className="text-[10px] font-black text-muted uppercase tracking-widest">Student allocation across academic phases</p>
+              <h2 className="text-xl font-black text-primary uppercase tracking-tight">
+                Operational Density
+              </h2>
+              <p className="text-[10px] font-black text-muted uppercase tracking-widest">
+                Student allocation across academic phases
+              </p>
             </div>
           </div>
 
@@ -117,7 +197,12 @@ export const AnalyticsPage = () => {
             {isLoading ? (
               <Skeleton className="w-72 h-72 rounded-full mx-auto" />
             ) : (
-              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
+                minWidth={0}
+                minHeight={0}
+              >
                 <PieChart>
                   <Pie
                     data={analytics?.class_distribution}
@@ -129,18 +214,34 @@ export const AnalyticsPage = () => {
                     dataKey="value"
                     stroke="none"
                   >
-                    {analytics?.class_distribution.map((_: any, index: number) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
+                    {analytics?.class_distribution.map(
+                      (_: any, index: number) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ),
+                    )}
                   </Pie>
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-color)', borderRadius: '24px', backdropFilter: 'blur(10px)', border: '1px solid var(--border-color)', padding: '16px' }}
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "var(--bg-surface)",
+                      borderColor: "var(--border-color)",
+                      borderRadius: "24px",
+                      backdropFilter: "blur(10px)",
+                      border: "1px solid var(--border-color)",
+                      padding: "16px",
+                    }}
                   />
-                  <Legend 
-                    verticalAlign="bottom" 
-                    height={36} 
+                  <Legend
+                    verticalAlign="bottom"
+                    height={36}
                     iconType="circle"
-                    formatter={(value) => <span className="text-[10px] font-black text-muted uppercase tracking-widest ml-2">{value}</span>}
+                    formatter={(value) => (
+                      <span className="text-[10px] font-black text-muted uppercase tracking-widest ml-2">
+                        {value}
+                      </span>
+                    )}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -149,14 +250,21 @@ export const AnalyticsPage = () => {
         </motion.div>
 
         {/* Attendance Trends */}
-        <motion.div variants={itemVariants} className="lg:col-span-2 glass p-10 rounded-[40px] border-white/5 relative overflow-hidden group">
+        <motion.div
+          variants={itemVariants}
+          className="lg:col-span-2 glass p-10 rounded-[40px] border-white/5 relative overflow-hidden group"
+        >
           <div className="flex items-center gap-4 mb-10">
             <div className="w-12 h-12 bg-emerald-600/20 rounded-2xl flex items-center justify-center border border-emerald-500/20">
               <Calendar className="w-6 h-6 text-emerald-400" />
             </div>
             <div>
-              <h2 className="text-xl font-black text-primary uppercase tracking-tight">Engagement Trajectory</h2>
-              <p className="text-[10px] font-black text-muted uppercase tracking-widest">30-day operational attendance tracking</p>
+              <h2 className="text-xl font-black text-primary uppercase tracking-tight">
+                Engagement Trajectory
+              </h2>
+              <p className="text-[10px] font-black text-muted uppercase tracking-widest">
+                30-day operational attendance tracking
+              </p>
             </div>
           </div>
 
@@ -164,27 +272,103 @@ export const AnalyticsPage = () => {
             {isLoading ? (
               <Skeleton className="w-full h-full rounded-[32px]" />
             ) : (
-              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
+                minWidth={0}
+                minHeight={0}
+              >
                 <AreaChart data={analytics?.attendance_trend}>
                   <defs>
-                    <linearGradient id="presentGradient" x1="0" y1="0" x2="0" y2="1">
+                    <linearGradient
+                      id="presentGradient"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
                       <stop offset="0%" stopColor="#10b981" stopOpacity={0.3} />
                       <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
                     </linearGradient>
-                    <linearGradient id="absentGradient" x1="0" y1="0" x2="0" y2="1">
+                    <linearGradient
+                      id="absentGradient"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
                       <stop offset="0%" stopColor="#f43f5e" stopOpacity={0.2} />
                       <stop offset="100%" stopColor="#f43f5e" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--text-color), 0.05)" vertical={false} />
-                  <XAxis dataKey="date" stroke="var(--text-muted)" fontSize={10} tickLine={false} axisLine={false} tick={{ fill: 'var(--text-muted)', fontWeight: 900 }} />
-                  <YAxis stroke="var(--text-muted)" fontSize={10} tickLine={false} axisLine={false} tick={{ fill: 'var(--text-muted)', fontWeight: 900 }} />
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-color)', borderRadius: '24px', backdropFilter: 'blur(10px)', border: '1px solid var(--border-color)', padding: '16px' }}
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="rgba(var(--text-color), 0.05)"
+                    vertical={false}
                   />
-                  <Legend iconType="circle" formatter={(value) => <span className="text-[10px] font-black text-muted uppercase tracking-widest ml-2">{value}</span>} />
-                  <Area type="monotone" dataKey="present" stroke="#10b981" strokeWidth={4} fillOpacity={1} fill="url(#presentGradient)" dot={{ r: 4, fill: '#10b981', strokeWidth: 2, stroke: '#0f172a' }} activeDot={{ r: 6, strokeWidth: 0 }} />
-                  <Area type="monotone" dataKey="absent" stroke="#f43f5e" strokeWidth={4} fillOpacity={1} fill="url(#absentGradient)" dot={{ r: 4, fill: '#f43f5e', strokeWidth: 2, stroke: '#0f172a' }} activeDot={{ r: 6, strokeWidth: 0 }} />
+                  <XAxis
+                    dataKey="date"
+                    stroke="var(--text-muted)"
+                    fontSize={10}
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fill: "var(--text-muted)", fontWeight: 900 }}
+                  />
+                  <YAxis
+                    stroke="var(--text-muted)"
+                    fontSize={10}
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fill: "var(--text-muted)", fontWeight: 900 }}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "var(--bg-surface)",
+                      borderColor: "var(--border-color)",
+                      borderRadius: "24px",
+                      backdropFilter: "blur(10px)",
+                      border: "1px solid var(--border-color)",
+                      padding: "16px",
+                    }}
+                  />
+                  <Legend
+                    iconType="circle"
+                    formatter={(value) => (
+                      <span className="text-[10px] font-black text-muted uppercase tracking-widest ml-2">
+                        {value}
+                      </span>
+                    )}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="present"
+                    stroke="#10b981"
+                    strokeWidth={4}
+                    fillOpacity={1}
+                    fill="url(#presentGradient)"
+                    dot={{
+                      r: 4,
+                      fill: "#10b981",
+                      strokeWidth: 2,
+                      stroke: "#0f172a",
+                    }}
+                    activeDot={{ r: 6, strokeWidth: 0 }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="absent"
+                    stroke="#f43f5e"
+                    strokeWidth={4}
+                    fillOpacity={1}
+                    fill="url(#absentGradient)"
+                    dot={{
+                      r: 4,
+                      fill: "#f43f5e",
+                      strokeWidth: 2,
+                      stroke: "#0f172a",
+                    }}
+                    activeDot={{ r: 6, strokeWidth: 0 }}
+                  />
                 </AreaChart>
               </ResponsiveContainer>
             )}

@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import client from '../api/client';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import client from "../api/client";
 
 interface ThemeContextType {
   schoolName: string;
@@ -9,19 +9,21 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType>({
-  schoolName: 'ElimuHub',
+  schoolName: "ElimuHub",
   logoUrl: null,
-  primaryColor: '#2DD4BF',
+  primaryColor: "#2DD4BF",
   isLoading: true,
 });
 
 export const useTheme = () => useContext(ThemeContext);
 
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = useState<Omit<ThemeContextType, 'isLoading'>>({
-    schoolName: 'ElimuHub',
+export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [theme, setTheme] = useState<Omit<ThemeContextType, "isLoading">>({
+    schoolName: "ElimuHub",
     logoUrl: null,
-    primaryColor: '#2DD4BF',
+    primaryColor: "#2DD4BF",
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -29,24 +31,30 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const fetchTheme = async () => {
       try {
         // Assume API is served on the same domain or configured via base URL
-        const response = await client.get('theme/');
-        
+        const response = await client.get("theme/");
+
         const { school_name, logo_url, primary_color } = response.data;
-        
+
         setTheme({
-          schoolName: school_name || 'ElimuHub',
+          schoolName: school_name || "ElimuHub",
           logoUrl: logo_url || null,
-          primaryColor: primary_color || '#2DD4BF',
+          primaryColor: primary_color || "#2DD4BF",
         });
 
         // Inject dynamic CSS variable into the root document
         if (primary_color) {
-          document.documentElement.style.setProperty('--tenant-primary-base', primary_color);
+          document.documentElement.style.setProperty(
+            "--tenant-primary-base",
+            primary_color,
+          );
         }
       } catch (error) {
-        console.error('Failed to load tenant theme:', error);
+        console.error("Failed to load tenant theme:", error);
         // Fallback to default Teal
-        document.documentElement.style.setProperty('--tenant-primary-base', '#2DD4BF');
+        document.documentElement.style.setProperty(
+          "--tenant-primary-base",
+          "#2DD4BF",
+        );
       } finally {
         setIsLoading(false);
       }

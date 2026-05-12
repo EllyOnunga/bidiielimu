@@ -1,13 +1,13 @@
-import { motion } from 'framer-motion';
-import { Scale, ShieldAlert, Construction } from 'lucide-react';
-import { Button } from '../components/ui/Button';
-import { useNavigate } from 'react-router-dom';
+import { motion } from "framer-motion";
+import { Scale, ShieldAlert, Construction } from "lucide-react";
+import { Button } from "../components/ui/Button";
+import { useNavigate } from "react-router-dom";
 
 export const DisciplinePage = () => {
   const navigate = useNavigate();
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-8"
@@ -22,9 +22,12 @@ export const DisciplinePage = () => {
       </div>
 
       <div className="max-w-md space-y-4">
-        <h1 className="text-4xl font-black text-white uppercase tracking-tight">Discipline <span className="text-gradient">Module</span></h1>
+        <h1 className="text-4xl font-black text-white uppercase tracking-tight">
+          Discipline <span className="text-gradient">Module</span>
+        </h1>
         <p className="text-primary-200/50 font-medium">
-          The comprehensive student conduct and co-curricular portfolio tracking system is currently being integrated into the ElimuHub core.
+          The comprehensive student conduct and co-curricular portfolio tracking
+          system is currently being integrated into the ElimuHub core.
         </p>
       </div>
 
@@ -35,25 +38,30 @@ export const DisciplinePage = () => {
           </div>
           <div>
             <h3 className="font-bold text-white">Under Construction</h3>
-            <p className="text-xs text-primary-200/40">Expected deployment: Version 1.2.0</p>
+            <p className="text-xs text-primary-200/40">
+              Expected deployment: Version 1.2.0
+            </p>
           </div>
         </div>
-        
+
         <div className="space-y-3">
           <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-primary-200/30">
             <span>Integration Progress</span>
             <span>65%</span>
           </div>
           <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
-            <motion.div 
+            <motion.div
               initial={{ width: 0 }}
-              animate={{ width: '65%' }}
+              animate={{ width: "65%" }}
               className="h-full bg-primary-500 shadow-[0_0_15px_rgba(59,130,246,0.5)]"
             />
           </div>
         </div>
 
-        <Button onClick={() => navigate('/students')} className="w-full h-14 rounded-2xl font-black uppercase tracking-widest text-xs shadow-premium">
+        <Button
+          onClick={() => navigate("/students")}
+          className="w-full h-14 rounded-2xl font-black uppercase tracking-widest text-xs shadow-premium"
+        >
           Back to Students SIS
         </Button>
       </div>

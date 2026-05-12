@@ -1,15 +1,25 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { CheckCircle, XCircle, Mail, ArrowRight, Loader2, ChevronLeft, RefreshCw } from 'lucide-react';
-import { motion } from 'framer-motion';
-import toast from 'react-hot-toast';
-import { authService } from '../api/services/authService';
+import { useState, useEffect } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import {
+  CheckCircle,
+  XCircle,
+  Mail,
+  ArrowRight,
+  Loader2,
+  ChevronLeft,
+  RefreshCw,
+} from "lucide-react";
+import { motion } from "framer-motion";
+import toast from "react-hot-toast";
+import { authService } from "../api/services/authService";
 
 export const EmailVerificationPage = () => {
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
-  const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'expired'>('loading');
-  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<
+    "loading" | "success" | "error" | "expired"
+  >("loading");
+  const [email, setEmail] = useState("");
   const [isResending, setIsResending] = useState(false);
 
   useEffect(() => {
@@ -21,32 +31,32 @@ export const EmailVerificationPage = () => {
   const verifyEmail = async (verificationToken: string) => {
     try {
       await authService.verifyEmail(verificationToken);
-      setStatus('success');
-      toast.success('Email verified successfully!');
-      setTimeout(() => navigate('/login'), 3000);
+      setStatus("success");
+      toast.success("Email verified successfully!");
+      setTimeout(() => navigate("/login"), 3000);
     } catch (error: any) {
-      console.error('Verification failed', error);
+      console.error("Verification failed", error);
       if (error.response?.status === 400) {
-        setStatus('expired');
+        setStatus("expired");
       } else {
-        setStatus('error');
+        setStatus("error");
       }
     }
   };
 
   const handleResendVerification = async () => {
     if (!email) {
-      toast.error('Please enter your email address');
+      toast.error("Please enter your email address");
       return;
     }
 
     setIsResending(true);
     try {
       await authService.resendVerification(email);
-      toast.success('Verification email sent! Please check your inbox.');
-      setEmail('');
+      toast.success("Verification email sent! Please check your inbox.");
+      setEmail("");
     } catch (error: any) {
-      toast.error('Failed to send verification email. Please try again.');
+      toast.error("Failed to send verification email. Please try again.");
     } finally {
       setIsResending(false);
     }
@@ -54,7 +64,7 @@ export const EmailVerificationPage = () => {
 
   const renderContent = () => {
     switch (status) {
-      case 'loading':
+      case "loading":
         return (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -64,12 +74,16 @@ export const EmailVerificationPage = () => {
             <div className="inline-flex w-20 h-20 bg-primary-600 rounded-3xl mb-6 shadow-premium items-center justify-center">
               <Loader2 className="w-10 h-10 text-white animate-spin" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight mb-3">Verifying Email</h1>
-            <p className="text-primary-200/60 font-medium">Please wait while we verify your email address...</p>
+            <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight mb-3">
+              Verifying Email
+            </h1>
+            <p className="text-primary-200/60 font-medium">
+              Please wait while we verify your email address...
+            </p>
           </motion.div>
         );
 
-      case 'success':
+      case "success":
         return (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -79,8 +93,13 @@ export const EmailVerificationPage = () => {
             <div className="inline-flex w-20 h-20 bg-green-600 rounded-3xl mb-6 shadow-premium items-center justify-center">
               <CheckCircle className="w-10 h-10 text-white" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight mb-3">Email Verified!</h1>
-            <p className="text-primary-200/60 font-medium mb-6">Your email has been successfully verified. You can now sign in to your account.</p>
+            <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight mb-3">
+              Email Verified!
+            </h1>
+            <p className="text-primary-200/60 font-medium mb-6">
+              Your email has been successfully verified. You can now sign in to
+              your account.
+            </p>
             <Link
               to="/login"
               className="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-500 text-white font-bold px-8 py-4 rounded-2xl shadow-premium transition-all"
@@ -91,7 +110,7 @@ export const EmailVerificationPage = () => {
           </motion.div>
         );
 
-      case 'expired':
+      case "expired":
         return (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -101,12 +120,18 @@ export const EmailVerificationPage = () => {
             <div className="inline-flex w-20 h-20 bg-orange-600 rounded-3xl mb-6 shadow-premium items-center justify-center">
               <XCircle className="w-10 h-10 text-white" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight mb-3">Link Expired</h1>
-            <p className="text-primary-200/60 font-medium mb-6">This verification link has expired. Please request a new one.</p>
+            <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight mb-3">
+              Link Expired
+            </h1>
+            <p className="text-primary-200/60 font-medium mb-6">
+              This verification link has expired. Please request a new one.
+            </p>
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-primary-200/70 ml-1">Email Address</label>
+                <label className="text-sm font-semibold text-primary-200/70 ml-1">
+                  Email Address
+                </label>
                 <div className="relative group">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-400/50 group-focus-within:text-primary-400 transition-colors" />
                   <input
@@ -137,7 +162,7 @@ export const EmailVerificationPage = () => {
           </motion.div>
         );
 
-      case 'error':
+      case "error":
         return (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -147,8 +172,12 @@ export const EmailVerificationPage = () => {
             <div className="inline-flex w-20 h-20 bg-red-600 rounded-3xl mb-6 shadow-premium items-center justify-center">
               <XCircle className="w-10 h-10 text-white" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight mb-3">Verification Failed</h1>
-            <p className="text-primary-200/60 font-medium mb-6">We couldn't verify your email. The link may be invalid or expired.</p>
+            <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight mb-3">
+              Verification Failed
+            </h1>
+            <p className="text-primary-200/60 font-medium mb-6">
+              We couldn't verify your email. The link may be invalid or expired.
+            </p>
             <Link
               to="/login"
               className="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-500 text-white font-bold px-8 py-4 rounded-2xl shadow-premium transition-all"
@@ -172,8 +201,12 @@ export const EmailVerificationPage = () => {
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="w-full max-w-[480px] relative z-10"
       >
-        <Link to="/" className="inline-flex items-center gap-2 text-primary-400 hover:text-primary-300 transition-colors mb-8 text-sm font-semibold group">
-          <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to Home
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 text-primary-400 hover:text-primary-300 transition-colors mb-8 text-sm font-semibold group"
+        >
+          <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />{" "}
+          Back to Home
         </Link>
 
         <div className="glass p-8 md:p-12 rounded-[40px]">

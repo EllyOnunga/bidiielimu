@@ -1,4 +1,4 @@
-import client from '../client';
+import client from "../client";
 
 export interface Teacher {
   id: number;
@@ -15,13 +15,13 @@ export interface Teacher {
 
 export const teachersService = {
   getAll: async (search?: string) => {
-    const response = await client.get('teachers/', { params: { search } });
+    const response = await client.get("teachers/", { params: { search } });
     return response.data;
   },
 
   bulkUpload: async (formData: FormData) => {
-    const response = await client.post('teachers/bulk_upload/', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    const response = await client.post("teachers/bulk_upload/", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
     });
     return response.data;
   },
@@ -31,8 +31,10 @@ export const teachersService = {
     return response.data;
   },
 
-  create: async (data: Omit<Teacher, 'id' | 'name' | 'is_active'> & { password?: string }) => {
-    const response = await client.post('teachers/', data);
+  create: async (
+    data: Omit<Teacher, "id" | "name" | "is_active"> & { password?: string },
+  ) => {
+    const response = await client.post("teachers/", data);
     return response.data;
   },
 
@@ -44,5 +46,5 @@ export const teachersService = {
   delete: async (id: number) => {
     const response = await client.delete(`teachers/${id}/`);
     return response.data;
-  }
+  },
 };

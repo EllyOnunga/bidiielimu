@@ -1,20 +1,28 @@
-import { 
-  BarChart, Bar, XAxis, YAxis, 
-  CartesianGrid, Tooltip, ResponsiveContainer
-} from 'recharts';
-import { 
-  Smartphone, Zap, TrendingUp, 
-  RefreshCcw, AlertTriangle 
-} from 'lucide-react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import {
+  Smartphone,
+  Zap,
+  TrendingUp,
+  RefreshCcw,
+  AlertTriangle,
+} from "lucide-react";
 
 const mockDailyData = [
-  { day: 'Mon', amount: 120000 },
-  { day: 'Tue', amount: 450000 },
-  { day: 'Wed', amount: 890000 },
-  { day: 'Thu', amount: 230000 },
-  { day: 'Fri', amount: 670000 },
-  { day: 'Sat', amount: 340000 },
-  { day: 'Sun', amount: 150000 },
+  { day: "Mon", amount: 120000 },
+  { day: "Tue", amount: 450000 },
+  { day: "Wed", amount: 890000 },
+  { day: "Thu", amount: 230000 },
+  { day: "Fri", amount: 670000 },
+  { day: "Sat", amount: 340000 },
+  { day: "Sun", amount: 150000 },
 ];
 
 export const MPesaDashboard = () => {
@@ -27,11 +35,15 @@ export const MPesaDashboard = () => {
             <Smartphone className="w-9 h-9" />
           </div>
           <div>
-            <h1 className="text-4xl font-black text-white tracking-tighter">M-Pesa Gateway</h1>
-            <p className="text-primary-200/40 font-bold uppercase tracking-widest mt-1">Real-time Mobile Collections</p>
+            <h1 className="text-4xl font-black text-white tracking-tighter">
+              M-Pesa Gateway
+            </h1>
+            <p className="text-primary-200/40 font-bold uppercase tracking-widest mt-1">
+              Real-time Mobile Collections
+            </p>
           </div>
         </div>
-        
+
         <button className="px-8 py-4 bg-white/5 border border-white/10 text-white rounded-[24px] font-black text-lg flex items-center gap-3 hover:bg-white/10 shadow-premium transition-all">
           <RefreshCcw className="w-6 h-6" />
           Sync Transactions
@@ -45,9 +57,15 @@ export const MPesaDashboard = () => {
             <TrendingUp className="w-7 h-7" />
           </div>
           <div>
-            <p className="text-xs font-black text-[#3BB34A] uppercase tracking-widest mb-1">Today's Volume</p>
-            <h2 className="text-4xl font-black text-white tracking-tighter">KES 642,500</h2>
-            <p className="text-xs font-bold text-emerald-400 mt-2">+12% from yesterday</p>
+            <p className="text-xs font-black text-[#3BB34A] uppercase tracking-widest mb-1">
+              Today's Volume
+            </p>
+            <h2 className="text-4xl font-black text-white tracking-tighter">
+              KES 642,500
+            </h2>
+            <p className="text-xs font-bold text-emerald-400 mt-2">
+              +12% from yesterday
+            </p>
           </div>
         </div>
 
@@ -56,9 +74,15 @@ export const MPesaDashboard = () => {
             <Zap className="w-7 h-7" />
           </div>
           <div>
-            <p className="text-xs font-black text-primary-400 uppercase tracking-widest mb-1">Active STK Pushes</p>
-            <h2 className="text-4xl font-black text-white tracking-tighter">24 PENDING</h2>
-            <p className="text-xs font-bold text-primary-200/40 mt-2">Avg response: 12 seconds</p>
+            <p className="text-xs font-black text-primary-400 uppercase tracking-widest mb-1">
+              Active STK Pushes
+            </p>
+            <h2 className="text-4xl font-black text-white tracking-tighter">
+              24 PENDING
+            </h2>
+            <p className="text-xs font-bold text-primary-200/40 mt-2">
+              Avg response: 12 seconds
+            </p>
           </div>
         </div>
 
@@ -67,43 +91,65 @@ export const MPesaDashboard = () => {
             <AlertTriangle className="w-7 h-7" />
           </div>
           <div>
-            <p className="text-xs font-black text-rose-400 uppercase tracking-widest mb-1">Failed Attempts</p>
-            <h2 className="text-4xl font-black text-white tracking-tighter">3 FAILED</h2>
-            <p className="text-xs font-bold text-rose-400 mt-2">Timeout or Insufficient Funds</p>
+            <p className="text-xs font-black text-rose-400 uppercase tracking-widest mb-1">
+              Failed Attempts
+            </p>
+            <h2 className="text-4xl font-black text-white tracking-tighter">
+              3 FAILED
+            </h2>
+            <p className="text-xs font-bold text-rose-400 mt-2">
+              Timeout or Insufficient Funds
+            </p>
           </div>
         </div>
       </div>
 
       {/* Analytics Chart */}
       <div className="glass rounded-[48px] border border-white/5 overflow-hidden p-10 space-y-10">
-        <h3 className="text-2xl font-black text-white tracking-tight">Collection Trends (Last 7 Days)</h3>
+        <h3 className="text-2xl font-black text-white tracking-tight">
+          Collection Trends (Last 7 Days)
+        </h3>
         <div className="h-[400px] w-full">
-          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+          <ResponsiveContainer
+            width="100%"
+            height="100%"
+            minWidth={0}
+            minHeight={0}
+          >
             <BarChart data={mockDailyData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-              <XAxis 
-                dataKey="day" 
-                stroke="rgba(255,255,255,0.2)" 
-                fontSize={10} 
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="rgba(255,255,255,0.05)"
+                vertical={false}
+              />
+              <XAxis
+                dataKey="day"
+                stroke="rgba(255,255,255,0.2)"
+                fontSize={10}
                 fontWeight={900}
                 tickLine={false}
                 axisLine={false}
               />
-              <YAxis 
-                stroke="rgba(255,255,255,0.2)" 
-                fontSize={10} 
+              <YAxis
+                stroke="rgba(255,255,255,0.2)"
+                fontSize={10}
                 fontWeight={900}
                 tickLine={false}
                 axisLine={false}
               />
-              <Tooltip 
-                contentStyle={{ backgroundColor: '#0f172a', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}
-                itemStyle={{ color: '#fff' }}
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#0f172a",
+                  borderRadius: "16px",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  color: "#fff",
+                }}
+                itemStyle={{ color: "#fff" }}
               />
-              <Bar 
-                dataKey="amount" 
-                fill="#3BB34A" 
-                radius={[12, 12, 0, 0]} 
+              <Bar
+                dataKey="amount"
+                fill="#3BB34A"
+                radius={[12, 12, 0, 0]}
                 barSize={40}
               />
             </BarChart>

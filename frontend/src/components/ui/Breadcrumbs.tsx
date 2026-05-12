@@ -16,11 +16,12 @@ export function Breadcrumbs() {
         <Home className="w-3.5 h-3.5 mr-1" />
         Dashboard
       </Link>
-      
+
       {pathnames.map((value, index) => {
         const last = index === pathnames.length - 1;
         const to = `/${pathnames.slice(0, index + 1).join("/")}`;
-        const label = value.charAt(0).toUpperCase() + value.slice(1).replace("-", " ");
+        const label =
+          value.charAt(0).toUpperCase() + value.slice(1).replace("-", " ");
 
         if (value === "dashboard") return null;
 

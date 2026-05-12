@@ -1,45 +1,65 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Search, LayoutDashboard, Users, UserSquare2, BookOpen, Wallet, ClipboardList, CheckSquare, X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Search,
+  LayoutDashboard,
+  Users,
+  UserSquare2,
+  BookOpen,
+  Wallet,
+  ClipboardList,
+  CheckSquare,
+  X,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const items = [
-  { id: 'dashboard', label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
-  { id: 'students', label: 'Students', to: '/students', icon: Users },
-  { id: 'teachers', label: 'Teachers', to: '/teachers', icon: UserSquare2 },
-  { id: 'classes', label: 'Classes', to: '/classes', icon: BookOpen },
-  { id: 'fees', label: 'Fees', to: '/fees', icon: Wallet },
-  { id: 'exams', label: 'Exams', to: '/exams', icon: ClipboardList },
-  { id: 'attendance', label: 'Attendance', to: '/attendance', icon: CheckSquare },
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    to: "/dashboard",
+    icon: LayoutDashboard,
+  },
+  { id: "students", label: "Students", to: "/students", icon: Users },
+  { id: "teachers", label: "Teachers", to: "/teachers", icon: UserSquare2 },
+  { id: "classes", label: "Classes", to: "/classes", icon: BookOpen },
+  { id: "fees", label: "Fees", to: "/fees", icon: Wallet },
+  { id: "exams", label: "Exams", to: "/exams", icon: ClipboardList },
+  {
+    id: "attendance",
+    label: "Attendance",
+    to: "/attendance",
+    icon: CheckSquare,
+  },
 ];
 
 export const CommandPalette = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         setIsOpen(true);
       }
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         setIsOpen(false);
       }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  const filteredItems = items.filter(item =>
-    item.label.toLowerCase().includes(search.toLowerCase())
+  const filteredItems = items.filter((item) =>
+    item.label.toLowerCase().includes(search.toLowerCase()),
   );
 
   const handleSelect = (to: string) => {
     navigate(to);
     setIsOpen(false);
-    setSearch('');
+    setSearch("");
   };
 
   return (
@@ -100,8 +120,18 @@ export const CommandPalette = () => {
 
             <div className="p-4 bg-slate-900/50 border-t border-white/5 flex items-center justify-between text-[10px] text-slate-500 uppercase tracking-widest font-bold">
               <div className="flex gap-4">
-                <span><kbd className="bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700 text-slate-400 mr-1">↵</kbd> Select</span>
-                <span><kbd className="bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700 text-slate-400 mr-1">esc</kbd> Close</span>
+                <span>
+                  <kbd className="bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700 text-slate-400 mr-1">
+                    ↵
+                  </kbd>{" "}
+                  Select
+                </span>
+                <span>
+                  <kbd className="bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700 text-slate-400 mr-1">
+                    esc
+                  </kbd>{" "}
+                  Close
+                </span>
               </div>
               <span>ElimuHub Search</span>
             </div>

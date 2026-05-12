@@ -1,13 +1,33 @@
-import { useState, useEffect } from 'react';
-import { Users, UserSquare2, BookOpen, Wallet, ArrowUpRight, ArrowDownRight, TrendingUp, Calendar, FileText, Shield, ChevronRight } from 'lucide-react';
-import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { motion } from 'framer-motion';
-import { ROLES } from '../constants/roles';
-import client from '../api/client';
-import { Skeleton } from '../components/ui/Skeleton';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
-import { Button } from '../components/ui/Button';
+import { useState, useEffect } from "react";
+import {
+  Users,
+  UserSquare2,
+  BookOpen,
+  Wallet,
+  ArrowUpRight,
+  ArrowDownRight,
+  TrendingUp,
+  Calendar,
+  FileText,
+  Shield,
+  ChevronRight,
+} from "lucide-react";
+import {
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+} from "recharts";
+import { motion } from "framer-motion";
+import { ROLES } from "../constants/roles";
+import client from "../api/client";
+import { Skeleton } from "../components/ui/Skeleton";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/authStore";
+import { Button } from "../components/ui/Button";
 
 interface Stats {
   students: number;
@@ -33,36 +53,63 @@ interface StatCardProps {
   title: string;
   value: string | number;
   icon: React.ElementType;
-  trend?: 'up' | 'down';
+  trend?: "up" | "down";
   trendValue?: string;
   color: string;
   to?: string;
 }
 
-const StatCard = ({ title, value, icon: Icon, trend, trendValue, color, to }: StatCardProps) => {
+const StatCard = ({
+  title,
+  value,
+  icon: Icon,
+  trend,
+  trendValue,
+  color,
+  to,
+}: StatCardProps) => {
   const CardContent = (
     <div className="glass-interactive p-5 md:p-6 rounded-[32px] h-full group">
       <div className="flex items-center justify-between mb-4 md:mb-6">
-        <div className={`p-3 md:p-4 rounded-2xl ${color} shadow-premium border border-white/10 group-hover:scale-110 transition-transform duration-500`}>
+        <div
+          className={`p-3 md:p-4 rounded-2xl ${color} shadow-premium border border-white/10 group-hover:scale-110 transition-transform duration-500`}
+        >
           <Icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
         </div>
         {trend && (
-          <div className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[10px] font-black tracking-tighter uppercase ${trend === 'up' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'
-            }`}>
-            {trend === 'up' ? <ArrowUpRight className="w-3 h-3 md:w-4 md:h-4" /> : <ArrowDownRight className="w-3 h-3 md:w-4 md:h-4" />}
+          <div
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[10px] font-black tracking-tighter uppercase ${
+              trend === "up"
+                ? "bg-emerald-500/10 text-emerald-400"
+                : "bg-rose-500/10 text-rose-400"
+            }`}
+          >
+            {trend === "up" ? (
+              <ArrowUpRight className="w-3 h-3 md:w-4 md:h-4" />
+            ) : (
+              <ArrowDownRight className="w-3 h-3 md:w-4 md:h-4" />
+            )}
             {trendValue}
           </div>
         )}
       </div>
       <div className="space-y-1">
-        <h3 className="text-muted text-[10px] font-black uppercase tracking-widest">{title}</h3>
-        <p className="text-2xl md:text-3xl lg:text-4xl font-black text-primary tracking-tight">{value}</p>
+        <h3 className="text-muted text-[10px] font-black uppercase tracking-widest">
+          {title}
+        </h3>
+        <p className="text-2xl md:text-3xl lg:text-4xl font-black text-primary tracking-tight">
+          {value}
+        </p>
       </div>
     </div>
   );
 
   if (to) {
-    return <Link to={to} className="block">{CardContent}</Link>;
+    return (
+      <Link to={to} className="block">
+        {CardContent}
+      </Link>
+    );
   }
   return CardContent;
 };
@@ -82,10 +129,10 @@ export const DashboardPage = () => {
     students: 0,
     teachers: 0,
     classes: 0,
-    fees: 'KSh 0',
-    student_trend: '0%',
-    teacher_trend: '0%',
-    fees_trend: '0%',
+    fees: "KSh 0",
+    student_trend: "0%",
+    teacher_trend: "0%",
+    fees_trend: "0%",
     library_books: 0,
     library_titles: 0,
     library_low_stock: 0,
@@ -97,8 +144,10 @@ export const DashboardPage = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const isSuperAdmin = user?.role === 'SUPER_ADMIN';
-        const endpoint = isSuperAdmin ? 'schools/super_admin_stats/' : 'schools/dashboard_stats/';
+        const isSuperAdmin = user?.role === "SUPER_ADMIN";
+        const endpoint = isSuperAdmin
+          ? "schools/super_admin_stats/"
+          : "schools/dashboard_stats/";
 
         const res = await client.get(endpoint);
 
@@ -108,9 +157,9 @@ export const DashboardPage = () => {
             teachers: res.data.total_users,
             classes: res.data.total_schools,
             fees: `KSh ${res.data.total_revenue.toLocaleString()}`,
-            student_trend: '+0%',
-            teacher_trend: '+0%',
-            fees_trend: '+0%',
+            student_trend: "+0%",
+            teacher_trend: "+0%",
+            fees_trend: "+0%",
             library_books: 0,
             library_titles: 0,
             library_low_stock: 0,
@@ -131,21 +180,26 @@ export const DashboardPage = () => {
           setRevenueData(res.data.revenue_trend);
         }
 
-        if (user?.role !== 'SUPER_ADMIN') {
-          const auditRes = await client.get('audit/logs/');
-          const logs = Array.isArray(auditRes.data) ? auditRes.data : (auditRes.data.results || []);
+        if (user?.role !== "SUPER_ADMIN") {
+          const auditRes = await client.get("audit/logs/");
+          const logs = Array.isArray(auditRes.data)
+            ? auditRes.data
+            : auditRes.data.results || [];
           const mapped = logs.slice(0, 4).map((log: any) => ({
             id: log.id,
             label: `${log.action}: ${log.model_name}`,
             detail: log.object_repr,
-            time: new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            time: new Date(log.timestamp).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
           }));
           setActivities(mapped);
         } else {
           setActivities([]);
         }
       } catch (err) {
-        console.error('Dashboard fetch error', err);
+        console.error("Dashboard fetch error", err);
       } finally {
         setLoadingStats(false);
       }
@@ -158,14 +212,14 @@ export const DashboardPage = () => {
     show: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1
-      }
-    }
+        staggerChildren: 0.1,
+      },
+    },
   };
 
   const item = {
     hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
+    show: { opacity: 1, y: 0 },
   };
 
   return (
@@ -177,25 +231,35 @@ export const DashboardPage = () => {
     >
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div className="space-y-2">
-          <motion.h1 variants={item} className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary tracking-tight leading-none">
+          <motion.h1
+            variants={item}
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary tracking-tight leading-none"
+          >
             School <span className="text-gradient">Intelligence</span>
           </motion.h1>
-          <motion.p variants={item} className="text-muted text-xs sm:text-sm md:text-base font-medium max-w-xl">
-            Real-time operational monitoring and strategic insights for your institution.
+          <motion.p
+            variants={item}
+            className="text-muted text-xs sm:text-sm md:text-base font-medium max-w-xl"
+          >
+            Real-time operational monitoring and strategic insights for your
+            institution.
           </motion.p>
         </div>
-        <motion.div variants={item} className="flex gap-2 sm:gap-3 w-full md:w-auto">
-          <Button 
-            variant="outline" 
+        <motion.div
+          variants={item}
+          className="flex gap-2 sm:gap-3 w-full md:w-auto"
+        >
+          <Button
+            variant="outline"
             className="flex-1 md:flex-none gap-2 text-xs py-3"
             onClick={() => window.print()}
           >
             <FileText className="w-4 h-4" />
             Report
           </Button>
-          <Button 
+          <Button
             className="flex-1 md:flex-none gap-2 text-xs py-3"
-            onClick={() => navigate('/analytics')}
+            onClick={() => navigate("/analytics")}
           >
             <TrendingUp className="w-4 h-4" />
             Insights
@@ -210,44 +274,54 @@ export const DashboardPage = () => {
           <>
             <motion.div variants={item}>
               <StatCard
-                to={user?.role === 'SUPER_ADMIN' ? "/super-admin" : "/students"}
+                to={user?.role === "SUPER_ADMIN" ? "/super-admin" : "/students"}
                 title="Total Students"
                 value={stats.students}
                 icon={Users}
                 color="bg-primary-500"
-                trend={stats.student_trend.startsWith('-') ? 'down' : 'up'}
+                trend={stats.student_trend.startsWith("-") ? "down" : "up"}
                 trendValue={stats.student_trend}
               />
             </motion.div>
             <motion.div variants={item}>
               <StatCard
-                to={user?.role === 'SUPER_ADMIN' ? "/super-admin" : "/teachers"}
-                title={user?.role === 'SUPER_ADMIN' ? "Total Users" : "Active Teachers"}
+                to={user?.role === "SUPER_ADMIN" ? "/super-admin" : "/teachers"}
+                title={
+                  user?.role === "SUPER_ADMIN"
+                    ? "Total Users"
+                    : "Active Teachers"
+                }
                 value={stats.teachers}
                 icon={UserSquare2}
                 color="bg-indigo-500"
-                trend={stats.teacher_trend.startsWith('-') ? 'down' : 'up'}
+                trend={stats.teacher_trend.startsWith("-") ? "down" : "up"}
                 trendValue={stats.teacher_trend}
               />
             </motion.div>
             <motion.div variants={item}>
               <StatCard
-                to={user?.role === 'SUPER_ADMIN' ? "/super-admin" : "/classes"}
-                title={user?.role === 'SUPER_ADMIN' ? "Total Schools" : "Total Classes"}
+                to={user?.role === "SUPER_ADMIN" ? "/super-admin" : "/classes"}
+                title={
+                  user?.role === "SUPER_ADMIN"
+                    ? "Total Schools"
+                    : "Total Classes"
+                }
                 value={stats.classes}
-                icon={user?.role === 'SUPER_ADMIN' ? Shield : BookOpen}
+                icon={user?.role === "SUPER_ADMIN" ? Shield : BookOpen}
                 color="bg-primary-600"
               />
             </motion.div>
-            {(user?.role === ROLES.ADMIN || user?.role === ROLES.SUPER_ADMIN || user?.role === ROLES.FINANCE) && (
+            {(user?.role === ROLES.ADMIN ||
+              user?.role === ROLES.SUPER_ADMIN ||
+              user?.role === ROLES.FINANCE) && (
               <motion.div variants={item}>
                 <StatCard
-                  to={user?.role === 'SUPER_ADMIN' ? "/super-admin" : "/fees"}
+                  to={user?.role === "SUPER_ADMIN" ? "/super-admin" : "/fees"}
                   title="Total Revenue"
                   value={stats.fees}
                   icon={Wallet}
                   color="bg-emerald-500"
-                  trend={stats.fees_trend.startsWith('-') ? 'down' : 'up'}
+                  trend={stats.fees_trend.startsWith("-") ? "down" : "up"}
                   trendValue={stats.fees_trend}
                 />
               </motion.div>
@@ -258,12 +332,26 @@ export const DashboardPage = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-5 md:gap-8 lg:gap-10">
         <motion.div variants={item} className="premium-card lg:col-span-1">
-          <h2 className="text-[10px] font-black text-primary-400 mb-5 uppercase tracking-widest">Quick Operations</h2>
+          <h2 className="text-[10px] font-black text-primary-400 mb-5 uppercase tracking-widest">
+            Quick Operations
+          </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
-            <QuickActionButton to="/students" label="Register Student" icon={UserSquare2} />
-            <QuickActionButton to="/teachers" label="Onboard Teacher" icon={Shield} />
+            <QuickActionButton
+              to="/students"
+              label="Register Student"
+              icon={UserSquare2}
+            />
+            <QuickActionButton
+              to="/teachers"
+              label="Onboard Teacher"
+              icon={Shield}
+            />
             <QuickActionButton to="/fees" label="Collect Fees" icon={Wallet} />
-            <QuickActionButton to="/attendance/mark" label="Mark Attendance" icon={Calendar} />
+            <QuickActionButton
+              to="/attendance/mark"
+              label="Mark Attendance"
+              icon={Calendar}
+            />
           </div>
         </motion.div>
 
@@ -274,57 +362,116 @@ export const DashboardPage = () => {
                 <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-primary-400" />
                 Revenue Matrix
               </h2>
-              <p className="text-[10px] font-bold text-muted uppercase tracking-widest mt-1">Growth progression analytics</p>
+              <p className="text-[10px] font-bold text-muted uppercase tracking-widest mt-1">
+                Growth progression analytics
+              </p>
             </div>
             <div className="flex p-1 bg-white/5 rounded-xl self-start">
-              <button className="px-3 sm:px-4 py-2 bg-primary-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-lg">6 Months</button>
-              <button className="px-3 sm:px-4 py-2 text-muted hover:text-primary text-[10px] font-black uppercase tracking-widest rounded-lg transition-all">Yearly</button>
+              <button className="px-3 sm:px-4 py-2 bg-primary-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-lg">
+                6 Months
+              </button>
+              <button className="px-3 sm:px-4 py-2 text-muted hover:text-primary text-[10px] font-black uppercase tracking-widest rounded-lg transition-all">
+                Yearly
+              </button>
             </div>
           </div>
           <div className="h-[220px] sm:h-[300px] md:h-[400px] w-full">
             {loadingStats ? (
               <Skeleton className="w-full h-full rounded-[24px]" />
             ) : (
-              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-                <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
+                minWidth={0}
+                minHeight={0}
+              >
+                <AreaChart
+                  data={revenueData}
+                  margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                >
                   <defs>
                     <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
                       <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--text-color), 0.03)" vertical={false} />
-                  <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={10} tickMargin={15} axisLine={false} tickLine={false} fontWeight="800" />
-                  <YAxis stroke="var(--text-muted)" fontSize={10} tickFormatter={(val) => `KSh ${val / 1000}k`} axisLine={false} tickLine={false} fontWeight="800" />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="rgba(var(--text-color), 0.03)"
+                    vertical={false}
+                  />
+                  <XAxis
+                    dataKey="name"
+                    stroke="var(--text-muted)"
+                    fontSize={10}
+                    tickMargin={15}
+                    axisLine={false}
+                    tickLine={false}
+                    fontWeight="800"
+                  />
+                  <YAxis
+                    stroke="var(--text-muted)"
+                    fontSize={10}
+                    tickFormatter={(val) => `KSh ${val / 1000}k`}
+                    axisLine={false}
+                    tickLine={false}
+                    fontWeight="800"
+                  />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: 'var(--bg-surface)',
-                      backdropFilter: 'blur(12px)',
-                      border: '1px solid var(--border-color)',
-                      borderRadius: '16px',
-                      boxShadow: 'var(--shadow-xl)'
+                      backgroundColor: "var(--bg-surface)",
+                      backdropFilter: "blur(12px)",
+                      border: "1px solid var(--border-color)",
+                      borderRadius: "16px",
+                      boxShadow: "var(--shadow-xl)",
                     }}
-                    itemStyle={{ color: '#22c55e', fontWeight: '900', fontSize: '12px' }}
+                    itemStyle={{
+                      color: "#22c55e",
+                      fontWeight: "900",
+                      fontSize: "12px",
+                    }}
                   />
-                  <Area type="monotone" dataKey="value" stroke="#22c55e" strokeWidth={4} fillOpacity={1} fill="url(#colorValue)" />
+                  <Area
+                    type="monotone"
+                    dataKey="value"
+                    stroke="#22c55e"
+                    strokeWidth={4}
+                    fillOpacity={1}
+                    fill="url(#colorValue)"
+                  />
                 </AreaChart>
               </ResponsiveContainer>
             )}
           </div>
         </motion.div>
 
-        <motion.div variants={item} className={(user?.role === ROLES.ADMIN || user?.role === ROLES.FINANCE) ? "premium-card" : "lg:col-span-3 premium-card"}>
+        <motion.div
+          variants={item}
+          className={
+            user?.role === ROLES.ADMIN || user?.role === ROLES.FINANCE
+              ? "premium-card"
+              : "lg:col-span-3 premium-card"
+          }
+        >
           <div className="flex items-center justify-between mb-10">
             <h2 className="text-2xl font-black text-primary flex items-center gap-3">
               <Calendar className="w-6 h-6 text-indigo-400" />
               Activity
             </h2>
-            <Link to="/audit-logs" className="text-[10px] font-black uppercase tracking-[0.2em] text-primary-400 hover:text-primary-300 transition-colors">Archive</Link>
+            <Link
+              to="/audit-logs"
+              className="text-[10px] font-black uppercase tracking-[0.2em] text-primary-400 hover:text-primary-300 transition-colors"
+            >
+              Archive
+            </Link>
           </div>
           <div className="space-y-3">
             {loadingStats ? (
               Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-4 p-4 rounded-2xl glass border border-white/5">
+                <div
+                  key={i}
+                  className="flex items-center gap-4 p-4 rounded-2xl glass border border-white/5"
+                >
                   <Skeleton className="w-10 h-10 rounded-xl shrink-0" />
                   <div className="flex-1 space-y-2">
                     <Skeleton className="w-24 h-3" />
@@ -335,7 +482,9 @@ export const DashboardPage = () => {
             ) : activities.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 text-muted/20">
                 <Calendar className="w-12 h-12 mb-4" />
-                <p className="text-[10px] font-black uppercase tracking-widest">No Recent Logs</p>
+                <p className="text-[10px] font-black uppercase tracking-widest">
+                  No Recent Logs
+                </p>
               </div>
             ) : (
               activities.map((act) => (
@@ -348,10 +497,16 @@ export const DashboardPage = () => {
                     {act.label[0]}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-black text-primary truncate group-hover:text-primary-400 transition-colors uppercase tracking-tight leading-none mb-1">{act.label}</p>
-                    <p className="text-[10px] font-bold text-muted truncate">{act.detail}</p>
+                    <p className="text-xs font-black text-primary truncate group-hover:text-primary-400 transition-colors uppercase tracking-tight leading-none mb-1">
+                      {act.label}
+                    </p>
+                    <p className="text-[10px] font-bold text-muted truncate">
+                      {act.detail}
+                    </p>
                   </div>
-                  <span className="text-[9px] font-black text-dim whitespace-nowrap uppercase">{act.time}</span>
+                  <span className="text-[9px] font-black text-dim whitespace-nowrap uppercase">
+                    {act.time}
+                  </span>
                 </motion.div>
               ))
             )}
@@ -362,7 +517,15 @@ export const DashboardPage = () => {
   );
 };
 
-const QuickActionButton = ({ to, label, icon: Icon }: { to: string; label: string; icon: React.ElementType }) => (
+const QuickActionButton = ({
+  to,
+  label,
+  icon: Icon,
+}: {
+  to: string;
+  label: string;
+  icon: React.ElementType;
+}) => (
   <Link
     to={to}
     className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-primary-600 hover:border-primary-500 group transition-all"
@@ -371,7 +534,9 @@ const QuickActionButton = ({ to, label, icon: Icon }: { to: string; label: strin
       <div className="p-2 rounded-xl bg-white/5 group-hover:bg-white/20 transition-colors">
         <Icon className="w-5 h-5 text-primary-400 group-hover:text-white" />
       </div>
-      <span className="text-xs font-black text-muted group-hover:text-white uppercase tracking-tight">{label}</span>
+      <span className="text-xs font-black text-muted group-hover:text-white uppercase tracking-tight">
+        {label}
+      </span>
     </div>
     <ChevronRight className="w-4 h-4 text-muted group-hover:text-white" />
   </Link>

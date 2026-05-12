@@ -220,13 +220,11 @@ def cleanup_expired_data(self):
     Clean up expired sessions, tokens, and temporary data across all tenants.
     """
     from django_tenants.utils import tenant_context
+
     from schools.models import School
-    
+
     try:
-        results = {
-            "public": {},
-            "tenants": []
-        }
+        results = {"public": {}, "tenants": []}
 
         # 1. Clean up public schema (shared data like sessions and tokens)
         results["public"] = _perform_cleanup(is_public=True)
@@ -250,6 +248,7 @@ def cleanup_expired_data(self):
 def _perform_cleanup(is_public=False):
     """Helper to perform the actual deletion of expired data in the current schema context."""
     from django.contrib.sessions.models import Session
+
     from accounts.models import EmailVerificationToken
 
     results = {

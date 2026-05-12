@@ -1,13 +1,17 @@
+import logging
 import random
 import string
-import logging
 from datetime import timedelta
+
 from django.core.cache import cache
 from django.utils import timezone
+
 from notifications.services_sms import SMSService
+
 from .models import SMSDevice
 
 logger = logging.getLogger(__name__)
+
 
 class OTPService:
     @staticmethod
@@ -26,7 +30,7 @@ class OTPService:
         Sends an OTP to the user via the specified method (SMS or EMAIL).
         """
         otp = OTPService.generate_otp(user)
-        
+
         if method == "SMS":
             return OTPService._send_sms(user, otp, phone_number)
         elif method == "EMAIL":
@@ -45,21 +49,25 @@ class OTPService:
         message = f"Your ElimuHub verification code is: {otp}. It expires in 5 minutes."
         sms_service = SMSService()
         response = sms_service.send_bulk_sms([phone_number], message)
-        
+
         if response:
-            SMSDevice.objects.filter(user=user, phone_number=phone_number).update(last_sent_at=timezone.now())
+            SMSDevice.objects.filter(user=user, phone_number=phone_number).update(
+                last_sent_at=timezone.now()
+            )
             return True
         return False
 
     @staticmethod
     def _send_email(user, otp):
+        from django.conf import settings
         from django.core.mail import send_mail
         from django.template.loader import render_to_string
-        from django.conf import settings
-        
+
         subject = f"{otp} is your ElimuHub verification code"
-        html_message = render_to_string("emails/otp_email.html", {"user": user, "otp": otp})
-        
+        html_message = render_to_string(
+            "emails/otp_email.html", {"user": user, "otp": otp}
+        )
+
         try:
             send_mail(
                 subject,
@@ -81,7 +89,7 @@ class OTPService:
         """
         cache_key = f"sms_otp_{user.id}"
         cached_otp = cache.get(cache_key)
-        
+
         if cached_otp and cached_otp == otp:
             cache.delete(cache_key)
             return True

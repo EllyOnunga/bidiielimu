@@ -36,11 +36,19 @@ class MyTokenObtainPairView(TokenObtainPairView):
         except Exception as e:
             # If it's a ValidationError with our special 2FA payload, flatten it
             # DRF's exception_handler wraps dictionary values in lists
-            if hasattr(e, 'detail') and isinstance(e.detail, dict) and e.detail.get('2fa_required'):
+            if (
+                hasattr(e, "detail")
+                and isinstance(e.detail, dict)
+                and e.detail.get("2fa_required")
+            ):
                 detail = e.detail
                 # Flatten most fields, but KEEP 'methods' as a list
                 flat_detail = {
-                    k: v[0] if isinstance(v, list) and len(v) > 0 and k != 'methods' else v 
+                    k: (
+                        v[0]
+                        if isinstance(v, list) and len(v) > 0 and k != "methods"
+                        else v
+                    )
                     for k, v in detail.items()
                 }
                 return Response(flat_detail, status=status.HTTP_400_BAD_REQUEST)

@@ -19,7 +19,7 @@ help:
 
 # Installation
 install:
-	cd backend && pip install -r requirements.txt
+	cd backend && pip install -r requirements.txt black isort flake8
 	cd frontend && npm install
 
 # Cleanup
@@ -38,11 +38,11 @@ test:
 
 # Linting and formatting
 lint:
-	cd backend && flake8 . && black --check . && isort --check-only .
+	cd backend && flake8 . && black --check . && isort --check-only --profile black .
 	cd frontend && npm run lint
 
 format:
-	cd backend && black . && isort .
+	cd backend && black . && isort --profile black .
 	cd frontend && npm run format
 
 # Docker commands
