@@ -41,6 +41,22 @@ class UserAPITest(APITestCase):
                 domain="testserver", tenant=public_school, is_primary=True
             )
 
+    def test_tenant_path_resolution(self):
+        """Test that the middleware resolves the tenant from the path."""
+        from schools.models import Domain, School
+
+        # Create a test tenant
+        tenant = School.objects.create(
+            schema_name="test_tenant", name="Test Tenant", curriculum="CBC"
+        )
+        Domain.objects.create(domain="test_tenant", tenant=tenant, is_primary=True)
+
+        # Access via path-based URL
+        # The prefix 'school' matches TENANT_SUBFOLDER_PREFIX in settings
+        response = self.client.get("/school/test_tenant/health/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()["schema"], "tenant")
+
     def test_register_user(self):
         data = {
             "email": "newuser@example.com",
