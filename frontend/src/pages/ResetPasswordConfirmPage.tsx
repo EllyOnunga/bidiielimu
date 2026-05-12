@@ -1,19 +1,19 @@
-import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Lock, CheckCircle2, Loader2 } from 'lucide-react';
-import { PasswordInput } from '../components/ui/PasswordInput';
-import { PasswordHint } from '../components/ui/PasswordHint';
-import { motion, AnimatePresence } from 'framer-motion';
-import toast from 'react-hot-toast';
-import client from '../api/client';
-import { Button } from '../components/ui/Button';
+import { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Lock, CheckCircle2, Loader2 } from "lucide-react";
+import { PasswordInput } from "../components/ui/PasswordInput";
+import { PasswordHint } from "../components/ui/PasswordHint";
+import { motion, AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
+import client from "../api/client";
+import { Button } from "../components/ui/Button";
 
 export const ResetPasswordConfirmPage = () => {
   const { uid, token } = useParams<{ uid: string; token: string }>();
   const navigate = useNavigate();
 
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -21,24 +21,27 @@ export const ResetPasswordConfirmPage = () => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      toast.error('Passwords do not match');
+      toast.error("Passwords do not match");
       return;
     }
 
     setLoading(true);
 
     try {
-      await client.post('auth/password/reset/confirm/', {
+      await client.post("auth/password/reset/confirm/", {
         uid,
         token,
         new_password1: password,
         new_password2: password,
       });
       setSuccess(true);
-      toast.success('Password reset successfully!');
-      setTimeout(() => navigate('/login'), 3000);
+      toast.success("Password reset successfully!");
+      setTimeout(() => navigate("/login"), 3000);
     } catch (error: any) {
-      toast.error(error.response?.data?.detail || 'Failed to reset password. Link may be expired.');
+      toast.error(
+        error.response?.data?.detail ||
+          "Failed to reset password. Link may be expired.",
+      );
     } finally {
       setLoading(false);
     }
@@ -67,14 +70,20 @@ export const ResetPasswordConfirmPage = () => {
                 className="space-y-6"
               >
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-black text-primary tracking-tight mb-2">New Password</h1>
-                  <p className="text-muted text-sm">Please enter and confirm your new secure password.</p>
+                  <h1 className="text-2xl sm:text-3xl font-black text-primary tracking-tight mb-2">
+                    New Password
+                  </h1>
+                  <p className="text-muted text-sm">
+                    Please enter and confirm your new secure password.
+                  </p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-muted uppercase tracking-widest ml-1">New Password</label>
+                      <label className="text-xs font-bold text-muted uppercase tracking-widest ml-1">
+                        New Password
+                      </label>
                       <div className="relative group">
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-dim group-focus-within:text-primary-400 transition-colors" />
                         <PasswordInput
@@ -89,7 +98,9 @@ export const ResetPasswordConfirmPage = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-muted uppercase tracking-widest ml-1">Confirm New Password</label>
+                      <label className="text-xs font-bold text-muted uppercase tracking-widest ml-1">
+                        Confirm New Password
+                      </label>
                       <div className="relative group">
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-dim group-focus-within:text-primary-400 transition-colors" />
                         <PasswordInput
@@ -113,7 +124,9 @@ export const ResetPasswordConfirmPage = () => {
                         <Loader2 className="w-5 h-5 animate-spin mr-2" />
                         Resetting Password...
                       </>
-                    ) : 'Update Password'}
+                    ) : (
+                      "Update Password"
+                    )}
                   </Button>
                 </form>
               </motion.div>
@@ -128,15 +141,18 @@ export const ResetPasswordConfirmPage = () => {
                   <CheckCircle2 className="w-10 h-10 text-emerald-400" />
                 </div>
                 <div className="space-y-2">
-                  <h2 className="text-2xl font-black text-primary">Password Updated!</h2>
+                  <h2 className="text-2xl font-black text-primary">
+                    Password Updated!
+                  </h2>
                   <p className="text-muted text-sm">
-                    Your password has been changed successfully. Redirecting you to login...
+                    Your password has been changed successfully. Redirecting you
+                    to login...
                   </p>
                 </div>
                 <div className="w-full bg-white/5 rounded-2xl h-2 overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
-                    animate={{ width: '100%' }}
+                    animate={{ width: "100%" }}
                     transition={{ duration: 3 }}
                     className="h-full bg-emerald-500"
                   />

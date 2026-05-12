@@ -1,7 +1,13 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Clock, ChevronLeft, ChevronRight, Send, HelpCircle } from 'lucide-react';
-import client from '../../api/client';
-import toast from 'react-hot-toast';
+import { useState, useEffect, useCallback } from "react";
+import {
+  Clock,
+  ChevronLeft,
+  ChevronRight,
+  Send,
+  HelpCircle,
+} from "lucide-react";
+import client from "../../api/client";
+import toast from "react-hot-toast";
 
 interface Question {
   id: string;
@@ -17,7 +23,13 @@ interface Quiz {
   questions: Question[];
 }
 
-export const QuizInterface = ({ quizId, onComplete }: { quizId: string, onComplete: () => void }) => {
+export const QuizInterface = ({
+  quizId,
+  onComplete,
+}: {
+  quizId: string;
+  onComplete: () => void;
+}) => {
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -35,23 +47,28 @@ export const QuizInterface = ({ quizId, onComplete }: { quizId: string, onComple
         setQuiz(res.data);
         setTimeLeft((res.data.duration_minutes || 30) * 60);
       } else {
-        toast.error('Invalid quiz data received');
+        toast.error("Invalid quiz data received");
       }
     } catch (err) {
-      toast.error('Failed to load quiz');
+      toast.error("Failed to load quiz");
     }
   };
 
   const submitQuiz = useCallback(async () => {
     if (isSubmitting) return;
     setIsSubmitting(true);
-    const toastId = toast.loading('Marking your quiz...');
+    const toastId = toast.loading("Marking your quiz...");
     try {
-      const res = await client.post(`lms/quizzes/${quizId}/attempt/`, { answers });
-      toast.success(`Quiz completed! Your score: ${res.data.score}/${res.data.max_score}`, { id: toastId, duration: 5000 });
+      const res = await client.post(`lms/quizzes/${quizId}/attempt/`, {
+        answers,
+      });
+      toast.success(
+        `Quiz completed! Your score: ${res.data.score}/${res.data.max_score}`,
+        { id: toastId, duration: 5000 },
+      );
       onComplete();
     } catch (err) {
-      toast.error('Failed to submit quiz', { id: toastId });
+      toast.error("Failed to submit quiz", { id: toastId });
     } finally {
       setIsSubmitting(false);
     }
@@ -63,7 +80,7 @@ export const QuizInterface = ({ quizId, onComplete }: { quizId: string, onComple
       return;
     }
     const timer = setInterval(() => {
-      setTimeLeft(prev => prev - 1);
+      setTimeLeft((prev) => prev - 1);
     }, 1000);
     return () => clearInterval(timer);
   }, [timeLeft, quiz, submitQuiz]);
@@ -71,7 +88,7 @@ export const QuizInterface = ({ quizId, onComplete }: { quizId: string, onComple
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   if (!quiz) return null;
@@ -87,14 +104,22 @@ export const QuizInterface = ({ quizId, onComplete }: { quizId: string, onComple
             <HelpCircle className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div className="overflow-hidden">
-            <h2 className="text-white font-black text-sm sm:text-base truncate">{quiz.title}</h2>
-            <p className="text-[9px] sm:text-xs text-primary-200/40 uppercase tracking-widest font-black">Question {currentIdx + 1} of {quiz.questions.length}</p>
+            <h2 className="text-white font-black text-sm sm:text-base truncate">
+              {quiz.title}
+            </h2>
+            <p className="text-[9px] sm:text-xs text-primary-200/40 uppercase tracking-widest font-black">
+              Question {currentIdx + 1} of {quiz.questions.length}
+            </p>
           </div>
         </div>
-        
-        <div className={`flex items-center gap-2 sm:gap-3 px-3 sm:px-6 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl border font-black transition-colors text-xs sm:text-sm shrink-0 ${
-          timeLeft < 60 ? 'bg-rose-500/10 border-rose-500 text-rose-400 animate-pulse' : 'bg-white/5 border-white/10 text-white'
-        }`}>
+
+        <div
+          className={`flex items-center gap-2 sm:gap-3 px-3 sm:px-6 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl border font-black transition-colors text-xs sm:text-sm shrink-0 ${
+            timeLeft < 60
+              ? "bg-rose-500/10 border-rose-500 text-rose-400 animate-pulse"
+              : "bg-white/5 border-white/10 text-white"
+          }`}
+        >
           <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
           {formatTime(timeLeft)}
         </div>
@@ -105,9 +130,11 @@ export const QuizInterface = ({ quizId, onComplete }: { quizId: string, onComple
         <div className="max-w-3xl w-full">
           <div className="glass p-6 sm:p-8 lg:p-12 rounded-[32px] sm:rounded-[48px] border border-white/10 shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1 bg-white/5">
-              <div 
-                className="h-full bg-primary-500 transition-all duration-500" 
-                style={{ width: `${((currentIdx + 1) / quiz.questions.length) * 100}%` }} 
+              <div
+                className="h-full bg-primary-500 transition-all duration-500"
+                style={{
+                  width: `${((currentIdx + 1) / quiz.questions.length) * 100}%`,
+                }}
               />
             </div>
 
@@ -117,24 +144,36 @@ export const QuizInterface = ({ quizId, onComplete }: { quizId: string, onComple
               </h3>
 
               <div className="grid grid-cols-1 gap-3 sm:gap-4">
-                {Array.isArray(currentQuestion?.options) && currentQuestion.options.map((option, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setAnswers({ ...answers, [currentQuestion.id]: String(idx) })}
-                    className={`w-full p-4 sm:p-6 rounded-2xl sm:rounded-3xl text-left font-bold transition-all border flex items-center justify-between group ${
-                      answers[currentQuestion.id] === String(idx)
-                        ? 'bg-primary-500 border-primary-400 text-white shadow-xl scale-[1.02]'
-                        : 'bg-white/5 border-white/10 text-primary-200 hover:bg-white/10 hover:border-white/20'
-                    }`}
-                  >
-                    <span className="text-sm sm:text-base">{option}</span>
-                    <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center transition-all shrink-0 ${
-                      answers[currentQuestion.id] === String(idx) ? 'border-white bg-white/20' : 'border-white/10'
-                    }`}>
-                      {answers[currentQuestion.id] === String(idx) && <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-white rounded-full" />}
-                    </div>
-                  </button>
-                ))}
+                {Array.isArray(currentQuestion?.options) &&
+                  currentQuestion.options.map((option, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() =>
+                        setAnswers({
+                          ...answers,
+                          [currentQuestion.id]: String(idx),
+                        })
+                      }
+                      className={`w-full p-4 sm:p-6 rounded-2xl sm:rounded-3xl text-left font-bold transition-all border flex items-center justify-between group ${
+                        answers[currentQuestion.id] === String(idx)
+                          ? "bg-primary-500 border-primary-400 text-white shadow-xl scale-[1.02]"
+                          : "bg-white/5 border-white/10 text-primary-200 hover:bg-white/10 hover:border-white/20"
+                      }`}
+                    >
+                      <span className="text-sm sm:text-base">{option}</span>
+                      <div
+                        className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center transition-all shrink-0 ${
+                          answers[currentQuestion.id] === String(idx)
+                            ? "border-white bg-white/20"
+                            : "border-white/10"
+                        }`}
+                      >
+                        {answers[currentQuestion.id] === String(idx) && (
+                          <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-white rounded-full" />
+                        )}
+                      </div>
+                    </button>
+                  ))}
               </div>
             </div>
           </div>
@@ -172,14 +211,17 @@ export const QuizInterface = ({ quizId, onComplete }: { quizId: string, onComple
 
       {/* Progress Footer */}
       <div className="h-6 bg-white/5 flex">
-        {Array.isArray(quiz?.questions) && quiz.questions.map((_, idx) => (
-          <div 
-            key={idx} 
-            className={`flex-1 transition-colors ${
-              answers[quiz.questions[idx].id] !== undefined ? 'bg-primary-500' : 'bg-transparent'
-            }`} 
-          />
-        ))}
+        {Array.isArray(quiz?.questions) &&
+          quiz.questions.map((_, idx) => (
+            <div
+              key={idx}
+              className={`flex-1 transition-colors ${
+                answers[quiz.questions[idx].id] !== undefined
+                  ? "bg-primary-500"
+                  : "bg-transparent"
+              }`}
+            />
+          ))}
       </div>
     </div>
   );

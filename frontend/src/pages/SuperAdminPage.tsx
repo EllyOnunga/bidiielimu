@@ -1,7 +1,18 @@
-import { useState, useEffect } from 'react';
-import { Shield, Building2, Users, CreditCard, ArrowUpRight, Search, MoreHorizontal, CheckCircle, AlertTriangle, ExternalLink } from 'lucide-react';
-import { TableSkeleton } from '../components/ui/Skeleton';
-import client from '../api/client';
+import { useState, useEffect } from "react";
+import {
+  Shield,
+  Building2,
+  Users,
+  CreditCard,
+  ArrowUpRight,
+  Search,
+  MoreHorizontal,
+  CheckCircle,
+  AlertTriangle,
+  ExternalLink,
+} from "lucide-react";
+import { TableSkeleton } from "../components/ui/Skeleton";
+import client from "../api/client";
 
 interface SchoolData {
   id: number;
@@ -18,7 +29,7 @@ export const SuperAdminPage = () => {
     total_schools: 0,
     total_users: 0,
     total_revenue: 0,
-    system_alerts: 0
+    system_alerts: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -27,18 +38,20 @@ export const SuperAdminPage = () => {
   const fetchStats = async () => {
     try {
       const [schoolsRes, statsRes] = await Promise.all([
-        client.get('schools/'),
-        client.get('schools/super_admin_stats/')
+        client.get("schools/"),
+        client.get("schools/super_admin_stats/"),
       ]);
 
-      const schoolsData = Array.isArray(schoolsRes.data) ? schoolsRes.data : (schoolsRes.data.results || []);
+      const schoolsData = Array.isArray(schoolsRes.data)
+        ? schoolsRes.data
+        : schoolsRes.data.results || [];
       const mapped = schoolsData.map((s: any) => ({
         id: s.id,
         name: s.name,
         students: s.student_count || 0,
-        plan: s.subscription?.plan || 'BASIC',
-        status: s.subscription?.status === 'ACTIVE' ? 'ACTIVE' : 'EXPIRED',
-        revenue: `KSh ${Number(s.total_revenue || 0).toLocaleString()}`
+        plan: s.subscription?.plan || "BASIC",
+        status: s.subscription?.status === "ACTIVE" ? "ACTIVE" : "EXPIRED",
+        revenue: `KSh ${Number(s.total_revenue || 0).toLocaleString()}`,
       }));
       setSchools(mapped);
       setStats(statsRes.data);
@@ -46,7 +59,7 @@ export const SuperAdminPage = () => {
       if (error.response?.status === 403) {
         setUnauthorized(true);
       }
-      console.error('Failed to fetch super admin data', error);
+      console.error("Failed to fetch super admin data", error);
     } finally {
       setLoading(false);
     }
@@ -63,11 +76,16 @@ export const SuperAdminPage = () => {
           <Shield className="w-10 h-10 text-rose-500" />
         </div>
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-primary mb-2">Access Denied</h1>
-          <p className="text-muted max-w-md mx-auto">This panel is restricted to System Super-Admins. Your current role does not have the permissions required to manage all schools.</p>
+          <h1 className="text-2xl sm:text-3xl font-black text-primary mb-2">
+            Access Denied
+          </h1>
+          <p className="text-muted max-w-md mx-auto">
+            This panel is restricted to System Super-Admins. Your current role
+            does not have the permissions required to manage all schools.
+          </p>
         </div>
-        <button 
-          onClick={() => window.location.href = '/dashboard'}
+        <button
+          onClick={() => (window.location.href = "/dashboard")}
           className="px-6 py-3 bg-white/5 text-primary rounded-xl font-bold border border-white/10 hover:bg-white/10 transition-all"
         >
           Return to Dashboard
@@ -84,8 +102,12 @@ export const SuperAdminPage = () => {
             <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-rose-400" />
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-primary tracking-tight">Super-Admin <span className="text-gradient">Panel</span></h1>
-            <p className="text-muted text-xs sm:text-sm">System-wide management of schools and subscriptions.</p>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-primary tracking-tight">
+              Super-Admin <span className="text-gradient">Panel</span>
+            </h1>
+            <p className="text-muted text-xs sm:text-sm">
+              System-wide management of schools and subscriptions.
+            </p>
           </div>
         </div>
         <button className="flex items-center justify-center gap-2 px-5 py-3 bg-rose-600 hover:bg-rose-500 text-white rounded-xl font-bold transition-all shadow-lg shadow-rose-900/20 w-full sm:w-auto text-sm">
@@ -94,15 +116,37 @@ export const SuperAdminPage = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-        <StatCard title="Total Schools" value={stats.total_schools} icon={Building2} color="bg-blue-500/20" />
-        <StatCard title="Active Users" value={(stats.total_users / 1000).toFixed(1) + 'k'} icon={Users} color="bg-purple-500/20" />
-        <StatCard title="Monthly Revenue" value={`KSh ${(stats.total_revenue / 1000000).toFixed(1)}M`} icon={CreditCard} color="bg-emerald-500/20" />
-        <StatCard title="System Alerts" value={stats.system_alerts} icon={AlertTriangle} color="bg-rose-500/20" />
+        <StatCard
+          title="Total Schools"
+          value={stats.total_schools}
+          icon={Building2}
+          color="bg-blue-500/20"
+        />
+        <StatCard
+          title="Active Users"
+          value={(stats.total_users / 1000).toFixed(1) + "k"}
+          icon={Users}
+          color="bg-purple-500/20"
+        />
+        <StatCard
+          title="Monthly Revenue"
+          value={`KSh ${(stats.total_revenue / 1000000).toFixed(1)}M`}
+          icon={CreditCard}
+          color="bg-emerald-500/20"
+        />
+        <StatCard
+          title="System Alerts"
+          value={stats.system_alerts}
+          icon={AlertTriangle}
+          color="bg-rose-500/20"
+        />
       </div>
 
       <div className="glass rounded-3xl border border-white/5 overflow-hidden">
         <div className="p-4 md:p-6 border-b border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <h2 className="text-lg md:text-xl font-bold text-primary">Registered Schools</h2>
+          <h2 className="text-lg md:text-xl font-bold text-primary">
+            Registered Schools
+          </h2>
           <div className="relative w-full sm:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dim" />
             <input
@@ -116,12 +160,24 @@ export const SuperAdminPage = () => {
           <table className="w-full text-left min-w-[800px]">
             <thead>
               <tr className="bg-white/5">
-                <th className="px-8 py-4 text-xs font-bold text-muted uppercase">School Name</th>
-                <th className="px-8 py-4 text-xs font-bold text-muted uppercase">Plan</th>
-                <th className="px-8 py-4 text-xs font-bold text-muted uppercase text-center">Students</th>
-                <th className="px-8 py-4 text-xs font-bold text-muted uppercase text-center">Status</th>
-                <th className="px-8 py-4 text-xs font-bold text-muted uppercase text-right">Revenue</th>
-                <th className="px-8 py-4 text-xs font-bold text-muted uppercase text-right">Actions</th>
+                <th className="px-8 py-4 text-xs font-bold text-muted uppercase">
+                  School Name
+                </th>
+                <th className="px-8 py-4 text-xs font-bold text-muted uppercase">
+                  Plan
+                </th>
+                <th className="px-8 py-4 text-xs font-bold text-muted uppercase text-center">
+                  Students
+                </th>
+                <th className="px-8 py-4 text-xs font-bold text-muted uppercase text-center">
+                  Status
+                </th>
+                <th className="px-8 py-4 text-xs font-bold text-muted uppercase text-right">
+                  Revenue
+                </th>
+                <th className="px-8 py-4 text-xs font-bold text-muted uppercase text-right">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -129,31 +185,45 @@ export const SuperAdminPage = () => {
                 <TableSkeleton rows={8} cols={6} />
               ) : schools.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-8 py-12 text-center text-muted">No schools found.</td>
+                  <td colSpan={6} className="px-8 py-12 text-center text-muted">
+                    No schools found.
+                  </td>
                 </tr>
               ) : (
                 schools.map((school) => (
-                  <tr key={school.id} className="hover:bg-white/[0.02] transition-all group">
+                  <tr
+                    key={school.id}
+                    className="hover:bg-white/[0.02] transition-all group"
+                  >
                     <td className="px-8 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/5 text-muted">
                           <Building2 className="w-5 h-5" />
                         </div>
-                        <div className="text-sm font-bold text-primary">{school.name}</div>
+                        <div className="text-sm font-bold text-primary">
+                          {school.name}
+                        </div>
                       </div>
                     </td>
                     <td className="px-8 py-4">
-                      <span className={`px-2 py-1 rounded-lg text-[10px] font-bold border ${school.plan === 'ENTERPRISE' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' :
-                          school.plan === 'PREMIUM' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-                            'bg-white/5 text-muted border-white/10'
-                        }`}>
+                      <span
+                        className={`px-2 py-1 rounded-lg text-[10px] font-bold border ${
+                          school.plan === "ENTERPRISE"
+                            ? "bg-purple-500/10 text-purple-400 border-purple-500/20"
+                            : school.plan === "PREMIUM"
+                              ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                              : "bg-white/5 text-muted border-white/10"
+                        }`}
+                      >
                         {school.plan}
                       </span>
                     </td>
-                    <td className="px-8 py-4 text-center text-sm text-muted">{school.students}</td>
+                    <td className="px-8 py-4 text-center text-sm text-muted">
+                      {school.students}
+                    </td>
                     <td className="px-8 py-4">
                       <div className="flex items-center justify-center gap-1.5">
-                        {school.status === 'ACTIVE' ? (
+                        {school.status === "ACTIVE" ? (
                           <span className="flex items-center gap-1 text-emerald-400 text-[10px] font-bold uppercase">
                             <CheckCircle className="w-3 h-3" />
                             Active
@@ -166,10 +236,15 @@ export const SuperAdminPage = () => {
                         )}
                       </div>
                     </td>
-                    <td className="px-8 py-4 text-right font-bold text-primary text-sm">{school.revenue}</td>
+                    <td className="px-8 py-4 text-right font-bold text-primary text-sm">
+                      {school.revenue}
+                    </td>
                     <td className="px-8 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <button className="p-2 hover:bg-white/10 rounded-lg text-muted transition-all" title="Manage School">
+                        <button
+                          className="p-2 hover:bg-white/10 rounded-lg text-muted transition-all"
+                          title="Manage School"
+                        >
                           <ExternalLink className="w-4 h-4" />
                         </button>
                         <button className="p-2 hover:bg-white/10 rounded-lg text-muted transition-all">
@@ -197,7 +272,9 @@ interface StatCardProps {
 
 const StatCard = ({ title, value, icon: Icon, color }: StatCardProps) => (
   <div className="glass p-6 rounded-3xl border border-white/5 relative overflow-hidden group">
-    <div className={`p-3 rounded-2xl ${color} w-fit mb-4 group-hover:scale-110 transition-transform`}>
+    <div
+      className={`p-3 rounded-2xl ${color} w-fit mb-4 group-hover:scale-110 transition-transform`}
+    >
       <Icon className="w-6 h-6 text-white" />
     </div>
     <p className="text-sm text-muted font-medium mb-1">{title}</p>

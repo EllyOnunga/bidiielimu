@@ -1,4 +1,4 @@
-import client from '../client';
+import client from "../client";
 
 export interface Payment {
   id: number;
@@ -21,17 +21,21 @@ export interface StudentBalance {
 
 export const feesService = {
   getPayments: async (search?: string) => {
-    const response = await client.get('fees/payments/', { params: { search } });
+    const response = await client.get("fees/payments/", { params: { search } });
     return response.data;
   },
 
   getBalances: async () => {
-    const response = await client.get('fees/payments/student_balances/');
+    const response = await client.get("fees/payments/student_balances/");
     return response.data;
   },
 
-  initiateMpesa: async (data: { student_id: string; amount: string; phone: string }) => {
-    const response = await client.post('fees/payments/initiate_mpesa/', data);
+  initiateMpesa: async (data: {
+    student_id: string;
+    amount: string;
+    phone: string;
+  }) => {
+    const response = await client.post("fees/payments/initiate_mpesa/", data);
     return response.data;
-  }
+  },
 };

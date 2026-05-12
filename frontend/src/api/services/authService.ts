@@ -1,8 +1,8 @@
-import client from '../client';
+import client from "../client";
 
 export const authService = {
   login: async (email: string, password: string) => {
-    const response = await client.post('accounts/login/', { email, password });
+    const response = await client.post("accounts/login/", { email, password });
     return response.data;
   },
 
@@ -14,7 +14,7 @@ export const authService = {
     last_name: string;
     curriculum: string;
   }) => {
-    const response = await client.post('accounts/register/', data);
+    const response = await client.post("accounts/register/", data);
     return response.data;
   },
 
@@ -24,22 +24,24 @@ export const authService = {
   },
 
   resendVerification: async (email: string) => {
-    const response = await client.post('accounts/resend-verification/', { email });
+    const response = await client.post("accounts/resend-verification/", {
+      email,
+    });
     return response.data;
   },
 
   refreshToken: async (refresh: string) => {
-    const response = await client.post('accounts/token/refresh/', { refresh });
+    const response = await client.post("accounts/token/refresh/", { refresh });
     return response.data;
   },
 
   forgotPassword: async (email: string) => {
-    const response = await client.post('accounts/forgot-password/', { email });
+    const response = await client.post("accounts/forgot-password/", { email });
     return response.data;
   },
 
   resetPassword: async (uid: string, token: string, newPassword: string) => {
-    const response = await client.post('accounts/reset-password/', {
+    const response = await client.post("accounts/reset-password/", {
       uid,
       token,
       new_password: newPassword,
@@ -48,17 +50,17 @@ export const authService = {
   },
 
   verifyOTP: async (userId: number, otp: string) => {
-    const response = await client.post('accounts/otp/verify-login/', { 
-      user_id: userId, 
-      otp 
+    const response = await client.post("accounts/otp/verify-login/", {
+      user_id: userId,
+      otp,
     });
     return response.data;
   },
 
   triggerOTP: async (userId: number, method: string) => {
-    const response = await client.post('accounts/otp/trigger/', { 
-      user_id: userId, 
-      method 
+    const response = await client.post("accounts/otp/trigger/", {
+      user_id: userId,
+      method,
     });
     return response.data;
   },

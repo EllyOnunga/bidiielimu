@@ -1,4 +1,4 @@
-import client from '../client';
+import client from "../client";
 
 export interface Exam {
   id: number;
@@ -11,17 +11,17 @@ export interface Exam {
 
 export const examsService = {
   getExams: async (search?: string) => {
-    const response = await client.get('exams/exams/', { params: { search } });
+    const response = await client.get("exams/exams/", { params: { search } });
     return response.data;
   },
 
   getAnalytics: async () => {
-    const response = await client.get('exams/exams/analytics/');
+    const response = await client.get("exams/exams/analytics/");
     return response.data;
   },
 
-  createExam: async (data: Omit<Exam, 'id' | 'is_published'>) => {
-    const response = await client.post('exams/exams/', data);
+  createExam: async (data: Omit<Exam, "id" | "is_published">) => {
+    const response = await client.post("exams/exams/", data);
     return response.data;
   },
 
@@ -31,17 +31,19 @@ export const examsService = {
   },
 
   getGradingSystems: async (search?: string) => {
-    const response = await client.get('exams/grading-systems/', { params: { search } });
+    const response = await client.get("exams/grading-systems/", {
+      params: { search },
+    });
     return response.data;
   },
 
   createGradingSystem: async (data: { name: string }) => {
-    const response = await client.post('exams/grading-systems/', data);
+    const response = await client.post("exams/grading-systems/", data);
     return response.data;
   },
 
   createThreshold: async (data: any) => {
-    const response = await client.post('exams/grade-thresholds/', data);
+    const response = await client.post("exams/grade-thresholds/", data);
     return response.data;
   },
 
@@ -49,9 +51,9 @@ export const examsService = {
     const response = await client.delete(`exams/grade-thresholds/${id}/`);
     return response.data;
   },
-  
+
   computeRanks: async (id: number) => {
     const response = await client.post(`exams/exams/${id}/compute_ranks/`);
     return response.data;
-  }
+  },
 };

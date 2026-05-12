@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Mail, ArrowLeft, Loader2, CheckCircle2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import toast from 'react-hot-toast';
-import client from '../api/client';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { Mail, ArrowLeft, Loader2, CheckCircle2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
+import client from "../api/client";
+import { Button } from "../components/ui/Button";
+import { Input } from "../components/ui/Input";
 
 export const ForgotPasswordPage = () => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
 
@@ -17,11 +17,11 @@ export const ForgotPasswordPage = () => {
     setLoading(true);
 
     try {
-      await client.post('auth/password/reset/', { email });
+      await client.post("auth/password/reset/", { email });
       setSent(true);
-      toast.success('Reset link sent to your email');
+      toast.success("Reset link sent to your email");
     } catch (error: any) {
-      toast.error(error.response?.data?.detail || 'Failed to send reset link');
+      toast.error(error.response?.data?.detail || "Failed to send reset link");
     } finally {
       setLoading(false);
     }
@@ -41,8 +41,8 @@ export const ForgotPasswordPage = () => {
         className="w-full max-w-md z-10"
       >
         <div className="glass p-8 md:p-10 rounded-[40px] border border-white/10 shadow-2xl relative">
-          <Link 
-            to="/login" 
+          <Link
+            to="/login"
             className="inline-flex items-center gap-2 text-muted hover:text-primary mb-8 transition-colors text-sm font-bold"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -59,13 +59,20 @@ export const ForgotPasswordPage = () => {
                 className="space-y-6"
               >
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-black text-primary tracking-tight mb-2">Forgot Password?</h1>
-                  <p className="text-muted text-sm">No worries, it happens. Enter your email and we'll send you a reset link.</p>
+                  <h1 className="text-2xl sm:text-3xl font-black text-primary tracking-tight mb-2">
+                    Forgot Password?
+                  </h1>
+                  <p className="text-muted text-sm">
+                    No worries, it happens. Enter your email and we'll send you
+                    a reset link.
+                  </p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-muted uppercase tracking-widest ml-1">Email Address</label>
+                    <label className="text-xs font-bold text-muted uppercase tracking-widest ml-1">
+                      Email Address
+                    </label>
                     <div className="relative group">
                       <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-dim group-focus-within:text-primary-400 transition-colors" />
                       <Input
@@ -79,8 +86,8 @@ export const ForgotPasswordPage = () => {
                     </div>
                   </div>
 
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     disabled={loading}
                     className="w-full h-14 text-lg font-black shadow-xl shadow-primary-900/20"
                   >
@@ -89,7 +96,9 @@ export const ForgotPasswordPage = () => {
                         <Loader2 className="w-5 h-5 animate-spin mr-2" />
                         Sending Link...
                       </>
-                    ) : 'Send Reset Link'}
+                    ) : (
+                      "Send Reset Link"
+                    )}
                   </Button>
                 </form>
               </motion.div>
@@ -104,16 +113,19 @@ export const ForgotPasswordPage = () => {
                   <CheckCircle2 className="w-10 h-10 text-emerald-400" />
                 </div>
                 <div className="space-y-2">
-                  <h2 className="text-2xl font-black text-primary">Check your email</h2>
+                  <h2 className="text-2xl font-black text-primary">
+                    Check your email
+                  </h2>
                   <p className="text-muted text-sm">
-                    We've sent a password reset link to <span className="text-primary font-bold">{email}</span>.
+                    We've sent a password reset link to{" "}
+                    <span className="text-primary font-bold">{email}</span>.
                   </p>
                 </div>
                 <div className="pt-4">
                   <p className="text-xs text-dim">
-                    Didn't receive the email? Check your spam folder or{' '}
-                    <button 
-                      onClick={() => setSent(false)} 
+                    Didn't receive the email? Check your spam folder or{" "}
+                    <button
+                      onClick={() => setSent(false)}
                       className="text-primary-400 font-bold hover:underline"
                     >
                       try another email address

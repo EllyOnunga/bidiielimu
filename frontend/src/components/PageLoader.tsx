@@ -1,5 +1,5 @@
-import { Loader2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
 
 export const PageLoader = () => {
   return (
@@ -15,8 +15,12 @@ export const PageLoader = () => {
           <Loader2 className="w-12 h-12 text-primary-400 animate-spin relative z-10" />
         </div>
         <div className="text-center">
-          <h3 className="text-white font-black text-lg uppercase tracking-tight">ElimuHub</h3>
-          <p className="text-primary-200/50 text-[10px] font-black uppercase tracking-[0.2em] mt-1">Loading Assets...</p>
+          <h3 className="text-white font-black text-lg uppercase tracking-tight">
+            ElimuHub
+          </h3>
+          <p className="text-primary-200/50 text-[10px] font-black uppercase tracking-[0.2em] mt-1">
+            Loading Assets...
+          </p>
         </div>
       </motion.div>
     </div>

@@ -1,43 +1,66 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  BookOpen, FileText, HelpCircle,
-  Sparkles, Plus, Clock, Settings
-} from 'lucide-react';
-import { Button } from '../components/ui/Button';
-import { AssignmentList } from '../components/lms/AssignmentList';
-import { ResourceLibrary } from '../components/lms/ResourceLibrary';
-import { QuizInterface } from '../components/lms/QuizInterface';
-import { QuizBuilder } from '../components/lms/QuizBuilder';
-import { useAuthStore } from '../store/authStore';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import client from '../api/client';
+  BookOpen,
+  FileText,
+  HelpCircle,
+  Sparkles,
+  Plus,
+  Clock,
+  Settings,
+} from "lucide-react";
+import { Button } from "../components/ui/Button";
+import { AssignmentList } from "../components/lms/AssignmentList";
+import { ResourceLibrary } from "../components/lms/ResourceLibrary";
+import { QuizInterface } from "../components/lms/QuizInterface";
+import { QuizBuilder } from "../components/lms/QuizBuilder";
+import { useAuthStore } from "../store/authStore";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import client from "../api/client";
 
-type TabType = 'assignments' | 'resources' | 'quizzes';
+type TabType = "assignments" | "resources" | "quizzes";
 
 export const LMSPage = () => {
   const queryClient = useQueryClient();
-  const user = useAuthStore(state => state.user);
-  const isTeacher = user?.role === 'TEACHER' || user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
+  const user = useAuthStore((state) => state.user);
+  const isTeacher =
+    user?.role === "TEACHER" ||
+    user?.role === "ADMIN" ||
+    user?.role === "SUPER_ADMIN";
 
-  const [activeTab, setActiveTab] = useState<TabType>('assignments');
+  const [activeTab, setActiveTab] = useState<TabType>("assignments");
   const [activeQuizId, setActiveQuizId] = useState<string | null>(null);
   const [isBuilderOpen, setIsBuilderOpen] = useState(false);
   const [editingQuiz, setEditingQuiz] = useState<any>(null);
 
   const { data: quizzes = [], isLoading: loadingQuizzes } = useQuery({
-    queryKey: ['quizzes'],
+    queryKey: ["quizzes"],
     queryFn: async () => {
-      const res = await client.get('lms/quizzes/');
-      return Array.isArray(res.data) ? res.data : (res.data.results || []);
+      const res = await client.get("lms/quizzes/");
+      return Array.isArray(res.data) ? res.data : res.data.results || [];
     },
-    enabled: activeTab === 'quizzes'
+    enabled: activeTab === "quizzes",
   });
 
   const tabs = [
-    { id: 'assignments', label: 'Assignments', icon: FileText, color: 'text-primary-400' },
-    { id: 'resources', label: 'Resource Hub', icon: BookOpen, color: 'text-emerald-400' },
-    { id: 'quizzes', label: 'Assessment Center', icon: HelpCircle, color: 'text-amber-400' },
+    {
+      id: "assignments",
+      label: "Assignments",
+      icon: FileText,
+      color: "text-primary-400",
+    },
+    {
+      id: "resources",
+      label: "Resource Hub",
+      icon: BookOpen,
+      color: "text-emerald-400",
+    },
+    {
+      id: "quizzes",
+      label: "Assessment Center",
+      icon: HelpCircle,
+      color: "text-amber-400",
+    },
   ] as const;
 
   return (
@@ -55,7 +78,8 @@ export const LMSPage = () => {
             Learning <span className="text-gradient">Ecosystem</span>
           </h1>
           <p className="text-muted text-xs sm:text-sm md:text-base font-medium max-w-xl leading-relaxed">
-            Access curated materials, submit assessments, and track your progression through a unified digital environment.
+            Access curated materials, submit assessments, and track your
+            progression through a unified digital environment.
           </p>
         </div>
 
@@ -68,12 +92,15 @@ export const LMSPage = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-3 px-4 sm:px-5 py-2.5 sm:py-3 rounded-[18px] font-black text-[9px] sm:text-[10px] uppercase tracking-widest transition-all duration-300 flex-1 sm:flex-none justify-center ${isActive
-                  ? 'bg-primary-600 text-white shadow-premium'
-                  : 'text-muted hover:bg-white/5 hover:text-primary'
-                  }`}
+                className={`flex items-center gap-3 px-4 sm:px-5 py-2.5 sm:py-3 rounded-[18px] font-black text-[9px] sm:text-[10px] uppercase tracking-widest transition-all duration-300 flex-1 sm:flex-none justify-center ${
+                  isActive
+                    ? "bg-primary-600 text-white shadow-premium"
+                    : "text-muted hover:bg-white/5 hover:text-primary"
+                }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : tab.color}`} />
+                <Icon
+                  className={`w-4 h-4 ${isActive ? "text-white" : tab.color}`}
+                />
                 <span>{tab.label}</span>
               </button>
             );
@@ -90,21 +117,25 @@ export const LMSPage = () => {
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.3 }}
         >
-          {activeTab === 'assignments' && <AssignmentList />}
-          {activeTab === 'resources' && <ResourceLibrary />}
-          {activeTab === 'quizzes' && (
+          {activeTab === "assignments" && <AssignmentList />}
+          {activeTab === "resources" && <ResourceLibrary />}
+          {activeTab === "quizzes" && (
             <div className="space-y-10">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                 <div>
-                  <h2 className="text-xl sm:text-2xl font-black text-primary uppercase tracking-tight">Active <span className="text-amber-400">Assessments</span></h2>
-                  <p className="text-muted text-[10px] font-bold uppercase tracking-widest mt-1">Timed examinations and knowledge validation modules.</p>
+                  <h2 className="text-xl sm:text-2xl font-black text-primary uppercase tracking-tight">
+                    Active <span className="text-amber-400">Assessments</span>
+                  </h2>
+                  <p className="text-muted text-[10px] font-bold uppercase tracking-widest mt-1">
+                    Timed examinations and knowledge validation modules.
+                  </p>
                 </div>
                 {isTeacher && (
-                  <Button 
+                  <Button
                     onClick={() => {
                       setEditingQuiz(null);
                       setIsBuilderOpen(true);
-                    }} 
+                    }}
                     className="gap-2 rounded-2xl px-6 bg-amber-500 hover:bg-amber-600 w-full sm:w-auto shrink-0"
                   >
                     <Plus className="w-5 h-5" />
@@ -115,26 +146,36 @@ export const LMSPage = () => {
 
               {loadingQuizzes ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {[1, 2, 3].map(i => (
-                    <div key={i} className="glass h-64 rounded-[32px] border border-white/5 animate-pulse" />
+                  {[1, 2, 3].map((i) => (
+                    <div
+                      key={i}
+                      className="glass h-64 rounded-[32px] border border-white/5 animate-pulse"
+                    />
                   ))}
                 </div>
               ) : quizzes.length === 0 ? (
                 <div className="glass p-20 rounded-[40px] border border-dashed border-white/10 text-center opacity-40">
                   <HelpCircle className="w-16 h-16 mx-auto mb-6 text-amber-500/50" />
-                  <p className="text-sm font-black uppercase tracking-widest italic">No Assessments Currently Deployed</p>
+                  <p className="text-sm font-black uppercase tracking-widest italic">
+                    No Assessments Currently Deployed
+                  </p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                   {quizzes.map((q: any) => (
-                    <div key={q.id} className="premium-card group hover:border-amber-500/30">
+                    <div
+                      key={q.id}
+                      className="premium-card group hover:border-amber-500/30"
+                    >
                       <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400 mb-6 group-hover:scale-110 transition-transform shadow-glow">
                         <HelpCircle className="w-6 h-6" />
                       </div>
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-base sm:text-lg font-black text-primary uppercase tracking-tight">{q.title}</h3>
+                        <h3 className="text-base sm:text-lg font-black text-primary uppercase tracking-tight">
+                          {q.title}
+                        </h3>
                         {isTeacher && (
-                          <button 
+                          <button
                             onClick={() => {
                               setEditingQuiz(q);
                               setIsBuilderOpen(true);
@@ -146,15 +187,22 @@ export const LMSPage = () => {
                           </button>
                         )}
                       </div>
-                      <p className="text-xs font-medium text-muted mb-8 leading-relaxed line-clamp-2">{q.description || 'Validate your comprehension of the core concepts covered in this module.'}</p>
+                      <p className="text-xs font-medium text-muted mb-8 leading-relaxed line-clamp-2">
+                        {q.description ||
+                          "Validate your comprehension of the core concepts covered in this module."}
+                      </p>
                       <div className="flex items-center gap-4 mb-8">
                         <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/5 border border-white/5">
                           <Clock className="w-3 h-3 text-amber-400" />
-                          <span className="text-[10px] font-black text-primary uppercase">{q.duration_minutes}m</span>
+                          <span className="text-[10px] font-black text-primary uppercase">
+                            {q.duration_minutes}m
+                          </span>
                         </div>
                         <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/5 border border-white/5">
                           <FileText className="w-3 h-3 text-primary-400" />
-                          <span className="text-[10px] font-black text-primary uppercase">{q.question_count || 0} Questions</span>
+                          <span className="text-[10px] font-black text-primary uppercase">
+                            {q.question_count || 0} Questions
+                          </span>
                         </div>
                       </div>
                       <Button
@@ -184,7 +232,7 @@ export const LMSPage = () => {
       </AnimatePresence>
 
       {/* Quiz Builder Modal */}
-      <QuizBuilder 
+      <QuizBuilder
         isOpen={isBuilderOpen}
         onClose={() => {
           setIsBuilderOpen(false);
@@ -192,7 +240,7 @@ export const LMSPage = () => {
         }}
         initialData={editingQuiz}
         onSuccess={() => {
-          queryClient.invalidateQueries({ queryKey: ['quizzes'] });
+          queryClient.invalidateQueries({ queryKey: ["quizzes"] });
         }}
       />
     </div>

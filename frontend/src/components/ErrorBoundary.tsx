@@ -32,9 +32,12 @@ class ErrorBoundary extends Component<Props, State> {
               <AlertTriangle className="w-8 h-8 text-rose-500" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white mb-2">Something went wrong</h1>
+              <h1 className="text-2xl font-bold text-white mb-2">
+                Something went wrong
+              </h1>
               <p className="text-slate-400 text-sm">
-                We've encountered an unexpected error. Don't worry, your data is safe.
+                We've encountered an unexpected error. Don't worry, your data is
+                safe.
               </p>
             </div>
             <div className="flex flex-col gap-3">
@@ -47,7 +50,7 @@ class ErrorBoundary extends Component<Props, State> {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => window.location.href = '/'}
+                onClick={() => (window.location.href = "/")}
                 className="w-full gap-2 border-slate-700 text-slate-300"
               >
                 <Home className="w-4 h-4" />
@@ -59,7 +62,7 @@ class ErrorBoundary extends Component<Props, State> {
       );
     }
 
-    return this.props.children
+    return this.props.children;
   }
 }
 

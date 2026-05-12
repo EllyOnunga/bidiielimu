@@ -215,28 +215,30 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         # 2FA / OTP Check
         from .models import SMSDevice
         from .services_otp import OTPService
-        
+
         sms_device = SMSDevice.objects.filter(user=self.user, confirmed=True).first()
         if sms_device or self.user.email:
             # Prepare available methods
             methods = ["EMAIL"]
             if sms_device:
                 methods.append("SMS")
-            
+
             # Default to SMS if available, otherwise EMAIL
             default_method = "SMS" if sms_device else "EMAIL"
-            
+
             # Trigger OTP send via default method
             OTPService.send_otp(self.user, method=default_method)
-            
+
             # Raise special error that frontend can catch to show OTP input
-            raise serializers.ValidationError({
-                "2fa_required": True,
-                "methods": methods,
-                "default_method": default_method,
-                "user_id": self.user.id,
-                "detail": "Two-factor authentication required."
-            })
+            raise serializers.ValidationError(
+                {
+                    "2fa_required": True,
+                    "methods": methods,
+                    "default_method": default_method,
+                    "user_id": self.user.id,
+                    "detail": "Two-factor authentication required.",
+                }
+            )
 
         # Add custom claims to token
         refresh = self.get_token(self.user)

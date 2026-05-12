@@ -1,13 +1,16 @@
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
+import React from "react";
+import { Navigate, useLocation } from "react-router-dom";
+import { useAuthStore } from "../store/authStore";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
   allowedRoles?: string[];
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles }) => {
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  children,
+  allowedRoles,
+}) => {
   const { user, token } = useAuthStore();
   const location = useLocation();
 
@@ -17,7 +20,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowe
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     // Redirect based on role if they don't have access
-    if (user.role === 'STUDENT' || user.role === 'PARENT') {
+    if (user.role === "STUDENT" || user.role === "PARENT") {
       return <Navigate to="/portal" replace />;
     }
     return <Navigate to="/dashboard" replace />;

@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react';
-import { FixedSizeList as List } from 'react-window';
-import AutoSizer from 'react-virtualized-auto-sizer';
+import React, { useMemo, useState } from "react";
+import { FixedSizeList as List } from "react-window";
+import AutoSizer from "react-virtualized-auto-sizer";
 
 interface VirtualizedTableProps<T> {
   data: T[];
@@ -22,9 +22,12 @@ export function VirtualizedTable<T extends Record<string, any>>({
   rowHeight = 50,
   height = 400,
   onRowClick,
-  className = '',
+  className = "",
 }: VirtualizedTableProps<T>) {
-  const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
+  const [sortConfig, setSortConfig] = useState<{
+    key: string;
+    direction: "asc" | "desc";
+  } | null>(null);
 
   // Sort data
   const sortedData = useMemo(() => {
@@ -34,27 +37,31 @@ export function VirtualizedTable<T extends Record<string, any>>({
       const aValue = a[sortConfig.key];
       const bValue = b[sortConfig.key];
 
-      if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+      if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1;
+      if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1;
       return 0;
     });
   }, [data, sortConfig]);
 
   const handleSort = (key: string) => {
-    setSortConfig(current => {
+    setSortConfig((current) => {
       if (current?.key === key) {
         return {
           key,
-          direction: current.direction === 'asc' ? 'desc' : 'asc',
+          direction: current.direction === "asc" ? "desc" : "asc",
         };
       }
-      return { key, direction: 'asc' };
+      return { key, direction: "asc" };
     });
   };
 
-
-
-  const Row = ({ index, style }: { index: number; style: React.CSSProperties }) => {
+  const Row = ({
+    index,
+    style,
+  }: {
+    index: number;
+    style: React.CSSProperties;
+  }) => {
     const item = sortedData[index];
     if (!item) return null;
 
@@ -62,12 +69,14 @@ export function VirtualizedTable<T extends Record<string, any>>({
       <div
         style={style}
         className={`flex border-b border-white/5 hover:bg-white/[0.03] transition-colors ${
-          onRowClick ? 'cursor-pointer' : ''
+          onRowClick ? "cursor-pointer" : ""
         }`}
         onClick={() => onRowClick?.(item)}
       >
         {columns.map((column, colIndex) => {
-          const value = column.render ? column.render(item) : item[column.key as keyof T];
+          const value = column.render
+            ? column.render(item)
+            : item[column.key as keyof T];
           return (
             <div
               key={colIndex}
@@ -83,9 +92,13 @@ export function VirtualizedTable<T extends Record<string, any>>({
   };
 
   return (
-    <div className={`glass rounded-2xl border border-white/5 overflow-hidden w-full ${className}`}>
+    <div
+      className={`glass rounded-2xl border border-white/5 overflow-hidden w-full ${className}`}
+    >
       <div className="overflow-x-auto custom-scrollbar w-full">
-        <div style={{ minWidth: columns.reduce((acc, col) => acc + col.width, 0) }}>
+        <div
+          style={{ minWidth: columns.reduce((acc, col) => acc + col.width, 0) }}
+        >
           {/* Header */}
           <div className="flex bg-white/5 border-b border-white/5">
             {columns.map((column, index) => (
@@ -99,7 +112,7 @@ export function VirtualizedTable<T extends Record<string, any>>({
                   <span>{column.header}</span>
                   {sortConfig?.key === column.key && (
                     <span className="ml-1 text-primary-400">
-                      {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                      {sortConfig.direction === "asc" ? "↑" : "↓"}
                     </span>
                   )}
                 </div>
@@ -108,7 +121,7 @@ export function VirtualizedTable<T extends Record<string, any>>({
           </div>
 
           {/* Virtualized Body */}
-          <div style={{ height, width: '100%' }}>
+          <div style={{ height, width: "100%" }}>
             <AutoSizer>
               {({ width }: { width: number }) => (
                 <List
@@ -132,7 +145,8 @@ export function VirtualizedTable<T extends Record<string, any>>({
         </div>
         {sortConfig && (
           <div className="uppercase tracking-widest text-[10px]">
-            Sorted by <span className="text-primary-400">{sortConfig.key}</span> ({sortConfig.direction})
+            Sorted by <span className="text-primary-400">{sortConfig.key}</span>{" "}
+            ({sortConfig.direction})
           </div>
         )}
       </div>
@@ -142,8 +156,11 @@ export function VirtualizedTable<T extends Record<string, any>>({
 
 // Hook for lazy loading data with virtualization
 export function useVirtualizedData<T>(
-  fetchData: (offset: number, limit: number) => Promise<{ data: T[]; total: number }>,
-  pageSize: number = 50
+  fetchData: (
+    offset: number,
+    limit: number,
+  ) => Promise<{ data: T[]; total: number }>,
+  pageSize: number = 50,
 ) {
   const [data, setData] = useState<T[]>([]);
   const [total, setTotal] = useState(0);
@@ -157,7 +174,7 @@ export function useVirtualizedData<T>(
     setLoading(true);
     try {
       const result = await fetchData(start, end - start + 1);
-      setData(prev => {
+      setData((prev) => {
         const newData = [...prev];
         for (let i = start; i <= end && i < result.data.length; i++) {
           newData[i] = result.data[i - start];
@@ -165,9 +182,9 @@ export function useVirtualizedData<T>(
         return newData;
       });
       setTotal(result.total);
-      setLoadedRanges(prev => new Set([...prev, rangeKey]));
+      setLoadedRanges((prev) => new Set([...prev, rangeKey]));
     } catch (error) {
-      console.error('Failed to load data range:', error);
+      console.error("Failed to load data range:", error);
     } finally {
       setLoading(false);
     }

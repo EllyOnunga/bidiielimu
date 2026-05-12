@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 // Performance monitoring utilities
 export class PerformanceMonitor {
@@ -47,8 +47,14 @@ export class PerformanceMonitor {
   }
 
   // Get metrics summary
-  getMetrics(): Record<string, { avg: number; min: number; max: number; count: number }> {
-    const result: Record<string, { avg: number; min: number; max: number; count: number }> = {};
+  getMetrics(): Record<
+    string,
+    { avg: number; min: number; max: number; count: number }
+  > {
+    const result: Record<
+      string,
+      { avg: number; min: number; max: number; count: number }
+    > = {};
 
     for (const [name, values] of this.metrics.entries()) {
       if (values.length > 0) {
@@ -95,16 +101,16 @@ export class PerformanceMonitor {
       try {
         const response = await originalFetch(...args);
         const duration = performance.now() - start;
-        this.recordMetric('api_request', duration);
+        this.recordMetric("api_request", duration);
 
         if (response.status >= 400) {
-          this.recordMetric('api_error', duration);
+          this.recordMetric("api_error", duration);
         }
 
         return response;
       } catch (error) {
         const duration = performance.now() - start;
-        this.recordMetric('api_network_error', duration);
+        this.recordMetric("api_network_error", duration);
         throw error;
       }
     };
@@ -124,38 +130,41 @@ export class PerformanceMonitor {
         }
       }
     });
-    clsObserver.observe({ entryTypes: ['layout-shift'] });
+    clsObserver.observe({ entryTypes: ["layout-shift"] });
 
     // Report CLS on page unload
-    window.addEventListener('beforeunload', () => {
-      this.recordMetric('web_vitals_cls', clsValue);
+    window.addEventListener("beforeunload", () => {
+      this.recordMetric("web_vitals_cls", clsValue);
     });
 
     // FID - First Input Delay
     const fidObserver = new PerformanceObserver((list) => {
       for (const entry of list.getEntries()) {
-        this.recordMetric('web_vitals_fid', (entry as any).processingStart - entry.startTime);
+        this.recordMetric(
+          "web_vitals_fid",
+          (entry as any).processingStart - entry.startTime,
+        );
       }
     });
-    fidObserver.observe({ entryTypes: ['first-input'] });
+    fidObserver.observe({ entryTypes: ["first-input"] });
 
     // LCP - Largest Contentful Paint
     const lcpObserver = new PerformanceObserver((list) => {
       const entries = list.getEntries();
       const lastEntry = entries[entries.length - 1];
-      this.recordMetric('web_vitals_lcp', lastEntry.startTime);
+      this.recordMetric("web_vitals_lcp", lastEntry.startTime);
     });
-    lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
+    lcpObserver.observe({ entryTypes: ["largest-contentful-paint"] });
   }
 
   // Memory usage monitoring
   monitorMemory(): void {
-    if ('memory' in performance) {
+    if ("memory" in performance) {
       setInterval(() => {
         const memory = (performance as any).memory;
-        this.recordMetric('memory_used', memory.usedJSHeapSize / 1024 / 1024);
-        this.recordMetric('memory_total', memory.totalJSHeapSize / 1024 / 1024);
-        this.recordMetric('memory_limit', memory.jsHeapSizeLimit / 1024 / 1024);
+        this.recordMetric("memory_used", memory.usedJSHeapSize / 1024 / 1024);
+        this.recordMetric("memory_total", memory.totalJSHeapSize / 1024 / 1024);
+        this.recordMetric("memory_limit", memory.jsHeapSizeLimit / 1024 / 1024);
       }, 30000); // Every 30 seconds
     }
   }
@@ -178,10 +187,10 @@ export class PerformanceMonitor {
     if (Object.keys(metrics).length === 0) return;
 
     try {
-      await fetch('/api/v1/analytics/frontend-metrics/', {
-        method: 'POST',
+      await fetch("/api/v1/analytics/frontend-metrics/", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           metrics,
@@ -191,7 +200,7 @@ export class PerformanceMonitor {
         }),
       });
     } catch (error) {
-      console.warn('Failed to report frontend metrics:', error);
+      console.warn("Failed to report frontend metrics:", error);
     }
   }
 }
