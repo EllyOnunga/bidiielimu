@@ -58,6 +58,12 @@ urlpatterns = [
     path(
         "api/v1/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"
     ),
+    # Password Reset Confirm (Required by dj-rest-auth for reversing names)
+    path(
+        "reset-password/<uidb64>/<token>/",
+        lambda r, **kwargs: JsonResponse({"status": "reset_link_valid"}),
+        name="password_reset_confirm",
+    ),
 ]
 
 if settings.DEBUG:
