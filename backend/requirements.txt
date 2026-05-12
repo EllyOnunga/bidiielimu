@@ -62,3 +62,6 @@ scipy>=1.11.0
 africastalking>=1.2.0
 # PDF Generation
 reportlab>=4.1.0
+# Development
+black>=24.0.0
+isort>=5.13.0
