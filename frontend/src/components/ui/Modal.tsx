@@ -15,26 +15,31 @@ export function Modal({ isOpen, onClose, children, title, description, className
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div 
-        className={cn("bg-background dark:bg-gray-800 w-full max-w-lg rounded-xl shadow-lg border dark:border-gray-700 p-6 relative animate-in fade-in zoom-in-95 duration-200", className)}
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-md p-0 sm:p-4">
+      <div
+        className={cn(
+          "glass w-full max-w-lg rounded-t-[28px] rounded-b-none sm:rounded-[32px] p-5 sm:p-6 md:p-8 relative animate-in fade-in slide-in-from-bottom-4 sm:zoom-in-95 duration-300 max-h-[92vh] sm:max-h-[90vh] overflow-y-auto custom-scrollbar",
+          className
+        )}
       >
-        <button 
+        <button
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+          className="absolute right-5 top-5 sm:right-6 sm:top-6 p-2 rounded-xl text-muted hover:text-primary hover:bg-white/5 transition-all active:scale-95 z-10"
         >
-          <X className="h-4 w-4 dark:text-gray-300" />
+          <X className="h-5 w-5" />
           <span className="sr-only">Close</span>
         </button>
-        
+
         {(title || description) && (
-          <div className="flex flex-col space-y-1.5 text-center sm:text-left mb-4">
-            {title && <h2 className="text-lg font-semibold leading-none tracking-tight dark:text-white">{title}</h2>}
-            {description && <p className="text-sm text-muted-foreground dark:text-gray-400">{description}</p>}
+          <div className="flex flex-col space-y-1 text-left mb-5 sm:mb-6 pr-10">
+            {title && <h2 className="text-lg sm:text-xl md:text-2xl font-black text-primary tracking-tight">{title}</h2>}
+            {description && <p className="text-xs sm:text-sm font-medium text-muted mt-1">{description}</p>}
           </div>
         )}
-        
-        {children}
+
+        <div className="text-primary">
+          {children}
+        </div>
       </div>
     </div>
   )

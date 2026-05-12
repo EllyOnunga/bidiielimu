@@ -146,7 +146,7 @@ export const ResourceLibrary = () => {
               placeholder="Search resources..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all h-14"
+              className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-primary focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all h-14"
             />
           </div>
           {isTeacher && (
@@ -171,7 +171,7 @@ export const ResourceLibrary = () => {
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
               className={`px-6 py-3 rounded-2xl font-bold text-sm transition-all whitespace-nowrap flex items-center gap-2 ${
-                activeCategory === cat.id ? 'bg-primary-500 text-white shadow-premium' : 'bg-white/5 text-primary-200/50 border border-white/5 hover:border-white/10'
+                activeCategory === cat.id ? 'bg-primary-500 text-white shadow-premium' : 'bg-white/5 text-muted border border-white/5 hover:border-white/10'
               }`}
             >
               <cat.icon className="w-4 h-4" />
@@ -196,15 +196,15 @@ export const ResourceLibrary = () => {
                     v{resource.version}.0
                   </div>
                 </div>
-                <h3 className="text-lg font-bold text-white group-hover:text-primary-400 transition-colors line-clamp-2">{resource.title}</h3>
-                <div className="flex items-center gap-2 mt-4 text-xs text-primary-200/40">
+                <h3 className="text-lg font-bold text-primary group-hover:text-primary-400 transition-colors line-clamp-2">{resource.title}</h3>
+                <div className="flex items-center gap-2 mt-4 text-xs text-muted">
                   <Tag className="w-3 h-3" />
                   <span>{resource.subject_name}</span>
                 </div>
               </div>
 
               <div className="mt-8 pt-6 border-t border-white/5 flex items-center justify-between">
-                <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">
+                <span className="text-[10px] font-black text-dim uppercase tracking-widest">
                   {new Date(resource.uploaded_at).toLocaleDateString()}
                 </span>
                 <button 
@@ -228,13 +228,13 @@ export const ResourceLibrary = () => {
       >
         <form onSubmit={handleUpload} className="space-y-6 mt-6">
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">Resource Title</label>
+            <label className="text-[10px] font-black text-muted uppercase tracking-widest">Resource Title</label>
             <input 
               required
               type="text"
               value={uploadData.title}
               onChange={e => setUploadData({ ...uploadData, title: e.target.value })}
-              className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-white text-sm outline-none focus:border-primary-500"
+              className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-primary text-sm outline-none focus:border-primary-500"
               placeholder="e.g. Q3 Physics Seminar Notes"
             />
           </div>
@@ -269,12 +269,12 @@ export const ResourceLibrary = () => {
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">Payload File</label>
+            <label className="text-[10px] font-black text-muted uppercase tracking-widest">Payload File</label>
             <input 
               required
               type="file"
               onChange={e => setUploadData({ ...uploadData, file: e.target.files?.[0] || null })}
-              className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-white file:bg-primary-500 file:border-0 file:rounded-lg file:text-white file:font-bold file:px-3 file:py-1 file:mr-3"
+              className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-primary file:bg-primary-500 file:border-0 file:rounded-lg file:text-white file:font-bold file:px-3 file:py-1 file:mr-3"
             />
           </div>
 

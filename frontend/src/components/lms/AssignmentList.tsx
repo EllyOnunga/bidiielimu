@@ -223,13 +223,13 @@ export const AssignmentList = () => {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* List */}
       <div className="lg:col-span-2 space-y-4">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-black text-white flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
+          <h2 className="text-xl sm:text-2xl font-black text-primary flex items-center gap-3">
             <BookOpen className="text-primary-400" />
             {isTeacher ? 'My Active Assignments' : 'Active Assignments'}
           </h2>
           {isTeacher && (
-            <Button onClick={() => setIsCreateModalOpen(true)} className="gap-2 rounded-2xl px-6">
+            <Button onClick={() => setIsCreateModalOpen(true)} className="gap-2 rounded-2xl px-6 w-full sm:w-auto shrink-0">
               <Plus className="w-5 h-5" />
               Prepare Assignment
             </Button>
@@ -254,11 +254,11 @@ export const AssignmentList = () => {
                   <FileText className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-white group-hover:text-primary-400 transition-colors">{assignment.title}</h3>
+                  <h3 className="font-bold text-primary group-hover:text-primary-400 transition-colors">{assignment.title}</h3>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs text-primary-200/50 font-bold uppercase tracking-wider">{assignment.subject_name}</span>
+                    <span className="text-xs text-muted font-bold uppercase tracking-wider">{assignment.subject_name}</span>
                     {assignment.stream_name && (
-                      <span className="text-[10px] bg-white/5 px-2 py-0.5 rounded-full text-slate-400 font-bold">Class: {assignment.stream_name}</span>
+                      <span className="text-[10px] bg-white/5 px-2 py-0.5 rounded-full text-muted font-bold">Class: {assignment.stream_name}</span>
                     )}
                   </div>
                 </div>
@@ -302,8 +302,8 @@ export const AssignmentList = () => {
             <div className="space-y-6">
               <div>
                 <span className="text-[10px] font-black uppercase tracking-widest text-primary-400">Assignment Detail</span>
-                <h3 className="text-xl font-black text-white mt-1">{selectedAssignment.title}</h3>
-                <p className="text-sm text-primary-200/60 mt-4 leading-relaxed">{selectedAssignment.description}</p>
+                <h3 className="text-xl font-black text-primary mt-1">{selectedAssignment.title}</h3>
+                <p className="text-sm text-muted mt-4 leading-relaxed">{selectedAssignment.description}</p>
                 
                 {selectedAssignment.file && (
                   <a 
@@ -320,14 +320,14 @@ export const AssignmentList = () => {
 
               <div className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/5">
                 <div className="text-center flex-1">
-                  <p className="text-[10px] text-primary-200/40 uppercase font-black">Max Points</p>
-                  <p className="text-lg font-black text-white">{selectedAssignment.max_score}</p>
+                  <p className="text-[10px] text-dim uppercase font-black">Max Points</p>
+                  <p className="text-lg font-black text-primary">{selectedAssignment.max_score}</p>
                 </div>
                 <div className="w-px h-8 bg-white/10" />
                 <div className="text-center flex-1">
-                  <p className="text-[10px] text-primary-200/40 uppercase font-black">{isTeacher ? 'Submissions' : 'Status'}</p>
+                  <p className="text-[10px] text-dim uppercase font-black">{isTeacher ? 'Submissions' : 'Status'}</p>
                   {isTeacher ? (
-                    <div className="text-lg font-black text-white">{selectedAssignment.submission_count || 0}</div>
+                    <div className="text-lg font-black text-primary">{selectedAssignment.submission_count || 0}</div>
                   ) : (
                     <div className="flex flex-col items-center">
                       <div className={`text-xs font-black uppercase px-3 py-1 rounded-full inline-block mt-1 ${
@@ -338,8 +338,8 @@ export const AssignmentList = () => {
                         {selectedAssignment.status || 'Pending'}
                       </div>
                       {selectedAssignment.status === 'graded' && selectedAssignment.student_grade !== null && (
-                        <p className="text-lg font-black text-white mt-2">
-                          {selectedAssignment.student_grade} <span className="text-[10px] text-slate-500">/ {selectedAssignment.max_score}</span>
+                        <p className="text-lg font-black text-primary mt-2">
+                          {selectedAssignment.student_grade} <span className="text-[10px] text-dim">/ {selectedAssignment.max_score}</span>
                         </p>
                       )}
                     </div>
@@ -351,7 +351,7 @@ export const AssignmentList = () => {
               {!isTeacher && selectedAssignment.status === 'graded' && selectedAssignment.student_feedback && (
                 <div className="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl">
                   <h4 className="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-2">Teacher Feedback</h4>
-                  <p className="text-sm text-white italic leading-relaxed">
+                  <p className="text-sm text-primary italic leading-relaxed">
                     "{selectedAssignment.student_feedback}"
                   </p>
                 </div>
@@ -360,7 +360,7 @@ export const AssignmentList = () => {
               {isTeacher && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                    <h4 className="text-sm font-black text-white uppercase">Submissions</h4>
+                    <h4 className="text-sm font-black text-primary uppercase">Submissions</h4>
                     <Button 
                       size="sm" 
                       variant="ghost" 
@@ -377,8 +377,8 @@ export const AssignmentList = () => {
                     ) : submissions.map(sub => (
                       <div key={sub.id} className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between group hover:border-primary-500/30 transition-all">
                         <div>
-                          <p className="text-xs font-bold text-white">{sub.student_name}</p>
-                          <p className="text-[10px] text-slate-500">{new Date(sub.submitted_at).toLocaleDateString()}</p>
+                          <p className="text-xs font-bold text-primary">{sub.student_name}</p>
+                          <p className="text-[10px] text-dim">{new Date(sub.submitted_at).toLocaleDateString()}</p>
                         </div>
                         <div className="flex items-center gap-2">
                           {sub.is_graded ? (
@@ -408,24 +408,24 @@ export const AssignmentList = () => {
               {!isTeacher && (
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <label className="text-xs font-bold text-white/40 mb-2 block ml-1">Your Submission</label>
+                    <label className="text-xs font-bold text-dim mb-2 block ml-1">Your Submission</label>
                     <textarea 
                       value={submissionText}
                       onChange={(e) => setSubmissionText(e.target.value)}
                       placeholder="Type your response here..."
-                      className="w-full h-40 bg-white/5 border border-white/10 rounded-2xl p-4 text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all resize-none"
+                      className="w-full h-40 bg-white/5 border border-white/10 rounded-2xl p-4 text-primary placeholder:text-dim focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all resize-none"
                       required
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-white/40 mb-2 block ml-1">Attachment (Optional)</label>
+                    <label className="text-xs font-bold text-dim mb-2 block ml-1">Attachment (Optional)</label>
                     <div 
                       onClick={() => document.getElementById('submission-file')?.click()}
                       className="flex items-center gap-3 p-4 border-2 border-dashed border-white/10 rounded-2xl hover:border-primary-500/30 cursor-pointer transition-all group"
                     >
-                      <Upload className="w-5 h-5 text-white/30 group-hover:text-primary-400" />
-                      <span className="text-xs font-bold text-white/40 group-hover:text-primary-200">
+                      <Upload className="w-5 h-5 text-dim group-hover:text-primary-400" />
+                      <span className="text-xs font-bold text-muted group-hover:text-primary">
                         {submissionFile ? submissionFile.name : 'Attach files (PDF/Image)'}
                       </span>
                       <input 
@@ -454,8 +454,8 @@ export const AssignmentList = () => {
               <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
                 <ChevronRight className="w-8 h-8 text-white/20" />
               </div>
-              <p className="text-white font-bold">Select an assignment</p>
-              <p className="text-sm text-primary-200/40 mt-2">Choose from the list to view details and {isTeacher ? 'review submissions.' : 'submit your work.'}</p>
+              <p className="text-primary font-bold">Select an assignment</p>
+              <p className="text-sm text-muted mt-2">Choose from the list to view details and {isTeacher ? 'review submissions.' : 'submit your work.'}</p>
             </div>
           )}
         </div>
@@ -469,34 +469,34 @@ export const AssignmentList = () => {
         className="max-w-2xl"
       >
         <form onSubmit={handleCreate} className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-xs font-black uppercase text-slate-400 ml-1">Subject</label>
+              <label className="text-xs font-black uppercase text-muted ml-1">Subject</label>
               <select 
                 required
                 value={formData.subject}
                 onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                className="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3 text-white outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-primary outline-none focus:ring-2 focus:ring-primary-500"
               >
-                <option value="">Select Subject</option>
+                <option value="" className="bg-bg-color">Select Subject</option>
                 {subjects.map((s: any) => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
+                  <option key={s.id} value={s.id} className="bg-bg-color">{s.name}</option>
                 ))}
               </select>
             </div>
             
             {(user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN') && (
               <div className="space-y-2">
-                <label className="text-xs font-black uppercase text-slate-400 ml-1 text-primary-400">Assigned Teacher</label>
+                <label className="text-xs font-black uppercase text-primary-400 ml-1">Assigned Teacher</label>
                 <select 
                   required
                   value={formData.teacher}
                   onChange={(e) => setFormData({ ...formData, teacher: e.target.value })}
-                  className="w-full bg-slate-800 border border-primary-500/30 rounded-2xl px-4 py-3 text-white outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full bg-white/5 border border-primary-500/30 rounded-2xl px-4 py-3 text-primary outline-none focus:ring-2 focus:ring-primary-500"
                 >
-                  <option value="">Select Teacher</option>
+                  <option value="" className="bg-bg-color">Select Teacher</option>
                   {teachers.map((t: any) => (
-                    <option key={t.id} value={t.id}>{t.full_name || `${t.first_name} ${t.last_name}`}</option>
+                    <option key={t.id} value={t.id} className="bg-bg-color">{t.full_name || `${t.first_name} ${t.last_name}`}</option>
                   ))}
                 </select>
               </div>
@@ -504,17 +504,17 @@ export const AssignmentList = () => {
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-black uppercase text-slate-400 ml-1">Target Class</label>
+            <label className="text-xs font-black uppercase text-muted ml-1">Target Class</label>
             <select 
               value={formData.stream}
               onChange={(e) => setFormData({ ...formData, stream: e.target.value })}
-              className="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3 text-white outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-primary outline-none focus:ring-2 focus:ring-primary-500"
             >
-              <option value="">Select Class</option>
+              <option value="" className="bg-bg-color">Select Class</option>
               {grades.map((g: any) => (
-                <optgroup key={g.id} label={g.name}>
+                <optgroup key={g.id} label={g.name} className="bg-bg-color">
                   {g.streams.map((s: any) => (
-                    <option key={s.id} value={s.id}>{g.name} {s.name}</option>
+                    <option key={s.id} value={s.id} className="bg-bg-color">{g.name} {s.name}</option>
                   ))}
                 </optgroup>
               ))}
@@ -522,56 +522,56 @@ export const AssignmentList = () => {
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-black uppercase text-slate-400 ml-1">Assignment Title</label>
+            <label className="text-xs font-black uppercase text-muted ml-1">Assignment Title</label>
             <input 
               required
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               placeholder="e.g., Introduction to Quadratic Equations"
-              className="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3 text-white outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-primary outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-black uppercase text-slate-400 ml-1">Description & Instructions</label>
+            <label className="text-xs font-black uppercase text-muted ml-1">Description & Instructions</label>
             <textarea 
               required
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full h-32 bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3 text-white outline-none focus:ring-2 focus:ring-primary-500 resize-none"
+              className="w-full h-32 bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-primary outline-none focus:ring-2 focus:ring-primary-500 resize-none"
               placeholder="Provide detailed instructions for the students..."
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-black uppercase text-slate-400 ml-1">Attachment (PDF/Image)</label>
+            <label className="text-xs font-black uppercase text-muted ml-1">Attachment (PDF/Image)</label>
             <input 
               type="file"
               onChange={(e) => setFormData({ ...formData, file: e.target.files?.[0] || null })}
-              className="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3 text-white outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-primary outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-xs font-black uppercase text-slate-400 ml-1">Due Date</label>
+              <label className="text-xs font-black uppercase text-muted ml-1">Due Date</label>
               <input 
                 required
                 type="datetime-local"
                 value={formData.due_date}
                 onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
-                className="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3 text-white outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-primary outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-black uppercase text-slate-400 ml-1">Max Score</label>
+              <label className="text-xs font-black uppercase text-muted ml-1">Max Score</label>
               <input 
                 required
                 type="number"
                 value={formData.max_score}
                 onChange={(e) => setFormData({ ...formData, max_score: parseInt(e.target.value) })}
-                className="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3 text-white outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-primary outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
           </div>
@@ -589,9 +589,9 @@ export const AssignmentList = () => {
         title={`Grade Submission: ${selectedSubmission?.student_name}`}
       >
         <div className="space-y-6">
-          <div className="p-4 bg-slate-900/50 rounded-2xl border border-white/5">
+          <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
             <h4 className="text-[10px] font-black uppercase tracking-widest text-primary-400 mb-2">Student Response</h4>
-            <p className="text-sm text-white whitespace-pre-wrap leading-relaxed">
+            <p className="text-sm text-primary whitespace-pre-wrap leading-relaxed">
               {selectedSubmission?.text_content || "No text provided."}
             </p>
             {selectedSubmission?.file && (
@@ -607,28 +607,28 @@ export const AssignmentList = () => {
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-xs font-black uppercase text-slate-400 ml-1">Score (Max: {selectedSubmission?.max_score})</label>
+              <label className="text-xs font-black uppercase text-muted ml-1">Score (Max: {selectedSubmission?.max_score})</label>
               <input 
                 type="number"
                 value={gradingData.score}
                 onChange={(e) => setGradingData({ ...gradingData, score: e.target.value })}
-                className="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-3 text-white outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-primary outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
             <div className="flex items-end">
-              <p className="text-[10px] text-slate-500 mb-4 ml-2 italic">Student will see this score instantly.</p>
+              <p className="text-[10px] text-dim mb-4 ml-2 italic">Student will see this score instantly.</p>
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-black uppercase text-slate-400 ml-1">Feedback</label>
+            <label className="text-xs font-black uppercase text-muted ml-1">Feedback</label>
             <textarea 
               value={gradingData.feedback}
               onChange={(e) => setGradingData({ ...gradingData, feedback: e.target.value })}
               placeholder="Good work! Pay attention to..."
-              className="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-4 text-white outline-none focus:ring-2 focus:ring-primary-500 h-32 resize-none"
+              className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-primary outline-none focus:ring-2 focus:ring-primary-500 h-32 resize-none"
             />
           </div>
 

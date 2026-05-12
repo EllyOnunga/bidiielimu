@@ -51,10 +51,10 @@ export const LMSPage = () => {
               LMS Environment v2.0
             </div>
           </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-none">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary tracking-tight leading-none">
             Learning <span className="text-gradient">Ecosystem</span>
           </h1>
-          <p className="text-primary-200/40 text-sm md:text-base font-medium max-w-xl leading-relaxed">
+          <p className="text-muted text-xs sm:text-sm md:text-base font-medium max-w-xl leading-relaxed">
             Access curated materials, submit assessments, and track your progression through a unified digital environment.
           </p>
         </div>
@@ -68,9 +68,9 @@ export const LMSPage = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-3 px-5 py-3 rounded-[18px] font-black text-[10px] uppercase tracking-widest transition-all duration-300 flex-1 sm:flex-none justify-center ${isActive
+                className={`flex items-center gap-3 px-4 sm:px-5 py-2.5 sm:py-3 rounded-[18px] font-black text-[9px] sm:text-[10px] uppercase tracking-widest transition-all duration-300 flex-1 sm:flex-none justify-center ${isActive
                   ? 'bg-primary-600 text-white shadow-premium'
-                  : 'text-primary-200/40 hover:bg-white/5 hover:text-white'
+                  : 'text-muted hover:bg-white/5 hover:text-primary'
                   }`}
               >
                 <Icon className={`w-4 h-4 ${isActive ? 'text-white' : tab.color}`} />
@@ -94,10 +94,10 @@ export const LMSPage = () => {
           {activeTab === 'resources' && <ResourceLibrary />}
           {activeTab === 'quizzes' && (
             <div className="space-y-10">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                 <div>
-                  <h2 className="text-2xl font-black text-white uppercase tracking-tight">Active <span className="text-amber-400">Assessments</span></h2>
-                  <p className="text-primary-200/40 text-xs font-bold uppercase tracking-widest mt-1">Timed examinations and knowledge validation modules.</p>
+                  <h2 className="text-xl sm:text-2xl font-black text-primary uppercase tracking-tight">Active <span className="text-amber-400">Assessments</span></h2>
+                  <p className="text-muted text-[10px] font-bold uppercase tracking-widest mt-1">Timed examinations and knowledge validation modules.</p>
                 </div>
                 {isTeacher && (
                   <Button 
@@ -105,7 +105,7 @@ export const LMSPage = () => {
                       setEditingQuiz(null);
                       setIsBuilderOpen(true);
                     }} 
-                    className="gap-2 rounded-2xl px-6 bg-amber-500 hover:bg-amber-600"
+                    className="gap-2 rounded-2xl px-6 bg-amber-500 hover:bg-amber-600 w-full sm:w-auto shrink-0"
                   >
                     <Plus className="w-5 h-5" />
                     Initialize Assessment
@@ -132,7 +132,7 @@ export const LMSPage = () => {
                         <HelpCircle className="w-6 h-6" />
                       </div>
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-lg font-black text-white uppercase tracking-tight">{q.title}</h3>
+                        <h3 className="text-base sm:text-lg font-black text-primary uppercase tracking-tight">{q.title}</h3>
                         {isTeacher && (
                           <button 
                             onClick={() => {
@@ -146,15 +146,15 @@ export const LMSPage = () => {
                           </button>
                         )}
                       </div>
-                      <p className="text-xs font-medium text-primary-200/40 mb-8 leading-relaxed line-clamp-2">{q.description || 'Validate your comprehension of the core concepts covered in this module.'}</p>
+                      <p className="text-xs font-medium text-muted mb-8 leading-relaxed line-clamp-2">{q.description || 'Validate your comprehension of the core concepts covered in this module.'}</p>
                       <div className="flex items-center gap-4 mb-8">
                         <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/5 border border-white/5">
                           <Clock className="w-3 h-3 text-amber-400" />
-                          <span className="text-[10px] font-black text-white uppercase">{q.duration_minutes}m</span>
+                          <span className="text-[10px] font-black text-primary uppercase">{q.duration_minutes}m</span>
                         </div>
                         <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/5 border border-white/5">
                           <FileText className="w-3 h-3 text-primary-400" />
-                          <span className="text-[10px] font-black text-white uppercase">{q.question_count || 0} Questions</span>
+                          <span className="text-[10px] font-black text-primary uppercase">{q.question_count || 0} Questions</span>
                         </div>
                       </div>
                       <Button

@@ -167,13 +167,13 @@ export const SettingsPage = () => {
       className="space-y-12 pb-24 max-w-7xl mx-auto"
     >
       <div>
-        <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight mb-2">Platform <span className="text-gradient">Control</span></h1>
-        <p className="text-primary-200/50 text-base font-medium">Fine-tune your institutional ecosystem and personal preferences.</p>
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-primary tracking-tight mb-2">Platform <span className="text-gradient">Control</span></h1>
+        <p className="text-muted text-base font-medium">Fine-tune your institutional ecosystem and personal preferences.</p>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-12">
+      <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
         {/* Sidebar Tabs */}
-        <div className="lg:w-72 space-y-3">
+        <div className="lg:w-72 flex flex-row lg:flex-col gap-2 overflow-x-auto pb-1 custom-scrollbar lg:pb-0">
           {tabs.map((tab) => {
             if (tab.adminOnly && user?.role !== ROLES.ADMIN) return null;
             const isActive = activeTab === tab.id;
@@ -182,9 +182,9 @@ export const SettingsPage = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as ActiveTab)}
-                className={`w-full flex items-center gap-4 px-6 py-4 rounded-[24px] transition-all relative overflow-hidden group ${isActive
-                  ? 'glass text-white shadow-premium'
-                  : 'text-primary-200/40 hover:bg-white/5 hover:text-white'
+                className={`shrink-0 lg:w-full flex items-center gap-3 lg:gap-4 px-4 lg:px-6 py-3 lg:py-4 rounded-2xl lg:rounded-[24px] transition-all relative overflow-hidden group whitespace-nowrap ${isActive
+                  ? 'glass text-primary shadow-premium'
+                  : 'text-muted hover:bg-white/5 hover:text-primary'
                   }`}
               >
                 {isActive && (
@@ -217,17 +217,17 @@ export const SettingsPage = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="glass p-10 md:p-12 rounded-[40px] border-white/5 shadow-premium min-h-[500px]"
+              className="glass p-5 sm:p-8 md:p-10 lg:p-12 rounded-[28px] lg:rounded-[40px] border-white/5 shadow-premium min-h-[400px]"
             >
               {activeTab === 'profile' && (
                 <div className="space-y-12">
                   <form onSubmit={handleUpdatePersonalInfo} className="space-y-8">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div>
-                        <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-2">Identity Configuration</h2>
+                        <h2 className="text-lg sm:text-xl md:text-2xl font-black text-primary uppercase tracking-tight mb-1">Identity Configuration</h2>
                         <p className="text-primary-200/30 text-[10px] font-black uppercase tracking-[0.2em]">Manage your personal credentials within the network.</p>
                       </div>
-                      <Button type="submit" disabled={loading} className="gap-2 h-12 px-6 bg-primary-600 rounded-2xl font-black uppercase tracking-widest text-[10px]">
+                      <Button type="submit" disabled={loading} className="gap-2 h-11 px-5 bg-primary-600 rounded-2xl font-black uppercase tracking-widest text-[10px] shrink-0 w-full sm:w-auto">
                         <Save className="w-4 h-4" />
                         Update Identity
                       </Button>
@@ -290,11 +290,11 @@ export const SettingsPage = () => {
 
                   <form onSubmit={handleChangePassword} className="space-y-8">
                     <div>
-                      <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-2">Security Override</h2>
+                      <h2 className="text-xl sm:text-2xl font-black text-primary uppercase tracking-tight mb-2">Security Override</h2>
                       <p className="text-primary-200/30 text-[10px] font-black uppercase tracking-[0.2em]">Update your cryptographic access keys.</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                       <div className="space-y-3">
                         <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pl-1">Current Password</label>
                         <PasswordInput
@@ -337,7 +337,7 @@ export const SettingsPage = () => {
                 <form onSubmit={handleUpdateSchoolProfile} className="space-y-10">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                     <div>
-                      <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-2">Institutional Profile</h2>
+                      <h2 className="text-xl sm:text-2xl font-black text-primary uppercase tracking-tight mb-2">Institutional Profile</h2>
                       <p className="text-primary-200/30 text-[10px] font-black uppercase tracking-[0.2em]">Define your school's global identity parameters.</p>
                     </div>
                     <Button
@@ -386,7 +386,7 @@ export const SettingsPage = () => {
                 <form onSubmit={handleUpdateSettings} className="space-y-10">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                     <div>
-                      <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-2">Phase Synchronization</h2>
+                      <h2 className="text-xl sm:text-2xl font-black text-primary uppercase tracking-tight mb-2">Phase Synchronization</h2>
                       <p className="text-primary-200/30 text-[10px] font-black uppercase tracking-[0.2em]">Synchronize institutional clocks and academic cycles.</p>
                     </div>
                     <Button
@@ -408,9 +408,9 @@ export const SettingsPage = () => {
                           onChange={(e) => setSettings({ ...settings, academic_year: e.target.value })}
                           className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 text-white text-sm font-black uppercase tracking-tight focus:bg-white/10 focus:border-primary-500/50 outline-none transition-all appearance-none"
                         >
-                          <option value="2025" className="bg-slate-900">2025 Cycle</option>
-                          <option value="2026" className="bg-slate-900">2026 Cycle</option>
-                          <option value="2027" className="bg-slate-900">2027 Cycle</option>
+                          <option value="2025" className="bg-bg-color">2025 Cycle</option>
+                          <option value="2026" className="bg-bg-color">2026 Cycle</option>
+                          <option value="2027" className="bg-bg-color">2027 Cycle</option>
                         </select>
                         <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-200/30 rotate-90" />
                       </div>
@@ -423,9 +423,9 @@ export const SettingsPage = () => {
                           onChange={(e) => setSettings({ ...settings, current_term: e.target.value })}
                           className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 text-white text-sm font-black uppercase tracking-tight focus:bg-white/10 focus:border-primary-500/50 outline-none transition-all appearance-none"
                         >
-                          <option value="Term 1" className="bg-slate-900">Sector Alpha (Term 1)</option>
-                          <option value="Term 2" className="bg-slate-900">Sector Beta (Term 2)</option>
-                          <option value="Term 3" className="bg-slate-900">Sector Gamma (Term 3)</option>
+                          <option value="Term 1" className="bg-bg-color">Sector Alpha (Term 1)</option>
+                          <option value="Term 2" className="bg-bg-color">Sector Beta (Term 2)</option>
+                          <option value="Term 3" className="bg-bg-color">Sector Gamma (Term 3)</option>
                         </select>
                         <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-200/30 rotate-90" />
                       </div>
@@ -438,7 +438,7 @@ export const SettingsPage = () => {
                 <form onSubmit={handleUpdateSettings} className="space-y-10">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                     <div>
-                      <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-2">Financial Engine</h2>
+                      <h2 className="text-xl sm:text-2xl font-black text-primary uppercase tracking-tight mb-2">Financial Engine</h2>
                       <p className="text-primary-200/30 text-[10px] font-black uppercase tracking-[0.2em]">Configure revenue protocols and taxation matrices.</p>
                     </div>
                     <Button
@@ -479,7 +479,7 @@ export const SettingsPage = () => {
                 <form onSubmit={handleUpdateSettings} className="space-y-10">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                     <div>
-                      <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-2">Visual DNA</h2>
+                      <h2 className="text-xl sm:text-2xl font-black text-primary uppercase tracking-tight mb-2">Visual DNA</h2>
                       <p className="text-primary-200/30 text-[10px] font-black uppercase tracking-[0.2em]">Inject your institution's color signature into the ecosystem.</p>
                     </div>
                     <Button
@@ -522,7 +522,7 @@ export const SettingsPage = () => {
                 <form onSubmit={handleUpdateSettings} className="space-y-12">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                     <div>
-                      <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-2">Transmission Matrix</h2>
+                      <h2 className="text-xl sm:text-2xl font-black text-primary uppercase tracking-tight mb-2">Transmission Matrix</h2>
                       <p className="text-primary-200/30 text-[10px] font-black uppercase tracking-[0.2em]">Configure external communication and alert protocols.</p>
                     </div>
                     <Button

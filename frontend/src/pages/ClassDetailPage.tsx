@@ -71,19 +71,19 @@ export const ClassDetailPage = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate('/classes')} className="p-2 hover:bg-slate-800 rounded-xl transition-all">
-            <ChevronLeft className="w-6 h-6 text-slate-400" />
+          <button onClick={() => navigate('/classes')} className="p-2 hover:bg-white/10 rounded-xl transition-all">
+            <ChevronLeft className="w-6 h-6 text-muted" />
           </button>
           <div>
-            <div className="flex items-center gap-2 text-xs text-slate-500 font-bold mb-1">
+            <div className="flex items-center gap-2 text-xs text-dim font-bold mb-1">
               <span className="hover:text-primary-400 cursor-pointer" onClick={() => navigate('/classes')}>Classes</span>
               <span>›</span>
               <span className="text-primary-400">{breadcrumb}</span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-primary tracking-tight">
               {streamInfo ? `${streamInfo.grade_level_name} ${streamInfo.name}` : 'Loading...'}
             </h1>
-            <p className="text-slate-400 text-sm mt-0.5">
+            <p className="text-muted text-sm mt-0.5">
               {streamInfo?.teacher_name ? `Class Teacher: ${streamInfo.teacher_name}` : 'No class teacher assigned'}
               {' · '}
               <span className="text-primary-400 font-bold">{streamInfo?.student_count ?? 0} students</span>
@@ -108,29 +108,29 @@ export const ClassDetailPage = () => {
           { label: 'Inactive', value: students.filter(s => !s.is_active).length, icon: XCircle, color: 'bg-rose-500/10 text-rose-400' },
           { label: 'Subjects', value: '—', icon: BookOpen, color: 'bg-amber-500/10 text-amber-400' },
         ].map(stat => (
-          <div key={stat.label} className="glass-dark p-5 rounded-2xl border border-white/5 flex items-center gap-4">
+          <div key={stat.label} className="glass p-5 rounded-2xl border border-white/5 flex items-center gap-4">
             <div className={`p-3 rounded-xl ${stat.color}`}>
               <stat.icon className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-xs text-slate-500 font-bold">{stat.label}</p>
-              <p className="text-2xl font-black text-white">{stat.value}</p>
+              <p className="text-xs text-muted font-bold">{stat.label}</p>
+              <p className="text-2xl font-black text-primary">{stat.value}</p>
             </div>
           </div>
         ))}
       </div>
 
       {/* Student Table */}
-      <div className="glass-dark rounded-3xl border border-white/5 overflow-hidden">
+      <div className="glass rounded-3xl border border-white/5 overflow-hidden">
         <div className="p-4 md:p-6 border-b border-white/5 flex items-center justify-between gap-4">
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dim" />
             <input
               type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search by name or admission no..."
-              className="w-full pl-10 pr-4 py-2 bg-slate-800/50 border border-slate-700 rounded-xl text-white text-sm outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-xl text-primary text-sm outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
         </div>
@@ -139,22 +139,22 @@ export const ClassDetailPage = () => {
           <table className="w-full text-left min-w-[700px]">
             <thead>
               <tr className="bg-white/5">
-                <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Adm No</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Student</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Gender</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Guardian Contact</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right">Actions</th>
+                <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">Adm No</th>
+                <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">Student</th>
+                <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">Gender</th>
+                <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">Guardian Contact</th>
+                <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">Status</th>
+                <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {loading ? (
-                <tr><td colSpan={6} className="px-6 py-12 text-center text-slate-500">Loading students...</td></tr>
+                <tr><td colSpan={6} className="px-6 py-12 text-center text-muted">Loading students...</td></tr>
               ) : filtered.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-16 text-center">
-                    <Users className="w-12 h-12 text-slate-700 mx-auto mb-4" />
-                    <p className="text-slate-400 font-medium">No students in this class yet.</p>
+                    <Users className="w-12 h-12 text-dim mx-auto mb-4" />
+                    <p className="text-muted font-medium">No students in this class yet.</p>
                     <Link to="/students" className="text-primary-400 text-sm hover:underline mt-2 inline-block">
                       Add the first student →
                     </Link>
@@ -172,21 +172,21 @@ export const ClassDetailPage = () => {
                     <td className="px-6 py-4 text-sm font-mono text-primary-400">{student.admission_number}</td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-slate-800 border border-white/5 flex items-center justify-center text-xs font-bold text-slate-400 shrink-0">
+                        <div className="w-9 h-9 rounded-full bg-white/5 border border-white/5 flex items-center justify-center text-xs font-bold text-muted shrink-0">
                           {student.first_name[0]}{student.last_name[0]}
                         </div>
-                        <span className="text-sm font-semibold text-white">{student.first_name} {student.last_name}</span>
+                        <span className="text-sm font-semibold text-primary">{student.first_name} {student.last_name}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-400">{student.gender === 'M' ? 'Male' : student.gender === 'F' ? 'Female' : 'Other'}</td>
+                    <td className="px-6 py-4 text-sm text-muted">{student.gender === 'M' ? 'Male' : student.gender === 'F' ? 'Female' : 'Other'}</td>
                     <td className="px-6 py-4">
-                      <div className="text-sm text-slate-300">
+                      <div className="text-sm text-primary">
                         {student.guardians?.[0] ? `${student.guardians[0].first_name} ${student.guardians[0].last_name}`.trim() : '—'}
                       </div>
-                      <div className="text-xs text-slate-500">{student.guardians?.[0]?.phone_number || '—'}</div>
+                      <div className="text-xs text-muted">{student.guardians?.[0]?.phone_number || '—'}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-2 py-1 rounded-lg text-xs font-medium border ${student.is_active ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-700 text-slate-400 border-slate-600'}`}>
+                      <span className={`px-2 py-1 rounded-lg text-xs font-medium border ${student.is_active ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-white/5 text-muted border-white/10'}`}>
                         {student.is_active ? 'Active' : 'Inactive'}
                       </span>
                     </td>
@@ -194,12 +194,12 @@ export const ClassDetailPage = () => {
                       <div className="flex items-center justify-end gap-2">
                         <Link
                           to={`/students/${student.id}/report`}
-                          className="p-2 hover:bg-primary-500/10 text-slate-400 hover:text-primary-400 rounded-lg transition-all"
+                          className="p-2 hover:bg-primary-500/10 text-muted hover:text-primary-400 rounded-lg transition-all"
                           title="View Report Card"
                         >
                           <FileText className="w-4 h-4" />
                         </Link>
-                        <button className="p-2 hover:bg-slate-700 rounded-lg text-slate-400 transition-all">
+                        <button className="p-2 hover:bg-white/10 rounded-lg text-muted transition-all">
                           <MoreHorizontal className="w-4 h-4" />
                         </button>
                       </div>

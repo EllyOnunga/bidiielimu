@@ -98,8 +98,8 @@ export const AttendancePage = () => {
     <div className="space-y-8 md:space-y-12 pb-20">
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
         <div className="space-y-2">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-none">Attendance <span className="text-gradient">Protocol</span></h1>
-          <p className="text-primary-200/40 text-sm md:text-base font-medium max-w-xl">Mark and track daily student presence across the institutional grid.</p>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary tracking-tight leading-none">Attendance <span className="text-gradient">Protocol</span></h1>
+          <p className="text-muted text-sm md:text-base font-medium max-w-xl">Mark and track daily student presence across the institutional grid.</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
           <Button
@@ -135,13 +135,13 @@ export const AttendancePage = () => {
           <select
             value={selectedStream}
             onChange={(e) => setSelectedStream(e.target.value)}
-            className="flex h-12 w-full rounded-xl border border-white/5 bg-white/5 px-4 text-sm text-white outline-none focus:border-primary-500 transition-all"
+            className="flex h-12 w-full rounded-xl border border-white/5 bg-white/5 px-4 text-sm text-primary outline-none focus:border-primary-500 transition-all"
           >
-            <option value="">Select Stream...</option>
+            <option value="" className="bg-bg-color">Select Stream...</option>
             {grades.map((g: any) => (
-              <optgroup key={g.id} label={g.name}>
+              <optgroup key={g.id} label={g.name} className="bg-bg-color">
                 {g.streams.map((s: any) => (
-                  <option key={s.id} value={s.id}>{g.name} {s.name}</option>
+                  <option key={s.id} value={s.id} className="bg-bg-color">{g.name} {s.name}</option>
                 ))}
               </optgroup>
             ))}
@@ -189,13 +189,13 @@ export const AttendancePage = () => {
                         {s.name.split(' ').map((n: string) => n[0]).join('')}
                       </div>
                       <div>
-                        <p className="text-xs font-black text-white uppercase tracking-tight">{s.name}</p>
-                        <p className="text-[10px] font-mono text-primary-200/20">{s.admission}</p>
+                        <p className="text-xs font-black text-primary uppercase tracking-tight">{s.name}</p>
+                        <p className="text-[10px] font-mono text-dim">{s.admission}</p>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center justify-center gap-2">
+                    <div className="flex flex-wrap items-center justify-center gap-1.5">
                       <StatusButton
                         active={s.status === 'PRESENT'}
                         type="PRESENT"
@@ -250,13 +250,13 @@ const StatusButton = ({ active, type, icon: Icon, label, onClick }: any) => {
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-[9px] font-black uppercase tracking-widest transition-all ${active
+      className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-xl border text-[9px] font-black uppercase tracking-widest transition-all active:scale-95 ${active
         ? activeColors[type as keyof typeof activeColors] + ' border-transparent'
-        : 'bg-white/5 border-white/5 text-primary-200/30 hover:text-white hover:bg-white/10'
+        : 'bg-white/5 border-white/5 text-muted hover:text-primary hover:bg-white/10'
         }`}
     >
-      <Icon className="w-3.5 h-3.5" />
-      <span className="hidden md:inline">{label}</span>
+      <Icon className="w-3.5 h-3.5 shrink-0" />
+      <span className="hidden sm:inline">{label}</span>
     </button>
   );
 };

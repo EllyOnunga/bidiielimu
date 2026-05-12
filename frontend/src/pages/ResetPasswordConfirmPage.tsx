@@ -56,7 +56,7 @@ export const ResetPasswordConfirmPage = () => {
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md z-10"
       >
-        <div className="glass-dark p-8 md:p-10 rounded-[40px] border border-white/10 shadow-2xl">
+        <div className="glass p-8 md:p-10 rounded-[40px] border border-white/10 shadow-2xl">
           <AnimatePresence mode="wait">
             {!success ? (
               <motion.div
@@ -67,16 +67,16 @@ export const ResetPasswordConfirmPage = () => {
                 className="space-y-6"
               >
                 <div>
-                  <h1 className="text-3xl font-black text-white tracking-tight mb-2">New Password</h1>
-                  <p className="text-slate-400 text-sm">Please enter and confirm your new secure password.</p>
+                  <h1 className="text-2xl sm:text-3xl font-black text-primary tracking-tight mb-2">New Password</h1>
+                  <p className="text-muted text-sm">Please enter and confirm your new secure password.</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">New Password</label>
+                      <label className="text-xs font-bold text-muted uppercase tracking-widest ml-1">New Password</label>
                       <div className="relative group">
-                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-primary-400 transition-colors" />
+                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-dim group-focus-within:text-primary-400 transition-colors" />
                         <PasswordInput
                           required
                           value={password}
@@ -89,9 +89,9 @@ export const ResetPasswordConfirmPage = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Confirm New Password</label>
+                      <label className="text-xs font-bold text-muted uppercase tracking-widest ml-1">Confirm New Password</label>
                       <div className="relative group">
-                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-primary-400 transition-colors" />
+                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-dim group-focus-within:text-primary-400 transition-colors" />
                         <PasswordInput
                           required
                           value={confirmPassword}
@@ -128,8 +128,8 @@ export const ResetPasswordConfirmPage = () => {
                   <CheckCircle2 className="w-10 h-10 text-emerald-400" />
                 </div>
                 <div className="space-y-2">
-                  <h2 className="text-2xl font-black text-white">Password Updated!</h2>
-                  <p className="text-slate-400 text-sm">
+                  <h2 className="text-2xl font-black text-primary">Password Updated!</h2>
+                  <p className="text-muted text-sm">
                     Your password has been changed successfully. Redirecting you to login...
                   </p>
                 </div>

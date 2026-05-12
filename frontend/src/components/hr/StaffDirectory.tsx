@@ -111,15 +111,15 @@ export const StaffDirectory = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <h1 className="text-4xl font-black text-white tracking-tighter">Staff Directory</h1>
-          <p className="text-primary-200/40 font-bold uppercase tracking-widest mt-1">Human Capital Management</p>
+          <h1 className="text-3xl sm:text-4xl font-black text-primary tracking-tighter">Staff Directory</h1>
+          <p className="text-muted font-bold uppercase tracking-widest mt-1">Human Capital Management</p>
         </div>
         
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="px-8 py-4 bg-primary-500 text-white rounded-[24px] font-black text-lg flex items-center gap-3 hover:bg-primary-400 shadow-premium transition-all active:scale-95"
+          className="px-6 sm:px-8 py-3 sm:py-4 bg-primary-500 text-white rounded-[24px] font-black text-sm sm:text-lg flex items-center gap-3 hover:bg-primary-400 shadow-premium transition-all active:scale-95 w-full sm:w-auto justify-center"
         >
-          <Plus className="w-6 h-6" />
+          <Plus className="w-5 h-5 sm:w-6 sm:h-6" />
           Onboard New Staff
         </button>
       </div>
@@ -133,7 +133,7 @@ export const StaffDirectory = () => {
             placeholder="Search staff by name, role or ID..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-white/5 border border-white/5 rounded-2xl py-3 pl-12 pr-4 text-white focus:ring-2 focus:ring-primary-500/20 transition-all outline-none"
+            className="w-full bg-white/5 border border-white/5 rounded-2xl py-3 pl-12 pr-4 text-primary focus:ring-2 focus:ring-primary-500/20 transition-all outline-none"
           />
         </div>
         <div className="flex gap-2 p-2 bg-white/5 rounded-2xl border border-white/5">
@@ -141,7 +141,7 @@ export const StaffDirectory = () => {
             <button 
               key={tab} 
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${tab === activeTab ? 'bg-primary-500 text-white shadow-premium' : 'text-primary-200/40 hover:text-white'}`}
+              className={`px-4 py-2 rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-widest transition-all ${tab === activeTab ? 'bg-primary-500 text-white shadow-premium' : 'text-muted hover:text-primary'}`}
             >
               {tab}
             </button>
@@ -153,7 +153,7 @@ export const StaffDirectory = () => {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 gap-4">
           <Loader2 className="w-12 h-12 text-primary-500 animate-spin" />
-          <p className="text-primary-200/40 font-bold uppercase tracking-widest">Accessing Secure Records...</p>
+          <p className="text-muted font-bold uppercase tracking-widest">Accessing Secure Records...</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -175,19 +175,19 @@ export const StaffDirectory = () => {
                 </div>
                 
                 <div>
-                  <h3 className="text-xl font-black text-white">{member.first_name} {member.last_name}</h3>
-                  <p className="text-xs font-bold text-primary-400 uppercase tracking-widest mt-1">{member.designation || member.specialization || 'Staff'}</p>
-                  <p className="text-[10px] font-black text-primary-200/20 uppercase tracking-tighter mt-1">ID: {member.employee_id}</p>
+                  <h3 className="text-lg sm:text-xl font-black text-primary">{member.first_name} {member.last_name}</h3>
+                  <p className="text-[10px] sm:text-xs font-bold text-primary-400 uppercase tracking-widest mt-1">{member.designation || member.specialization || 'Staff'}</p>
+                  <p className="text-[9px] sm:text-[10px] font-black text-dim uppercase tracking-tighter mt-1">ID: {member.employee_id}</p>
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex items-center gap-3">
-                    <Mail className="w-3.5 h-3.5 text-primary-200/30" />
-                    <p className="text-xs text-primary-200/60 truncate">{member.email || 'No email'}</p>
+                    <Mail className="w-3.5 h-3.5 text-dim" />
+                    <p className="text-xs text-muted truncate">{member.email || 'No email'}</p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <Phone className="w-3.5 h-3.5 text-primary-200/30" />
-                    <p className="text-xs text-primary-200/60">{member.phone_number}</p>
+                    <Phone className="w-3.5 h-3.5 text-dim" />
+                    <p className="text-xs text-muted">{member.phone_number}</p>
                   </div>
                 </div>
 
@@ -214,13 +214,13 @@ export const StaffDirectory = () => {
       <Modal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)}
-        className="max-w-2xl bg-[#0f172a] border-white/10 p-0 overflow-hidden"
+        className="max-w-2xl p-0 overflow-hidden"
       >
         <div className="p-8 bg-gradient-to-br from-primary-500/10 to-transparent">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h2 className="text-3xl font-black text-white tracking-tighter">Onboard Staff</h2>
-              <p className="text-primary-400 text-xs font-bold uppercase tracking-widest">Access Provisioning</p>
+              <h2 className="text-2xl sm:text-3xl font-black text-primary tracking-tighter">Onboard Staff</h2>
+              <p className="text-primary-400 text-[10px] font-bold uppercase tracking-widest">Access Provisioning</p>
             </div>
             <button onClick={() => setIsModalOpen(false)} className="p-2 bg-white/5 rounded-xl text-primary-200/40 hover:text-white transition-all">
               <X className="w-6 h-6" />
@@ -229,39 +229,39 @@ export const StaffDirectory = () => {
 
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-primary-200/40 uppercase tracking-widest ml-1">First Name</label>
+              <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">First Name</label>
               <input 
                 required
-                className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
+                className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-primary outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
                 value={formData.first_name}
                 onChange={e => setFormData({...formData, first_name: e.target.value})}
               />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-primary-200/40 uppercase tracking-widest ml-1">Last Name</label>
+              <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">Last Name</label>
               <input 
                 required
-                className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
+                className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-primary outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
                 value={formData.last_name}
                 onChange={e => setFormData({...formData, last_name: e.target.value})}
               />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-primary-200/40 uppercase tracking-widest ml-1">Work Email</label>
+              <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">Work Email</label>
               <input 
                 required
                 type="email"
-                className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
+                className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-primary outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
                 value={formData.email}
                 onChange={e => setFormData({...formData, email: e.target.value})}
               />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-primary-200/40 uppercase tracking-widest ml-1">Temporary Password</label>
+              <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">Temporary Password</label>
               <input 
                 required
                 type="password"
-                className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
+                className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-primary outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
                 value={formData.password}
                 onChange={e => setFormData({...formData, password: e.target.value})}
               />
@@ -285,19 +285,19 @@ export const StaffDirectory = () => {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-primary-200/40 uppercase tracking-widest ml-1">System Role</label>
+              <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">System Role</label>
               <select
                 required
-                className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white outline-none focus:ring-2 focus:ring-primary-500/20 transition-all appearance-none"
+                className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-primary outline-none focus:ring-2 focus:ring-primary-500/20 transition-all appearance-none"
                 value={formData.role}
                 onChange={e => setFormData({...formData, role: e.target.value})}
               >
-                <option value="TEACHER" className="bg-[#0f172a]">Teacher</option>
-                <option value="ADMIN" className="bg-[#0f172a]">Administrator</option>
-                <option value="PRINCIPAL" className="bg-[#0f172a]">Principal</option>
-                <option value="HOD" className="bg-[#0f172a]">Head of Department</option>
-                <option value="LIBRARIAN" className="bg-[#0f172a]">Librarian</option>
-                <option value="FINANCE" className="bg-[#0f172a]">Finance / Bursar</option>
+                <option value="TEACHER" className="bg-bg-color">Teacher</option>
+                <option value="ADMIN" className="bg-bg-color">Administrator</option>
+                <option value="PRINCIPAL" className="bg-bg-color">Principal</option>
+                <option value="HOD" className="bg-bg-color">Head of Department</option>
+                <option value="LIBRARIAN" className="bg-bg-color">Librarian</option>
+                <option value="FINANCE" className="bg-bg-color">Finance / Bursar</option>
               </select>
             </div>
             <div className="space-y-2">

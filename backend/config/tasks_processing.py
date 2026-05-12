@@ -217,44 +217,69 @@ def process_fee_payments(self, payments_data: List[Dict[str, Any]]):
 @shared_task(bind=True)
 def cleanup_expired_data(self):
     """
-    Clean up expired sessions, tokens, and temporary data
+    Clean up expired sessions, tokens, and temporary data across all tenants.
     """
+    from django_tenants.utils import tenant_context
+    from schools.models import School
+    
     try:
-        from django.contrib.sessions.models import Session
-
-        from accounts.models import EmailVerificationToken
-
-        # Clean up expired email verification tokens
-        expired_tokens = EmailVerificationToken.objects.filter(
-            expires_at__lt=timezone.now()
-        )
-        expired_count = expired_tokens.delete()[0]
-
-        # Clean up expired sessions
-        expired_sessions = Session.objects.filter(expire_date__lt=timezone.now())
-        session_count = expired_sessions.delete()[0]
-
-        # Clean up old audit logs (keep last 6 months)
-        from audit.models import AuditLog
-
-        six_months_ago = timezone.now() - timedelta(days=180)
-        old_audit_logs = AuditLog.objects.filter(timestamp__lt=six_months_ago)
-        audit_count = old_audit_logs.delete()[0]
-
-        logger.info(
-            f"Cleaned up {expired_count} tokens, {session_count} sessions, {audit_count} audit logs"
-        )
-
-        return {
-            "status": "success",
-            "tokens_cleaned": expired_count,
-            "sessions_cleaned": session_count,
-            "audit_logs_cleaned": audit_count,
+        results = {
+            "public": {},
+            "tenants": []
         }
+
+        # 1. Clean up public schema (shared data like sessions and tokens)
+        results["public"] = _perform_cleanup(is_public=True)
+
+        # 2. Clean up each tenant schema (tenant-specific data like audit logs)
+        schools = School.objects.filter(status="ACTIVE").exclude(schema_name="public")
+        for school in schools:
+            with tenant_context(school):
+                tenant_result = _perform_cleanup(is_public=False)
+                tenant_result["school"] = school.name
+                results["tenants"].append(tenant_result)
+
+        logger.info(f"Data cleanup complete for public and {len(schools)} tenants.")
+        return {"status": "success", "results": results}
 
     except Exception as e:
         logger.error(f"Data cleanup failed: {e}")
         return {"status": "failed", "error": str(e)}
+
+
+def _perform_cleanup(is_public=False):
+    """Helper to perform the actual deletion of expired data in the current schema context."""
+    from django.contrib.sessions.models import Session
+    from accounts.models import EmailVerificationToken
+
+    results = {
+        "tokens_cleaned": 0,
+        "sessions_cleaned": 0,
+        "audit_logs_cleaned": 0,
+    }
+
+    # 1. Shared/Public Only Cleanups
+    if is_public:
+        # Clean up expired email verification tokens (only exist in public schema)
+        expired_tokens = EmailVerificationToken.objects.filter(
+            expires_at__lt=timezone.now()
+        )
+        results["tokens_cleaned"] = expired_tokens.delete()[0]
+
+    # 2. Schema-Specific Cleanups (exists in both public and tenant schemas)
+    expired_sessions = Session.objects.filter(expire_date__lt=timezone.now())
+    results["sessions_cleaned"] = expired_sessions.delete()[0]
+
+    # 3. Tenant Only Cleanups
+    if not is_public:
+        # Clean up old audit logs (keep last 6 months) - only exists in tenant schemas
+        from audit.models import AuditLog
+
+        six_months_ago = timezone.now() - timedelta(days=180)
+        old_audit_logs = AuditLog.objects.filter(timestamp__lt=six_months_ago)
+        results["audit_logs_cleaned"] = old_audit_logs.delete()[0]
+
+    return results
 
 
 @shared_task(bind=True)

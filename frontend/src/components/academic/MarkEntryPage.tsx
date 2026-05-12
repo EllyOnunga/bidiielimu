@@ -169,49 +169,50 @@ export const MarkEntryPage = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div className="flex items-center gap-6">
-          <button className="p-3 bg-white/5 rounded-2xl border border-white/5 text-primary-200/40 hover:text-white">
+          <button className="p-2 sm:p-3 bg-white/5 rounded-2xl border border-white/5 text-muted hover:text-primary shrink-0">
             <ChevronLeft className="w-6 h-6" />
           </button>
           <div>
-            <h1 className="text-4xl font-black text-white tracking-tighter">Bulk Mark Entry</h1>
-            <p className="text-primary-200/40 font-bold uppercase tracking-widest mt-1">Mathematics • Form 4 North • Term 2</p>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-primary tracking-tighter">Bulk Mark Entry</h1>
+            <p className="text-muted font-bold uppercase tracking-widest mt-1 text-[10px] sm:text-xs">Mathematics • Form 4 North • Term 2</p>
           </div>
         </div>
         
-        <div className="flex gap-4">
-          <button className="px-6 py-3 bg-white/5 border border-white/10 text-white rounded-2xl font-bold flex items-center gap-3 hover:bg-white/10 transition-all">
-            <Upload className="w-5 h-5" />
-            Import CSV
+        <div className="flex gap-2 sm:gap-4 w-full md:w-auto">
+          <button className="flex-1 md:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-white/5 border border-white/10 text-primary rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-white/10 transition-all text-sm">
+            <Upload className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span className="hidden sm:inline">Import CSV</span>
+            <span className="sm:hidden">Import</span>
           </button>
           <button 
             onClick={handleSave}
             disabled={saveMutation.isPending}
-            className="px-8 py-3 bg-primary-500 text-white rounded-2xl font-black flex items-center gap-3 hover:bg-primary-400 shadow-premium transition-all disabled:opacity-50"
+            className="flex-1 md:flex-none px-4 sm:px-8 py-2.5 sm:py-3 bg-primary-500 text-white rounded-2xl font-black flex items-center justify-center gap-2 hover:bg-primary-400 shadow-premium transition-all disabled:opacity-50 text-sm"
           >
             {saveMutation.isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-            Save Changes
+            Save
           </button>
         </div>
       </div>
 
       {/* Toolbar */}
-      <div className="glass p-6 rounded-[28px] border border-white/5 flex flex-wrap gap-6 items-end">
-        <div className="flex-1 min-w-[200px] space-y-2">
-          <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest ml-1">Examination</label>
+      <div className="glass p-4 sm:p-6 rounded-[28px] border border-white/5 flex flex-wrap gap-4 sm:gap-6 items-end">
+        <div className="flex-1 min-w-[140px] space-y-2">
+          <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">Examination</label>
           <select 
             value={selectedExam}
             onChange={(e) => setSelectedExam(e.target.value)}
-            className="w-full bg-white/5 border border-white/5 rounded-2xl py-3 px-4 text-white outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
+            className="w-full bg-white/5 border border-white/5 rounded-2xl py-2.5 sm:py-3 px-3 sm:px-4 text-primary text-sm outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
           >
-            <option value="" className="bg-slate-900">Select Exam</option>
+            <option value="" className="bg-bg-color">Select Exam</option>
             {exams.map((e: Exam) => (
-              <option key={e.id} value={e.id} className="bg-slate-900">{e.name}</option>
+              <option key={e.id} value={e.id} className="bg-bg-color">{e.name}</option>
             ))}
           </select>
         </div>
 
-        <div className="flex-1 min-w-[200px] space-y-2">
-          <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest ml-1">Subject & Stream</label>
+        <div className="flex-1 min-w-[140px] space-y-2">
+          <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">Subject & Stream</label>
           <select 
             value={`${selectedSubject}-${selectedStream}`}
             onChange={(e) => {
@@ -219,42 +220,43 @@ export const MarkEntryPage = () => {
               setSelectedSubject(subjectId);
               setSelectedStream(streamId);
             }}
-            className="w-full bg-white/5 border border-white/5 rounded-2xl py-3 px-4 text-white outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
+            className="w-full bg-white/5 border border-white/5 rounded-2xl py-2.5 sm:py-3 px-3 sm:px-4 text-primary text-sm outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
           >
-            <option value="" className="bg-slate-900">Select Class</option>
+            <option value="" className="bg-bg-color">Select Class</option>
             {assignments.map((as: Assignment) => (
-              <option key={as.id} value={`${as.subject}-${as.stream}`} className="bg-slate-900">
+              <option key={as.id} value={`${as.subject}-${as.stream}`} className="bg-bg-color">
                 {as.subject_name} - {as.grade_name} {as.stream_name}
               </option>
             ))}
           </select>
         </div>
 
-        <div className="relative flex-[2] min-w-[300px] space-y-2">
-          <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest ml-1">Filter Students</label>
+        <div className="relative w-full sm:flex-[2] sm:min-w-[240px] space-y-2">
+          <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">Filter Students</label>
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-200/20" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-dim" />
             <input 
               type="text" 
-              placeholder="Search student or admission number..."
+              placeholder="Search student..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-white/5 border border-white/5 rounded-2xl py-3 pl-12 pr-4 text-white focus:ring-2 focus:ring-primary-500/20 transition-all outline-none"
+              className="w-full bg-white/5 border border-white/5 rounded-2xl py-2.5 sm:py-3 pl-10 sm:pl-12 pr-4 text-primary text-sm focus:ring-2 focus:ring-primary-500/20 transition-all outline-none"
             />
           </div>
         </div>
       </div>
 
       {/* Mark Grid */}
-      <div className="glass rounded-[40px] border border-white/5 overflow-hidden">
-        <table className="w-full border-collapse">
+      <div className="glass rounded-[28px] sm:rounded-[40px] border border-white/5 overflow-hidden">
+        <div className="overflow-x-auto custom-scrollbar">
+        <table className="w-full border-collapse min-w-[640px]">
           <thead>
             <tr className="bg-white/[0.02] border-b border-white/5">
-              <th className="px-8 py-6 text-left text-[10px] font-black text-primary-200/30 uppercase tracking-widest">Student Details</th>
-              <th className="px-8 py-6 text-left text-[10px] font-black text-primary-200/30 uppercase tracking-widest">Admission No</th>
-              <th className="px-8 py-6 text-center text-[10px] font-black text-primary-200/30 uppercase tracking-widest">Current Grade</th>
-              <th className="px-8 py-6 text-center text-[10px] font-black text-primary-200/30 uppercase tracking-widest">Marks Entry (/{marks[0]?.out_of})</th>
-              <th className="px-8 py-6 text-center text-[10px] font-black text-primary-200/30 uppercase tracking-widest">Status</th>
+              <th className="px-8 py-6 text-left text-[10px] font-black text-muted uppercase tracking-widest">Student Details</th>
+              <th className="px-8 py-6 text-left text-[10px] font-black text-muted uppercase tracking-widest">Admission No</th>
+              <th className="px-8 py-6 text-center text-[10px] font-black text-muted uppercase tracking-widest">Current Grade</th>
+              <th className="px-8 py-6 text-center text-[10px] font-black text-muted uppercase tracking-widest">Marks Entry (/{marks[0]?.out_of})</th>
+              <th className="px-8 py-6 text-center text-[10px] font-black text-muted uppercase tracking-widest">Status</th>
             </tr>
           </thead>
           <tbody>
@@ -297,7 +299,7 @@ export const MarkEntryPage = () => {
                       value={m.score}
                       onChange={(e) => handleScoreChange(m.id, e.target.value)}
                       onKeyDown={(e) => handleKeyDown(e, index)}
-                      className="w-24 bg-white/5 border border-white/10 rounded-xl py-3 text-center text-white font-black text-lg focus:ring-4 focus:ring-primary-500/20 focus:border-primary-500/50 transition-all outline-none"
+                      className="w-24 bg-white/5 border border-white/10 rounded-xl py-3 text-center text-primary font-black text-lg focus:ring-4 focus:ring-primary-500/20 focus:border-primary-500/50 transition-all outline-none"
                     />
                   </div>
                 </td>
@@ -318,21 +320,22 @@ export const MarkEntryPage = () => {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
-      <div className="flex justify-between items-center px-10 py-6 bg-primary-500/5 border border-primary-500/10 rounded-[32px]">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-primary-500/20 flex items-center justify-center text-primary-400">
-            <AlertCircle className="w-6 h-6" />
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-4 sm:px-8 py-5 sm:py-6 bg-primary-500/5 border border-primary-500/10 rounded-[24px] sm:rounded-[32px]">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-primary-500/20 flex items-center justify-center text-primary-400 shrink-0">
+            <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
-            <p className="text-white font-bold text-sm">Batch Summary</p>
-            <p className="text-primary-200/40 text-xs">{filteredMarks.length} students loaded. Average: 85.7%</p>
+            <p className="text-primary font-bold text-sm">Batch Summary</p>
+            <p className="text-muted text-xs">{filteredMarks.length} students loaded. Average: 85.7%</p>
           </div>
         </div>
-        <button className="flex items-center gap-2 text-white/40 hover:text-white transition-all text-xs font-black uppercase tracking-widest">
+        <button className="flex items-center gap-2 text-muted hover:text-primary transition-all text-xs font-black uppercase tracking-widest whitespace-nowrap">
           <Download className="w-4 h-4" />
-          Export Provisional Sheet
+          Export Sheet
         </button>
       </div>
     </div>

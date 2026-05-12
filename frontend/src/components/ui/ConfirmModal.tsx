@@ -28,28 +28,28 @@ export function ConfirmModal({
       isOpen={isOpen}
       onClose={onClose}
       title={title}
-      className="max-w-md bg-slate-900 border-white/10"
+      className="max-w-md"
     >
-      <div className="space-y-6 pt-4">
-        <div className="flex items-start gap-4 p-4 rounded-2xl bg-rose-500/5 border border-rose-500/10">
-          <div className={`p-2 rounded-lg ${variant === 'destructive' ? 'bg-rose-500/20 text-rose-500' : 'bg-primary-500/20 text-primary-500'}`}>
+      <div className="space-y-6">
+        <div className="flex items-start gap-4 p-5 rounded-2xl bg-primary-500/5 border border-primary-500/10">
+          <div className={`p-2.5 rounded-xl shrink-0 ${variant === 'destructive' ? 'bg-rose-500/20 text-rose-500' : 'bg-primary-500/20 text-primary-500'}`}>
             <AlertTriangle className="w-5 h-5" />
           </div>
-          <p className="text-sm text-slate-400 leading-relaxed">
+          <p className="text-sm font-medium text-muted leading-relaxed">
             {description}
           </p>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3 pt-2">
           <Button
             variant="outline"
-            className="flex-1 bg-slate-800 border-slate-700 text-white hover:bg-slate-700"
+            className="flex-1 order-2 sm:order-1"
             onClick={onClose}
           >
             {cancelText}
           </Button>
           <Button
-            className={`flex-1 ${variant === 'destructive' ? 'bg-rose-600 hover:bg-rose-500' : ''}`}
+            className={`flex-1 order-1 sm:order-2 ${variant === 'destructive' ? 'bg-rose-600 hover:bg-rose-500 shadow-rose-500/20' : ''}`}
             onClick={() => {
               onConfirm();
               onClose();

@@ -16,6 +16,10 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 # Load task modules from all registered Django apps.
 app.autodiscover_tasks()
 
+# Explicitly import tasks that are not in standard tasks.py files
+import config.tasks_backup  # noqa
+import config.tasks_processing  # noqa
+
 
 @app.task(bind=True, ignore_result=True)
 def debug_task(self):

@@ -170,8 +170,8 @@ export const TeachersPage = () => {
     >
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
         <div>
-          <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight mb-2">Faculty <span className="text-gradient">Network</span></h1>
-          <p className="text-primary-200/50 text-base font-medium">Coordinate educators and cross-functional assignments.</p>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-primary tracking-tight mb-2">Faculty <span className="text-gradient">Network</span></h1>
+          <p className="text-muted text-xs sm:text-sm md:text-base font-medium">Coordinate educators and cross-functional assignments.</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <Button variant="secondary" onClick={() => setIsBulkModalOpen(true)} className="gap-2 rounded-2xl h-12 px-6 font-black uppercase tracking-widest text-xs">
@@ -205,11 +205,11 @@ export const TeachersPage = () => {
           <Table className="min-w-[1000px]">
             <TableHeader className="bg-white/5">
               <TableRow className="border-0 hover:bg-transparent h-16">
-                <TableHead className="text-primary-200/40 text-[10px] font-black uppercase tracking-widest pl-8">Educator</TableHead>
-                <TableHead className="text-primary-200/40 text-[10px] font-black uppercase tracking-widest">Communication Channel</TableHead>
-                <TableHead className="text-primary-200/40 text-[10px] font-black uppercase tracking-widest">Core Domain</TableHead>
-                <TableHead className="text-primary-200/40 text-[10px] font-black uppercase tracking-widest">Status</TableHead>
-                <TableHead className="text-right text-primary-200/40 text-[10px] font-black uppercase tracking-widest pr-8">Operations</TableHead>
+                <TableHead className="text-muted text-[10px] font-black uppercase tracking-widest pl-8">Educator</TableHead>
+                <TableHead className="text-muted text-[10px] font-black uppercase tracking-widest">Communication Channel</TableHead>
+                <TableHead className="text-muted text-[10px] font-black uppercase tracking-widest">Core Domain</TableHead>
+                <TableHead className="text-muted text-[10px] font-black uppercase tracking-widest">Status</TableHead>
+                <TableHead className="text-right text-muted text-[10px] font-black uppercase tracking-widest pr-8">Operations</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody className="divide-y divide-white/5">
@@ -237,8 +237,8 @@ export const TeachersPage = () => {
                           {teacher.first_name[0]}{teacher.last_name[0]}
                         </div>
                         <div>
-                          <div className="text-sm font-black text-white uppercase tracking-tight">{teacher.first_name} {teacher.last_name}</div>
-                          <div className="text-[10px] font-black text-primary-200/30 uppercase tracking-tighter">{teacher.employee_id}</div>
+                          <div className="text-xs sm:text-sm font-black text-primary uppercase tracking-tight">{teacher.first_name} {teacher.last_name}</div>
+                          <div className="text-[9px] sm:text-[10px] font-black text-dim uppercase tracking-tighter">{teacher.employee_id}</div>
                         </div>
                       </div>
                     </TableCell>
@@ -255,7 +255,7 @@ export const TeachersPage = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <span className="px-3 py-1.5 rounded-xl bg-white/5 text-primary-200/60 text-[10px] font-black uppercase tracking-widest border border-white/5">
+                      <span className="px-3 py-1.5 rounded-xl bg-white/5 text-muted text-[10px] font-black uppercase tracking-widest border border-white/5">
                         {teacher.specialization || 'Generalist'}
                       </span>
                     </TableCell>
@@ -314,7 +314,7 @@ export const TeachersPage = () => {
             <div className="space-y-6">
               <div className="flex items-center gap-3 pb-3 border-b border-white/5">
                 <Plus className="w-4 h-4 text-primary-400" />
-                <h3 className="text-xs font-black text-white uppercase tracking-[0.2em]">Deployment Identity</h3>
+                <h3 className="text-xs font-black text-primary uppercase tracking-[0.2em]">Deployment Identity</h3>
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">Identifier (Employee ID)</label>
@@ -322,11 +322,11 @@ export const TeachersPage = () => {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">First Name</label>
+                  <label className="text-[10px] font-black text-muted uppercase tracking-widest">First Name</label>
                   <Input required value={formData.first_name} onChange={(e) => setFormData({ ...formData, first_name: e.target.value })} className="bg-white/5 border-white/5 rounded-xl h-12" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">Last Name</label>
+                  <label className="text-[10px] font-black text-muted uppercase tracking-widest">Last Name</label>
                   <Input required value={formData.last_name} onChange={(e) => setFormData({ ...formData, last_name: e.target.value })} className="bg-white/5 border-white/5 rounded-xl h-12" />
                 </div>
               </div>
@@ -335,7 +335,7 @@ export const TeachersPage = () => {
             <div className="space-y-6">
               <div className="flex items-center gap-3 pb-3 border-b border-white/5">
                 <Settings className="w-4 h-4 text-accent-400" />
-                <h3 className="text-xs font-black text-white uppercase tracking-[0.2em]">Operational Scope</h3>
+                <h3 className="text-xs font-black text-primary uppercase tracking-[0.2em]">Operational Scope</h3>
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">Domain Specialization</label>
@@ -350,7 +350,7 @@ export const TeachersPage = () => {
             <div className="space-y-6">
               <div className="flex items-center gap-3 pb-3 border-b border-white/5">
                 <Phone className="w-4 h-4 text-emerald-400" />
-                <h3 className="text-xs font-black text-white uppercase tracking-[0.2em]">Transmission Channel</h3>
+                <h3 className="text-xs font-black text-primary uppercase tracking-[0.2em]">Transmission Channel</h3>
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">Secure Line (Phone)</label>
@@ -361,22 +361,22 @@ export const TeachersPage = () => {
             <div className="space-y-6">
               <div className="flex items-center gap-3 pb-3 border-b border-white/5">
                 <Mail className="w-4 h-4 text-purple-400" />
-                <h3 className="text-xs font-black text-white uppercase tracking-[0.2em]">Access Credentials</h3>
+                <h3 className="text-xs font-black text-primary uppercase tracking-[0.2em]">Access Credentials</h3>
               </div>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">System Email</label>
+                  <label className="text-[10px] font-black text-muted uppercase tracking-widest">System Email</label>
                   <Input required type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="bg-white/5 border-white/5 rounded-xl h-12" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">Encryption Key (Password)</label>
+                  <label className="text-[10px] font-black text-muted uppercase tracking-widest">Encryption Key (Password)</label>
                   <Input required={!editingTeacher} type="password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} placeholder={editingTeacher ? "Current" : "Min 8 chars"} className="bg-white/5 border-white/5 rounded-xl h-12" />
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="flex gap-4 pt-4">
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
             <Button type="button" variant="outline" className="flex-1 h-14 bg-white/5 border-white/5 text-primary-200/50 rounded-2xl font-black uppercase tracking-widest text-xs" onClick={() => setIsModalOpen(false)}>
               Discard
             </Button>
@@ -398,7 +398,7 @@ export const TeachersPage = () => {
       >
         <div className="mt-8 space-y-8">
           <div
-            className={`border-4 border-dashed rounded-[32px] p-12 text-center transition-all cursor-pointer ${csvFile ? 'border-primary-500 bg-primary-500/10' : 'border-white/5 bg-white/5 hover:border-white/10'
+            className={`border-4 border-dashed rounded-[32px] p-8 sm:p-12 text-center transition-all cursor-pointer ${csvFile ? 'border-primary-500 bg-primary-500/10' : 'border-white/5 bg-white/5 hover:border-white/10'
               }`}
             onClick={() => document.getElementById('teacher-csv-input')?.click()}
           >
@@ -406,18 +406,18 @@ export const TeachersPage = () => {
             <UploadCloud className={`w-16 h-16 mx-auto mb-6 ${csvFile ? 'text-primary-400' : 'text-primary-200/20'}`} />
             {csvFile ? (
               <div className="animate-in fade-in zoom-in duration-300">
-                <p className="text-white font-black uppercase tracking-widest text-sm mb-2">{csvFile.name}</p>
-                <p className="text-[10px] font-black text-primary-200/40 uppercase tracking-widest">{(csvFile.size / 1024).toFixed(1)} KB Payload</p>
+                <p className="text-primary font-black uppercase tracking-widest text-sm mb-2">{csvFile.name}</p>
+                <p className="text-[10px] font-black text-muted uppercase tracking-widest">{(csvFile.size / 1024).toFixed(1)} KB Payload</p>
               </div>
             ) : (
               <div>
-                <p className="text-white font-black uppercase tracking-widest text-sm mb-2">Drop Protocol File</p>
-                <p className="text-[10px] font-black text-primary-200/40 uppercase tracking-widest">CSV Data Only</p>
+                <p className="text-primary font-black uppercase tracking-widest text-sm mb-2">Drop Protocol File</p>
+                <p className="text-[10px] font-black text-muted uppercase tracking-widest">CSV Data Only</p>
               </div>
             )}
           </div>
 
-          <div className="flex gap-4 pt-2 pb-4">
+          <div className="flex flex-col sm:flex-row gap-3 pt-2 pb-4">
             <Button type="button" variant="outline" className="flex-1 h-12 bg-white/5 border-white/5 text-primary-200/50 rounded-2xl font-black uppercase tracking-widest text-xs" onClick={() => setIsBulkModalOpen(false)}>
               Abort
             </Button>
@@ -534,21 +534,21 @@ const TeacherAssignmentsModal = ({ isOpen, onClose, teacher }: { isOpen: boolean
                 + Create Domain
               </button>
             </div>
-            <select value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)} className="w-full h-12 bg-white/5 border border-white/5 rounded-xl px-4 text-white text-sm outline-none focus:border-primary-500 transition-all">
-              <option value="">Select Domain...</option>
+            <select value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)} className="w-full h-12 bg-white/5 border border-white/5 rounded-xl px-4 text-primary text-sm outline-none focus:border-primary-500 transition-all">
+              <option value="" className="bg-bg-color">Select Domain...</option>
               {subjects.map((s: any) => (
-                <option key={s.id} value={s.id}>{s.name}</option>
+                <option key={s.id} value={s.id} className="bg-bg-color">{s.name}</option>
               ))}
             </select>
           </div>
           <div className="space-y-3">
             <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">Deployment Stream</label>
-            <select value={selectedStream} onChange={(e) => setSelectedStream(e.target.value)} className="w-full h-12 bg-white/5 border border-white/5 rounded-xl px-4 text-white text-sm outline-none focus:border-primary-500 transition-all">
-              <option value="">Select Stream...</option>
+            <select value={selectedStream} onChange={(e) => setSelectedStream(e.target.value)} className="w-full h-12 bg-white/5 border border-white/5 rounded-xl px-4 text-primary text-sm outline-none focus:border-primary-500 transition-all">
+              <option value="" className="bg-bg-color">Select Stream...</option>
               {grades.map((g: any) => (
-                <optgroup key={g.id} label={g.name}>
+                <optgroup key={g.id} label={g.name} className="bg-bg-color">
                   {g.streams.map((s: any) => (
-                    <option key={s.id} value={s.id}>{g.name} {s.name}</option>
+                    <option key={s.id} value={s.id} className="bg-bg-color">{g.name} {s.name}</option>
                   ))}
                 </optgroup>
               ))}
@@ -560,7 +560,7 @@ const TeacherAssignmentsModal = ({ isOpen, onClose, teacher }: { isOpen: boolean
         </div>
 
         <div className="space-y-4 pb-4">
-          <h3 className="text-[10px] font-black text-white uppercase tracking-[0.3em]">Active Intelligence Scope</h3>
+          <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Active Intelligence Scope</h3>
           {loadingAssignments ? (
             <div className="py-12 text-center"><Loader2 className="w-8 h-8 animate-spin mx-auto text-primary-500" /></div>
           ) : assignments.length === 0 ? (
@@ -580,8 +580,8 @@ const TeacherAssignmentsModal = ({ isOpen, onClose, teacher }: { isOpen: boolean
                     className="flex items-center justify-between p-5 glass border-white/5 rounded-[24px] hover:bg-white/5 transition-all group"
                   >
                     <div>
-                      <p className="text-xs font-black text-white uppercase tracking-tight">{as.subject_name}</p>
-                      <p className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">{as.grade_name} • {as.stream_name}</p>
+                      <p className="text-xs font-black text-primary uppercase tracking-tight">{as.subject_name}</p>
+                      <p className="text-[10px] font-black text-dim uppercase tracking-widest">{as.grade_name} • {as.stream_name}</p>
                     </div>
                     <button onClick={() => deleteAssignmentMutation.mutate(as.id)} className="p-2.5 text-primary-200/30 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all">
                       <X className="w-4 h-4" />
