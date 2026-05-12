@@ -81,29 +81,29 @@ export const QuizInterface = ({ quizId, onComplete }: { quizId: string, onComple
   return (
     <div className="fixed inset-0 z-50 bg-slate-950 flex flex-col">
       {/* Header */}
-      <div className="h-20 bg-white/5 border-b border-white/10 px-8 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl bg-primary-500/10 flex items-center justify-center text-primary-400">
-            <HelpCircle className="w-6 h-6" />
+      <div className="h-16 sm:h-20 bg-white/5 border-b border-white/10 px-4 sm:px-8 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-3 sm:gap-4 overflow-hidden">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-primary-500/10 flex items-center justify-center text-primary-400 shrink-0">
+            <HelpCircle className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <div>
-            <h2 className="text-white font-black">{quiz.title}</h2>
-            <p className="text-xs text-primary-200/40 uppercase tracking-widest font-black">Question {currentIdx + 1} of {quiz.questions.length}</p>
+          <div className="overflow-hidden">
+            <h2 className="text-white font-black text-sm sm:text-base truncate">{quiz.title}</h2>
+            <p className="text-[9px] sm:text-xs text-primary-200/40 uppercase tracking-widest font-black">Question {currentIdx + 1} of {quiz.questions.length}</p>
           </div>
         </div>
         
-        <div className={`flex items-center gap-3 px-6 py-2 rounded-2xl border font-black transition-colors ${
+        <div className={`flex items-center gap-2 sm:gap-3 px-3 sm:px-6 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl border font-black transition-colors text-xs sm:text-sm shrink-0 ${
           timeLeft < 60 ? 'bg-rose-500/10 border-rose-500 text-rose-400 animate-pulse' : 'bg-white/5 border-white/10 text-white'
         }`}>
-          <Clock className="w-5 h-5" />
+          <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
           {formatTime(timeLeft)}
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-auto p-8 lg:p-20 flex flex-col items-center">
+      <div className="flex-1 overflow-auto p-4 sm:p-8 lg:p-20 flex flex-col items-center">
         <div className="max-w-3xl w-full">
-          <div className="glass p-12 rounded-[48px] border border-white/10 shadow-2xl relative overflow-hidden">
+          <div className="glass p-6 sm:p-8 lg:p-12 rounded-[32px] sm:rounded-[48px] border border-white/10 shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1 bg-white/5">
               <div 
                 className="h-full bg-primary-500 transition-all duration-500" 
@@ -111,27 +111,27 @@ export const QuizInterface = ({ quizId, onComplete }: { quizId: string, onComple
               />
             </div>
 
-            <div className="space-y-12">
-              <h3 className="text-2xl lg:text-3xl font-black text-white leading-tight">
+            <div className="space-y-8 sm:space-y-12">
+              <h3 className="text-xl sm:text-2xl lg:text-3xl font-black text-white leading-tight">
                 {currentQuestion.text}
               </h3>
 
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 gap-3 sm:gap-4">
                 {Array.isArray(currentQuestion?.options) && currentQuestion.options.map((option, idx) => (
                   <button
                     key={idx}
                     onClick={() => setAnswers({ ...answers, [currentQuestion.id]: String(idx) })}
-                    className={`w-full p-6 rounded-3xl text-left font-bold transition-all border flex items-center justify-between group ${
+                    className={`w-full p-4 sm:p-6 rounded-2xl sm:rounded-3xl text-left font-bold transition-all border flex items-center justify-between group ${
                       answers[currentQuestion.id] === String(idx)
-                        ? 'bg-primary-500 border-primary-400 text-white shadow-xl'
+                        ? 'bg-primary-500 border-primary-400 text-white shadow-xl scale-[1.02]'
                         : 'bg-white/5 border-white/10 text-primary-200 hover:bg-white/10 hover:border-white/20'
                     }`}
                   >
-                    <span>{option}</span>
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                    <span className="text-sm sm:text-base">{option}</span>
+                    <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center transition-all shrink-0 ${
                       answers[currentQuestion.id] === String(idx) ? 'border-white bg-white/20' : 'border-white/10'
                     }`}>
-                      {answers[currentQuestion.id] === String(idx) && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+                      {answers[currentQuestion.id] === String(idx) && <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-white rounded-full" />}
                     </div>
                   </button>
                 ))}

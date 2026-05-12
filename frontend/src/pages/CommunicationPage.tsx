@@ -95,15 +95,15 @@ export const CommunicationPage = () => {
   return (
     <div className="space-y-8 pb-20">
       <div>
-        <h1 className="text-3xl font-bold text-white tracking-tight">Communication Center</h1>
-        <p className="text-slate-400">Broadcast messages to parents, students, and staff via Email or SMS.</p>
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-primary tracking-tight mb-2">Communication <span className="text-gradient">Center</span></h1>
+        <p className="text-muted text-xs sm:text-sm font-medium">Broadcast messages to parents, students, and staff via Email or SMS.</p>
       </div>
 
-      <div className="flex gap-4 p-1.5 bg-slate-800/50 rounded-2xl w-fit border border-white/5">
+      <div className="flex flex-wrap gap-2 p-1.5 bg-white/5 rounded-2xl w-fit border border-white/5">
         <button
           onClick={() => setActiveTab('email')}
-          className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
-            activeTab === 'email' ? 'bg-primary-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'
+          className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
+            activeTab === 'email' ? 'bg-primary-600 text-white shadow-lg' : 'text-muted hover:text-primary'
           }`}
         >
           <Mail className="w-4 h-4" />
@@ -111,8 +111,8 @@ export const CommunicationPage = () => {
         </button>
         <button
           onClick={() => setActiveTab('sms')}
-          className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
-            activeTab === 'sms' ? 'bg-primary-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'
+          className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
+            activeTab === 'sms' ? 'bg-primary-600 text-white shadow-lg' : 'text-muted hover:text-primary'
           }`}
         >
           <Phone className="w-4 h-4" />
@@ -121,30 +121,30 @@ export const CommunicationPage = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 glass-dark p-8 rounded-3xl border border-white/5">
+        <div className="lg:col-span-2 glass p-6 sm:p-8 rounded-3xl border border-white/5">
           <form onSubmit={handleSend} className="space-y-6">
             <div className="flex items-center gap-3 mb-4">
               <div className={`p-2 rounded-xl ${activeTab === 'email' ? 'bg-blue-500/10' : 'bg-emerald-500/10'}`}>
                 {activeTab === 'email' ? <Mail className="w-6 h-6 text-blue-400" /> : <Phone className="w-6 h-6 text-emerald-400" />}
               </div>
-              <h2 className="text-xl font-bold text-white">Compose {activeTab === 'email' ? 'Email' : 'SMS'}</h2>
+              <h2 className="text-xl font-bold text-primary">Compose {activeTab === 'email' ? 'Email' : 'SMS'}</h2>
             </div>
 
             {activeTab === 'email' && (
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase">Subject Line</label>
+                <label className="text-xs font-bold text-muted uppercase">Subject Line</label>
                 <Input
                   required
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                   placeholder="Enter email subject..."
-                  className="bg-slate-800/50 border-slate-700 h-12"
+                  className="bg-white/5 border-white/10 h-12"
                 />
               </div>
             )}
 
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 uppercase">
+              <label className="text-xs font-bold text-muted uppercase">
                 {activeTab === 'email' ? 'Recipients (Comma separated emails)' : 'Recipients (Comma separated phone numbers)'}
               </label>
               <textarea
@@ -152,21 +152,21 @@ export const CommunicationPage = () => {
                 value={activeTab === 'email' ? formData.recipients : formData.phones}
                 onChange={(e) => setFormData({ ...formData, [activeTab === 'email' ? 'recipients' : 'phones']: e.target.value })}
                 placeholder={activeTab === 'email' ? "parent1@gmail.com, parent2@gmail.com..." : "0712345678, 0722334455..."}
-                className="w-full bg-slate-800/50 border border-slate-700 rounded-xl p-4 text-white text-sm outline-none focus:ring-2 focus:ring-primary-500 min-h-[100px] transition-all"
+                className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-primary text-sm outline-none focus:ring-2 focus:ring-primary-500 min-h-[100px] transition-all"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 uppercase">Message Content</label>
+              <label className="text-xs font-bold text-muted uppercase">Message Content</label>
               <textarea
                 required
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 placeholder={activeTab === 'email' ? "Dear Parents, we would like to inform you..." : "School Notice: Reopening dates have been changed..."}
-                className="w-full bg-slate-800/50 border border-slate-700 rounded-xl p-4 text-white text-sm outline-none focus:ring-2 focus:ring-primary-500 min-h-[200px] transition-all"
+                className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-primary text-sm outline-none focus:ring-2 focus:ring-primary-500 min-h-[200px] transition-all"
               />
               {activeTab === 'sms' && (
-                <p className="text-[10px] text-slate-500 text-right">{formData.message.length} characters • {Math.ceil(formData.message.length / 160)} SMS units</p>
+                <p className="text-[10px] text-dim text-right">{formData.message.length} characters • {Math.ceil(formData.message.length / 160)} SMS units</p>
               )}
             </div>
 
@@ -191,9 +191,9 @@ export const CommunicationPage = () => {
         </div>
 
         <div className="space-y-6">
-          <div className="glass-dark p-6 rounded-3xl border border-white/5">
-            <h3 className="text-sm font-bold text-white uppercase mb-4 flex items-center gap-2">
-              <Users className="w-4 h-4 text-slate-400" />
+          <div className="glass p-6 rounded-3xl border border-white/5">
+            <h3 className="text-sm font-bold text-primary uppercase mb-4 flex items-center gap-2">
+              <Users className="w-4 h-4 text-muted" />
               Quick Select Groups
             </h3>
             <div className="space-y-3">
@@ -203,14 +203,14 @@ export const CommunicationPage = () => {
                   onClick={() => handleSelectGroup(group.id)}
                   className="w-full p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all text-left group"
                 >
-                  <p className="text-sm font-bold text-white group-hover:text-primary-400">{group.name}</p>
-                  <p className="text-[10px] text-slate-500">Approx. {group.count} contacts</p>
+                  <p className="text-sm font-bold text-primary group-hover:text-primary-400">{group.name}</p>
+                  <p className="text-[10px] text-dim">Approx. {group.count} contacts</p>
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="glass-dark p-6 rounded-3xl border border-white/5 bg-primary-600/5">
+          <div className="glass p-6 rounded-3xl border border-white/5 bg-primary-600/5">
             <h3 className="text-sm font-bold text-primary-400 uppercase mb-4 flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4" />
               Usage Statistics
@@ -218,12 +218,12 @@ export const CommunicationPage = () => {
             <div className="space-y-4">
               <div>
                 <div className="flex justify-between text-xs mb-1.5">
-                  <span className="text-slate-400">Monthly {activeTab === 'email' ? 'Email' : 'SMS'} Limit</span>
-                  <span className="text-white font-bold">
+                  <span className="text-muted">Monthly {activeTab === 'email' ? 'Email' : 'SMS'} Limit</span>
+                  <span className="text-primary font-bold">
                     {activeTab === 'email' ? stats?.email_used : stats?.sms_used} / {activeTab === 'email' ? stats?.email_limit : stats?.sms_limit}
                   </span>
                 </div>
-                <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-primary-500 transition-all duration-500" 
                     style={{ 

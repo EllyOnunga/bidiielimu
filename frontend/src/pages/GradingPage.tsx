@@ -68,28 +68,28 @@ export const GradingPage = () => {
 
   return (
     <div className="space-y-8 pb-20">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">Grading Systems</h1>
-          <p className="text-slate-400">Define how marks are converted to grades across your school.</p>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-primary tracking-tight leading-none">Grading <span className="text-gradient">Systems</span></h1>
+          <p className="text-muted text-xs sm:text-sm font-medium mt-2">Define how marks are converted to grades across your school.</p>
         </div>
-        <Button onClick={() => setIsSystemModalOpen(true)} className="gap-2">
+        <Button onClick={() => setIsSystemModalOpen(true)} className="gap-2 w-full sm:w-auto">
           <Layers className="w-5 h-5" />
           New Grading System
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
         {/* Systems List */}
         <div className="lg:col-span-1 space-y-4">
-          <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest px-1">Available Systems</h2>
+          <h2 className="text-sm font-bold text-muted uppercase tracking-widest px-1">Available Systems</h2>
           {isLoading ? (
             <div className="space-y-4">
-              {[1, 2].map(i => <div key={i} className="h-20 glass-dark rounded-2xl animate-pulse" />)}
+              {[1, 2].map(i => <div key={i} className="h-20 glass rounded-2xl animate-pulse" />)}
             </div>
           ) : systems.length === 0 ? (
-            <div className="glass-dark p-8 rounded-3xl border border-white/5 text-center">
-              <p className="text-slate-500 italic">No grading systems defined.</p>
+            <div className="glass p-8 rounded-3xl border border-white/5 text-center">
+              <p className="text-muted italic">No grading systems defined.</p>
             </div>
           ) : (
             systems.map((system: any) => (
@@ -99,16 +99,16 @@ export const GradingPage = () => {
                 className={`p-6 rounded-3xl border transition-all cursor-pointer group ${
                   activeSystem?.id === system.id 
                     ? 'glass-primary border-primary-500/50 shadow-lg shadow-primary-500/10' 
-                    : 'glass-dark border-white/5 hover:border-white/10'
+                    : 'glass border-white/5 hover:border-white/10'
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-bold text-white">{system.name}</h3>
-                    <p className="text-xs text-slate-400 mt-1">{system.thresholds?.length || 0} Grade Levels</p>
+                    <h3 className="text-lg font-bold text-primary">{system.name}</h3>
+                    <p className="text-xs text-muted mt-1">{system.thresholds?.length || 0} Grade Levels</p>
                   </div>
                   <Edit2 className={`w-4 h-4 transition-all ${
-                    activeSystem?.id === system.id ? 'text-white opacity-100' : 'text-slate-500 opacity-0 group-hover:opacity-100'
+                    activeSystem?.id === system.id ? 'text-white opacity-100' : 'text-muted opacity-0 group-hover:opacity-100'
                   }`} />
                 </div>
               </div>
@@ -119,31 +119,31 @@ export const GradingPage = () => {
         {/* Thresholds View */}
         <div className="lg:col-span-2">
           {activeSystem ? (
-            <div className="glass-dark rounded-3xl border border-white/5 overflow-hidden">
-              <div className="p-6 border-b border-white/5 flex items-center justify-between">
+            <div className="glass rounded-3xl border border-white/5 overflow-hidden">
+              <div className="p-4 sm:p-6 border-b border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <h2 className="text-xl font-bold text-white">{activeSystem.name} Thresholds</h2>
-                  <p className="text-sm text-slate-400">Scores between min and max will be assigned the specified grade.</p>
+                  <h2 className="text-lg sm:text-xl font-bold text-primary">{activeSystem.name} Thresholds</h2>
+                  <p className="text-xs sm:text-sm text-muted mt-0.5">Scores between min and max will be assigned the specified grade.</p>
                 </div>
-                <Button variant="outline" size="sm" onClick={() => setIsThresholdModalOpen(true)} className="gap-2 bg-white/5 border-white/10">
+                <Button variant="outline" size="sm" onClick={() => setIsThresholdModalOpen(true)} className="gap-2 bg-white/5 border-white/10 w-full sm:w-auto">
                   <Plus className="w-4 h-4" /> Add Grade
                 </Button>
               </div>
-              <div className="p-0">
+              <div className="p-0 overflow-x-auto">
                 <Table>
                   <TableHeader className="bg-white/5">
                     <TableRow className="border-0">
-                      <TableHead className="text-slate-400">Grade</TableHead>
-                      <TableHead className="text-slate-400 text-center">Score Range</TableHead>
-                      <TableHead className="text-slate-400 text-center">Points</TableHead>
-                      <TableHead className="text-slate-400">Remarks</TableHead>
-                      <TableHead className="text-right text-slate-400 px-8">Actions</TableHead>
+                      <TableHead className="text-muted">Grade</TableHead>
+                      <TableHead className="text-muted text-center">Score Range</TableHead>
+                      <TableHead className="text-muted text-center">Points</TableHead>
+                      <TableHead className="text-muted">Remarks</TableHead>
+                      <TableHead className="text-right text-muted px-8">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody className="divide-y divide-white/5">
                     {activeSystem.thresholds?.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center py-20 text-slate-500 italic">
+                        <TableCell colSpan={5} className="text-center py-20 text-muted italic">
                           No grades added to this system yet.
                         </TableCell>
                       </TableRow>
@@ -152,12 +152,12 @@ export const GradingPage = () => {
                         <TableRow key={t.id} className="hover:bg-white/5 border-white/5 transition-colors">
                           <TableCell className="font-black text-lg text-primary-400">{t.grade}</TableCell>
                           <TableCell className="text-center font-mono">
-                            <span className="text-white">{t.min_score}</span>
-                            <span className="text-slate-600 mx-2">—</span>
-                            <span className="text-white">{t.max_score}</span>
+                            <span className="text-primary">{t.min_score}</span>
+                            <span className="text-dim mx-2">—</span>
+                            <span className="text-primary">{t.max_score}</span>
                           </TableCell>
-                          <TableCell className="text-center font-bold text-white">{t.points}</TableCell>
-                          <TableCell className="text-slate-400 italic text-sm">{t.remarks}</TableCell>
+                          <TableCell className="text-center font-bold text-primary">{t.points}</TableCell>
+                          <TableCell className="text-muted italic text-sm">{t.remarks}</TableCell>
                           <TableCell className="text-right px-8">
                             <button 
                               onClick={() => deleteThresholdMutation.mutate(t.id)}
@@ -174,12 +174,12 @@ export const GradingPage = () => {
               </div>
             </div>
           ) : (
-            <div className="h-full min-h-[400px] glass-dark rounded-3xl border border-white/5 border-dashed flex flex-col items-center justify-center text-center p-12">
+            <div className="h-full min-h-[400px] glass rounded-3xl border border-white/5 border-dashed flex flex-col items-center justify-center text-center p-12">
               <div className="w-16 h-16 rounded-3xl bg-white/5 flex items-center justify-center mb-6">
-                <Layers className="w-8 h-8 text-slate-500" />
+                <Layers className="w-8 h-8 text-muted" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Select a Grading System</h3>
-              <p className="text-slate-400 max-w-sm">
+              <h3 className="text-xl font-bold text-primary mb-2">Select a Grading System</h3>
+              <p className="text-muted max-w-sm">
                 Choose a grading system from the left to view and manage its grade thresholds.
               </p>
             </div>
@@ -192,16 +192,16 @@ export const GradingPage = () => {
         isOpen={isSystemModalOpen} 
         onClose={() => setIsSystemModalOpen(false)} 
         title="New Grading System"
-        className="max-w-md bg-slate-900 border-white/10"
+        className="max-w-md"
       >
         <div className="space-y-6 mt-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-400">System Name</label>
+            <label className="text-sm font-medium text-muted">System Name</label>
             <Input 
               placeholder="e.g. Standard 8-4-4, CBC, Cambridge" 
               value={systemName}
               onChange={(e) => setSystemName(e.target.value)}
-              className="bg-slate-800/50 border-slate-700"
+              className="bg-white/5 border-white/10"
             />
           </div>
           <div className="flex gap-3 pt-2">
@@ -216,57 +216,57 @@ export const GradingPage = () => {
         isOpen={isThresholdModalOpen} 
         onClose={() => setIsThresholdModalOpen(false)} 
         title="Add Grade Level"
-        className="max-w-lg bg-slate-900 border-white/10"
+        className="max-w-lg"
       >
         <form onSubmit={handleAddThreshold} className="space-y-6 mt-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-400">Grade (e.g. A)</label>
+              <label className="text-sm font-medium text-muted">Grade (e.g. A)</label>
               <Input 
                 required
                 value={thresholdData.grade}
                 onChange={(e) => setThresholdData({...thresholdData, grade: e.target.value.toUpperCase()})}
-                className="bg-slate-800/50 border-slate-700 font-bold"
+                className="bg-white/5 border-white/10 font-bold"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-400">Points</label>
+              <label className="text-sm font-medium text-muted">Points</label>
               <Input 
                 required
                 type="number"
                 value={thresholdData.points}
                 onChange={(e) => setThresholdData({...thresholdData, points: parseInt(e.target.value)})}
-                className="bg-slate-800/50 border-slate-700"
+                className="bg-white/5 border-white/10"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-400">Min Score</label>
+              <label className="text-sm font-medium text-muted">Min Score</label>
               <Input 
                 required
                 type="number"
                 value={thresholdData.min_score}
                 onChange={(e) => setThresholdData({...thresholdData, min_score: parseInt(e.target.value)})}
-                className="bg-slate-800/50 border-slate-700"
+                className="bg-white/5 border-white/10"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-400">Max Score</label>
+              <label className="text-sm font-medium text-muted">Max Score</label>
               <Input 
                 required
                 type="number"
                 value={thresholdData.max_score}
                 onChange={(e) => setThresholdData({...thresholdData, max_score: parseInt(e.target.value)})}
-                className="bg-slate-800/50 border-slate-700"
+                className="bg-white/5 border-white/10"
               />
             </div>
-            <div className="col-span-2 space-y-2">
-              <label className="text-sm font-medium text-slate-400">Remarks</label>
+            <div className="col-span-full space-y-2">
+              <label className="text-sm font-medium text-muted">Remarks</label>
               <Input 
                 required
                 placeholder="e.g. Excellent, Very Good"
                 value={thresholdData.remarks}
                 onChange={(e) => setThresholdData({...thresholdData, remarks: e.target.value})}
-                className="bg-slate-800/50 border-slate-700"
+                className="bg-white/5 border-white/10"
               />
             </div>
           </div>

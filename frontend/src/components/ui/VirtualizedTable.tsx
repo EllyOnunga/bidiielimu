@@ -61,7 +61,7 @@ export function VirtualizedTable<T extends Record<string, any>>({
     return (
       <div
         style={style}
-        className={`flex border-b border-gray-200 hover:bg-gray-50 cursor-pointer ${
+        className={`flex border-b border-white/5 hover:bg-white/[0.03] transition-colors ${
           onRowClick ? 'cursor-pointer' : ''
         }`}
         onClick={() => onRowClick?.(item)}
@@ -71,7 +71,7 @@ export function VirtualizedTable<T extends Record<string, any>>({
           return (
             <div
               key={colIndex}
-              className="px-4 py-2 truncate"
+              className="px-4 py-2 truncate text-sm text-primary flex items-center"
               style={{ width: column.width }}
             >
               {value}
@@ -83,51 +83,57 @@ export function VirtualizedTable<T extends Record<string, any>>({
   };
 
   return (
-    <div className={`border border-gray-300 rounded-lg overflow-hidden ${className}`}>
-      {/* Header */}
-      <div className="flex bg-gray-100 border-b border-gray-300">
-        {columns.map((column, index) => (
-          <div
-            key={index}
-            className="px-4 py-2 font-semibold text-gray-700 cursor-pointer hover:bg-gray-200 select-none"
-            style={{ width: column.width }}
-            onClick={() => handleSort(column.key as string)}
-          >
-            <div className="flex items-center justify-between">
-              <span>{column.header}</span>
-              {sortConfig?.key === column.key && (
-                <span className="ml-1">
-                  {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                </span>
-              )}
-            </div>
+    <div className={`glass rounded-2xl border border-white/5 overflow-hidden w-full ${className}`}>
+      <div className="overflow-x-auto custom-scrollbar w-full">
+        <div style={{ minWidth: columns.reduce((acc, col) => acc + col.width, 0) }}>
+          {/* Header */}
+          <div className="flex bg-white/5 border-b border-white/5">
+            {columns.map((column, index) => (
+              <div
+                key={index}
+                className="px-4 py-3 font-black text-muted text-[10px] uppercase tracking-[0.2em] cursor-pointer hover:bg-white/5 select-none transition-colors"
+                style={{ width: column.width }}
+                onClick={() => handleSort(column.key as string)}
+              >
+                <div className="flex items-center justify-between">
+                  <span>{column.header}</span>
+                  {sortConfig?.key === column.key && (
+                    <span className="ml-1 text-primary-400">
+                      {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      {/* Virtualized Body */}
-      <div style={{ height, width: '100%' }}>
-        <AutoSizer>
-          {({ width }: { width: number }) => (
-            <List
-              height={height - 40} // Subtract header height
-              itemCount={sortedData.length}
-              itemSize={rowHeight}
-              width={width}
-            >
-              {Row}
-            </List>
-          )}
-        </AutoSizer>
+          {/* Virtualized Body */}
+          <div style={{ height, width: '100%' }}>
+            <AutoSizer>
+              {({ width }: { width: number }) => (
+                <List
+                  height={height - 40} // Subtract header height
+                  itemCount={sortedData.length}
+                  itemSize={rowHeight}
+                  width={width}
+                >
+                  {Row}
+                </List>
+              )}
+            </AutoSizer>
+          </div>
+        </div>
       </div>
 
       {/* Footer with row count */}
-      <div className="bg-gray-100 px-4 py-2 text-sm text-gray-600 border-t border-gray-300">
-        {sortedData.length} of {data.length} rows
+      <div className="bg-white/5 px-4 py-3 text-xs font-bold text-muted border-t border-white/5 flex items-center justify-between">
+        <div>
+          {sortedData.length} of {data.length} rows
+        </div>
         {sortConfig && (
-          <span className="ml-4">
-            Sorted by {sortConfig.key} ({sortConfig.direction})
-          </span>
+          <div className="uppercase tracking-widest text-[10px]">
+            Sorted by <span className="text-primary-400">{sortConfig.key}</span> ({sortConfig.direction})
+          </div>
         )}
       </div>
     </div>

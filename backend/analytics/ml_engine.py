@@ -49,11 +49,14 @@ class EarlyWarningEngine:
             level = "MEDIUM"
 
         # 4. Save/Update Profile
-        risk, _ = PredictiveRisk.objects.get_or_create(student=student)
-        risk.risk_level = level
-        risk.confidence_score = risk_score
-        risk.reason_summary = reasons
-        risk.save()
+        risk, created = PredictiveRisk.objects.update_or_create(
+            student=student,
+            defaults={
+                "risk_level": level,
+                "confidence_score": risk_score,
+                "factors": reasons,
+            },
+        )
 
         return risk
 

@@ -88,35 +88,35 @@ export const FeesPage = () => {
     >
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
         <div>
-          <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight mb-2">Revenue <span className="text-gradient">Engine</span></h1>
-          <p className="text-primary-200/50 text-base font-medium">Monitor financial health and manage secure transaction protocols.</p>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary tracking-tight mb-2">Revenue <span className="text-gradient">Engine</span></h1>
+          <p className="text-muted text-xs sm:text-sm md:text-base font-medium">Monitor financial health and manage secure transaction protocols.</p>
         </div>
         <Button onClick={() => setShowPaymentModal(true)} className="gap-2 h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-xs shadow-premium w-full sm:w-auto">
           <Plus className="w-5 h-5" /> Execute New Payment
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="glass p-8 rounded-[40px] border-white/5 relative overflow-hidden group">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="glass p-5 sm:p-6 md:p-8 rounded-[28px] sm:rounded-[40px] border-white/5 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 blur-[80px] -mr-16 -mt-16 group-hover:bg-primary-500/20 transition-all" />
-          <p className="text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em] mb-4">Gross Collected</p>
+          <p className="text-[10px] font-black text-muted uppercase tracking-[0.2em] mb-3 sm:mb-4">Gross Collected</p>
           <div className="flex items-end justify-between">
-            <h3 className="text-4xl font-black text-white tracking-tight">KSh {(totalCollected / 1000).toFixed(1)}k</h3>
-            <div className="w-10 h-10 rounded-xl bg-primary-500/10 flex items-center justify-center border border-primary-500/10">
-              <CreditCard className="w-5 h-5 text-primary-400" />
+            <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-primary tracking-tight">KSh {(totalCollected / 1000).toFixed(1)}k</h3>
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-primary-500/10 flex items-center justify-center border border-primary-500/10">
+              <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 text-primary-400" />
             </div>
           </div>
         </div>
-        <div className="glass p-8 rounded-[40px] border-white/5 relative overflow-hidden group">
+        <div className="glass p-5 sm:p-6 md:p-8 rounded-[28px] sm:rounded-[40px] border-white/5 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/10 blur-[80px] -mr-16 -mt-16 group-hover:bg-rose-500/20 transition-all" />
-          <p className="text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em] mb-4">Outstanding Assets</p>
-          <h3 className="text-4xl font-black text-rose-400 tracking-tight">KSh {(totalOutstanding / 1000).toFixed(1)}k</h3>
+          <p className="text-[10px] font-black text-muted uppercase tracking-[0.2em] mb-3 sm:mb-4">Outstanding Assets</p>
+          <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-rose-400 tracking-tight">KSh {(totalOutstanding / 1000).toFixed(1)}k</h3>
         </div>
-        <div className="glass p-8 rounded-[40px] border-white/5 relative overflow-hidden group sm:col-span-2 lg:col-span-1">
+        <div className="glass p-5 sm:p-6 md:p-8 rounded-[28px] sm:rounded-[40px] border-white/5 relative overflow-hidden group sm:col-span-2 lg:col-span-1">
           <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-[80px] -mr-16 -mt-16 group-hover:bg-emerald-500/20 transition-all" />
-          <p className="text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em] mb-4">Collection Index</p>
-          <div className="flex items-center gap-4">
-            <h3 className="text-4xl font-black text-primary-400 tracking-tight">{completionRate}%</h3>
+          <p className="text-[10px] font-black text-muted uppercase tracking-[0.2em] mb-3 sm:mb-4">Collection Index</p>
+          <div className="flex items-center gap-3 sm:gap-4">
+            <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-primary-400 tracking-tight">{completionRate}%</h3>
             <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden border border-white/5">
               <motion.div 
                 initial={{ width: 0 }}
@@ -129,8 +129,8 @@ export const FeesPage = () => {
       </div>
 
       <div className="glass rounded-[40px] border-white/5 overflow-hidden">
-        <div className="p-8 border-b border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-          <h2 className="text-xl font-black text-white uppercase tracking-widest">Transaction Journal</h2>
+        <div className="p-6 md:p-8 border-b border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <h2 className="text-lg md:text-xl font-black text-primary uppercase tracking-widest">Transaction Journal</h2>
           <div className="relative w-full sm:w-80">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-200/30" />
             <Input 
@@ -165,7 +165,7 @@ export const FeesPage = () => {
                 </TableRow>
               ) : (
                 paymentsData.map((payment: Payment, idx: number) => (
-                  <motion.tr 
+                   <motion.tr 
                     key={payment.id} 
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -173,11 +173,11 @@ export const FeesPage = () => {
                     className="group transition-all h-20 border-white/5 hover:bg-white/5"
                   >
                     <TableCell className="pl-8">
-                      <div className="text-sm font-black text-white uppercase tracking-tight">{payment.student_name}</div>
-                      <div className="text-[10px] font-black text-primary-200/30 uppercase tracking-tighter">{payment.student_admission}</div>
+                      <div className="text-xs sm:text-sm font-black text-primary uppercase tracking-tight">{payment.student_name}</div>
+                      <div className="text-[9px] sm:text-[10px] font-black text-dim uppercase tracking-tighter">{payment.student_admission}</div>
                     </TableCell>
-                    <TableCell className="font-mono text-[10px] text-primary-200/50 uppercase tracking-widest">{payment.transaction_reference}</TableCell>
-                    <TableCell className="font-black text-base text-white tracking-tight">KSh {Number(payment.amount).toLocaleString()}</TableCell>
+                    <TableCell className="font-mono text-[9px] sm:text-[10px] text-muted uppercase tracking-widest">{payment.transaction_reference}</TableCell>
+                    <TableCell className="font-black text-sm sm:text-base text-primary tracking-tight">KSh {Number(payment.amount).toLocaleString()}</TableCell>
                     <TableCell>
                       <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${
                         payment.status === 'COMPLETED' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 
@@ -217,25 +217,25 @@ export const FeesPage = () => {
           <form onSubmit={handlePayment} className="space-y-8">
             <div className="space-y-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pl-1">Target Operational Unit (Student)</label>
+                <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">Target Operational Unit (Student)</label>
                 <select
                   required
                   value={selectedStudentId}
                   onChange={(e) => setSelectedStudentId(e.target.value)}
-                  className="w-full h-14 bg-white/5 border border-white/5 rounded-2xl px-4 text-white text-sm outline-none focus:border-primary-500 transition-all appearance-none font-medium"
+                  className="w-full h-14 bg-white/5 border border-white/5 rounded-2xl px-4 text-primary text-sm outline-none focus:border-primary-500 transition-all appearance-none font-medium"
                 >
-                  <option value="" className="bg-slate-900">Select Identity...</option>
+                  <option value="" className="bg-bg-color">Select Identity...</option>
                   {balances.map((b: StudentBalance) => (
-                    <option key={b.student_id} value={b.student_id} className="bg-slate-900">
+                    <option key={b.student_id} value={b.student_id} className="bg-bg-color">
                       {b.name} ({b.admission_number}) • Bal: KSh {Number(b.balance).toLocaleString()}
                     </option>
                   ))}
                 </select>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pl-1">M-Pesa Gateway Line</label>
+                  <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">M-Pesa Gateway Line</label>
                   <div className="relative">
                     <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-200/30" />
                     <Input 
@@ -249,7 +249,7 @@ export const FeesPage = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pl-1">Quantum (Amount)</label>
+                  <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">Quantum (Amount)</label>
                   <Input 
                     required
                     type="number"
@@ -269,7 +269,7 @@ export const FeesPage = () => {
               </p>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-3">
               <Button 
                 type="button"
                 variant="outline"

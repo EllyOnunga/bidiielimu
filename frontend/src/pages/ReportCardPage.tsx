@@ -183,18 +183,18 @@ export const ReportCardPage = () => {
     <div className="space-y-6 pb-20">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 print:hidden">
         <div className="flex items-center gap-4">
-          <Link to="/students" className="p-2 hover:bg-slate-800 rounded-xl transition-all">
-            <ChevronLeft className="w-6 h-6 text-slate-400" />
+          <Link to="/students" className="p-2 hover:bg-white/10 rounded-xl transition-all">
+            <ChevronLeft className="w-6 h-6 text-muted" />
           </Link>
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Academic Report</h1>
-            <p className="text-slate-400 text-sm">{fetching ? <Skeleton className="w-48 h-4 inline-block" /> : `Viewing results for ${studentData.name}`}</p>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-primary tracking-tight">Academic Report</h1>
+            <p className="text-muted text-sm">{fetching ? <Skeleton className="w-48 h-4 inline-block" /> : `Viewing results for ${studentData.name}`}</p>
           </div>
         </div>
         <div className="flex gap-2 md:gap-3">
           <button 
             onClick={() => window.print()}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-xl border border-slate-700 hover:bg-slate-700 transition-all text-sm print:hidden"
+            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white/5 text-primary rounded-xl border border-white/10 hover:bg-white/10 transition-all text-sm print:hidden"
           >
             <Printer className="w-4 h-4" />
             Print

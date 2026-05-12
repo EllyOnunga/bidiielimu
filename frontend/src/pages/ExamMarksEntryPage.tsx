@@ -128,66 +128,64 @@ export const ExamMarksEntryPage = () => {
     <div className="space-y-6 md:space-y-8 pb-20">
       
       <div className="flex items-center gap-4">
-        <Link to="/exams" className="p-2 hover:bg-slate-800 rounded-xl transition-all">
-          <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-slate-400" />
+        <Link to="/exams" className="p-2 hover:bg-white/10 rounded-xl transition-all">
+          <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-muted" />
         </Link>
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Record Marks</h1>
-          <p className="text-slate-400 text-sm md:text-base">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-primary tracking-tight">Record Marks</h1>
+          <p className="text-muted text-sm md:text-base">
             {selectedAssignmentName || 'Select a class and subject below'}
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        <div className="glass-dark p-5 md:p-6 rounded-3xl border border-white/5 space-y-3 md:space-y-4">
-          <label className="block text-xs md:text-sm font-medium text-slate-400 font-bold uppercase tracking-widest">Examination</label>
+        <div className="glass p-5 md:p-6 rounded-3xl border border-white/5 space-y-3 md:space-y-4">
+          <label className="block text-xs md:text-sm font-medium text-muted font-bold uppercase tracking-widest">Examination</label>
           <select 
             value={selectedExam}
             onChange={(e) => setSelectedExam(e.target.value)}
-            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 md:py-3 text-white text-sm outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 md:py-3 text-primary text-sm outline-none focus:ring-2 focus:ring-primary-500"
           >
             {loading ? (
-              <option value="">Loading examinations...</option>
+              <option value="" className="bg-bg-color">Loading examinations...</option>
             ) : exams.length === 0 ? (
-              <option value="">No exams found</option>
+              <option value="" className="bg-bg-color">No exams found</option>
             ) : (
               <>
-                <option value="">Select an examination</option>
+                <option value="" className="bg-bg-color">Select an examination</option>
                 {exams.map(e => (
-                  <option key={e.id} value={e.id}>{e.name} ({e.academic_year})</option>
+                  <option key={e.id} value={e.id} className="bg-bg-color">{e.name} ({e.academic_year})</option>
                 ))}
               </>
             )}
           </select>
         </div>
 
-        <div className="glass-dark p-5 md:p-6 rounded-3xl border border-white/5 space-y-3 md:space-y-4">
-          <label className="block text-xs md:text-sm font-medium text-slate-400 font-bold uppercase tracking-widest">Subject & Class</label>
+        <div className="glass p-5 md:p-6 rounded-3xl border border-white/5 space-y-3 md:space-y-4">
+          <label className="block text-xs md:text-sm font-medium text-muted font-bold uppercase tracking-widest">Subject &amp; Class</label>
           <select 
             value={`${selectedSubject}-${selectedStream}`}
             onChange={(e) => {
               const [subjectId, streamId] = e.target.value.split('-');
               setSelectedSubject(subjectId);
               setSelectedStream(streamId);
-              
-              // Update readable name
               const selected = assignments.find(a => a.subject.toString() === subjectId && a.stream.toString() === streamId);
               if (selected) {
                 setSelectedAssignmentName(`${selected.subject_name} - ${selected.grade_name} ${selected.stream_name}`);
               }
             }}
-            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 md:py-3 text-white text-sm outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 md:py-3 text-primary text-sm outline-none focus:ring-2 focus:ring-primary-500"
           >
             {loading ? (
-              <option value="">Loading subjects...</option>
+              <option value="" className="bg-bg-color">Loading subjects...</option>
             ) : assignments.length === 0 ? (
-              <option value="">No subjects assigned</option>
+              <option value="" className="bg-bg-color">No subjects assigned</option>
             ) : (
               <>
-                <option value="">Select subject & class</option>
+                <option value="" className="bg-bg-color">Select subject &amp; class</option>
                 {assignments.map(as => (
-                  <option key={as.id} value={`${as.subject}-${as.stream}`}>
+                  <option key={as.id} value={`${as.subject}-${as.stream}`} className="bg-bg-color">
                     {as.subject_name} - {as.grade_name} {as.stream_name}
                   </option>
                 ))}
@@ -196,7 +194,7 @@ export const ExamMarksEntryPage = () => {
           </select>
         </div>
 
-        <div className="glass-dark p-5 md:p-6 rounded-3xl border border-white/5 flex items-end sm:col-span-2 lg:col-span-2">
+        <div className="glass p-5 md:p-6 rounded-3xl border border-white/5 flex items-end sm:col-span-2 lg:col-span-2">
           <button 
             onClick={handleSave}
             disabled={saving || fetchingStudents}
@@ -208,14 +206,14 @@ export const ExamMarksEntryPage = () => {
         </div>
       </div>
 
-      <div className="glass-dark rounded-3xl border border-white/5 overflow-hidden">
+      <div className="glass rounded-3xl border border-white/5 overflow-hidden">
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full text-left min-w-[600px]">
             <thead>
               <tr className="border-b border-white/5 bg-white/5">
-                <th className="px-6 md:px-8 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Student Details</th>
-                <th className="px-6 md:px-8 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-center">Score (out of 100)</th>
-                <th className="px-6 md:px-8 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Grade</th>
+                <th className="px-6 md:px-8 py-4 text-xs font-semibold text-muted uppercase tracking-wider">Student Details</th>
+                <th className="px-6 md:px-8 py-4 text-xs font-semibold text-muted uppercase tracking-wider text-center">Score (out of 100)</th>
+                <th className="px-6 md:px-8 py-4 text-xs font-semibold text-muted uppercase tracking-wider">Grade</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -223,7 +221,7 @@ export const ExamMarksEntryPage = () => {
                 <TableSkeleton rows={10} cols={3} />
               ) : students.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="text-center py-20 text-slate-500 italic">
+                  <td colSpan={3} className="text-center py-20 text-muted italic">
                     Select a subject and class to start recording marks.
                   </td>
                 </tr>
@@ -242,8 +240,8 @@ export const ExamMarksEntryPage = () => {
                           {student.name.split(' ').map(n => n[0]).join('')}
                         </div>
                         <div className="min-w-0">
-                          <p className="text-sm font-semibold text-white truncate">{student.name}</p>
-                          <p className="text-xs text-slate-500 truncate">{student.admission}</p>
+                          <p className="text-sm font-semibold text-primary truncate">{student.name}</p>
+                          <p className="text-xs text-dim truncate">{student.admission}</p>
                         </div>
                       </div>
                     </td>
@@ -253,7 +251,7 @@ export const ExamMarksEntryPage = () => {
                           type="number"
                           value={student.score}
                           onChange={(e) => updateScore(student.id, e.target.value)}
-                          className="w-20 md:w-24 text-center bg-slate-800/50 border border-slate-700 rounded-xl px-3 md:px-4 py-1.5 md:py-2 text-white font-bold outline-none focus:ring-2 focus:ring-primary-500 text-sm md:text-base"
+                          className="w-20 md:w-24 text-center bg-white/5 border border-white/10 rounded-xl px-3 md:px-4 py-1.5 md:py-2 text-primary font-bold outline-none focus:ring-2 focus:ring-primary-500 text-sm md:text-base"
                           min="0"
                           max="100"
                         />

@@ -2,8 +2,8 @@ import * as React from "react"
 import { cn } from "../../lib/utils"
 
 const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-auto custom-scrollbar">
-    <table ref={ref} className={cn("w-full caption-bottom text-sm border-separate border-spacing-0", className)} {...props} />
+  <div className="relative w-full overflow-x-auto custom-scrollbar">
+    <table ref={ref} className={cn("w-full min-w-[500px] sm:min-w-[640px] caption-bottom text-sm border-separate border-spacing-0", className)} {...props} />
   </div>
 ))
 Table.displayName = "Table"
@@ -29,12 +29,12 @@ const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTML
 TableRow.displayName = "TableRow"
 
 const TableHead = React.forwardRef<HTMLTableCellElement, React.ThHTMLAttributes<HTMLTableCellElement>>(({ className, ...props }, ref) => (
-  <th ref={ref} className={cn("h-14 px-6 text-left align-middle font-black text-primary-200/40 text-[10px] uppercase tracking-[0.2em] [&:has([role=checkbox])]:pr-0", className)} {...props} />
+  <th ref={ref} className={cn("h-12 sm:h-14 px-4 sm:px-6 text-left align-middle font-black text-muted text-[10px] uppercase tracking-[0.2em] [&:has([role=checkbox])]:pr-0", className)} {...props} />
 ))
 TableHead.displayName = "TableHead"
 
 const TableCell = React.forwardRef<HTMLTableCellElement, React.TdHTMLAttributes<HTMLTableCellElement>>(({ className, ...props }, ref) => (
-  <td ref={ref} className={cn("px-6 py-4 align-middle [&:has([role=checkbox])]:pr-0 text-sm", className)} {...props} />
+  <td ref={ref} className={cn("px-4 sm:px-6 py-3 sm:py-4 align-middle [&:has([role=checkbox])]:pr-0 text-sm", className)} {...props} />
 ))
 TableCell.displayName = "TableCell"
 

@@ -50,7 +50,7 @@ const NavItem = ({ to, icon: Icon, label, onClick }: NavItemProps) => (
     className={({ isActive }) =>
       `flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-300 group relative ${isActive
         ? 'text-primary-400'
-        : 'text-primary-200/50 hover:bg-white/5 hover:text-white'
+        : 'text-muted hover:bg-white/5 hover:text-primary'
       }`
     }
   >
@@ -90,10 +90,10 @@ const SidebarContent = ({ user, schoolName, schoolLogo, setIsSidebarOpen, handle
           )}
         </div>
         <div className="min-w-0">
-          <h1 className="text-lg font-black text-white tracking-tight truncate w-32 font-serif" title={schoolName}>
+          <h1 className="text-lg font-black text-primary tracking-tight truncate w-32 font-serif" title={schoolName}>
             {schoolName || 'ElimuHub'}
           </h1>
-          <p className="text-[10px] font-bold text-primary-400/60 uppercase tracking-widest">{user?.role} PORTAL</p>
+          <p className="text-[10px] font-bold text-muted uppercase tracking-widest">{user?.role} PORTAL</p>
         </div>
       </div>
       <button

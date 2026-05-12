@@ -102,14 +102,14 @@ export const RegisterPage = () => {
             >
               <GraduationCap className="w-10 h-10 text-white" />
             </motion.div>
-            <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight mb-2">Register School</h1>
-            <p className="text-primary-200/60 font-medium text-sm md:text-base">Join the future of education management</p>
+            <h1 className="text-3xl md:text-4xl font-black text-primary tracking-tight mb-2">Register School</h1>
+            <p className="text-muted font-medium text-sm md:text-base">Join the future of education management</p>
           </div>
 
           <form onSubmit={handleRegister} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-primary-200/70 ml-1">School Name</label>
+                <label className="text-sm font-semibold text-muted ml-1">School Name</label>
                 <div className="relative group">
                   <School className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-400/50 group-focus-within:text-primary-400" />
                   <input
@@ -117,13 +117,13 @@ export const RegisterPage = () => {
                     required
                     value={formData.school_name}
                     onChange={(e) => setFormData({ ...formData, school_name: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 text-white pl-11 pr-4 py-3.5 rounded-2xl outline-none focus:border-primary-500 transition-all text-sm"
+                    className="w-full bg-white/5 border border-white/10 text-primary pl-11 pr-4 py-3.5 rounded-2xl outline-none focus:border-primary-500 transition-all text-sm"
                     placeholder="Excellence Academy"
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-primary-200/70 ml-1">Admin Name</label>
+                <label className="text-sm font-semibold text-muted ml-1">Admin Name</label>
                 <div className="relative group">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-400/50 group-focus-within:text-primary-400" />
                   <input
@@ -131,7 +131,7 @@ export const RegisterPage = () => {
                     required
                     value={formData.admin_name}
                     onChange={(e) => setFormData({ ...formData, admin_name: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 text-white pl-11 pr-4 py-3.5 rounded-2xl outline-none focus:border-primary-500 transition-all text-sm"
+                    className="w-full bg-white/5 border border-white/10 text-primary pl-11 pr-4 py-3.5 rounded-2xl outline-none focus:border-primary-500 transition-all text-sm"
                     placeholder="John Doe"
                   />
                 </div>
@@ -146,12 +146,12 @@ export const RegisterPage = () => {
                   required
                   value={formData.curriculum}
                   onChange={(e) => setFormData({ ...formData, curriculum: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 text-white pl-12 pr-4 py-4 rounded-2xl outline-none focus:border-primary-500 transition-all text-base appearance-none cursor-pointer"
+                  className="w-full bg-white/5 border border-white/10 text-primary pl-12 pr-4 py-4 rounded-2xl outline-none focus:border-primary-500 transition-all text-base appearance-none cursor-pointer"
                 >
-                  <option value="CBC" className="bg-[#0f172a]">Kenya CBC (Competency Based Curriculum)</option>
-                  <option value="844" className="bg-[#0f172a]">Kenya 8-4-4 System</option>
-                  <option value="IGCSE_EDEXCEL" className="bg-[#0f172a]">Pearson Edexcel IGCSE</option>
-                  <option value="IGCSE_CAMBRIDGE" className="bg-[#0f172a]">Cambridge IGCSE</option>
+                  <option value="CBC" className="bg-bg-color">Kenya CBC (Competency Based Curriculum)</option>
+                  <option value="844" className="bg-bg-color">Kenya 8-4-4 System</option>
+                  <option value="IGCSE_EDEXCEL" className="bg-bg-color">Pearson Edexcel IGCSE</option>
+                  <option value="IGCSE_CAMBRIDGE" className="bg-bg-color">Cambridge IGCSE</option>
                 </select>
                 <ArrowRight className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-400/50 pointer-events-none rotate-90" />
               </div>
@@ -166,7 +166,7 @@ export const RegisterPage = () => {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 text-white pl-12 pr-4 py-4 rounded-2xl outline-none focus:border-primary-500 transition-all text-base"
+                  className="w-full bg-white/5 border border-white/10 text-primary pl-12 pr-4 py-4 rounded-2xl outline-none focus:border-primary-500 transition-all text-base"
                   placeholder="admin@school.com"
                 />
               </div>
@@ -174,24 +174,24 @@ export const RegisterPage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-primary-200/70 ml-1">Password</label>
+                <label className="text-sm font-semibold text-muted ml-1">Password</label>
                 <PasswordInput
                   required
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 text-white pl-12 pr-12 py-4 rounded-2xl outline-none focus:border-primary-500 transition-all text-base"
+                  className="w-full bg-white/5 border border-white/10 text-primary pl-12 pr-12 py-4 rounded-2xl outline-none focus:border-primary-500 transition-all text-base"
                   placeholder="••••••••"
                 />
                 <PasswordHint />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-primary-200/70 ml-1">Confirm Password</label>
+                <label className="text-sm font-semibold text-muted ml-1">Confirm Password</label>
                 <PasswordInput
                   required
                   value={formData.confirm_password}
                   onChange={(e) => setFormData({ ...formData, confirm_password: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 text-white pl-12 pr-12 py-4 rounded-2xl outline-none focus:border-primary-500 transition-all text-base"
+                  className="w-full bg-white/5 border border-white/10 text-primary pl-12 pr-12 py-4 rounded-2xl outline-none focus:border-primary-500 transition-all text-base"
                   placeholder="••••••••"
                 />
               </div>
@@ -214,7 +214,7 @@ export const RegisterPage = () => {
           </form>
 
           <div className="mt-10 text-center">
-            <p className="text-primary-200/50 font-medium text-sm">
+            <p className="text-muted font-medium text-sm">
               Already managing with us?{' '}
               <Link to="/login" className="text-primary-400 font-bold hover:text-primary-300 transition-colors underline-offset-4 hover:underline">Sign In</Link>
             </p>

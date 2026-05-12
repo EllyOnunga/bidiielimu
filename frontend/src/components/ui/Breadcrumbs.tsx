@@ -8,7 +8,7 @@ export function Breadcrumbs() {
   if (pathnames.length === 0) return null;
 
   return (
-    <nav className="flex items-center space-x-2 text-xs font-medium text-slate-500 mb-6">
+    <nav className="flex items-center space-x-2 text-xs font-medium text-slate-500 mb-6 overflow-x-auto no-scrollbar whitespace-nowrap pb-1">
       <Link
         to="/dashboard"
         className="flex items-center hover:text-primary-400 transition-colors"

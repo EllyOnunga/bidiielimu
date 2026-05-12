@@ -146,12 +146,42 @@ export const PortalDashboard = () => {
   return (
     <div className="space-y-8 pb-24">
       {/* Header & Child Switcher */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-        <div>
-          <h1 className="text-3xl font-black text-white tracking-tight">
-            {user?.role === 'PARENT' ? 'Parent Portal' : 'Student Portal'}
-          </h1>
-          <p className="text-slate-400">Welcome back, {user?.first_name || 'User'}!</p>
+      <div className="flex flex-col gap-4 sm:gap-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+              {user?.role === 'PARENT' ? 'Parent Portal' : 'Student Portal'}
+            </h1>
+            <p className="text-slate-400 text-sm mt-1">Welcome back, {user?.first_name || 'User'}!</p>
+          </div>
+
+          <AnimatePresence mode="wait">
+            {activeStudent && (
+              <motion.div
+                key={activeStudent.id}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="flex items-center gap-3 bg-white/5 p-2.5 sm:p-3 pr-4 sm:pr-6 rounded-2xl sm:rounded-3xl border border-white/5 shadow-xl self-start"
+              >
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-black text-base sm:text-lg overflow-hidden border-2 border-white/10 shadow-inner">
+                  {activeStudent.photo ? (
+                    <img src={activeStudent.photo} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    activeStudent.first_name[0] + activeStudent.last_name[0]
+                  )}
+                </div>
+                <div>
+                  <p className="text-sm font-black text-white">{activeStudent.first_name} {activeStudent.last_name}</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold text-primary-400 uppercase tracking-widest">{activeStudent.admission_number}</span>
+                    <span className="w-1 h-1 rounded-full bg-slate-700" />
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{activeStudent.stream_name || 'No Class'}</span>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {user?.role === 'PARENT' && children.length > 1 && (
@@ -170,34 +200,6 @@ export const PortalDashboard = () => {
             ))}
           </div>
         )}
-
-        <AnimatePresence mode="wait">
-          {activeStudent && (
-            <motion.div
-              key={activeStudent.id}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="flex items-center gap-4 bg-white/5 p-3 pr-6 rounded-3xl border border-white/5 shadow-xl"
-            >
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-black text-lg overflow-hidden border-2 border-white/10 shadow-inner">
-                {activeStudent.photo ? (
-                  <img src={activeStudent.photo} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  activeStudent.first_name[0] + activeStudent.last_name[0]
-                )}
-              </div>
-              <div>
-                <p className="text-sm font-black text-white">{activeStudent.first_name} {activeStudent.last_name}</p>
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold text-primary-400 uppercase tracking-widest">{activeStudent.admission_number}</span>
-                  <span className="w-1 h-1 rounded-full bg-slate-700" />
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{activeStudent.stream_name || 'No Class'}</span>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
 
       {/* Stats Overview */}
@@ -235,15 +237,15 @@ export const PortalDashboard = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
         {/* Main Feed */}
-        <div className="lg:col-span-2 space-y-8">
+        <div className="lg:col-span-2 space-y-6 lg:space-y-8">
           {/* Recent Exam Results */}
-          <div className="glass-dark rounded-[2.5rem] border border-white/5 overflow-hidden shadow-2xl">
-            <div className="p-8 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+          <div className="glass-dark rounded-[2rem] sm:rounded-[2.5rem] border border-white/5 overflow-hidden shadow-2xl">
+            <div className="p-5 sm:p-8 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
               <div>
-                <h2 className="text-xl font-black text-white">Recent Performance</h2>
-                <p className="text-sm text-slate-500">Breakdown of the latest examination scores.</p>
+                <h2 className="text-lg sm:text-xl font-black text-white">Recent Performance</h2>
+                <p className="text-xs sm:text-sm text-slate-500">Breakdown of the latest examination scores.</p>
               </div>
               <Link to="/exams" className="p-2 bg-white/5 rounded-xl text-slate-400 hover:text-white transition-all">
                 <ArrowRight className="w-5 h-5" />
@@ -286,11 +288,11 @@ export const PortalDashboard = () => {
           </div>
 
           {/* Schedule */}
-          <div className="glass-dark p-8 rounded-[2.5rem] border border-white/5 shadow-2xl">
-            <div className="flex items-center justify-between mb-8">
+          <div className="glass-dark p-5 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] border border-white/5 shadow-2xl">
+            <div className="flex items-center justify-between mb-5 sm:mb-8">
               <div>
-                <h2 className="text-xl font-black text-white">Today's Schedule</h2>
-                <p className="text-sm text-slate-500">Upcoming classes and activities.</p>
+                <h2 className="text-lg sm:text-xl font-black text-white">Today's Schedule</h2>
+                <p className="text-xs sm:text-sm text-slate-500">Upcoming classes and activities.</p>
               </div>
               <div className="p-3 bg-primary-600/10 rounded-2xl text-primary-400">
                 <Clock className="w-6 h-6" />
@@ -320,9 +322,9 @@ export const PortalDashboard = () => {
         {/* Sidebar Widgets */}
         <div className="space-y-8">
           {/* Quick Actions */}
-          <div className="glass-dark p-8 rounded-[2.5rem] border border-white/5 shadow-2xl bg-gradient-to-b from-white/[0.02] to-transparent">
-            <h2 className="text-lg font-black text-white mb-6 uppercase tracking-widest text-[10px] text-slate-500">Quick Actions</h2>
-            <div className="grid grid-cols-1 gap-3">
+          <div className="glass-dark p-5 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] border border-white/5 shadow-2xl bg-gradient-to-b from-white/[0.02] to-transparent">
+            <h2 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-5 sm:mb-6">Quick Actions</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-1 gap-3">
               <PortalAction to="/exams" label="View Report Card" icon={ClipboardList} />
               <PortalAction to="/fees" label="Pay School Fees" icon={Wallet} />
               <PortalAction to="/timetable" label="Full Timetable" icon={Calendar} />

@@ -11,6 +11,12 @@ from .views import (
     VerifyEmailView,
 )
 from .views_api import APIKeyViewSet
+from .views_otp import (
+    OTPTriggerView,
+    OTPVerifyLoginView,
+    SMSOTPSetupView,
+    SMSOTPVerifySetupView,
+)
 from .views_social import GitHubLogin, GoogleLogin, MicrosoftLogin
 
 urlpatterns = [
@@ -48,4 +54,9 @@ urlpatterns = [
     # GDPR Endpoints
     path("gdpr/export/", GDPRExportView.as_view(), name="gdpr_export"),
     path("gdpr/delete/", GDPRDeleteView.as_view(), name="gdpr_delete"),
+    # SMS OTP
+    path("otp/setup/", SMSOTPSetupView.as_view(), name="otp_setup"),
+    path("otp/verify-setup/", SMSOTPVerifySetupView.as_view(), name="otp_verify_setup"),
+    path("otp/verify-login/", OTPVerifyLoginView.as_view(), name="otp_verify_login"),
+    path("otp/trigger/", OTPTriggerView.as_view(), name="otp_trigger"),
 ]

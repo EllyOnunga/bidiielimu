@@ -252,8 +252,8 @@ export const StudentsPage = () => {
     >
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
         <div className="space-y-2">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-none">Student <span className="text-gradient">Registry</span></h1>
-          <p className="text-primary-200/40 text-sm md:text-base font-medium max-w-xl">Comprehensive lifecycle management and digital records for all students.</p>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary tracking-tight leading-none">Student <span className="text-gradient">Registry</span></h1>
+          <p className="text-muted text-xs sm:text-sm md:text-base font-medium max-w-xl">Comprehensive lifecycle management and digital records for all students.</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
           <Button variant="outline" onClick={() => setIsBulkModalOpen(true)} className="gap-2 flex-1 sm:flex-none">
@@ -338,13 +338,13 @@ export const StudentsPage = () => {
               <TableSkeleton rows={10} cols={8} />
             ) : studentsData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-24">
+                <TableCell colSpan={8} className="text-center py-20 md:py-24">
                   <div className="flex flex-col items-center justify-center">
-                    <div className="w-20 h-20 rounded-3xl bg-primary-600/10 border border-primary-500/20 flex items-center justify-center mb-6">
+                    <div className="w-16 h-16 md:w-20 md:h-20 rounded-3xl bg-primary-600/10 border border-primary-500/20 flex items-center justify-center mb-6">
                       <Users className="w-8 h-8 text-primary-400" />
                     </div>
-                    <h3 className="text-xl font-black text-white tracking-tight mb-2 uppercase">No Records Found</h3>
-                    <p className="text-primary-200/30 font-medium text-xs max-w-sm mx-auto mb-8 leading-relaxed">
+                    <h3 className="text-lg md:text-xl font-black text-primary tracking-tight mb-2 uppercase">No Records Found</h3>
+                    <p className="text-muted font-medium text-[10px] sm:text-xs max-w-sm mx-auto mb-8 leading-relaxed px-4">
                       Your search did not return any assets. Try different query parameters or initialize a new record.
                     </p>
                     {search && (
@@ -370,27 +370,27 @@ export const StudentsPage = () => {
                       className="w-4 h-4 rounded border-white/10 bg-white/5 text-primary-600 focus:ring-primary-500 cursor-pointer"
                     />
                   </TableCell>
-                  <TableCell className="font-black text-primary-400 font-mono text-xs">{student.admission_number}</TableCell>
+                  <TableCell className="font-black text-primary-400 font-mono text-[10px] sm:text-xs">{student.admission_number}</TableCell>
                   <TableCell>
-                    <div className="text-xs font-black text-white uppercase tracking-tight">{student.first_name} {student.last_name}</div>
+                    <div className="text-[10px] sm:text-xs font-black text-primary uppercase tracking-tight truncate max-w-[100px] sm:max-w-none">{student.first_name} {student.last_name}</div>
                   </TableCell>
                   <TableCell>
                     {student.grade_name ? (
-                      <span className="px-2 py-1 rounded-lg bg-primary-600/10 text-primary-400 text-[9px] font-black uppercase tracking-widest border border-primary-500/10 whitespace-nowrap">
+                      <span className="px-2 py-1 rounded-lg bg-primary-600/10 text-primary-400 text-[8px] sm:text-[9px] font-black uppercase tracking-widest border border-primary-500/10 whitespace-nowrap">
                         {student.grade_name} • {student.stream_name}
                       </span>
                     ) : (
-                      <span className="text-primary-200/10 text-[9px] font-black uppercase tracking-widest italic">Unallocated</span>
+                      <span className="text-dim text-[9px] font-black uppercase tracking-widest italic">Unallocated</span>
                     )}
                   </TableCell>
-                  <TableCell className="hidden md:table-cell text-primary-200/40 text-[10px] font-bold uppercase">
+                  <TableCell className="hidden md:table-cell text-muted text-[10px] font-bold uppercase">
                     {student.gender === 'M' ? 'Male' : 'Female'}
                   </TableCell>
                   <TableCell>
-                    <div className="text-xs font-bold text-white truncate max-w-[120px]">
+                    <div className="text-[10px] sm:text-xs font-bold text-primary truncate max-w-[80px] sm:max-w-[120px]">
                       {student.guardians?.[0] ? `${student.guardians[0].first_name} ${student.guardians[0].last_name}`.trim() : '—'}
                     </div>
-                    <div className="text-[9px] font-black text-primary-200/20 uppercase font-mono">
+                    <div className="text-[8px] sm:text-[9px] font-black text-dim uppercase font-mono">
                       {student.guardians?.[0]?.phone_number || '—'}
                     </div>
                   </TableCell>
@@ -429,14 +429,14 @@ export const StudentsPage = () => {
           setEditingStudent(null);
         }}
         title={editingStudent ? "Operational Modification" : "Record Admission"}
-        className="max-w-2xl glass-morphic border-white/10 !rounded-[32px]"
+        className="max-w-2xl"
       >
-        <form onSubmit={handleAddStudent} className="space-y-8 mt-6 pb-2">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <form onSubmit={handleAddStudent} className="space-y-6 sm:space-y-8 mt-6 pb-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
             <div className="space-y-4">
               <div className="flex items-center gap-2 pb-2 border-b border-white/5">
                 <Users className="w-3.5 h-3.5 text-primary-400" />
-                <h3 className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Identity</h3>
+                <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Identity</h3>
               </div>
               <div className="space-y-3">
                 <div className="grid grid-cols-2 gap-3">
@@ -463,7 +463,7 @@ export const StudentsPage = () => {
             <div className="space-y-4">
               <div className="flex items-center gap-2 pb-2 border-b border-white/5">
                 <BookOpen className="w-3.5 h-3.5 text-indigo-400" />
-                <h3 className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Allocation</h3>
+                <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Allocation</h3>
               </div>
               <div className="space-y-3">
                 <Input required placeholder="Admission No (e.g. ADM-001)" value={formData.admission_number} onChange={(e) => setFormData({ ...formData, admission_number: e.target.value })} className="h-10 text-xs" />

@@ -28,7 +28,7 @@ export const ForgotPasswordPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f172a] flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-transparent flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background Gradients */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary-600/20 blur-[120px] rounded-full" />
@@ -40,10 +40,10 @@ export const ForgotPasswordPage = () => {
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md z-10"
       >
-        <div className="glass-dark p-8 md:p-10 rounded-[40px] border border-white/10 shadow-2xl relative">
+        <div className="glass p-8 md:p-10 rounded-[40px] border border-white/10 shadow-2xl relative">
           <Link 
             to="/login" 
-            className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-8 transition-colors text-sm font-bold"
+            className="inline-flex items-center gap-2 text-muted hover:text-primary mb-8 transition-colors text-sm font-bold"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Login
@@ -59,15 +59,15 @@ export const ForgotPasswordPage = () => {
                 className="space-y-6"
               >
                 <div>
-                  <h1 className="text-3xl font-black text-white tracking-tight mb-2">Forgot Password?</h1>
-                  <p className="text-slate-400 text-sm">No worries, it happens. Enter your email and we'll send you a reset link.</p>
+                  <h1 className="text-2xl sm:text-3xl font-black text-primary tracking-tight mb-2">Forgot Password?</h1>
+                  <p className="text-muted text-sm">No worries, it happens. Enter your email and we'll send you a reset link.</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Email Address</label>
+                    <label className="text-xs font-bold text-muted uppercase tracking-widest ml-1">Email Address</label>
                     <div className="relative group">
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-primary-400 transition-colors" />
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-dim group-focus-within:text-primary-400 transition-colors" />
                       <Input
                         type="email"
                         required
@@ -104,13 +104,13 @@ export const ForgotPasswordPage = () => {
                   <CheckCircle2 className="w-10 h-10 text-emerald-400" />
                 </div>
                 <div className="space-y-2">
-                  <h2 className="text-2xl font-black text-white">Check your email</h2>
-                  <p className="text-slate-400 text-sm">
-                    We've sent a password reset link to <span className="text-white font-bold">{email}</span>.
+                  <h2 className="text-2xl font-black text-primary">Check your email</h2>
+                  <p className="text-muted text-sm">
+                    We've sent a password reset link to <span className="text-primary font-bold">{email}</span>.
                   </p>
                 </div>
                 <div className="pt-4">
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-dim">
                     Didn't receive the email? Check your spam folder or{' '}
                     <button 
                       onClick={() => setSent(false)} 

@@ -170,12 +170,12 @@ export const QuizBuilder = ({ isOpen, onClose, onSuccess, initialData }: QuizBui
 
         {/* Questions Section */}
         <div className="space-y-8">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
              <h3 className="text-xl font-black text-white uppercase tracking-tight flex items-center gap-3">
                <HelpCircle className="text-amber-500" />
                Question Matrix
              </h3>
-             <Button type="button" onClick={addQuestion} variant="outline" className="gap-2 border-amber-500/20 text-amber-500 hover:bg-amber-500 hover:text-white rounded-xl text-[10px] font-black uppercase">
+             <Button type="button" onClick={addQuestion} variant="outline" className="gap-2 border-amber-500/20 text-amber-500 hover:bg-amber-500 hover:text-white rounded-xl text-[10px] font-black uppercase w-full sm:w-auto justify-center">
                <Plus className="w-4 h-4" />
                Insert Question
              </Button>

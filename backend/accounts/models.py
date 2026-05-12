@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.validators import RegexValidator
 from django.db import models
+from django_otp.models import Device
 
 
 class UserManager(BaseUserManager):
@@ -173,3 +174,22 @@ class EmailVerificationToken(models.Model):
 
             self.expires_at = timezone.now() + timedelta(hours=24)
         super().save(*args, **kwargs)
+
+
+class SMSDevice(Device):
+    """
+    A custom device for SMS-based Two-Factor Authentication.
+    """
+
+    phone_number = models.CharField(
+        max_length=17,
+        help_text="The verified phone number to send the OTP to.",
+    )
+    last_sent_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"SMS Device for {self.user.email} ({self.phone_number})"
+
+    class Meta:
+        verbose_name = "SMS Device"
+        verbose_name_plural = "SMS Devices"

@@ -46,4 +46,20 @@ export const authService = {
     });
     return response.data;
   },
+
+  verifyOTP: async (userId: number, otp: string) => {
+    const response = await client.post('accounts/otp/verify-login/', { 
+      user_id: userId, 
+      otp 
+    });
+    return response.data;
+  },
+
+  triggerOTP: async (userId: number, method: string) => {
+    const response = await client.post('accounts/otp/trigger/', { 
+      user_id: userId, 
+      method 
+    });
+    return response.data;
+  },
 };

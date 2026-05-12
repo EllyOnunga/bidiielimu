@@ -41,22 +41,22 @@ interface StatCardProps {
 
 const StatCard = ({ title, value, icon: Icon, trend, trendValue, color, to }: StatCardProps) => {
   const CardContent = (
-    <div className="glass-interactive p-6 rounded-[32px] h-full group">
-      <div className="flex items-center justify-between mb-6">
-        <div className={`p-4 rounded-2xl ${color} shadow-premium border border-white/10 group-hover:scale-110 transition-transform duration-500`}>
-          <Icon className="w-6 h-6 text-white" />
+    <div className="glass-interactive p-5 md:p-6 rounded-[32px] h-full group">
+      <div className="flex items-center justify-between mb-4 md:mb-6">
+        <div className={`p-3 md:p-4 rounded-2xl ${color} shadow-premium border border-white/10 group-hover:scale-110 transition-transform duration-500`}>
+          <Icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
         </div>
         {trend && (
-          <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black tracking-tighter uppercase ${trend === 'up' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'
+          <div className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[10px] font-black tracking-tighter uppercase ${trend === 'up' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'
             }`}>
-            {trend === 'up' ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
+            {trend === 'up' ? <ArrowUpRight className="w-3 h-3 md:w-4 md:h-4" /> : <ArrowDownRight className="w-3 h-3 md:w-4 md:h-4" />}
             {trendValue}
           </div>
         )}
       </div>
       <div className="space-y-1">
-        <h3 className="text-primary-200/50 text-xs font-black uppercase tracking-widest">{title}</h3>
-        <p className="text-4xl font-black text-white tracking-tight">{value}</p>
+        <h3 className="text-muted text-[10px] font-black uppercase tracking-widest">{title}</h3>
+        <p className="text-2xl md:text-3xl lg:text-4xl font-black text-primary tracking-tight">{value}</p>
       </div>
     </div>
   );
@@ -177,24 +177,24 @@ export const DashboardPage = () => {
     >
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div className="space-y-2">
-          <motion.h1 variants={item} className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-none">
+          <motion.h1 variants={item} className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary tracking-tight leading-none">
             School <span className="text-gradient">Intelligence</span>
           </motion.h1>
-          <motion.p variants={item} className="text-primary-200/40 text-sm md:text-base font-medium max-w-xl">
+          <motion.p variants={item} className="text-muted text-xs sm:text-sm md:text-base font-medium max-w-xl">
             Real-time operational monitoring and strategic insights for your institution.
           </motion.p>
         </div>
-        <motion.div variants={item} className="flex gap-3 w-full md:w-auto">
+        <motion.div variants={item} className="flex gap-2 sm:gap-3 w-full md:w-auto">
           <Button 
             variant="outline" 
-            className="flex-1 md:flex-none gap-2"
+            className="flex-1 md:flex-none gap-2 text-xs py-3"
             onClick={() => window.print()}
           >
             <FileText className="w-4 h-4" />
             Report
           </Button>
           <Button 
-            className="flex-1 md:flex-none gap-2"
+            className="flex-1 md:flex-none gap-2 text-xs py-3"
             onClick={() => navigate('/analytics')}
           >
             <TrendingUp className="w-4 h-4" />
@@ -203,7 +203,7 @@ export const DashboardPage = () => {
         </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {loadingStats ? (
           Array.from({ length: 4 }).map((_, i) => <StatCardSkeleton key={i} />)
         ) : (
@@ -256,10 +256,10 @@ export const DashboardPage = () => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 md:gap-10">
-        <motion.div variants={item} className="premium-card">
-          <h2 className="text-xl font-black text-white mb-6 uppercase tracking-widest text-[10px] text-primary-400">Quick Operations</h2>
-          <div className="grid grid-cols-1 gap-3">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-5 md:gap-8 lg:gap-10">
+        <motion.div variants={item} className="premium-card lg:col-span-1">
+          <h2 className="text-[10px] font-black text-primary-400 mb-5 uppercase tracking-widest">Quick Operations</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
             <QuickActionButton to="/students" label="Register Student" icon={UserSquare2} />
             <QuickActionButton to="/teachers" label="Onboard Teacher" icon={Shield} />
             <QuickActionButton to="/fees" label="Collect Fees" icon={Wallet} />
@@ -268,20 +268,20 @@ export const DashboardPage = () => {
         </motion.div>
 
         <motion.div variants={item} className="lg:col-span-3 premium-card">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-12">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 md:mb-12">
             <div>
-              <h2 className="text-2xl font-black text-white flex items-center gap-3">
-                <TrendingUp className="w-6 h-6 text-primary-400" />
+              <h2 className="text-xl sm:text-2xl font-black text-primary flex items-center gap-3">
+                <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-primary-400" />
                 Revenue Matrix
               </h2>
-              <p className="text-xs font-bold text-primary-200/20 uppercase tracking-widest mt-1">Growth progression analytics</p>
+              <p className="text-[10px] font-bold text-muted uppercase tracking-widest mt-1">Growth progression analytics</p>
             </div>
-            <div className="flex p-1 bg-white/5 rounded-xl self-start sm:self-auto">
-              <button className="px-4 py-2 bg-primary-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-lg">6 Months</button>
-              <button className="px-4 py-2 text-primary-200/40 hover:text-white text-[10px] font-black uppercase tracking-widest rounded-lg transition-all">Yearly</button>
+            <div className="flex p-1 bg-white/5 rounded-xl self-start">
+              <button className="px-3 sm:px-4 py-2 bg-primary-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-lg">6 Months</button>
+              <button className="px-3 sm:px-4 py-2 text-muted hover:text-primary text-[10px] font-black uppercase tracking-widest rounded-lg transition-all">Yearly</button>
             </div>
           </div>
-          <div className="h-[300px] md:h-[400px] w-full">
+          <div className="h-[220px] sm:h-[300px] md:h-[400px] w-full">
             {loadingStats ? (
               <Skeleton className="w-full h-full rounded-[24px]" />
             ) : (
@@ -289,24 +289,24 @@ export const DashboardPage = () => {
                 <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#14b8a6" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.03)" vertical={false} />
-                  <XAxis dataKey="name" stroke="rgba(255, 255, 255, 0.1)" fontSize={10} tickMargin={15} axisLine={false} tickLine={false} fontWeight="800" />
-                  <YAxis stroke="rgba(255, 255, 255, 0.1)" fontSize={10} tickFormatter={(val) => `KSh ${val / 1000}k`} axisLine={false} tickLine={false} fontWeight="800" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--text-color), 0.03)" vertical={false} />
+                  <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={10} tickMargin={15} axisLine={false} tickLine={false} fontWeight="800" />
+                  <YAxis stroke="var(--text-muted)" fontSize={10} tickFormatter={(val) => `KSh ${val / 1000}k`} axisLine={false} tickLine={false} fontWeight="800" />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                      backgroundColor: 'var(--bg-surface)',
                       backdropFilter: 'blur(12px)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      border: '1px solid var(--border-color)',
                       borderRadius: '16px',
                       boxShadow: 'var(--shadow-xl)'
                     }}
-                    itemStyle={{ color: '#14b8a6', fontWeight: '900', fontSize: '12px' }}
+                    itemStyle={{ color: '#22c55e', fontWeight: '900', fontSize: '12px' }}
                   />
-                  <Area type="monotone" dataKey="value" stroke="#14b8a6" strokeWidth={4} fillOpacity={1} fill="url(#colorValue)" />
+                  <Area type="monotone" dataKey="value" stroke="#22c55e" strokeWidth={4} fillOpacity={1} fill="url(#colorValue)" />
                 </AreaChart>
               </ResponsiveContainer>
             )}
@@ -315,7 +315,7 @@ export const DashboardPage = () => {
 
         <motion.div variants={item} className={(user?.role === ROLES.ADMIN || user?.role === ROLES.FINANCE) ? "premium-card" : "lg:col-span-3 premium-card"}>
           <div className="flex items-center justify-between mb-10">
-            <h2 className="text-2xl font-black text-white flex items-center gap-3">
+            <h2 className="text-2xl font-black text-primary flex items-center gap-3">
               <Calendar className="w-6 h-6 text-indigo-400" />
               Activity
             </h2>
@@ -333,7 +333,7 @@ export const DashboardPage = () => {
                 </div>
               ))
             ) : activities.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 text-primary-200/10">
+              <div className="flex flex-col items-center justify-center py-20 text-muted/20">
                 <Calendar className="w-12 h-12 mb-4" />
                 <p className="text-[10px] font-black uppercase tracking-widest">No Recent Logs</p>
               </div>
@@ -348,10 +348,10 @@ export const DashboardPage = () => {
                     {act.label[0]}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-black text-white truncate group-hover:text-primary-400 transition-colors uppercase tracking-tight leading-none mb-1">{act.label}</p>
-                    <p className="text-[10px] font-bold text-primary-200/20 truncate">{act.detail}</p>
+                    <p className="text-xs font-black text-primary truncate group-hover:text-primary-400 transition-colors uppercase tracking-tight leading-none mb-1">{act.label}</p>
+                    <p className="text-[10px] font-bold text-muted truncate">{act.detail}</p>
                   </div>
-                  <span className="text-[9px] font-black text-primary-200/10 whitespace-nowrap uppercase">{act.time}</span>
+                  <span className="text-[9px] font-black text-dim whitespace-nowrap uppercase">{act.time}</span>
                 </motion.div>
               ))
             )}
@@ -371,9 +371,9 @@ const QuickActionButton = ({ to, label, icon: Icon }: { to: string; label: strin
       <div className="p-2 rounded-xl bg-white/5 group-hover:bg-white/20 transition-colors">
         <Icon className="w-5 h-5 text-primary-400 group-hover:text-white" />
       </div>
-      <span className="text-xs font-black text-slate-300 group-hover:text-white uppercase tracking-tight">{label}</span>
+      <span className="text-xs font-black text-muted group-hover:text-white uppercase tracking-tight">{label}</span>
     </div>
-    <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-white" />
+    <ChevronRight className="w-4 h-4 text-muted group-hover:text-white" />
   </Link>
 );
 
