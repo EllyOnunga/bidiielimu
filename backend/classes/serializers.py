@@ -1,15 +1,8 @@
 from rest_framework import serializers
-
 from schools.utils import TenantSerializerMixin
 
-from .models import (
-    Classroom,
-    GradeLevel,
-    ScheduleSlot,
-    Stream,
-    Subject,
-    SubjectAssignment,
-)
+from .models import (Classroom, GradeLevel, ScheduleSlot, Stream, Subject,
+                     SubjectAssignment)
 
 
 class StreamSerializer(TenantSerializerMixin, serializers.ModelSerializer):
@@ -58,10 +51,33 @@ class SubjectAssignmentSerializer(TenantSerializerMixin, serializers.ModelSerial
             "stream",
             "stream_name",
             "grade_name",
+            "academic_year",
+            "periods_per_week",
         ]
 
     def get_teacher_name(self, obj):
         return f"{obj.teacher.first_name} {obj.teacher.last_name}"
+
+    def validate(self, data):
+        stream = data.get("stream") or getattr(self.instance, "stream", None)
+        subject = data.get("subject") or getattr(self.instance, "subject", None)
+        academic_year = data.get("academic_year") or getattr(
+            self.instance, "academic_year", None
+        )
+
+        if stream and subject and academic_year:
+            qs = SubjectAssignment.objects.filter(
+                stream=stream,
+                subject=subject,
+                academic_year=academic_year,
+            )
+            if self.instance:
+                qs = qs.exclude(pk=self.instance.pk)
+            if qs.exists():
+                raise serializers.ValidationError(
+                    "This subject is already assigned to this stream for the selected academic year."
+                )
+        return data
 
 
 class GradeLevelSerializer(TenantSerializerMixin, serializers.ModelSerializer):

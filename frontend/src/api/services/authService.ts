@@ -35,8 +35,23 @@ export const authService = {
     return response.data;
   },
 
+  googleLogin: async (data: { access_token: string }) => {
+    const response = await client.post("accounts/google/", data);
+    return response.data;
+  },
+
   forgotPassword: async (email: string) => {
     const response = await client.post("accounts/forgot-password/", { email });
+    return response.data;
+  },
+
+  resetPasswordRequest: async (email: string) => {
+    const response = await client.post("auth/password/reset/", { email });
+    return response.data;
+  },
+
+  confirmPasswordReset: async (data: any) => {
+    const response = await client.post("auth/password/reset/confirm/", data);
     return response.data;
   },
 
@@ -62,6 +77,16 @@ export const authService = {
       user_id: userId,
       method,
     });
+    return response.data;
+  },
+
+  updateMe: async (data: any) => {
+    const response = await client.patch("accounts/me/", data);
+    return response.data;
+  },
+
+  changePassword: async (data: any) => {
+    const response = await client.post("auth/password/change/", data);
     return response.data;
   },
 };

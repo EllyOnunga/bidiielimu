@@ -1,14 +1,9 @@
 from django.conf import settings
 from django.conf.urls.static import static
-from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import include, path, re_path
-from drf_spectacular.views import (
-    SpectacularAPIView,
-    SpectacularRedocView,
-    SpectacularSwaggerView,
-)
-
+from drf_spectacular.views import (SpectacularAPIView, SpectacularRedocView,
+                                   SpectacularSwaggerView)
 from schools.views_theme import TenantThemeView
 
 
@@ -29,7 +24,8 @@ urlpatterns = [
     path("api/v1/accounts/", include("accounts.urls")),
     path("api/v1/schools/", include("schools.urls")),
     path("api/v1/theme/", TenantThemeView.as_view(), name="public-theme"),
-    # These routes are now dynamically switched by Middleware if accessed on public domain
+    # These routes are now dynamically switched by Middleware if accessed on
+    # public domain
     path("api/v1/notifications/", include("notifications.urls")),
     path("api/v1/analytics/", include("analytics.urls")),
     path("api/v1/students/", include("students.urls")),
@@ -58,12 +54,7 @@ urlpatterns = [
     path(
         "api/v1/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"
     ),
-    # Password Reset Confirm (Required by dj-rest-auth for reversing names)
-    path(
-        "reset-password/<uidb64>/<token>/",
-        lambda r, **kwargs: JsonResponse({"status": "reset_link_valid"}),
-        name="password_reset_confirm",
-    ),
+    path("health/", lambda r: JsonResponse({"status": "ok"}), name="health"),
 ]
 
 if settings.DEBUG:

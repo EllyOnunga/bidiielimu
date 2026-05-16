@@ -1,6 +1,4 @@
 from celery import shared_task
-from django.conf import settings
-
 from config.backup_manager import BackupManager
 
 

@@ -1,12 +1,23 @@
 import logging
 
-from django.conf import settings
 from django.core.cache import cache
 from django.http import JsonResponse
 from django.utils import timezone
 from django.utils.deprecation import MiddlewareMixin
 
 logger = logging.getLogger(__name__)
+
+
+def add_security_headers(get_response):
+    def middleware(request):
+        response = get_response(request)
+        response["Content-Security-Policy"] = (
+            "default-src 'self'; script-src 'self' 'unsafe-inline'"
+        )
+        response["X-Content-Type-Options"] = "nosniff"
+        return response
+
+    return middleware
 
 
 class APIKeyAuthenticationMiddleware(MiddlewareMixin):
@@ -51,10 +62,31 @@ class APIKeyAuthenticationMiddleware(MiddlewareMixin):
             return JsonResponse({"error": "Invalid API key"}, status=401)
 
 
-class SecurityHeadersMiddleware(MiddlewareMixin):
+class SecurityMiddleware(MiddlewareMixin):
     """
-    Middleware to add security headers to all responses
+    Consolidated middleware for security headers, input validation, and sensitive endpoint handling
     """
+
+    SENSITIVE_ENDPOINTS = [
+        "/api/v1/accounts/login/",
+        "/api/v1/accounts/register/",
+        "/api/v1/accounts/change-password/",
+    ]
+
+    def process_request(self, request):
+        # Input validation
+        if request.method in ["POST", "PUT", "PATCH"]:
+            self._validate_json_content(request)
+
+        # Log sensitive requests
+        if any(endpoint in request.path for endpoint in self.SENSITIVE_ENDPOINTS):
+            logger.info(
+                f"Sensitive request: {request.method} {request.path}",
+                extra={
+                    "user_agent": request.META.get("HTTP_USER_AGENT", ""),
+                    "remote_addr": self._get_client_ip(request),
+                },
+            )
 
     def process_response(self, request, response):
         # Security headers
@@ -81,38 +113,24 @@ class SecurityHeadersMiddleware(MiddlewareMixin):
                 "max-age=31536000; includeSubDomains"
             )
 
-        return response
-
-
-class RequestEncryptionMiddleware(MiddlewareMixin):
-    """
-    Middleware to handle encrypted request/response data for sensitive endpoints
-    """
-
-    SENSITIVE_ENDPOINTS = [
-        "/api/v1/accounts/login/",
-        "/api/v1/accounts/register/",
-        "/api/v1/accounts/change-password/",
-    ]
-
-    def process_request(self, request):
-        if any(endpoint in request.path for endpoint in self.SENSITIVE_ENDPOINTS):
-            # Log sensitive request (without sensitive data)
-            logger.info(
-                f"Sensitive request: {request.method} {request.path}",
-                extra={
-                    "user_agent": request.META.get("HTTP_USER_AGENT", ""),
-                    "remote_addr": self._get_client_ip(request),
-                },
-            )
-
-    def process_response(self, request, response):
-        # Add encryption headers for sensitive responses
+        # Cache control for sensitive endpoints
         if any(endpoint in request.path for endpoint in self.SENSITIVE_ENDPOINTS):
             response["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
             response["Pragma"] = "no-cache"
 
         return response
+
+    def _validate_json_content(self, request):
+        """Validate JSON content for API requests"""
+        if request.content_type == "application/json":
+            try:
+                import json
+
+                json.loads(request.body.decode("utf-8"))
+            except (json.JSONDecodeError, UnicodeDecodeError):
+                from django.http import JsonResponse
+
+                return JsonResponse({"error": "Invalid JSON content"}, status=400)
 
     def _get_client_ip(self, request):
         x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
@@ -121,27 +139,3 @@ class RequestEncryptionMiddleware(MiddlewareMixin):
         else:
             ip = request.META.get("REMOTE_ADDR")
         return ip
-
-
-class InputValidationMiddleware(MiddlewareMixin):
-    """
-    Middleware to validate and sanitize input data
-    """
-
-    def process_request(self, request):
-        # Basic input validation
-        if request.method in ["POST", "PUT", "PATCH"]:
-            self._validate_json_content(request)
-
-    def _validate_json_content(self, request):
-        """Validate JSON content for API requests"""
-        if request.content_type == "application/json":
-            try:
-                # Attempt to parse JSON
-                import json
-
-                json.loads(request.body.decode("utf-8"))
-            except (json.JSONDecodeError, UnicodeDecodeError):
-                from django.http import JsonResponse
-
-                return JsonResponse({"error": "Invalid JSON content"}, status=400)

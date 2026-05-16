@@ -1,12 +1,23 @@
-import { useState, useEffect } from "react";
-import { Download, ChevronLeft, Printer, Users } from "lucide-react";
+import { useState } from "react";
+import {
+  Download,
+  ChevronLeft,
+  Printer,
+  Users,
+  ShieldCheck,
+  Star,
+  Award,
+  TrendingUp,
+} from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
+import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import client from "../api/client";
-import { Skeleton } from "../components/ui/Skeleton";
-import { notificationsService } from "../api/services/notificationsService";
+import { useQuery } from "@tanstack/react-query";
+import { studentsService } from "../api/services/studentsService";
+import { schoolsService } from "../api/services/schoolsService";
+import { Button } from "../components/ui/Button";
 
 interface MarkRow {
   subject_id: number;
@@ -52,110 +63,81 @@ interface StudentInfo {
 }
 
 export const ReportCardPage = () => {
-  const [loading, setLoading] = useState(false);
-  const [fetching, setFetching] = useState(true);
   const { id: studentId } = useParams();
+  const [loading, setLoading] = useState(false);
 
-  const [studentData, setStudentData] = useState<StudentInfo>({
-    name: "",
-    admission: "",
-    class: "",
-    class_teacher: "",
-    email: "",
-    guardians: [],
-    photo: null,
-    term: "",
-    academic_year: "",
-    marks: [],
-    attendance: {
-      present_days: 0,
-      absent_days: 0,
-      total_days: 0,
-      percentage: 0,
-    },
-    remarks: {
-      teacher: "",
-      principal: "",
-      is_official: false,
-    },
-    summary: {
-      total_score: 0,
-      mean_score: 0,
-      total_points: 0,
-      mean_grade: "",
-      overall_remarks: "",
-    },
+  const { data: reportData, isLoading: fetchingReport } = useQuery({
+    queryKey: ["report-card", studentId],
+    queryFn: () => studentsService.getReportCard(Number(studentId)),
+    enabled: !!studentId,
   });
 
-  const [schoolInfo, setSchoolInfo] = useState({
-    name: "",
-    address: "",
-    email: "",
-    logo: null as string | null,
-    principalName: "",
-    motto: "",
-    accentColor: "#6366f1",
+  const { data: settingsData, isLoading: fetchingSettings } = useQuery({
+    queryKey: ["school-settings"],
+    queryFn: schoolsService.getSettings,
   });
 
-  useEffect(() => {
-    const fetchReportData = async () => {
-      try {
-        if (!studentId) return;
-        const [reportRes, settingsRes] = await Promise.all([
-          client.get(`students/${studentId}/report_card/`),
-          client.get("schools/settings/"),
-        ]);
+  const fetching = fetchingReport || fetchingSettings;
 
-        setStudentData({
-          name: reportRes.data.student.name,
-          admission: reportRes.data.student.admission_number,
-          class: reportRes.data.student.grade_level
-            ? `${reportRes.data.student.grade_level} ${reportRes.data.student.stream || ""}`
-            : "",
-          class_teacher: reportRes.data.student.class_teacher || "",
-          email: reportRes.data.student.email || "",
-          guardians: reportRes.data.student.guardians || [],
-          photo: reportRes.data.student.photo || null,
-          term: reportRes.data.exam.term,
-          academic_year: reportRes.data.exam.academic_year,
-          marks: reportRes.data.results,
-          summary: reportRes.data.summary,
-          attendance: reportRes.data.attendance,
-          remarks: reportRes.data.remarks,
-        });
-
-        if (settingsRes.data) {
-          setSchoolInfo({
-            name: settingsRes.data.school_name || "",
-            address: settingsRes.data.school_address || "",
-            email: settingsRes.data.school_email || "",
-            logo: settingsRes.data.school_logo,
-            principalName: settingsRes.data.principal_name || "",
-            motto: settingsRes.data.school_motto || "Striving for Excellence",
-            accentColor: settingsRes.data.accent_color || "#6366f1",
-          });
-        }
-      } catch (err: any) {
-        if (err.response?.status === 404) {
-          toast.error(
-            err.response?.data?.detail || "No results found for this student.",
-          );
-        } else {
-          toast.error("Failed to load report data");
-        }
-      } finally {
-        setFetching(false);
+  const studentData: StudentInfo = reportData
+    ? {
+        name: reportData.student.name,
+        admission: reportData.student.admission_number,
+        class: reportData.student.grade_level
+          ? `${reportData.student.grade_level} ${reportData.student.stream || ""}`
+          : "",
+        class_teacher: reportData.student.class_teacher || "",
+        email: reportData.student.email || "",
+        guardians: reportData.student.guardians || [],
+        photo: reportData.student.photo || null,
+        term: reportData.exam.term,
+        academic_year: reportData.exam.academic_year,
+        marks: reportData.results,
+        summary: reportData.summary,
+        attendance: reportData.attendance,
+        remarks: reportData.remarks,
       }
-    };
+    : {
+        name: "",
+        admission: "",
+        class: "",
+        class_teacher: "",
+        email: "",
+        guardians: [],
+        photo: null,
+        term: "",
+        academic_year: "",
+        marks: [],
+        attendance: {
+          present_days: 0,
+          absent_days: 0,
+          total_days: 0,
+          percentage: 0,
+        },
+        remarks: { teacher: "", principal: "", is_official: false },
+        summary: {
+          total_score: 0,
+          mean_score: 0,
+          total_points: 0,
+          mean_grade: "",
+          overall_remarks: "",
+        },
+      };
 
-    fetchReportData();
-  }, [studentId]);
+  const schoolInfo = {
+    name: settingsData?.school_name || "",
+    address: settingsData?.school_address || "",
+    email: settingsData?.school_email || "",
+    logo: settingsData?.school_logo || null,
+    principalName: settingsData?.principal_name || "",
+    motto: settingsData?.school_motto || "Elite Excellence in Education",
+    accentColor: settingsData?.accent_color || "#3b82f6",
+  };
 
   const generatePDF = async () => {
     setLoading(true);
     const element = document.getElementById("report-card");
     if (!element) return;
-
     try {
       const canvas = await html2canvas(element, {
         scale: 2,
@@ -164,10 +146,8 @@ export const ReportCardPage = () => {
       });
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF("p", "mm", "a4");
-      const imgProps = pdf.getImageProperties(imgData);
       const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
       pdf.addImage(
         imgData,
         "PNG",
@@ -178,356 +158,381 @@ export const ReportCardPage = () => {
         undefined,
         "FAST",
       );
-      pdf.save(`Report_Card_${studentData.admission}.pdf`);
-
-      toast.success("Report card downloaded!");
-
-      // Add a notification for the activity
-      await notificationsService.getAll(); // Refresh
+      pdf.save(`Official_Report_${studentData.admission}.pdf`);
+      toast.success("Document Generated & Dispatched");
     } catch (error) {
-      console.error("PDF Generation Error:", error);
-      toast.error("Failed to generate PDF. See console for details.");
+      toast.error("PDF generation cycle failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="space-y-6 pb-20">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 print:hidden">
-        <div className="flex items-center gap-4">
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-12 pb-24"
+    >
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 print:hidden">
+        <div className="flex items-center gap-6">
           <Link
             to="/students"
-            className="p-2 hover:bg-white/10 rounded-xl transition-all"
+            className="p-4 bg-white/5 hover:bg-white/10 rounded-[20px] transition-all border border-white/5 group"
           >
-            <ChevronLeft className="w-6 h-6 text-muted" />
+            <ChevronLeft className="w-6 h-6 text-muted group-hover:text-primary transition-colors" />
           </Link>
           <div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-primary tracking-tight">
-              Academic Report
+            <h1 className="text-3xl font-black text-primary tracking-tight leading-none mb-2">
+              Academic <span className="text-gradient">Credential</span>
             </h1>
-            <p className="text-muted text-sm">
-              {fetching ? (
-                <Skeleton className="w-48 h-4 inline-block" />
-              ) : (
-                `Viewing results for ${studentData.name}`
-              )}
+            <p className="text-muted text-[10px] font-black uppercase tracking-[0.2em]">
+              {fetching
+                ? "Accessing Matrix..."
+                : `Official record for ${studentData.name}`}
             </p>
           </div>
         </div>
-        <div className="flex gap-2 md:gap-3">
-          <button
+        <div className="flex gap-4 w-full lg:w-auto">
+          <Button
+            variant="ghost"
             onClick={() => window.print()}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white/5 text-primary rounded-xl border border-white/10 hover:bg-white/10 transition-all text-sm print:hidden"
+            className="flex-1 lg:flex-none h-14 px-8 rounded-2xl gap-2 text-[10px] font-black uppercase tracking-widest border-white/10"
           >
-            <Printer className="w-4 h-4" />
-            Print
-          </button>
-          <button
+            <Printer className="w-5 h-5" /> Execute Print
+          </Button>
+          <Button
             onClick={generatePDF}
             disabled={loading || fetching}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 bg-primary-600 hover:bg-primary-500 text-white rounded-xl font-bold shadow-lg transition-all disabled:opacity-50 text-sm print:hidden"
+            className="flex-1 lg:flex-none h-14 px-8 rounded-2xl gap-2 text-[10px] font-black uppercase tracking-widest shadow-premium"
           >
-            <Download className="w-4 h-4" />
-            {loading ? "Generating..." : "Download PDF"}
-          </button>
+            <Download className="w-5 h-5" />{" "}
+            {loading ? "Generating..." : "Download Official PDF"}
+          </Button>
         </div>
       </div>
 
       <div className="flex justify-center">
         <div
           id="report-card"
-          className="w-full max-w-4xl bg-white text-slate-900 p-12 rounded-lg shadow-2xl space-y-10"
+          className="w-full max-w-[210mm] bg-white text-slate-900 p-16 shadow-[0_40px_100px_rgba(0,0,0,0.4)] relative overflow-hidden flex flex-col min-h-[297mm]"
         >
-          {/* School Header */}
-          <div
-            className="flex items-center justify-between border-b-2 pb-8"
-            style={{ borderColor: schoolInfo.accentColor }}
-          >
-            <div className="flex items-center gap-4">
-              <div
-                className="w-16 h-16 rounded-xl flex items-center justify-center text-white font-bold text-2xl overflow-hidden"
-                style={{ backgroundColor: schoolInfo.accentColor }}
-              >
-                {schoolInfo.logo ? (
-                  <img
-                    src={schoolInfo.logo}
-                    alt="logo"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  schoolInfo.name.substring(0, 2).toUpperCase()
-                )}
-              </div>
-              <div>
-                <h2
-                  className="text-2xl font-black uppercase"
-                  style={{ color: schoolInfo.accentColor }}
-                >
-                  {schoolInfo.name}
-                </h2>
-                <p className="text-sm text-slate-500 italic font-medium">
-                  "{schoolInfo.motto}"
-                </p>
-                <p className="text-xs text-slate-400 font-medium mt-1">
-                  {schoolInfo.address} • {schoolInfo.email}
-                </p>
-              </div>
-            </div>
-            <div className="text-right">
-              <h3 className="text-xl font-bold text-slate-800 uppercase tracking-widest">
-                Official Report Card
-              </h3>
-              <p
-                className="text-sm font-bold"
-                style={{ color: schoolInfo.accentColor }}
-              >
-                {studentData.term}
-              </p>
+          {/* Watermark/Texture */}
+          <div className="absolute inset-0 opacity-[0.02] pointer-events-none select-none overflow-hidden flex items-center justify-center rotate-12">
+            <div className="grid grid-cols-4 gap-20">
+              {Array.from({ length: 40 }).map((_, i) => (
+                <ShieldCheck key={i} className="w-40 h-40" />
+              ))}
             </div>
           </div>
 
-          {/* Student Info */}
-          <div className="flex gap-8 bg-slate-50 p-6 rounded-xl border border-slate-200">
-            <div className="w-32 h-32 bg-slate-200 rounded-lg overflow-hidden border-2 border-white shadow-sm flex-shrink-0">
-              {studentData.photo ? (
-                <img
-                  src={studentData.photo}
-                  alt="Student"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-slate-400 bg-slate-100">
-                  <Users className="w-12 h-12" />
-                </div>
-              )}
-            </div>
-            <div className="grid grid-cols-2 gap-x-12 gap-y-4 flex-1">
-              <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  Student Name
-                </p>
-                <p className="text-lg font-black text-slate-800">
-                  {studentData.name}
-                </p>
-              </div>
-              <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  Admission No.
-                </p>
-                <p className="text-lg font-black text-slate-800">
-                  {studentData.admission}
-                </p>
-              </div>
-              <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  Class / Level
-                </p>
-                <p className="text-sm font-bold text-slate-600">
-                  {studentData.class}
-                </p>
-              </div>
-              <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  Academic Year
-                </p>
-                <p className="text-sm font-bold text-slate-600">
-                  {studentData.academic_year}
-                </p>
-              </div>
-              <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  Attendance
-                </p>
-                <p className="text-sm font-bold text-slate-600">
-                  {studentData.attendance.present_days} /{" "}
-                  {studentData.attendance.total_days} Days (
-                  {studentData.attendance.percentage}%)
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Marks Table */}
-          <div className="overflow-hidden border border-slate-200 rounded-xl">
-            <table className="w-full text-left">
-              <thead>
-                <tr
-                  className="text-white"
+          <div className="relative z-10 flex flex-col flex-1">
+            {/* Header */}
+            <div
+              className="flex items-center justify-between border-b-4 pb-10 mb-12"
+              style={{ borderColor: schoolInfo.accentColor }}
+            >
+              <div className="flex items-center gap-8">
+                <div
+                  className="w-24 h-24 rounded-[32px] flex items-center justify-center text-white font-black text-4xl overflow-hidden shadow-xl"
                   style={{ backgroundColor: schoolInfo.accentColor }}
                 >
-                  <th className="px-6 py-4 font-bold uppercase text-xs tracking-widest">
-                    Subject
-                  </th>
-                  <th className="px-6 py-4 font-bold uppercase text-xs tracking-widest text-center">
-                    Score
-                  </th>
-                  <th className="px-6 py-4 font-bold uppercase text-xs tracking-widest text-center">
-                    Grade
-                  </th>
-                  <th className="px-6 py-4 font-bold uppercase text-xs tracking-widest">
-                    Teacher's Remarks
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200">
-                {fetching ? (
-                  Array.from({ length: 8 }).map((_, i) => (
-                    <tr key={i}>
-                      <td className="px-6 py-4">
-                        <Skeleton className="w-32 h-4" />
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <Skeleton className="w-12 h-4 mx-auto" />
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <Skeleton className="w-8 h-6 mx-auto rounded-lg" />
-                      </td>
-                      <td className="px-6 py-4">
-                        <Skeleton className="w-48 h-4" />
-                      </td>
-                    </tr>
-                  ))
-                ) : studentData.marks.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={4}
-                      className="px-6 py-8 text-center text-slate-400"
-                    >
-                      No results recorded yet.
-                    </td>
+                  {schoolInfo.logo ? (
+                    <img
+                      src={schoolInfo.logo}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    schoolInfo.name[0]
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <h2
+                    className="text-3xl font-black uppercase tracking-tight"
+                    style={{ color: schoolInfo.accentColor }}
+                  >
+                    {schoolInfo.name}
+                  </h2>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] italic mb-3">
+                    "{schoolInfo.motto}"
+                  </p>
+                  <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">
+                    {schoolInfo.address} • {schoolInfo.email}
+                  </p>
+                </div>
+              </div>
+              <div className="text-right flex flex-col items-end">
+                <div className="px-4 py-2 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-[0.3em] mb-4">
+                  Official Document
+                </div>
+                <h3 className="text-2xl font-black text-slate-800 uppercase tracking-tighter mb-1">
+                  {studentData.term}
+                </h3>
+                <p className="text-xs font-black uppercase tracking-widest text-slate-400">
+                  Academic Cycle {studentData.academic_year}
+                </p>
+              </div>
+            </div>
+
+            {/* Profile Grid */}
+            <div className="grid grid-cols-12 gap-10 mb-12 bg-slate-50 p-10 rounded-[40px] border border-slate-100 shadow-sm relative">
+              <div className="col-span-3">
+                <div className="aspect-square bg-slate-200 rounded-[32px] overflow-hidden border-4 border-white shadow-lg">
+                  {studentData.photo ? (
+                    <img
+                      src={studentData.photo}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-slate-100">
+                      <Users className="w-16 h-16 text-slate-300" />
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="col-span-9 grid grid-cols-2 gap-y-8 gap-x-12">
+                <ProfileMetric
+                  label="Identity Name"
+                  value={studentData.name}
+                  large
+                />
+                <ProfileMetric
+                  label="Admission Matrix"
+                  value={studentData.admission}
+                  large
+                />
+                <ProfileMetric
+                  label="Operational Unit"
+                  value={studentData.class}
+                />
+                <ProfileMetric
+                  label="Temporal Cycle"
+                  value={studentData.academic_year}
+                />
+                <ProfileMetric
+                  label="Attendance Percentage"
+                  value={`${studentData.attendance.percentage}% (${studentData.attendance.present_days}/${studentData.attendance.total_days} Days)`}
+                />
+                <ProfileMetric
+                  label="Faculty Lead"
+                  value={studentData.class_teacher}
+                />
+              </div>
+            </div>
+
+            {/* Assessment Grid */}
+            <div className="flex-1 mb-12">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr
+                    className="text-white"
+                    style={{ backgroundColor: schoolInfo.accentColor }}
+                  >
+                    <th className="p-6 text-left text-[10px] font-black uppercase tracking-[0.3em] rounded-tl-[24px]">
+                      Assessment Domain
+                    </th>
+                    <th className="p-6 text-center text-[10px] font-black uppercase tracking-[0.3em]">
+                      Quantum Score
+                    </th>
+                    <th className="p-6 text-center text-[10px] font-black uppercase tracking-[0.3em]">
+                      spectral Grade
+                    </th>
+                    <th className="p-6 text-left text-[10px] font-black uppercase tracking-[0.3em] rounded-tr-[24px]">
+                      Faculty Appraisal
+                    </th>
                   </tr>
-                ) : (
-                  studentData.marks.map((m, i) => (
+                </thead>
+                <tbody className="divide-y divide-slate-100 border-x border-slate-100">
+                  {studentData.marks.map((m, i) => (
                     <tr
                       key={i}
-                      className={i % 2 === 0 ? "bg-white" : "bg-slate-50"}
+                      className={i % 2 === 1 ? "bg-slate-50/50" : "bg-white"}
                     >
-                      <td className="px-6 py-4 font-bold text-slate-800">
+                      <td className="p-6 font-black text-slate-800 uppercase text-sm tracking-tight">
                         {m.subject_name}
                       </td>
-                      <td className="px-6 py-4 text-center font-mono font-bold text-primary-700">
+                      <td
+                        className="p-6 text-center font-black text-xl tracking-tighter"
+                        style={{ color: schoolInfo.accentColor }}
+                      >
                         {m.score}
                       </td>
-                      <td className="px-6 py-4 text-center">
-                        <span className="px-3 py-1 bg-primary-100 text-primary-700 rounded-lg font-bold">
+                      <td className="p-6 text-center">
+                        <span className="w-12 h-12 inline-flex items-center justify-center bg-slate-900 text-white rounded-xl font-black text-lg shadow-md">
                           {m.grade}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm italic text-slate-600">
+                      <td className="p-6 text-[10px] font-black uppercase tracking-widest text-slate-500 leading-relaxed italic">
                         {m.remarks}
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-              <tfoot>
-                <tr className="bg-slate-100 font-black text-slate-900 border-t-2 border-slate-300">
-                  <td className="px-6 py-4">OVERALL AVERAGE</td>
-                  <td
-                    className="px-6 py-4 text-center text-xl"
-                    style={{ color: schoolInfo.accentColor }}
-                  >
-                    {studentData.summary.mean_score}
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <span
-                      className="px-3 py-1 text-white rounded-lg font-bold"
-                      style={{ backgroundColor: schoolInfo.accentColor }}
-                    >
-                      {studentData.summary.mean_grade}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    {studentData.summary.overall_remarks}
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-
-          {/* Remarks & Positions */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-4">
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
-                  Class Teacher's Remarks
-                </p>
-                <p className="text-sm italic text-slate-700">
-                  "{studentData.remarks.teacher}"
-                </p>
-              </div>
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
-                  Principal's Remarks
-                </p>
-                <p className="text-sm italic text-slate-700">
-                  "{studentData.remarks.principal}"
-                </p>
-              </div>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr className="bg-slate-900 text-white border-t-4 border-white">
+                    <td className="p-8 font-black text-lg uppercase tracking-tight rounded-bl-[24px]">
+                      Composite Intelligence Metrics
+                    </td>
+                    <td className="p-8 text-center">
+                      <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">
+                        Mean Quantum
+                      </p>
+                      <p className="text-3xl font-black tracking-tighter">
+                        {studentData.summary.mean_score}
+                      </p>
+                    </td>
+                    <td className="p-8 text-center">
+                      <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">
+                        Spectral Grade
+                      </p>
+                      <p className="text-3xl font-black tracking-tighter text-blue-400">
+                        {studentData.summary.mean_grade}
+                      </p>
+                    </td>
+                    <td className="p-8 rounded-br-[24px]">
+                      <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">
+                        Overall Outcome
+                      </p>
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em]">
+                        {studentData.summary.overall_remarks}
+                      </p>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              {studentData.summary.class_position && (
-                <div className="p-4 bg-primary-50 rounded-xl border border-primary-100 text-center">
-                  <p className="text-[10px] font-bold text-primary-400 uppercase tracking-widest mb-1">
-                    Class Rank
-                  </p>
-                  <p className="text-2xl font-black text-primary-700">
-                    {studentData.summary.class_position} /{" "}
-                    {studentData.summary.total_in_class || "-"}
-                  </p>
-                </div>
-              )}
-              {studentData.summary.stream_position && (
-                <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100 text-center">
-                  <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-1">
-                    Stream Rank
-                  </p>
-                  <p className="text-2xl font-black text-emerald-700">
-                    {studentData.summary.stream_position} /{" "}
-                    {studentData.summary.total_in_class || "-"}
-                  </p>
-                </div>
-              )}
+            {/* Performance Ranks */}
+            <div className="grid grid-cols-3 gap-8 mb-12">
+              <RankCard
+                icon={Star}
+                label="Class Position"
+                value={studentData.summary.class_position}
+                total={studentData.summary.total_in_class}
+                color="indigo"
+              />
+              <RankCard
+                icon={Award}
+                label="Stream Position"
+                value={studentData.summary.stream_position}
+                total={studentData.summary.total_in_class}
+                color="emerald"
+              />
+              <RankCard
+                icon={TrendingUp}
+                label="Points"
+                value={studentData.summary.total_points}
+                total={null}
+                color="amber"
+              />
             </div>
-          </div>
 
-          {/* Footer Signatures */}
-          <div className="grid grid-cols-3 gap-12 pt-8 border-t border-slate-100">
-            <div className="text-center space-y-4">
-              <div className="h-16 flex items-end justify-center border-b border-slate-300 pb-1">
-                <p className="text-sm font-bold text-slate-800">
-                  {studentData.class_teacher || "Class Teacher"}
+            {/* Appraisals */}
+            <div className="grid grid-cols-2 gap-10 mb-16">
+              <div className="space-y-4">
+                <AppraisalBox
+                  label="Faculty Lead Assessment"
+                  remark={studentData.remarks.teacher}
+                />
+                <AppraisalBox
+                  label="Institutional Head Appraisal"
+                  remark={studentData.remarks.principal}
+                />
+              </div>
+              <div className="bg-slate-50 rounded-[40px] p-8 border border-slate-100 flex flex-col items-center justify-center text-center">
+                <ShieldCheck className="w-16 h-16 text-slate-200 mb-4" />
+                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-2">
+                  Authenticity Clause
+                </h4>
+                <p className="text-[9px] font-bold text-slate-400 uppercase leading-relaxed max-w-xs">
+                  This document is a certified academic transcript issued by{" "}
+                  {schoolInfo.name}. Any unauthorized modification voids its
+                  operational validity.
                 </p>
               </div>
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                Class Teacher's Signature
-              </p>
             </div>
-            <div className="text-center space-y-4">
-              <div className="h-16 flex items-end justify-center border-b border-slate-300 pb-1">
-                <p className="text-sm font-serif italic text-slate-700">
-                  {schoolInfo.principalName || "School Principal"}
-                </p>
-              </div>
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                Principal's Signature
-              </p>
-            </div>
-            <div className="text-center space-y-4">
-              <div className="h-16 flex items-end justify-center border-b border-slate-300 pb-1">
-                <p className="text-xs text-slate-400 font-bold">
-                  {new Date().toLocaleDateString()}
-                </p>
-              </div>
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                Date Issued
-              </p>
+
+            {/* Signatures */}
+            <div className="mt-auto grid grid-cols-3 gap-16 pt-12 border-t-2 border-slate-100">
+              <Signature
+                label="Faculty Lead"
+                name={studentData.class_teacher}
+              />
+              <Signature
+                label="Institutional Principal"
+                name={schoolInfo.principalName}
+              />
+              <Signature
+                label="Date of Issuance"
+                name={new Date().toLocaleDateString("en-GB", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+              />
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
+
+const ProfileMetric = ({ label, value, large }: any) => (
+  <div>
+    <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-1.5">
+      {label}
+    </p>
+    <p
+      className={`${large ? "text-xl" : "text-base"} font-black text-slate-800 uppercase tracking-tight`}
+    >
+      {value || "—"}
+    </p>
+  </div>
+);
+
+const RankCard = ({ icon: Icon, label, value, total, color }: any) => (
+  <div
+    className={`p-8 bg-${color}-50 rounded-[32px] border border-${color}-100 flex flex-col items-center text-center`}
+  >
+    <div
+      className={`w-12 h-12 rounded-2xl bg-${color}-500/10 flex items-center justify-center text-${color}-600 mb-4 border border-${color}-500/10`}
+    >
+      <Icon className="w-6 h-6" />
+    </div>
+    <p
+      className={`text-[9px] font-black uppercase tracking-[0.3em] text-${color}-400 mb-1`}
+    >
+      {label}
+    </p>
+    <p className={`text-2xl font-black text-${color}-700 tracking-tighter`}>
+      {value}
+      {total ? ` / ${total}` : ""}
+    </p>
+  </div>
+);
+
+const AppraisalBox = ({ label, remark }: any) => (
+  <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+    <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-3">
+      {label}
+    </p>
+    <p className="text-xs font-black text-slate-600 uppercase tracking-widest leading-relaxed italic">
+      "{remark || "No appraisal recorded."}"
+    </p>
+  </div>
+);
+
+const Signature = ({ label, name }: any) => (
+  <div className="text-center">
+    <div className="h-16 flex items-end justify-center border-b-2 border-slate-200 pb-2 mb-4">
+      <span className="text-sm font-black text-slate-800 uppercase tracking-tight">
+        {name}
+      </span>
+    </div>
+    <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">
+      {label}
+    </p>
+  </div>
+);
+
+export default ReportCardPage;

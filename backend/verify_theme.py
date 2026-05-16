@@ -2,7 +2,6 @@ import os
 
 import django
 from django.test import RequestFactory
-
 from schools.views_theme import TenantThemeView
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")

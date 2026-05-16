@@ -1,6 +1,4 @@
 import numpy as np
-from django.db.models import Avg
-
 from attendance.models import DailyAttendance
 from exams.models import ExamRanking, Mark
 from students.models import Student

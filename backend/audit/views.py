@@ -1,4 +1,6 @@
-from rest_framework import permissions, status, viewsets
+from config.tenant_security import (StrictTenantPermission,
+                                    TenantAwareViewSetMixin)
+from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -6,11 +8,9 @@ from .models import AuditLog
 from .serializers import AuditLogSerializer
 
 
-class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
+class AuditLogViewSet(TenantAwareViewSetMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = AuditLogSerializer
-    permission_classes = [
-        permissions.IsAuthenticated
-    ]  # Should ideally be IsAdminUser, but we use a custom role check later
+    permission_classes = [permissions.IsAuthenticated, StrictTenantPermission]
     search_fields = ["user_name", "action", "model_name", "object_repr", "ip_address"]
 
     def get_queryset(self):
@@ -20,9 +20,25 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
             return AuditLog.objects.none()
 
         user = self.request.user
+        tenant = self.request.tenant
+
+        if user.school and user.school != tenant:
+            return AuditLog.objects.none()
+
         if user.role_name and user.role_name in ["ADMIN", "SUPER_ADMIN", "PRINCIPAL"]:
-            return AuditLog.objects.all()
-        return AuditLog.objects.none()
+            qs = AuditLog.objects.all()
+        else:
+            qs = AuditLog.objects.none()
+
+        # Date range filtering
+        start = self.request.query_params.get("start_date")
+        end = self.request.query_params.get("end_date")
+        if start:
+            qs = qs.filter(timestamp__date__gte=start)
+        if end:
+            qs = qs.filter(timestamp__date__lte=end)
+
+        return qs
 
     @action(detail=False, methods=["get"])
     def stats(self, request):
@@ -46,7 +62,10 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
 
         from accounts.models import User
 
-        active_admins = User.objects.filter(role__name="ADMIN", is_active=True).count()
+        # Explicitly filter users by the current school to avoid cross-tenant counts
+        active_admins = User.objects.filter(
+            school=request.tenant, role__name="ADMIN", is_active=True
+        ).count()
 
         return Response(
             {
@@ -55,3 +74,30 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
                 "active_admins": active_admins,
             }
         )
+
+    @action(detail=False, methods=["get"])
+    def export(self, request):
+        """Export audit logs as CSV"""
+        import csv
+
+        from django.http import HttpResponse
+
+        qs = self.get_queryset()[:5000]  # Limit for performance
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = 'attachment; filename="audit_logs.csv"'
+
+        writer = csv.writer(response)
+        writer.writerow(["Timestamp", "User", "Action", "Model", "Object", "IP"])
+
+        for log in qs:
+            writer.writerow(
+                [
+                    log.timestamp,
+                    log.user.email if log.user else "System",
+                    log.action,
+                    log.model_name,
+                    log.object_repr,
+                    log.ip_address or "",
+                ]
+            )
+        return response

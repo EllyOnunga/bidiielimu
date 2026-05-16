@@ -1,13 +1,9 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from schools.utils import TenantSerializerMixin
-
-from .models import Teacher
+from .models import LeaveRequest, StaffProfile, Teacher
 
 User = get_user_model()
-
-from .models import LeaveRequest, StaffProfile, Teacher
 
 
 class TeacherSerializer(serializers.ModelSerializer):
@@ -107,17 +103,10 @@ class TeacherSerializer(serializers.ModelSerializer):
             teacher = Teacher.objects.create(user=user, **validated_data)
 
             # Send Welcome Email
-            from django.conf import settings
-
-            domain_name = (
-                school.domains.filter(is_primary=True).first().domain
-                if school
-                else "elimuhub.com"
-            )
-            protocol = "http://" if "localhost" in domain_name else "https://"
-            login_url = f"{protocol}{domain_name}/login"
-
             from accounts.services import EmailService
+
+            base_url = EmailService._get_frontend_url(user)
+            login_url = f"{base_url}/login"
 
             EmailService.send_welcome_email(
                 user, login_url=login_url, plain_password=password

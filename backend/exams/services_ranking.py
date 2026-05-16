@@ -1,6 +1,5 @@
-from django.db.models import Avg, Sum
-
 from classes.models import Stream
+from django.db.models import Avg, Sum
 from students.models import Student
 
 from .models import Exam, ExamRanking, GradeThreshold, Mark

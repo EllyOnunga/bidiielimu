@@ -1,4 +1,4 @@
-from django.db.models import Count, F, Q, Sum
+from django.db.models import F, Sum
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -224,7 +224,9 @@ class BookIssueViewSet(viewsets.ModelViewSet):
             results.append(
                 {
                     "id": issue.id,
-                    "student_name": f"{issue.student.first_name} {issue.student.last_name}",
+                    "student_name": f"{
+                        issue.student.first_name} {
+                        issue.student.last_name}",
                     "student_admission": issue.student.admission_number,
                     "title": issue.item.name,
                     "due_date": issue.due_date,

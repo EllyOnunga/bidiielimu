@@ -1,6 +1,5 @@
 import csv
 import io
-import json
 import logging
 from datetime import timedelta
 from typing import Any, Dict, List
@@ -221,7 +220,6 @@ def cleanup_expired_data(self):
     Clean up expired sessions, tokens, and temporary data across all tenants.
     """
     from django_tenants.utils import tenant_context
-
     from schools.models import School
 
     try:
@@ -248,9 +246,8 @@ def cleanup_expired_data(self):
 
 def _perform_cleanup(is_public=False):
     """Helper to perform the actual deletion of expired data in the current schema context."""
-    from django.contrib.sessions.models import Session
-
     from accounts.models import EmailVerificationToken
+    from django.contrib.sessions.models import Session
 
     results = {
         "tokens_cleaned": 0,
@@ -288,9 +285,8 @@ def generate_analytics_report(self, school_id: int, report_period: str = "monthl
     Generate comprehensive analytics reports
     """
     try:
-        from django.db.models import Avg, Count, Sum
-
         from attendance.models import DailyAttendance
+        from django.db.models import Avg, Count, Sum
         from exams.models import Mark
         from fees.models import FeePayment
         from students.models import Student

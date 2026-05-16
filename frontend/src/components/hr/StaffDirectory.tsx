@@ -7,12 +7,14 @@ import {
   Phone,
   MoreHorizontal,
   ChevronRight,
-  X,
   Loader2,
+  Edit2,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import client from "../../api/client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { teachersService } from "../../api/services/teachersService";
+import { hrService } from "../../api/services/hrService";
 import { Modal } from "../ui/Modal";
 
 interface StaffMember {
@@ -31,13 +33,13 @@ interface StaffMember {
 }
 
 export const StaffDirectory = () => {
-  const [staff, setStaff] = useState<StaffMember[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [activeTab, setActiveTab] = useState("All");
+  const [activeTab, setActiveTab] = useState<"All" | "Teachers" | "Other">("All");
+  const [editingStaff, setEditingStaff] = useState<StaffMember | null>(null);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -59,66 +61,112 @@ export const StaffDirectory = () => {
     return () => clearTimeout(timer);
   }, [search]);
 
-  const fetchStaff = async (query = "") => {
-    try {
-      setLoading(true);
-      const res = await client.get("teachers/", { params: { search: query } });
-      setStaff(res.data.results || res.data);
-    } catch (error) {
-      console.error("Failed to fetch staff", error);
-      toast.error("Failed to load staff directory");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: staff = [], isLoading: loading } = useQuery({
+    queryKey: ["staff", activeTab, debouncedSearch],
+    queryFn: async () => {
+      if (activeTab === "Teachers") {
+        const res = await teachersService.getAll(debouncedSearch);
+        return Array.isArray(res) ? res : res.results || [];
+      } else if (activeTab === "Other") {
+        const res = await hrService.getStaffProfiles({ search: debouncedSearch });
+        return Array.isArray(res) ? res : res.results || [];
+      } else {
+        // All - merge both
+        const [teachersRes, staffRes] = await Promise.all([
+          teachersService.getAll(debouncedSearch),
+          hrService.getStaffProfiles({ search: debouncedSearch }),
+        ]);
+        const teachers = Array.isArray(teachersRes) ? teachersRes : teachersRes.results || [];
+        const otherStaff = Array.isArray(staffRes) ? staffRes : staffRes.results || [];
+        return [...teachers, ...otherStaff];
+      }
+    },
+  });
 
-  useEffect(() => {
-    fetchStaff(debouncedSearch);
-  }, [debouncedSearch]);
+  const createMutation = useMutation({
+    mutationFn: (data: any) => {
+      return activeTab === "Other" 
+        ? hrService.createStaffProfile(data) 
+        : teachersService.create(data);
+    },
+    onSuccess: () => {
+      toast.success("Staff onboarded successfully!");
+      setIsModalOpen(false);
+      resetForm();
+      queryClient.invalidateQueries({ queryKey: ["staff"] });
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.detail || "Failed to onboard staff");
+    },
+  });
+
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: any }) => {
+      return activeTab === "Other"
+        ? hrService.updateStaffProfile(id, data)
+        : teachersService.update(id, data);
+    },
+    onSuccess: () => {
+      toast.success("Staff updated");
+      setIsModalOpen(false);
+      setEditingStaff(null);
+      resetForm();
+      queryClient.invalidateQueries({ queryKey: ["staff"] });
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.detail || "Update failed");
+    },
+  });
+
+  const resetForm = () => {
+    setFormData({
+      first_name: "",
+      last_name: "",
+      email: "",
+      password: "",
+      phone_number: "",
+      employee_id: "",
+      designation: "",
+      specialization: "",
+      joining_date: new Date().toISOString().split("T")[0],
+      contract_type: "PERMANENT",
+      role: "TEACHER",
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    try {
-      await client.post("teachers/", formData);
-      toast.success("Staff onboarded successfully!");
-      setIsModalOpen(false);
-      fetchStaff(debouncedSearch);
-      setFormData({
-        first_name: "",
-        last_name: "",
-        email: "",
-        password: "",
-        phone_number: "",
-        employee_id: "",
-        designation: "",
-        specialization: "",
-        joining_date: new Date().toISOString().split("T")[0],
-        contract_type: "PERMANENT",
-        role: "TEACHER",
-      });
-    } catch (error: any) {
-      const detail = error.response?.data?.detail || "Failed to onboard staff";
-      toast.error(detail);
-    } finally {
-      setIsSubmitting(false);
+    const payload = editingStaff ? { ...formData, id: editingStaff.id } : formData;
+    if (editingStaff) {
+      updateMutation.mutate({ id: editingStaff.id, data: payload });
+    } else {
+      createMutation.mutate(payload);
     }
+    setIsSubmitting(false);
   };
 
-  const filteredStaff = staff.filter((member) => {
-    if (activeTab === "All") return true;
-    if (activeTab === "Teaching")
-      return (
-        member.designation?.toLowerCase().includes("teacher") ||
-        member.specialization
-      );
-    if (activeTab === "Admin")
-      return (
-        member.designation?.toLowerCase().includes("admin") ||
-        member.designation?.toLowerCase().includes("principal")
-      );
-    return true;
-  });
+  const handleEdit = (member: StaffMember) => {
+    setEditingStaff(member);
+    setFormData({
+      first_name: member.first_name,
+      last_name: member.last_name,
+      email: member.email,
+      password: "",
+      phone_number: member.phone_number,
+      employee_id: member.employee_id,
+      designation: member.designation || "",
+      specialization: member.specialization || "",
+      joining_date: new Date().toISOString().split("T")[0],
+      contract_type: "PERMANENT",
+      role: member.role,
+    });
+    setIsModalOpen(true);
+  };
+
+
+  const filteredStaff = staff; // Filtering now handled server-side via tabs
 
   return (
     <div className="space-y-8 pb-20">
@@ -155,7 +203,7 @@ export const StaffDirectory = () => {
           />
         </div>
         <div className="flex gap-2 p-2 bg-white/5 rounded-2xl border border-white/5">
-          {["All", "Teaching", "Admin", "Support"].map((tab) => (
+          {(["All", "Teachers", "Other"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -177,7 +225,7 @@ export const StaffDirectory = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {filteredStaff.map((member) => (
+          {filteredStaff.map((member: StaffMember) => (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -189,9 +237,15 @@ export const StaffDirectory = () => {
                   <div className="w-16 h-16 rounded-[24px] bg-white/5 flex items-center justify-center text-primary-400 group-hover:bg-primary-500 group-hover:text-white transition-all shadow-inner">
                     <Users className="w-8 h-8" />
                   </div>
-                  <button className="p-2 text-primary-200/20 hover:text-white transition-all">
-                    <MoreHorizontal className="w-5 h-5" />
-                  </button>
+                   <button
+                     onClick={() => handleEdit(member)}
+                     className="p-2 text-primary-200/20 hover:text-primary-400 transition-all"
+                   >
+                     <Edit2 className="w-4 h-4" />
+                   </button>
+                   <button className="p-2 text-primary-200/20 hover:text-white transition-all">
+                     <MoreHorizontal className="w-5 h-5" />
+                   </button>
                 </div>
 
                 <div>
@@ -245,188 +299,173 @@ export const StaffDirectory = () => {
       )}
 
       {/* Onboard Modal */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        className="max-w-2xl p-0 overflow-hidden"
-      >
-        <div className="p-8 bg-gradient-to-br from-primary-500/10 to-transparent">
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-black text-primary tracking-tighter">
-                Onboard Staff
-              </h2>
-              <p className="text-primary-400 text-[10px] font-bold uppercase tracking-widest">
-                Access Provisioning
-              </p>
-            </div>
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="p-2 bg-white/5 rounded-xl text-primary-200/40 hover:text-white transition-all"
+        <Modal
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setEditingStaff(null);
+            resetForm();
+          }}
+          title={editingStaff ? "Edit Staff Member" : "Onboard New Staff"}
+        >
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-2"
+        >
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">
+              First Name
+            </label>
+            <input
+              required
+              className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-primary outline-none focus:ring-2 focus:ring-primary-500/20 transition-all text-sm"
+              value={formData.first_name}
+              onChange={(e) =>
+                setFormData({ ...formData, first_name: e.target.value })
+              }
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">
+              Last Name
+            </label>
+            <input
+              required
+              className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-primary outline-none focus:ring-2 focus:ring-primary-500/20 transition-all text-sm"
+              value={formData.last_name}
+              onChange={(e) =>
+                setFormData({ ...formData, last_name: e.target.value })
+              }
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">
+              Work Email
+            </label>
+            <input
+              required
+              type="email"
+              className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-primary outline-none focus:ring-2 focus:ring-primary-500/20 transition-all text-sm"
+              value={formData.email}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">
+              Temporary Password
+            </label>
+            <input
+              required
+              type="password"
+              className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-primary outline-none focus:ring-2 focus:ring-primary-500/20 transition-all text-sm"
+              value={formData.password}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-black text-primary-200/40 uppercase tracking-widest ml-1">
+              Employee ID
+            </label>
+            <input
+              required
+              className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white outline-none focus:ring-2 focus:ring-primary-500/20 transition-all text-sm"
+              value={formData.employee_id}
+              onChange={(e) =>
+                setFormData({ ...formData, employee_id: e.target.value })
+              }
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-black text-primary-200/40 uppercase tracking-widest ml-1">
+              Phone Number
+            </label>
+            <input
+              required
+              className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white outline-none focus:ring-2 focus:ring-primary-500/20 transition-all text-sm"
+              value={formData.phone_number}
+              onChange={(e) =>
+                setFormData({ ...formData, phone_number: e.target.value })
+              }
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">
+              System Role
+            </label>
+            <select
+              required
+              className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-primary outline-none focus:ring-2 focus:ring-primary-500/20 transition-all appearance-none text-sm"
+              value={formData.role}
+              onChange={(e) =>
+                setFormData({ ...formData, role: e.target.value })
+              }
             >
-              <X className="w-6 h-6" />
-            </button>
+              <option value="TEACHER" className="bg-bg-color">
+                Teacher
+              </option>
+              <option value="ADMIN" className="bg-bg-color">
+                Administrator
+              </option>
+              <option value="PRINCIPAL" className="bg-bg-color">
+                Principal
+              </option>
+              <option value="HOD" className="bg-bg-color">
+                Head of Department
+              </option>
+              <option value="LIBRARIAN" className="bg-bg-color">
+                Librarian
+              </option>
+              <option value="FINANCE" className="bg-bg-color">
+                Finance / Bursar
+              </option>
+            </select>
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-black text-primary-200/40 uppercase tracking-widest ml-1">
+              Designation
+            </label>
+            <input
+              className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white outline-none focus:ring-2 focus:ring-primary-500/20 transition-all text-sm"
+              placeholder="e.g. Senior Teacher"
+              value={formData.designation}
+              onChange={(e) =>
+                setFormData({ ...formData, designation: e.target.value })
+              }
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-black text-primary-200/40 uppercase tracking-widest ml-1">
+              Joining Date
+            </label>
+            <input
+              type="date"
+              required
+              className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white outline-none focus:ring-2 focus:ring-primary-500/20 transition-all text-sm"
+              value={formData.joining_date}
+              onChange={(e) =>
+                setFormData({ ...formData, joining_date: e.target.value })
+              }
+            />
           </div>
 
-          <form
-            onSubmit={handleSubmit}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6"
-          >
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">
-                First Name
-              </label>
-              <input
-                required
-                className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-primary outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
-                value={formData.first_name}
-                onChange={(e) =>
-                  setFormData({ ...formData, first_name: e.target.value })
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">
-                Last Name
-              </label>
-              <input
-                required
-                className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-primary outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
-                value={formData.last_name}
-                onChange={(e) =>
-                  setFormData({ ...formData, last_name: e.target.value })
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">
-                Work Email
-              </label>
-              <input
-                required
-                type="email"
-                className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-primary outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">
-                Temporary Password
-              </label>
-              <input
-                required
-                type="password"
-                className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-primary outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
-                value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-primary-200/40 uppercase tracking-widest ml-1">
-                Employee ID
-              </label>
-              <input
-                required
-                className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
-                value={formData.employee_id}
-                onChange={(e) =>
-                  setFormData({ ...formData, employee_id: e.target.value })
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-primary-200/40 uppercase tracking-widest ml-1">
-                Phone Number
-              </label>
-              <input
-                required
-                className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
-                value={formData.phone_number}
-                onChange={(e) =>
-                  setFormData({ ...formData, phone_number: e.target.value })
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">
-                System Role
-              </label>
-              <select
-                required
-                className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-primary outline-none focus:ring-2 focus:ring-primary-500/20 transition-all appearance-none"
-                value={formData.role}
-                onChange={(e) =>
-                  setFormData({ ...formData, role: e.target.value })
-                }
-              >
-                <option value="TEACHER" className="bg-bg-color">
-                  Teacher
-                </option>
-                <option value="ADMIN" className="bg-bg-color">
-                  Administrator
-                </option>
-                <option value="PRINCIPAL" className="bg-bg-color">
-                  Principal
-                </option>
-                <option value="HOD" className="bg-bg-color">
-                  Head of Department
-                </option>
-                <option value="LIBRARIAN" className="bg-bg-color">
-                  Librarian
-                </option>
-                <option value="FINANCE" className="bg-bg-color">
-                  Finance / Bursar
-                </option>
-              </select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-primary-200/40 uppercase tracking-widest ml-1">
-                Designation
-              </label>
-              <input
-                className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
-                placeholder="e.g. Senior Teacher"
-                value={formData.designation}
-                onChange={(e) =>
-                  setFormData({ ...formData, designation: e.target.value })
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-primary-200/40 uppercase tracking-widest ml-1">
-                Joining Date
-              </label>
-              <input
-                type="date"
-                required
-                className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
-                value={formData.joining_date}
-                onChange={(e) =>
-                  setFormData({ ...formData, joining_date: e.target.value })
-                }
-              />
-            </div>
-
-            <div className="col-span-full pt-4">
-              <button
-                disabled={isSubmitting}
-                className="w-full py-5 bg-primary-500 hover:bg-primary-400 text-white rounded-[24px] font-black text-xl shadow-premium transition-all flex items-center justify-center gap-3 disabled:opacity-50"
-              >
-                {isSubmitting ? (
-                  <Loader2 className="w-6 h-6 animate-spin" />
-                ) : (
-                  <Plus className="w-6 h-6" />
-                )}
-                {isSubmitting ? "PROVISIONING..." : "FINALIZE ONBOARDING"}
-              </button>
-            </div>
-          </form>
-        </div>
+          <div className="col-span-full pt-6">
+            <button
+              disabled={isSubmitting}
+              className="w-full py-4 bg-primary-500 hover:bg-primary-400 text-white rounded-[20px] font-black text-base shadow-premium transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+            >
+              {isSubmitting ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <Plus className="w-5 h-5" />
+              )}
+              {isSubmitting ? "PROVISIONING..." : "FINALIZE ONBOARDING"}
+            </button>
+          </div>
+        </form>
       </Modal>
     </div>
   );

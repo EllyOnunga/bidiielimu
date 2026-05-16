@@ -1,9 +1,7 @@
 from dj_rest_auth.serializers import PasswordResetSerializer
 from django.conf import settings
-from django.contrib.auth.forms import PasswordResetForm
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-
 from schools.models import School
 
 from .models import Role, User
@@ -42,11 +40,9 @@ class SchoolBasicSerializer(serializers.ModelSerializer):
 
     def get_domain(self, obj):
         domain = obj.domains.filter(is_primary=True).first()
-        return (
-            domain.domain
-            if domain
-            else f"{obj.schema_name.replace('_', '-')}.localhost"
-        )
+        if domain:
+            return domain.domain
+        return f"{obj.schema_name.replace('_', '-')}.{settings.TENANT_DOMAIN_SUFFIX}"
 
 
 class SchoolSerializer(serializers.ModelSerializer):
@@ -147,13 +143,16 @@ class RegisterSerializer(serializers.ModelSerializer):
             )
 
         try:
+            role, _ = Role.objects.get_or_create(
+                name="ADMIN", defaults={"description": "School Administrator"}
+            )
             user = User.objects.create_user(
                 email=validated_data["email"],
                 password=validated_data["password"],
                 first_name=validated_data.get("first_name", ""),
                 last_name=validated_data.get("last_name", ""),
                 school=school,
-                role=Role.objects.get(name="ADMIN"),
+                role=role,
                 is_email_verified=False,  # Explicitly set to False
             )
         except IntegrityError:
@@ -257,15 +256,19 @@ class CustomPasswordResetSerializer(PasswordResetSerializer):
         request = self.context.get("request")
         frontend_url = settings.FRONTEND_URL
 
-        # If we're on a tenant subdomain, ensure the link points back to that same subdomain
+        # If we're on a tenant subdomain, ensure the link points back to that same
+        # subdomain
         if request:
-            host = request.get_host()
-            if "localhost" in host:
-                # Handle local subdomains (e.g., school.localhost:5173)
-                # If the current request is to the backend (e.g. localhost:8000),
-                # we might want to preserve the subdomain if it was passed.
-                # However, usually FRONTEND_URL is enough for basic setup.
-                pass
+            tenant = getattr(request, "tenant", None)
+            if tenant and tenant.schema_name != "public":
+                domain = tenant.domains.filter(is_primary=True).first()
+                if domain:
+                    protocol = "http" if "localhost" in domain.domain else "https"
+                    # Handle local dev port
+                    if "localhost" in domain.domain:
+                        frontend_url = f"{protocol}://{domain.domain}:5173"
+                    else:
+                        frontend_url = f"{protocol}://{domain.domain}"
 
         return {
             "email_template_name": "registration/password_reset_email.html",

@@ -19,30 +19,32 @@ interface RolePermission {
   };
 }
 
+const DEFAULT_PERMISSIONS: RolePermission[] = [
+  {
+    module: "Student Records",
+    permissions: { view: true, create: true, edit: true, delete: false },
+  },
+  {
+    module: "Examinations",
+    permissions: { view: true, create: true, edit: true, delete: true },
+  },
+  {
+    module: "Financials",
+    permissions: { view: false, create: false, edit: false, delete: false },
+  },
+  {
+    module: "HR & Staff",
+    permissions: { view: true, create: false, edit: false, delete: false },
+  },
+  {
+    module: "Communication",
+    permissions: { view: true, create: true, edit: true, delete: false },
+  },
+];
+
 export const PermissionsManager = () => {
   const [activeRole, setActiveRole] = useState("Teacher");
-  const [permissions] = useState<RolePermission[]>([
-    {
-      module: "Student Records",
-      permissions: { view: true, create: true, edit: true, delete: false },
-    },
-    {
-      module: "Examinations",
-      permissions: { view: true, create: true, edit: true, delete: true },
-    },
-    {
-      module: "Financials",
-      permissions: { view: false, create: false, edit: false, delete: false },
-    },
-    {
-      module: "HR & Staff",
-      permissions: { view: true, create: false, edit: false, delete: false },
-    },
-    {
-      module: "Communication",
-      permissions: { view: true, create: true, edit: true, delete: false },
-    },
-  ]);
+  const permissions = DEFAULT_PERMISSIONS;
 
   return (
     <div className="space-y-10 pb-20">

@@ -1,14 +1,12 @@
 import os
 
 import django
+from django_tenants.utils import schema_context
+from exams.models import Exam, GradingSystem
+from schools.models import School
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
-
-from django_tenants.utils import schema_context
-
-from exams.models import Exam, GradeThreshold, GradingSystem
-from schools.models import School
 
 
 def check_grading():

@@ -1,7 +1,6 @@
 from rest_framework import permissions, status, views
 from rest_framework.response import Response
 
-from .models import ScheduleSlot, Stream
 from .serializers import ScheduleSlotSerializer
 from .services_timetable import TimetableGenerator
 

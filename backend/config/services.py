@@ -224,6 +224,31 @@ class ServiceRegistry:
             cls._services[service_name]["last_updated"] = str(timezone.now())
 
 
+# Retry decorator for operations
+def retry_on_failure(max_retries=3, delay=1, backoff=2, exceptions=(Exception,)):
+    """Decorator to retry operations on failure"""
+
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            current_delay = delay
+            last_exception = None
+            for attempt in range(max_retries + 1):
+                try:
+                    return func(*args, **kwargs)
+                except exceptions as e:
+                    last_exception = e
+                    if attempt < max_retries:
+                        import time
+
+                        time.sleep(current_delay)
+                        current_delay *= backoff
+            raise last_exception
+
+        return wrapper
+
+    return decorator
+
+
 # Circuit breaker pattern for service resilience
 class CircuitBreaker:
     """Circuit breaker for service fault tolerance"""

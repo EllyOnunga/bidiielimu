@@ -2,18 +2,16 @@ import os
 import sys
 
 import django
-
-# Setup Django
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
-django.setup()
-
-from django_tenants.utils import schema_context
-
 from classes.models import Stream, Subject, SubjectAssignment
+from django_tenants.utils import schema_context
 from exams.models import Exam, GradingSystem
 from schools.models import School
 from students.models import Student
 from teachers.models import Teacher
+
+# Setup Django
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+django.setup()
 
 
 def audit_tenant(schema_name):
@@ -28,9 +26,8 @@ def audit_tenant(schema_name):
         teachers = Teacher.objects.all()
         teachers_no_user = teachers.filter(user__isnull=True)
         if teachers_no_user.exists():
-            issues.append(
-                f"CRITICAL: {teachers_no_user.count()} teachers have no linked User account."
-            )
+            issues.append(f"CRITICAL: {
+                    teachers_no_user.count()} teachers have no linked User account.")
             for t in teachers_no_user:
                 print(f"  - Teacher ID {t.id}: {t.first_name} {t.last_name}")
 
@@ -39,7 +36,8 @@ def audit_tenant(schema_name):
         students_no_stream = students.filter(stream__isnull=True)
         if students_no_stream.exists():
             issues.append(
-                f"WARNING: {students_no_stream.count()} students are not assigned to any stream."
+                f"WARNING: {
+                    students_no_stream.count()} students are not assigned to any stream."
             )
 
         # 3. Streams Check
@@ -47,7 +45,8 @@ def audit_tenant(schema_name):
         streams_no_teacher = streams.filter(teacher__isnull=True)
         if streams_no_teacher.exists():
             issues.append(
-                f"INFO: {streams_no_teacher.count()} streams have no class teacher assigned."
+                f"INFO: {
+                    streams_no_teacher.count()} streams have no class teacher assigned."
             )
 
         # 4. Subject Assignments Check
@@ -62,9 +61,8 @@ def audit_tenant(schema_name):
         exams = Exam.objects.all()
         exams_no_grading = exams.filter(grading_system__isnull=True)
         if exams_no_grading.exists():
-            issues.append(
-                f"WARNING: {exams_no_grading.count()} exams have no grading system linked."
-            )
+            issues.append(f"WARNING: {
+                    exams_no_grading.count()} exams have no grading system linked.")
             for e in exams_no_grading:
                 print(f"  - Exam: {e.name} ({e.academic_year})")
 

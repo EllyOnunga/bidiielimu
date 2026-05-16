@@ -1,32 +1,30 @@
 from datetime import datetime, timedelta
 
-from django.db.models import Avg, Count, Q, Sum
-from django.db.models.functions import TruncMonth
-from django.utils import timezone
-from rest_framework import permissions, status, viewsets
-from rest_framework.decorators import action
-from rest_framework.response import Response
-
 from accounts.models import User
 from attendance.models import DailyAttendance
 from classes.models import Stream
-from config.caching import cache_response, cache_tenant_page
+from config.caching import cache_response
+from config.tenant_security import (StrictTenantPermission,
+                                    TenantAwareViewSetMixin)
+from django.db.models import Avg, Count, Q, Sum
+from django.db.models.functions import TruncMonth
+from django.utils import timezone
 from exams.models import Mark
 from fees.models import FeePayment
+from rest_framework import permissions, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from students.models import Student
 from teachers.models import Teacher
 
 from .models import School, SchoolSetting, Subscription
-from .serializers import (
-    SchoolSerializer,
-    SchoolSettingSerializer,
-    SubscriptionSerializer,
-)
+from .serializers import (SchoolSerializer, SchoolSettingSerializer,
+                          SubscriptionSerializer)
 
 
-class SchoolViewSet(viewsets.ModelViewSet):
+class SchoolViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
     serializer_class = SchoolSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, StrictTenantPermission]
 
     def get_queryset(self):
         from django.db import connection
@@ -134,7 +132,6 @@ class SchoolViewSet(viewsets.ModelViewSet):
 
         # Library Stats (from InventoryItem with LIBRARY category)
         from django.db.models import F as DbF
-
         from inventory.models import InventoryItem
 
         library_qs = InventoryItem.objects.filter(category="LIBRARY")
@@ -165,10 +162,9 @@ class SchoolViewSet(viewsets.ModelViewSet):
     def _get_global_analytics(self):
         from datetime import datetime, timedelta
 
+        from attendance.models import DailyAttendance
         from django.db.models import Avg, Count, Q
         from django_tenants.utils import tenant_context
-
-        from attendance.models import DailyAttendance
         from exams.models import Mark
         from schools.models import School
         from students.models import Student
@@ -321,9 +317,10 @@ class SchoolViewSet(viewsets.ModelViewSet):
     def super_admin_stats(self, request):
         from django.db import connection
 
-        print(
-            f"DEBUG: super_admin_stats called by {request.user.email} (Role: {request.user.role_name}) on schema: {connection.schema_name}"
-        )
+        print(f"DEBUG: super_admin_stats called by {
+                request.user.email} (Role: {
+                request.user.role_name}) on schema: {
+                connection.schema_name}")
         if request.user.role_name != "SUPER_ADMIN":
             return Response({"detail": "Permission denied."}, status=403)
 
@@ -395,9 +392,9 @@ class SchoolViewSet(viewsets.ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class SubscriptionViewSet(viewsets.ModelViewSet):
+class SubscriptionViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
     serializer_class = SubscriptionSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, StrictTenantPermission]
 
     def get_queryset(self):
         from django.db import connection

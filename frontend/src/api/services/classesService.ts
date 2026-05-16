@@ -91,4 +91,33 @@ export const classesService = {
     const response = await client.delete(`classes/subject-assignments/${id}/`);
     return response.data;
   },
+  getScheduleSlots: async () => {
+    const response = await client.get("classes/schedule-slots/");
+    return response.data;
+  },
+
+  createScheduleSlot: async (data: any) => {
+    const response = await client.post("classes/schedule-slots/", data);
+    return response.data;
+  },
+
+  getStreams: async () => {
+    const response = await client.get("classes/streams/");
+    return response.data;
+  },
+
+  getClassrooms: async () => {
+    const response = await client.get("classes/classrooms/");
+    return response.data;
+  },
+
+  getStreamById: async (id: number | string) => {
+    const response = await client.get(`classes/streams/${id}/`);
+    return response.data;
+  },
+
+  getStreamsByGrade: async (gradeId: number | string) => {
+    const response = await client.get(`classes/streams/?grade=${gradeId}`);
+    return response.data;
+  },
 };

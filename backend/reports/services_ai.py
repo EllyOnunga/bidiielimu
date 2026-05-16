@@ -1,5 +1,4 @@
 from django.utils import timezone
-
 from exams.models import Mark
 
 from .models import StudentReport
@@ -23,13 +22,14 @@ class AIReportService:
         prompt = f"""
         Act as a professional educator. Write a balanced terminal report comment for {student.first_name}.
         Performance Summary: {performance_summary}.
-        Tone: Encouraging but honest. 
+        Tone: Encouraging but honest.
         Focus: Mention strong subjects and areas for improvement.
         Keep it under 100 words.
         """
 
         # 3. LLM API Call (Mocked for now)
-        # In production: response = openai.ChatCompletion.create(model="gpt-4", messages=[...])
+        # In production: response = openai.ChatCompletion.create(model="gpt-4",
+        # messages=[...])
 
         # Enhanced Simulation: Create a nuanced comment based on marks
         avg_score = sum([float(m.score) for m in marks]) / len(marks) if marks else 0
@@ -48,8 +48,12 @@ class AIReportService:
         )
 
         ai_draft = (
-            f"{student.first_name} has achieved an average of {avg_score:.1f}% this term{strength_text}."
-            f"{improvement_text} Overall, {student.first_name} is a {'diligent' if avg_score > 70 else 'capable'} student with potential for further growth."
+            f"{
+                student.first_name} has achieved an average of {
+                avg_score:.1f}% this term{strength_text}."
+            f"{improvement_text} Overall, {
+                student.first_name} is a {
+                    'diligent' if avg_score > 70 else 'capable'} student with potential for further growth."
         )
 
         # 4. Save Draft

@@ -1,5 +1,3 @@
-from django.db.models import Avg, Count, Sum
-
 from attendance.models import DailyAttendance
 from exams.models import ExamRanking, GradeThreshold, Mark
 from students.models import Student
@@ -94,7 +92,9 @@ class ReportCardService:
             "student": {
                 "name": student.full_name,
                 "admission_number": student.admission_number,
-                "class": f"{student.current_class.name} {student.stream.name if student.stream else ''}",
+                "class": f"{
+                    student.current_class.name} {
+                    student.stream.name if student.stream else ''}",
                 "photo": student.photo.url if student.photo else None,
             },
             "exam": {

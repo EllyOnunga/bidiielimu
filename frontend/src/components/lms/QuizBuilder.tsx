@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Plus, Trash2, CheckCircle2, Save, X, HelpCircle } from "lucide-react";
 import { Button } from "../ui/Button";
 import { Modal } from "../ui/Modal";
-import client from "../../api/client";
+import { lmsService } from "../../api/services/lmsService";
 import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import { classesService } from "../../api/services/classesService";
@@ -111,10 +111,10 @@ export const QuizBuilder = ({
     setIsSubmitting(true);
     try {
       if (initialData?.id) {
-        await client.patch(`lms/quizzes/${initialData.id}/`, formData);
+        await lmsService.updateQuiz(initialData.id, formData);
         toast.success("Assessment updated successfully");
       } else {
-        await client.post("lms/quizzes/", formData);
+        await lmsService.createQuiz(formData);
         toast.success("New assessment deployed successfully");
       }
       onSuccess();

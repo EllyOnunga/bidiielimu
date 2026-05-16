@@ -1,18 +1,16 @@
+import json
 import os
 
 import django
+from accounts.models import User
+from django_tenants.utils import schema_context
+from exams.views import MarkViewSet
+from rest_framework.test import APIRequestFactory, force_authenticate
+from students.views import StudentViewSet
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
-import json
-
-from django_tenants.utils import schema_context
-from rest_framework.test import APIRequestFactory, force_authenticate
-
-from accounts.models import User
-from exams.views import MarkViewSet
-from students.views import StudentViewSet
 
 factory = APIRequestFactory()
 

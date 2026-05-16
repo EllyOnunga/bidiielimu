@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { auditService } from "../api/services/auditService";
 import {
   ShieldAlert,
   User,
@@ -8,11 +10,17 @@ import {
   Filter,
   Database,
   Eye,
-  X as CloseIcon,
 } from "lucide-react";
 import { TableSkeleton } from "../components/ui/Skeleton";
-import { motion } from "framer-motion";
-import client from "../api/client";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from "../components/ui/Table";
+import { Modal } from "../components/ui/Modal";
 
 interface AuditLog {
   id: number;
@@ -34,14 +42,7 @@ const actionColors: Record<string, string> = {
 };
 
 export const AuditLogPage = () => {
-  const [logs, setLogs] = useState<AuditLog[]>([]);
   const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
-  const [stats, setStats] = useState({
-    total_actions_24h: 0,
-    sensitive_changes: 0,
-    active_admins: 0,
-  });
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
@@ -50,40 +51,38 @@ export const AuditLogPage = () => {
     return () => clearTimeout(timer);
   }, [search]);
 
-  const fetchLogs = async (searchQuery = "") => {
-    try {
-      setLoading(true);
-      const [logsRes, statsRes] = await Promise.all([
-        client.get("audit/logs/", { params: { search: searchQuery } }),
-        client.get("audit/logs/stats/"),
-      ]);
+  const { data: logsData, isLoading: loadingLogs } = useQuery({
+    queryKey: ["audit-logs", debouncedSearch],
+    queryFn: () => auditService.getLogs(debouncedSearch),
+  });
 
-      const logsData = Array.isArray(logsRes.data)
-        ? logsRes.data
-        : logsRes.data.results || [];
-      const mapped = logsData.map((log: any) => ({
-        id: log.id,
-        user_name: log.user_name || "System",
-        action: log.action,
-        model_name: log.model_name,
-        object_repr: log.object_repr,
-        timestamp: new Date(log.timestamp).toLocaleString(),
-        ip_address: log.ip_address || "N/A",
-        changes: log.changes,
-        color: actionColors[log.action] || "text-blue-400",
-      }));
-      setLogs(mapped);
-      setStats(statsRes.data);
-    } catch (error) {
-      console.error("Failed to fetch logs", error);
-    } finally {
-      setLoading(false);
-    }
+  const { data: statsData } = useQuery({
+    queryKey: ["audit-stats"],
+    queryFn: auditService.getStats,
+  });
+
+  const logs = useMemo(() => {
+    const data = Array.isArray(logsData) ? logsData : logsData?.results || [];
+    return data.map((log: any) => ({
+      id: log.id,
+      user_name: log.user_name || "System",
+      action: log.action,
+      model_name: log.model_name,
+      object_repr: log.object_repr,
+      timestamp: new Date(log.timestamp).toLocaleString(),
+      ip_address: log.ip_address || "N/A",
+      changes: log.changes,
+      color: actionColors[log.action] || "text-blue-400",
+    }));
+  }, [logsData]);
+
+  const stats = statsData || {
+    total_actions_24h: 0,
+    sensitive_changes: 0,
+    active_admins: 0,
   };
 
-  useEffect(() => {
-    fetchLogs(debouncedSearch);
-  }, [debouncedSearch]);
+  const loading = loadingLogs;
 
   return (
     <div className="space-y-6 md:space-y-8 pb-20">
@@ -93,11 +92,11 @@ export const AuditLogPage = () => {
             <ShieldAlert className="w-5 h-5 sm:w-6 sm:h-6 text-rose-400" />
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-primary tracking-tight">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-primary tracking-tight">
               Security <span className="text-gradient">Audit Logs</span>
             </h1>
-            <p className="text-muted text-xs sm:text-sm">
-              Complete history of system activities and changes.
+            <p className="text-muted text-xs sm:text-sm uppercase tracking-widest font-bold mt-1">
+              System Activity History
             </p>
           </div>
         </div>
@@ -107,7 +106,7 @@ export const AuditLogPage = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
         <AuditStat
           label="Total Actions (24h)"
           value={stats.total_actions_24h}
@@ -128,164 +127,170 @@ export const AuditLogPage = () => {
         />
       </div>
 
-      <div className="glass rounded-3xl border border-white/5 overflow-hidden">
+      <div className="glass rounded-[32px] sm:rounded-[40px] border border-white/5 overflow-hidden">
         <div className="p-4 md:p-6 border-b border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="relative w-full sm:w-96">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dim" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-dim" />
             <input
               placeholder="Search logs by user, model or action..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-xl text-primary text-sm outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-primary text-sm outline-none focus:ring-2 focus:ring-primary-500 transition-all"
             />
           </div>
-          <button className="flex items-center justify-center gap-2 px-4 py-2 bg-white/5 text-muted rounded-xl border border-white/10 hover:bg-white/10 transition-all text-sm w-full sm:w-auto">
+          <button className="flex items-center justify-center gap-2 px-6 py-3 bg-white/5 text-muted rounded-2xl border border-white/10 hover:bg-white/10 transition-all text-sm w-full sm:w-auto font-bold">
             <Filter className="w-4 h-4" />
             Advanced Filter
           </button>
         </div>
 
-        <div className="overflow-x-auto custom-scrollbar">
-          <table className="w-full text-left min-w-[900px]">
-            <thead>
-              <tr className="bg-white/5">
-                <th className="px-6 py-4 text-xs font-bold text-muted uppercase">
-                  Timestamp
-                </th>
-                <th className="px-6 py-4 text-xs font-bold text-muted uppercase">
-                  User
-                </th>
-                <th className="px-6 py-4 text-xs font-bold text-muted uppercase">
-                  Action
-                </th>
-                <th className="px-6 py-4 text-xs font-bold text-muted uppercase">
-                  Module
-                </th>
-                <th className="px-6 py-4 text-xs font-bold text-muted uppercase">
-                  Target Object
-                </th>
-                <th className="px-6 py-4 text-xs font-bold text-muted uppercase text-right">
-                  IP Address
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5">
+        <div className="relative">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-white/[0.02]">
+                <TableHead>Timestamp</TableHead>
+                <TableHead>User</TableHead>
+                <TableHead>Action</TableHead>
+                <TableHead>Module</TableHead>
+                <TableHead>Target Object</TableHead>
+                <TableHead className="text-right">IP Address</TableHead>
+                <TableHead className="text-center">Details</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {loading ? (
-                <TableSkeleton rows={8} cols={6} />
+                <TableSkeleton rows={8} cols={7} />
               ) : logs.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-muted">
-                    No logs found.
-                  </td>
-                </tr>
-              ) : (
-                logs.map((log, idx) => (
-                  <motion.tr
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.05 }}
-                    key={log.id}
-                    className="hover:bg-white/[0.02] transition-all group"
+                <TableRow>
+                  <TableCell
+                    colSpan={7}
+                    className="py-12 text-center text-muted font-bold tracking-widest uppercase text-xs"
                   >
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 text-xs text-muted">
-                        <Clock className="w-3 h-3" />
+                    No logs found.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                logs.map((log: any) => (
+                  <TableRow key={log.id} className="group">
+                    <TableCell>
+                      <div className="flex items-center gap-2 text-xs sm:text-sm text-muted whitespace-nowrap">
+                        <Clock className="w-3.5 h-3.5" />
                         {log.timestamp}
                       </div>
-                    </td>
-                    <td className="px-6 py-4 font-bold text-primary text-sm">
-                      {log.user_name}
-                    </td>
-                    <td className="px-6 py-4">
+                    </TableCell>
+                    <TableCell>
+                      <span className="font-bold text-primary text-xs sm:text-sm">
+                        {log.user_name}
+                      </span>
+                    </TableCell>
+                    <TableCell>
                       <span
-                        className={`text-[10px] font-black tracking-widest uppercase ${log.color}`}
+                        className={`text-[9px] sm:text-[10px] font-black tracking-widest uppercase ${log.color}`}
                       >
                         {log.action}
                       </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="px-2 py-1 bg-white/5 rounded-lg text-[10px] font-bold text-muted border border-white/10">
+                    </TableCell>
+                    <TableCell>
+                      <span className="px-2.5 py-1 bg-white/5 rounded-lg text-[9px] sm:text-[10px] font-bold text-muted border border-white/10 uppercase tracking-widest whitespace-nowrap">
                         {log.model_name}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-muted">
-                      {log.object_repr}
-                    </td>
-                    <td className="px-6 py-4 text-right font-mono text-[10px] text-dim">
-                      {log.ip_address}
-                    </td>
-                    <td className="px-6 py-4 text-right">
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-xs sm:text-sm text-muted line-clamp-1 max-w-[200px]">
+                        {log.object_repr}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <span className="font-mono text-[9px] sm:text-[10px] text-dim whitespace-nowrap">
+                        {log.ip_address}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-center">
                       <button
                         onClick={() => setSelectedLog(log)}
-                        className="p-2 hover:bg-white/10 rounded-lg text-muted hover:text-primary transition-all"
+                        className="p-2 hover:bg-white/10 rounded-xl text-muted hover:text-primary transition-all"
                         title="View Details"
                       >
-                        <Eye className="w-4 h-4" />
+                        <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
                       </button>
-                    </td>
-                  </motion.tr>
+                    </TableCell>
+                  </TableRow>
                 ))
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </div>
 
-      {/* Detail Modal */}
-      {selectedLog && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="glass w-full max-w-2xl rounded-3xl border border-white/10 overflow-hidden shadow-2xl"
-          >
-            <div className="p-6 border-b border-white/5 flex items-center justify-between">
-              <h3 className="text-xl font-bold text-primary">Log Details</h3>
-              <button
-                onClick={() => setSelectedLog(null)}
-                className="p-2 text-muted hover:text-primary transition-all"
-              >
-                <CloseIcon className="w-6 h-6" />
-              </button>
-            </div>
-            <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-[10px] font-bold text-muted uppercase tracking-widest">
-                    User
-                  </p>
-                  <p className="text-primary font-medium">
-                    {selectedLog.user_name}
-                  </p>
-                </div>
-                <div className="space-y-1 sm:text-right">
-                  <p className="text-[10px] font-bold text-muted uppercase tracking-widest">
-                    Timestamp
-                  </p>
-                  <p className="text-primary font-medium">
-                    {selectedLog.timestamp}
-                  </p>
-                </div>
-              </div>
-
-              <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
-                <p className="text-[10px] font-bold text-muted uppercase tracking-widest mb-2">
-                  Changes
+      <Modal
+        isOpen={selectedLog !== null}
+        onClose={() => setSelectedLog(null)}
+        title="Audit Log Entry"
+        description="Detailed record of system activity"
+        className="max-w-2xl"
+      >
+        {selectedLog && (
+          <div className="space-y-6 mt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-1">
+                <p className="text-[10px] font-black text-muted uppercase tracking-widest">
+                  Actor
                 </p>
-                {selectedLog.changes ? (
-                  <pre className="text-xs text-emerald-400 font-mono overflow-x-auto p-2 bg-black/30 rounded-lg">
+                <p className="text-primary font-bold text-sm sm:text-base">
+                  {selectedLog.user_name}
+                </p>
+              </div>
+              <div className="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-1">
+                <p className="text-[10px] font-black text-muted uppercase tracking-widest">
+                  Timestamp
+                </p>
+                <p className="text-primary font-bold text-sm sm:text-base">
+                  {selectedLog.timestamp}
+                </p>
+              </div>
+              <div className="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-1">
+                <p className="text-[10px] font-black text-muted uppercase tracking-widest">
+                  Action
+                </p>
+                <p
+                  className={`font-black text-sm sm:text-base uppercase tracking-widest ${selectedLog.color}`}
+                >
+                  {selectedLog.action}
+                </p>
+              </div>
+              <div className="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-1">
+                <p className="text-[10px] font-black text-muted uppercase tracking-widest">
+                  IP Source
+                </p>
+                <p className="text-primary font-mono text-xs sm:text-sm">
+                  {selectedLog.ip_address}
+                </p>
+              </div>
+            </div>
+
+            <div className="p-6 bg-white/5 rounded-3xl border border-white/5">
+              <p className="text-[10px] font-black text-primary-200/40 uppercase tracking-widest mb-3">
+                Payload Delta
+              </p>
+              {selectedLog.changes &&
+              Object.keys(selectedLog.changes).length > 0 ? (
+                <div className="bg-[#0A0F1A] p-4 rounded-2xl overflow-x-auto border border-white/5 custom-scrollbar">
+                  <pre className="text-[10px] sm:text-xs text-emerald-400 font-mono">
                     {JSON.stringify(selectedLog.changes, null, 2)}
                   </pre>
-                ) : (
-                  <p className="text-sm text-muted italic">
-                    No changes recorded for this action.
+                </div>
+              ) : (
+                <div className="bg-[#0A0F1A] p-4 rounded-2xl border border-white/5">
+                  <p className="text-xs text-muted font-mono italic">
+                    {/* No delta recorded */} No mutations detected for this
+                    event.
                   </p>
-                )}
-              </div>
+                </div>
+              )}
             </div>
-          </motion.div>
-        </div>
-      )}
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };

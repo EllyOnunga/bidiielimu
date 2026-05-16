@@ -1,11 +1,8 @@
-import asyncio
 import json
 
 from asgiref.sync import sync_to_async
-from channels.generic.websocket import (
-    AsyncJsonWebsocketConsumer,
-    AsyncWebsocketConsumer,
-)
+from channels.generic.websocket import (AsyncJsonWebsocketConsumer,
+                                        AsyncWebsocketConsumer)
 from django.utils import timezone
 
 
@@ -223,4 +220,3 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     def _save_message(self, message):
         """Save chat message to database (optional)"""
         # Could implement chat message storage here
-        pass

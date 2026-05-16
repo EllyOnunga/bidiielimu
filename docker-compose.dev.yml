@@ -20,6 +20,7 @@ services:
       - ./backend:/app       # live code reload in dev
     environment:
       DEBUG: "True"
+      TENANT_DOMAIN_SUFFIX: "localhost"
     ports:
       - "8000:8000"
 
@@ -51,4 +52,4 @@ services:
     ports:
       - "5173:5173"
     environment:
-      VITE_API_URL: "http://localhost:8000/api/v1/"
+      VITE_API_BASE: "http://localhost:8000"

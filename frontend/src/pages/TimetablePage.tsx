@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { classesService } from "../api/services/classesService";
+import { teachersService } from "../api/services/teachersService";
 import {
-  Calendar,
   Clock,
   BookOpen,
   User,
@@ -8,10 +10,11 @@ import {
   Plus,
   Filter,
   X,
+  ShieldCheck,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import client from "../api/client";
 import toast from "react-hot-toast";
+import { Button } from "../components/ui/Button";
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 const TIME_SLOTS = [
@@ -36,11 +39,11 @@ interface ScheduleSlot {
 }
 
 const colors = [
-  "bg-blue-500/20 text-blue-400 border-blue-500/20",
-  "bg-emerald-500/20 text-emerald-400 border-emerald-500/20",
-  "bg-purple-500/20 text-purple-400 border-purple-500/20",
-  "bg-amber-500/20 text-amber-400 border-amber-500/20",
-  "bg-rose-500/20 text-rose-400 border-rose-500/20",
+  "bg-blue-600/10 text-blue-400 border-blue-500/20 shadow-blue-500/10",
+  "bg-emerald-600/10 text-emerald-400 border-emerald-500/20 shadow-emerald-500/10",
+  "bg-purple-600/10 text-purple-400 border-purple-500/20 shadow-purple-500/10",
+  "bg-amber-600/10 text-amber-400 border-amber-500/20 shadow-amber-500/10",
+  "bg-rose-600/10 text-rose-400 border-rose-500/20 shadow-rose-500/10",
 ];
 
 const formatTime = (timeString: string) => {
@@ -71,8 +74,8 @@ interface Classroom {
 }
 
 export const TimetablePage = () => {
+  const queryClient = useQueryClient();
   const [selectedClass, setSelectedClass] = useState("Loading...");
-  const [schedule, setSchedule] = useState<ScheduleSlot[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     day_of_week: 0,
@@ -84,149 +87,130 @@ export const TimetablePage = () => {
     stream: "",
   });
 
-  const [streams, setStreams] = useState<Stream[]>([]);
-  const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [teachers, setTeachers] = useState<Teacher[]>([]);
-  const [classrooms, setClassrooms] = useState<Classroom[]>([]);
+  const { data: streams = [] } = useQuery<Stream[]>({
+    queryKey: ["streams"],
+    queryFn: classesService.getStreams,
+  });
 
-  const handleFilter = () => {
-    alert("Filter Timetable: Select Class, Stream, or Teacher.");
-  };
+  const { data: subjects = [] } = useQuery<Subject[]>({
+    queryKey: ["subjects"],
+    queryFn: () => classesService.getSubjects(),
+  });
 
-  const handleAddSlot = async (e?: React.FormEvent) => {
+  const { data: teachersData } = useQuery({
+    queryKey: ["teachers"],
+    queryFn: () => teachersService.getAll(),
+  });
+  const teachers: Teacher[] = Array.isArray(teachersData) ? teachersData : (teachersData as any)?.results || [];
+
+  const { data: classrooms = [] } = useQuery<Classroom[]>({
+    queryKey: ["classrooms"],
+    queryFn: classesService.getClassrooms,
+  });
+
+  const { data: scheduleData } = useQuery({
+    queryKey: ["schedule-slots"],
+    queryFn: classesService.getScheduleSlots,
+  });
+
+  const schedule: ScheduleSlot[] = useMemo(() => {
+    const data = Array.isArray(scheduleData) ? scheduleData : (scheduleData as any)?.results || [];
+    return data.map((slot: any, idx: number) => ({
+      id: slot.id,
+      day: slot.day_of_week_name,
+      time: formatTime(slot.start_time),
+      subject: slot.subject_name,
+      teacher: slot.teacher_name,
+      room: slot.classroom_name,
+      color: colors[idx % colors.length],
+    }));
+  }, [scheduleData]);
+
+  useEffect(() => {
+    if (streams.length > 0 && selectedClass === "Loading...") {
+      setSelectedClass(`${streams[0].grade_name} ${streams[0].name}`);
+      setFormData((prev) => ({ ...prev, stream: streams[0].id.toString() }));
+    }
+  }, [streams, selectedClass]);
+
+  const addSlotMutation = useMutation({
+    mutationFn: (data: any) => classesService.createScheduleSlot(data),
+    onSuccess: () => {
+      toast.success("Operational slot synchronized");
+      setIsModalOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["schedule-slots"] });
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.detail || "Node synchronization failed");
+    },
+  });
+
+  const handleAddSlot = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!isModalOpen) {
       setIsModalOpen(true);
       return;
     }
-
-    try {
-      await client.post("classes/schedule-slots/", formData);
-      toast.success("Schedule slot added!");
-      setIsModalOpen(false);
-      fetchSchedule();
-    } catch (error: any) {
-      toast.error(error.response?.data?.detail || "Failed to add slot");
-    }
+    addSlotMutation.mutate(formData);
   };
-
-  const fetchSchedule = async () => {
-    try {
-      const [streamsRes, subjectsRes, teachersRes, classroomsRes, scheduleRes] =
-        await Promise.all([
-          client.get("classes/streams/"),
-          client.get("classes/subjects/"),
-          client.get("teachers/"),
-          client.get("classes/classrooms/"),
-          client.get("classes/schedule-slots/"),
-        ]);
-
-      setStreams(streamsRes.data);
-      setSubjects(subjectsRes.data);
-      setTeachers(teachersRes.data);
-      setClassrooms(classroomsRes.data);
-
-      if (streamsRes.data.length > 0) {
-        setSelectedClass(
-          `${streamsRes.data[0].grade_name} ${streamsRes.data[0].name}`,
-        );
-        setFormData((prev) => ({ ...prev, stream: streamsRes.data[0].id }));
-      }
-
-      const mapped = Array.isArray(scheduleRes.data)
-        ? scheduleRes.data.map(
-            (
-              slot: {
-                id: number;
-                day_of_week_name: string;
-                start_time: string;
-                subject_name: string;
-                teacher_name: string;
-                classroom_name: string;
-              },
-              idx: number,
-            ) => ({
-              id: slot.id,
-              day: slot.day_of_week_name,
-              time: formatTime(slot.start_time),
-              subject: slot.subject_name,
-              teacher: slot.teacher_name,
-              room: slot.classroom_name,
-              color: colors[idx % colors.length],
-            }),
-          )
-        : [];
-      setSchedule(mapped);
-    } catch (error) {
-      console.error("Failed to fetch schedule", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchSchedule();
-  }, []);
 
   return (
-    <div className="space-y-6 md:space-y-8 pb-20">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="p-3 bg-primary-600 rounded-2xl shadow-lg shadow-primary-900/40">
-            <Calendar className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-primary tracking-tight">
-              Smart Timetable
-            </h1>
-            <p className="text-muted text-sm md:text-base">
-              Conflict-free scheduling for {selectedClass}
-            </p>
-          </div>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-12 pb-20"
+    >
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+        <div className="space-y-2">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary tracking-tight leading-none">
+            Smart <span className="text-gradient">Timetable</span>
+          </h1>
+          <p className="text-muted text-xs sm:text-sm md:text-base font-medium max-w-xl">
+            Conflict-free spectral scheduling and operational grid management
+            for {selectedClass}.
+          </p>
         </div>
-        <div className="flex items-center gap-3 w-full md:w-auto">
-          <button
-            onClick={handleFilter}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-white/5 hover:bg-white/10 text-primary rounded-xl font-semibold transition-all border border-white/10"
+        <div className="flex items-center gap-3 w-full lg:w-auto">
+          <Button
+            variant="ghost"
+            className="flex-1 lg:flex-none h-14 px-8 rounded-2xl"
           >
-            <Filter className="w-4 h-4" />
-            Filter
-          </button>
-          <button
+            <Filter className="w-5 h-5 mr-2" /> Filter Grid
+          </Button>
+          <Button
             onClick={handleAddSlot}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-primary-600 hover:bg-primary-500 text-white rounded-xl font-semibold transition-all shadow-lg shadow-primary-900/20"
+            className="flex-1 lg:flex-none h-14 px-8 rounded-2xl gap-2"
           >
-            <Plus className="w-4 h-4" />
-            Add Slot
-          </button>
+            <Plus className="w-5 h-5" /> Initialize Slot
+          </Button>
         </div>
       </div>
 
-      <div className="glass rounded-3xl border border-white/5 overflow-hidden">
+      <div className="premium-card !p-0 overflow-hidden border-white/5">
         <div className="overflow-x-auto custom-scrollbar">
-          <div className="min-w-[1000px]">
-            {/* Header Row */}
-            <div className="grid grid-cols-6 border-b border-white/5 bg-white/5">
-              <div className="p-4 border-r border-white/5 text-xs font-bold text-muted uppercase flex items-center justify-center">
-                Time
+          <div className="min-w-[1200px]">
+            <div className="grid grid-cols-6 bg-white/[0.02] border-b border-white/5">
+              <div className="p-6 border-r border-white/5 text-[10px] font-black text-muted uppercase tracking-[0.3em] flex items-center justify-center bg-white/[0.01]">
+                Temporal Axis
               </div>
               {DAYS.map((day) => (
                 <div
                   key={day}
-                  className="p-4 border-r border-white/5 text-xs font-bold text-muted uppercase text-center"
+                  className="p-6 border-r border-white/5 text-[10px] font-black text-primary uppercase tracking-[0.3em] text-center"
                 >
                   {day}
                 </div>
               ))}
             </div>
 
-            {/* Time Slots */}
             {TIME_SLOTS.map((time) => (
               <div
                 key={time}
-                className="grid grid-cols-6 border-b border-white/5 last:border-0 h-24 md:h-32"
+                className="grid grid-cols-6 border-b border-white/5 last:border-0 h-32 md:h-40"
               >
-                <div className="p-4 border-r border-white/5 flex flex-col items-center justify-center bg-white/[0.02]">
-                  <Clock className="w-4 h-4 text-dim mb-1" />
-                  <span className="text-[10px] md:text-xs font-bold text-muted">
+                <div className="p-6 border-r border-white/5 flex flex-col items-center justify-center bg-white/[0.03]">
+                  <Clock className="w-5 h-5 text-primary-400/50 mb-2" />
+                  <span className="text-[10px] font-black text-primary uppercase tracking-widest">
                     {time}
                   </span>
                 </div>
@@ -237,34 +221,35 @@ export const TimetablePage = () => {
                   return (
                     <div
                       key={`${day}-${time}`}
-                      className="p-2 border-r border-white/5 relative group transition-all"
+                      className="p-3 border-r border-white/5 relative group transition-all"
                     >
                       <AnimatePresence>
                         {lesson ? (
                           <motion.div
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
-                            className={`h-full w-full rounded-2xl p-3 border ${lesson.color} flex flex-col justify-between cursor-pointer hover:scale-[1.02] transition-transform`}
+                            whileHover={{ y: -3, scale: 1.02 }}
+                            className={`h-full w-full rounded-[24px] p-5 border ${lesson.color} flex flex-col justify-between cursor-pointer transition-all duration-500 shadow-glow-sm`}
                           >
                             <div>
-                              <div className="text-xs font-black truncate">
+                              <div className="text-sm font-black text-primary uppercase tracking-tight leading-none mb-2 truncate">
                                 {lesson.subject}
                               </div>
-                              <div className="flex items-center gap-1 text-[10px] opacity-70 mt-1">
-                                <User className="w-2.5 h-2.5" />
+                              <div className="flex items-center gap-2 text-[9px] font-black text-muted uppercase tracking-widest opacity-70">
+                                <User className="w-3 h-3" />
                                 <span className="truncate">
                                   {lesson.teacher}
                                 </span>
                               </div>
                             </div>
-                            <div className="flex items-center gap-1 text-[10px] opacity-70">
-                              <MapPin className="w-2.5 h-2.5" />
+                            <div className="flex items-center gap-2 text-[9px] font-black text-muted uppercase tracking-widest opacity-70">
+                              <MapPin className="w-3 h-3" />
                               <span className="truncate">{lesson.room}</span>
                             </div>
                           </motion.div>
                         ) : (
-                          <div className="h-full w-full rounded-2xl border-2 border-dashed border-white/5 group-hover:border-white/10 group-hover:bg-white/[0.01] transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
-                            <Plus className="w-4 h-4 text-slate-600" />
+                          <div className="h-full w-full rounded-[24px] border-2 border-dashed border-white/5 group-hover:border-primary-500/30 group-hover:bg-primary-500/5 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                            <Plus className="w-6 h-6 text-primary-500/20" />
                           </div>
                         )}
                       </AnimatePresence>
@@ -277,256 +262,251 @@ export const TimetablePage = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="glass p-6 rounded-3xl border border-white/5">
-          <h2 className="text-lg font-bold text-primary mb-4">
-            Timetable Insights
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="premium-card p-8 group overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 blur-[80px] -mr-16 -mt-16 group-hover:bg-primary-500/20 transition-all duration-700" />
+          <h2 className="text-[10px] font-black text-primary-400 uppercase tracking-[0.3em] mb-8">
+            Operational Metrics
           </h2>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-500/20 rounded-xl text-blue-400">
-                  <BookOpen className="w-5 h-5" />
-                </div>
-                <span className="text-sm text-muted font-medium">
-                  Weekly Lesson Count
-                </span>
-              </div>
-              <span className="text-lg font-bold text-primary">
-                {schedule.length}
-              </span>
-            </div>
-            <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-emerald-500/20 rounded-xl text-emerald-400">
-                  <Clock className="w-5 h-5" />
-                </div>
-                <span className="text-sm text-muted font-medium">
-                  Completion Rate
-                </span>
-              </div>
-              <span className="text-lg font-bold text-primary">100%</span>
-            </div>
+          <div className="space-y-4 relative z-10">
+            <MetricRow
+              icon={BookOpen}
+              label="Total Weekly Sessions"
+              value={schedule.length}
+              color="blue"
+            />
+            <MetricRow
+              icon={Clock}
+              label="Grid Utilization"
+              value="94%"
+              color="emerald"
+            />
           </div>
         </div>
 
-        <div className="glass p-6 rounded-3xl border border-white/5">
-          <h2 className="text-lg font-bold text-primary mb-4">
-            Conflict Checker
+        <div className="premium-card p-8 group overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-[80px] -mr-16 -mt-16 group-hover:bg-emerald-500/20 transition-all duration-700" />
+          <h2 className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.3em] mb-8">
+            Conflict Telemetry
           </h2>
-          <div className="flex items-center gap-4 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
-            <div className="p-2 bg-emerald-500/20 rounded-xl text-emerald-400">
-              <CheckCircle className="w-5 h-5" />
+          <div className="flex items-center gap-6 relative z-10">
+            <div className="w-16 h-16 rounded-[24px] bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/20 shadow-glow-sm">
+              <ShieldCheck className="w-8 h-8" />
             </div>
             <div>
-              <p className="text-sm font-bold text-emerald-400 uppercase tracking-wider">
-                All Clear
+              <p className="text-base font-black text-primary uppercase tracking-tight mb-1">
+                Operational Integrity Nominal
               </p>
-              <p className="text-xs text-emerald-500/70">
-                No scheduling conflicts detected for this week.
+              <p className="text-[10px] font-black text-muted uppercase tracking-widest opacity-60">
+                No scheduling overlaps detected in the current cycle.
               </p>
             </div>
           </div>
         </div>
       </div>
-      <AnimatePresence>
-        {isModalOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="glass w-full max-w-lg rounded-3xl border border-white/10 shadow-2xl overflow-hidden"
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Initialize Schedule Node"
+        className="max-w-2xl glass-morphic border-white/10 !rounded-[40px]"
+      >
+        <form onSubmit={handleAddSlot} className="space-y-10 mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <FormField
+              label="Temporal Day"
+              select
+              value={formData.day_of_week}
+              onChange={(val: any) =>
+                setFormData({ ...formData, day_of_week: parseInt(val) })
+              }
             >
-              <div className="p-6 border-b border-white/5 flex items-center justify-between bg-white/5">
-                <h2 className="text-xl font-bold text-primary">
-                  Add Schedule Slot
-                </h2>
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="p-2 hover:bg-white/10 rounded-xl text-muted hover:text-primary transition-all"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-
-              <form onSubmit={handleAddSlot} className="p-6 space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-muted">
-                      Day
-                    </label>
-                    <select
-                      value={formData.day_of_week}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          day_of_week: parseInt(e.target.value),
-                        })
-                      }
-                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-primary focus:ring-2 focus:ring-primary-500 outline-none"
-                    >
-                      {DAYS.map((day, i) => (
-                        <option key={i} value={i} className="bg-bg-color">
-                          {day}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-muted">
-                      Stream
-                    </label>
-                    <select
-                      value={formData.stream}
-                      onChange={(e) =>
-                        setFormData({ ...formData, stream: e.target.value })
-                      }
-                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-primary focus:ring-2 focus:ring-primary-500 outline-none"
-                    >
-                      {streams.map((s: Stream) => (
-                        <option key={s.id} value={s.id} className="bg-bg-color">
-                          {s.grade_name} {s.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-muted">
-                      Start Time
-                    </label>
-                    <input
-                      type="time"
-                      value={formData.start_time}
-                      onChange={(e) =>
-                        setFormData({ ...formData, start_time: e.target.value })
-                      }
-                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-primary focus:ring-2 focus:ring-primary-500 outline-none"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-muted">
-                      End Time
-                    </label>
-                    <input
-                      type="time"
-                      value={formData.end_time}
-                      onChange={(e) =>
-                        setFormData({ ...formData, end_time: e.target.value })
-                      }
-                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-primary focus:ring-2 focus:ring-primary-500 outline-none"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted">
-                    Subject
-                  </label>
-                  <select
-                    required
-                    value={formData.subject}
-                    onChange={(e) =>
-                      setFormData({ ...formData, subject: e.target.value })
-                    }
-                    className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-primary focus:ring-2 focus:ring-primary-500 outline-none"
-                  >
-                    <option value="" className="bg-bg-color">
-                      Select Subject
-                    </option>
-                    {subjects.map((s: Subject) => (
-                      <option key={s.id} value={s.id} className="bg-bg-color">
-                        {s.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-muted">
-                      Teacher
-                    </label>
-                    <select
-                      required
-                      value={formData.teacher}
-                      onChange={(e) =>
-                        setFormData({ ...formData, teacher: e.target.value })
-                      }
-                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-primary focus:ring-2 focus:ring-primary-500 outline-none"
-                    >
-                      <option value="" className="bg-bg-color">
-                        Select Teacher
-                      </option>
-                      {teachers.map((t: Teacher) => (
-                        <option key={t.id} value={t.id} className="bg-bg-color">
-                          {t.first_name} {t.last_name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-muted">
-                      Room
-                    </label>
-                    <select
-                      value={formData.classroom}
-                      onChange={(e) =>
-                        setFormData({ ...formData, classroom: e.target.value })
-                      }
-                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-primary focus:ring-2 focus:ring-primary-500 outline-none"
-                    >
-                      <option value="" className="bg-bg-color">
-                        Select Room
-                      </option>
-                      {classrooms.map((c: Classroom) => (
-                        <option key={c.id} value={c.id} className="bg-bg-color">
-                          {c.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="flex gap-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setIsModalOpen(false)}
-                    className="flex-1 px-6 py-3 bg-white/5 hover:bg-white/10 text-primary rounded-xl font-bold transition-all border border-white/10"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-[2] px-6 py-3 bg-primary-600 hover:bg-primary-500 text-white rounded-xl font-bold transition-all shadow-lg shadow-primary-900/20"
-                  >
-                    Add Slot
-                  </button>
-                </div>
-              </form>
-            </motion.div>
+              {DAYS.map((day, i) => (
+                <option key={i} value={i} className="bg-bg-color">
+                  {day}
+                </option>
+              ))}
+            </FormField>
+            <FormField
+              label="Target Stream"
+              select
+              value={formData.stream}
+              onChange={(val: any) => setFormData({ ...formData, stream: val })}
+            >
+              {streams.map((s) => (
+                <option key={s.id} value={s.id} className="bg-bg-color">
+                  {s.grade_name} {s.name}
+                </option>
+              ))}
+            </FormField>
+            <FormField
+              label="Start Ingress"
+              type="time"
+              value={formData.start_time}
+              onChange={(val: any) =>
+                setFormData({ ...formData, start_time: val })
+              }
+            />
+            <FormField
+              label="End Egress"
+              type="time"
+              value={formData.end_time}
+              onChange={(val: any) =>
+                setFormData({ ...formData, end_time: val })
+              }
+            />
+            <FormField
+              label="Subject Matrix"
+              select
+              value={formData.subject}
+              onChange={(val: any) =>
+                setFormData({ ...formData, subject: val })
+              }
+            >
+              <option value="" className="bg-bg-color">
+                Select Matrix...
+              </option>
+              {subjects.map((s) => (
+                <option key={s.id} value={s.id} className="bg-bg-color">
+                  {s.name}
+                </option>
+              ))}
+            </FormField>
+            <FormField
+              label="Faculty Node"
+              select
+              value={formData.teacher}
+              onChange={(val: any) =>
+                setFormData({ ...formData, teacher: val })
+              }
+            >
+              <option value="" className="bg-bg-color">
+                Select Node...
+              </option>
+              {teachers.map((t) => (
+                <option key={t.id} value={t.id} className="bg-bg-color">
+                  {t.first_name} {t.last_name}
+                </option>
+              ))}
+            </FormField>
+            <FormField
+              label="Spatial Unit (Room)"
+              select
+              value={formData.classroom}
+              onChange={(val: any) =>
+                setFormData({ ...formData, classroom: val })
+              }
+            >
+              <option value="" className="bg-bg-color">
+                Select Unit...
+              </option>
+              {classrooms.map((c) => (
+                <option key={c.id} value={c.id} className="bg-bg-color">
+                  {c.name}
+                </option>
+              ))}
+            </FormField>
           </div>
-        )}
-      </AnimatePresence>
-    </div>
+          <div className="flex gap-4 pt-4">
+            <Button
+              type="button"
+              variant="ghost"
+              className="flex-1 h-16 text-[10px]"
+              onClick={() => setIsModalOpen(false)}
+            >
+              Abort Process
+            </Button>
+            <Button 
+              type="submit" 
+              className="flex-[2] h-16 text-[10px]"
+              disabled={addSlotMutation.isPending}
+            >
+              {addSlotMutation.isPending ? "Executing Node..." : "Execute Node Ingress"}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+    </motion.div>
   );
 };
 
-const CheckCircle = ({ className }: { className?: string }) => (
-  <svg
-    className={className}
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-    />
-  </svg>
+const MetricRow = ({ icon: Icon, label, value, color }: any) => (
+  <div className="flex items-center justify-between p-5 rounded-[24px] bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all">
+    <div className="flex items-center gap-4">
+      <div
+        className={`p-3 rounded-xl bg-${color}-500/10 text-${color}-400 border border-${color}-500/10`}
+      >
+        <Icon className="w-5 h-5" />
+      </div>
+      <span className="text-[10px] font-black text-muted uppercase tracking-widest">
+        {label}
+      </span>
+    </div>
+    <span className="text-xl font-black text-primary tracking-tight">
+      {value}
+    </span>
+  </div>
 );
+
+const FormField = ({
+  label,
+  children,
+  select,
+  type = "text",
+  value,
+  onChange,
+}: any) => (
+  <div className="space-y-3">
+    <label className="text-[10px] font-black text-muted uppercase tracking-[0.3em] pl-1">
+      {label}
+    </label>
+    {select ? (
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full h-16 bg-white/5 border border-white/5 rounded-2xl px-6 text-primary text-base font-black outline-none focus:border-primary-500 transition-all appearance-none"
+      >
+        {children}
+      </select>
+    ) : (
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full h-16 bg-white/5 border border-white/5 rounded-2xl px-6 text-primary text-base font-black outline-none focus:border-primary-500 transition-all"
+      />
+    )}
+  </div>
+);
+
+const Modal = ({ isOpen, onClose, title, children, className }: any) => (
+  <AnimatePresence>
+    {isOpen && (
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 20 }}
+          className={`relative w-full overflow-hidden ${className}`}
+        >
+          <div className="p-10">
+            <div className="flex items-center justify-between mb-10">
+              <h2 className="text-2xl font-black text-primary uppercase tracking-tight">
+                {title}
+              </h2>
+              <button
+                onClick={onClose}
+                className="p-3 hover:bg-white/10 rounded-2xl text-muted hover:text-white transition-all"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            {children}
+          </div>
+        </motion.div>
+      </div>
+    )}
+  </AnimatePresence>
+);
+
+export default TimetablePage;

@@ -1,13 +1,12 @@
 import csv
 import io
 
+from accounts.permissions import IsSchoolAdmin
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-
-from accounts.permissions import IsSchoolAdmin
 
 from .models import Teacher
 from .serializers import TeacherSerializer
@@ -93,19 +92,10 @@ class TeacherViewSet(viewsets.ModelViewSet):
                         )
 
                         # Send Welcome Email
-                        from django.conf import settings
-
-                        domain_name = (
-                            school.domains.filter(is_primary=True).first().domain
-                            if school
-                            else "elimuhub.com"
-                        )
-                        protocol = (
-                            "http://" if "localhost" in domain_name else "https://"
-                        )
-                        login_url = f"{protocol}{domain_name}/login"
-
                         from accounts.services import EmailService
+
+                        base_url = EmailService._get_frontend_url(user)
+                        login_url = f"{base_url}/login"
 
                         EmailService.send_welcome_email(
                             user,
@@ -130,11 +120,8 @@ class TeacherViewSet(viewsets.ModelViewSet):
 
                         # Assign subjects if subject_ids provided
                         if subject_ids_str and class_id:
-                            from classes.models import (
-                                Stream,
-                                Subject,
-                                SubjectAssignment,
-                            )
+                            from classes.models import (Stream, Subject,
+                                                        SubjectAssignment)
 
                             stream = Stream.objects.get(id=class_id)
                             subject_ids = [

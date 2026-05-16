@@ -1,14 +1,13 @@
 import os
 
 import django
+from accounts.models import User
+from django_tenants.utils import schema_context
+from teachers.models import Teacher
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
-from django_tenants.utils import schema_context
-
-from accounts.models import User
-from teachers.models import Teacher
 
 with schema_context("makini_school"):
     print(f"--- Schema: makini_school ---")
@@ -22,6 +21,7 @@ with schema_context("makini_school"):
     t = Teacher.objects.all()
     print(f"Total Teachers: {t.count()}")
     for teacher in t:
-        print(
-            f"Teacher: {teacher.first_name} {teacher.last_name}, User: {teacher.user.email if teacher.user else 'No User'}"
-        )
+        print(f"Teacher: {
+                teacher.first_name} {
+                teacher.last_name}, User: {
+                teacher.user.email if teacher.user else 'No User'}")

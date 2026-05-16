@@ -2,10 +2,6 @@
 Django settings for CI/CD environment.
 """
 
-import os
-
-from .settings import *
-
 # CI/CD specific settings
 DEBUG = False
 SECRET_KEY = "ci-secret-key-for-testing-only"

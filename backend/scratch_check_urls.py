@@ -1,8 +1,7 @@
 import os
 
 import django
-from django.test import RequestFactory
-from django.urls import get_resolver, resolve
+from django.urls import resolve
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()

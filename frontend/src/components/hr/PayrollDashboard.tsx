@@ -18,24 +18,18 @@ import {
 } from "lucide-react";
 
 import { useQuery } from "@tanstack/react-query";
-import client from "../../api/client";
+import { hrService } from "../../api/services/hrService";
 import { Skeleton } from "../ui/Skeleton";
 
 export const PayrollDashboard = () => {
   const { data: stats, isLoading: loadingStats } = useQuery({
     queryKey: ["payroll-stats"],
-    queryFn: async () => {
-      const res = await client.get("hr/payroll-records/stats/");
-      return res.data;
-    },
+    queryFn: () => hrService.getPayrollStats(),
   });
 
   const { data: recentLeave = [], isLoading: loadingLeave } = useQuery({
     queryKey: ["recent-leave"],
-    queryFn: async () => {
-      const res = await client.get("hr/leave-requests/recent/");
-      return res.data;
-    },
+    queryFn: () => hrService.getRecentLeaveRequests(),
   });
 
   if (loadingStats || loadingLeave) {

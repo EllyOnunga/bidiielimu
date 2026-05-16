@@ -1,15 +1,12 @@
 from datetime import timedelta
 
-from rest_framework import permissions, status, viewsets
+from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from .models import LeaveRequest, PayrollRecord, StaffProfile
-from .serializers import (
-    LeaveRequestSerializer,
-    PayrollRecordSerializer,
-    StaffProfileSerializer,
-)
+from .serializers import (LeaveRequestSerializer, PayrollRecordSerializer,
+                          StaffProfileSerializer)
 
 
 class StaffProfileViewSet(viewsets.ModelViewSet):
@@ -35,7 +32,7 @@ class PayrollRecordViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def stats(self, request):
-        from django.db.models import Count, Sum
+        from django.db.models import Sum
         from django.utils import timezone
 
         now = timezone.now()

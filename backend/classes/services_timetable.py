@@ -1,16 +1,10 @@
-from datetime import datetime, time, timedelta
+from datetime import datetime, timedelta
 
 from django.core.exceptions import ValidationError
+from teachers.models import TeacherAvailability
 
-from teachers.models import Teacher, TeacherAvailability
-
-from .models import (
-    Classroom,
-    CurriculumRequirement,
-    ScheduleSlot,
-    Stream,
-    SubjectAssignment,
-)
+from .models import (Classroom, CurriculumRequirement, ScheduleSlot, Stream,
+                     SubjectAssignment)
 
 
 class TimetableGenerator:

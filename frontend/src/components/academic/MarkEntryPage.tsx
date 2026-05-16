@@ -11,7 +11,9 @@ import {
   Download,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import client from "../../api/client";
+import { examsService } from "../../api/services/examsService";
+import { classesService } from "../../api/services/classesService";
+import { studentsService } from "../../api/services/studentsService";
 
 interface StudentMark {
   id: string;
@@ -51,16 +53,16 @@ export const MarkEntryPage = () => {
     queryKey: ["mark-entry-init"],
     queryFn: async () => {
       const [examsRes, assignmentsRes] = await Promise.all([
-        client.get("exams/exams/"),
-        client.get("classes/subject-assignments/"),
+        examsService.getExams(),
+        classesService.getAssignments(),
       ]);
       return {
-        exams: Array.isArray(examsRes.data)
-          ? examsRes.data
-          : examsRes.data.results || [],
-        assignments: Array.isArray(assignmentsRes.data)
-          ? assignmentsRes.data
-          : assignmentsRes.data.results || [],
+        exams: Array.isArray(examsRes)
+          ? examsRes
+          : examsRes.results || [],
+        assignments: Array.isArray(assignmentsRes)
+          ? assignmentsRes
+          : assignmentsRes.results || [],
       };
     },
   });
@@ -72,18 +74,16 @@ export const MarkEntryPage = () => {
       if (!selectedExam || !selectedSubject || !selectedStream) return [];
 
       const [studentsRes, marksRes] = await Promise.all([
-        client.get(`/students/?stream=${selectedStream}`),
-        client.get(
-          `exams/marks/?exam=${selectedExam}&subject=${selectedSubject}`,
-        ),
+        studentsService.getAll({ stream: selectedStream }),
+        examsService.getMarks(selectedExam, selectedSubject),
       ]);
 
-      const studentsData = Array.isArray(studentsRes.data)
-        ? studentsRes.data
-        : studentsRes.data.results || [];
-      const existingMarks = Array.isArray(marksRes.data)
-        ? marksRes.data
-        : marksRes.data.results || [];
+      const studentsData = Array.isArray(studentsRes)
+        ? studentsRes
+        : studentsRes.results || [];
+      const existingMarks = Array.isArray(marksRes)
+        ? marksRes
+        : marksRes.results || [];
 
       return studentsData.map((s: any) => {
         const mark = existingMarks.find((m: any) => m.student === s.id);
@@ -108,7 +108,7 @@ export const MarkEntryPage = () => {
   // 3. Save Mutation (Optimistic UI)
   const saveMutation = useMutation({
     mutationFn: async (marksToSave: StudentMark[]) => {
-      await client.post("exams/marks/bulk_save/", {
+      await examsService.saveMarks({
         exam: selectedExam,
         subject: selectedSubject,
         marks: marksToSave.map((m: StudentMark) => ({
@@ -423,7 +423,16 @@ export const MarkEntryPage = () => {
           <div>
             <p className="text-primary font-bold text-sm">Batch Summary</p>
             <p className="text-muted text-xs">
-              {filteredMarks.length} students loaded. Average: 85.7%
+              {filteredMarks.length} students loaded. Average:{" "}
+              {filteredMarks.length > 0
+                ? (
+                    filteredMarks.reduce(
+                      (acc, m) => acc + (Number(m.score) || 0),
+                      0,
+                    ) / filteredMarks.length
+                  ).toFixed(1)
+                : "0.0"}
+              %
             </p>
           </div>
         </div>

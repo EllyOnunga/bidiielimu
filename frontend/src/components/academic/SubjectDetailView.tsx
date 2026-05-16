@@ -20,22 +20,8 @@ import {
   Download,
 } from "lucide-react";
 
-const mockTrendData = [
-  { term: "Term 1 2023", avg: 68 },
-  { term: "Term 2 2023", avg: 72 },
-  { term: "Term 3 2023", avg: 75 },
-  { term: "Term 1 2024", avg: 71 },
-  { term: "Term 2 2024", avg: 82 },
-];
-
-const mockDistribution = [
-  { grade: "A", count: 12 },
-  { grade: "A-", count: 18 },
-  { grade: "B+", count: 25 },
-  { grade: "B", count: 22 },
-  { grade: "B-", count: 15 },
-  { grade: "C+", count: 8 },
-];
+const mockTrendData: any[] = []; // TODO: Replace with real performance trends API
+const mockDistribution: any[] = []; // TODO: Replace with real grade distribution API
 
 export const SubjectDetailView = () => {
   return (

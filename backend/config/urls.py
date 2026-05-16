@@ -15,24 +15,16 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from config.views_health import (HealthCheckView, LivenessCheckView,
+                                 MetricsView, ReadinessCheckView)
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import include, path
-from drf_spectacular.views import (
-    SpectacularAPIView,
-    SpectacularRedocView,
-    SpectacularSwaggerView,
-)
+from drf_spectacular.views import (SpectacularAPIView, SpectacularRedocView,
+                                   SpectacularSwaggerView)
 from graphene_django.views import GraphQLView
-
-from config.views_health import (
-    HealthCheckView,
-    LivenessCheckView,
-    MetricsView,
-    ReadinessCheckView,
-)
 from schools.views_theme import TenantThemeView
 
 
@@ -67,6 +59,7 @@ urlpatterns = [
     path("api/v1/hr/", include("hr.urls")),
     path("api/v1/inventory/", include("inventory.urls")),
     path("api/v1/lms/", include("lms.urls")),
+    path("api/v1/support/", include("support.urls")),
     # Auth endpoints
     path("api/v1/auth/registration/", include("dj_rest_auth.registration.urls")),
     path("api/v1/auth/social/", include("allauth.socialaccount.urls")),

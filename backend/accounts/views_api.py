@@ -1,5 +1,4 @@
-from django.utils import timezone
-from rest_framework import permissions, status, viewsets
+from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -43,7 +42,8 @@ class APIKeyViewSet(viewsets.ModelViewSet):
         api_key.save()
         return Response(
             {
-                "message": f'API key {"activated" if api_key.is_active else "deactivated"}',
+                "message": f'API key {
+                    "activated" if api_key.is_active else "deactivated"}',
                 "is_active": api_key.is_active,
             }
         )

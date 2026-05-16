@@ -1,22 +1,20 @@
+from config.caching import cache_tenant_page
+from config.tenant_security import (StrictTenantPermission,
+                                    TenantAwareViewSetMixin)
+from django.db import transaction
 from django.db.models import Avg
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from config.caching import cache_tenant_page
-
 from .models import Exam, GradeThreshold, GradingSystem, Mark
-from .serializers import (
-    ExamSerializer,
-    GradeThresholdSerializer,
-    GradingSystemSerializer,
-    MarkSerializer,
-)
+from .serializers import (ExamSerializer, GradeThresholdSerializer,
+                          GradingSystemSerializer, MarkSerializer)
 
 
-class GradingSystemViewSet(viewsets.ModelViewSet):
+class GradingSystemViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
     serializer_class = GradingSystemSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, StrictTenantPermission]
 
     def get_queryset(self):
         return GradingSystem.objects.all()
@@ -25,17 +23,17 @@ class GradingSystemViewSet(viewsets.ModelViewSet):
         serializer.save()
 
 
-class GradeThresholdViewSet(viewsets.ModelViewSet):
+class GradeThresholdViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
     serializer_class = GradeThresholdSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, StrictTenantPermission]
 
     def get_queryset(self):
         return GradeThreshold.objects.all()
 
 
-class ExamViewSet(viewsets.ModelViewSet):
+class ExamViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
     serializer_class = ExamSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, StrictTenantPermission]
     search_fields = ["name", "term", "academic_year"]
 
     def get_queryset(self):
@@ -79,16 +77,14 @@ class ExamViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def compute_ranks(self, request, pk=None):
-        from .services_ranking import RankingService
+        from .tasks import compute_ranks_task
 
-        try:
-            count = RankingService.compute_exam_ranks(pk)
-            return Response(
-                {"detail": f"Successfully computed ranks for {count} students."},
-                status=status.HTTP_200_OK,
-            )
-        except Exception as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        # Dispatch to Celery background task
+        compute_ranks_task.delay(pk)
+        return Response(
+            {"detail": "Ranking computation started in background."},
+            status=status.HTTP_202_ACCEPTED,
+        )
 
     @action(detail=True, methods=["get"])
     def export_mark_sheet(self, request, pk=None):
@@ -104,9 +100,9 @@ class ExamViewSet(viewsets.ModelViewSet):
         return response
 
 
-class MarkViewSet(viewsets.ModelViewSet):
+class MarkViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
     serializer_class = MarkSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, StrictTenantPermission]
     search_fields = [
         "student__first_name",
         "student__last_name",
@@ -140,7 +136,7 @@ class MarkViewSet(viewsets.ModelViewSet):
     def bulk_save(self, request):
         exam_id = request.data.get("exam")
         subject_id = request.data.get("subject")
-        marks_data = request.data.get("marks", [])  # List of {student_id, score}
+        marks_data = request.data.get("marks", [])
 
         if not exam_id or not subject_id:
             return Response(
@@ -154,32 +150,42 @@ class MarkViewSet(viewsets.ModelViewSet):
         subject = Subject.objects.get(id=subject_id)
 
         saved_marks = []
-        for entry in marks_data:
-            student_id = entry.get("student_id")
-            score = entry.get("score")
+        with transaction.atomic():
+            for entry in marks_data:
+                student_id = entry.get("student_id")
+                score = entry.get("score")
 
-            try:
-                score_val = float(score)
-                if score_val < 0 or score_val > 100:
+                try:
+                    score_val = float(score)
+                    if score_val < 0 or score_val > 100:
+                        raise ValueError(f"Invalid score {score}")
+                except (TypeError, ValueError):
                     return Response(
-                        {
-                            "detail": f"Invalid score {score}. Must be between 0 and 100."
-                        },
+                        {"detail": f"Invalid score format for student {student_id}."},
                         status=status.HTTP_400_BAD_REQUEST,
                     )
-            except (TypeError, ValueError):
-                return Response(
-                    {"detail": f"Invalid score format for student {student_id}."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
 
-            mark, created = Mark.objects.update_or_create(
-                exam=exam,
-                subject=subject,
-                student_id=student_id,
-                defaults={"score": score_val},
-            )
-            saved_marks.append(mark.id)
+                mark, created = Mark.objects.update_or_create(
+                    exam=exam,
+                    subject=subject,
+                    student_id=student_id,
+                    defaults={"score": score_val},
+                )
+                saved_marks.append(mark.id)
+
+                # Simple audit log
+                from django.contrib.admin.models import (ADDITION, CHANGE,
+                                                         LogEntry)
+                from django.contrib.contenttypes.models import ContentType
+
+                LogEntry.objects.log_action(
+                    user_id=request.user.id,
+                    content_type_id=ContentType.objects.get_for_model(Mark).pk,
+                    object_id=mark.id,
+                    object_repr=str(mark),
+                    action_flag=CHANGE if not created else ADDITION,
+                    change_message=f"Bulk mark save - score: {score_val}",
+                )
 
         return Response(
             {
@@ -203,7 +209,8 @@ class MarkViewSet(viewsets.ModelViewSet):
         # 1. Grade Distribution
         from django.db.models import Count
 
-        # This assumes we have a way to map scores to grades. For simplicity, we'll return raw counts in ranges.
+        # This assumes we have a way to map scores to grades. For simplicity,
+        # we'll return raw counts in ranges.
         distribution = (
             Mark.objects.filter(exam_id=exam_id, subject_id=subject_id)
             .values("score")

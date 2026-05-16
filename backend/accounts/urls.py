@@ -1,22 +1,13 @@
+from django.http import JsonResponse
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from .views import (
-    GDPRDeleteView,
-    GDPRExportView,
-    MyTokenObtainPairView,
-    RegisterView,
-    ResendVerificationView,
-    UserDetailView,
-    VerifyEmailView,
-)
+from .views import (GDPRDeleteView, GDPRExportView, MyTokenObtainPairView,
+                    RegisterView, ResendVerificationView, UserDetailView,
+                    UserSchoolsView, VerifyEmailView)
 from .views_api import APIKeyViewSet
-from .views_otp import (
-    OTPTriggerView,
-    OTPVerifyLoginView,
-    SMSOTPSetupView,
-    SMSOTPVerifySetupView,
-)
+from .views_otp import (OTPTriggerView, OTPVerifyLoginView, SMSOTPSetupView,
+                        SMSOTPVerifySetupView)
 from .views_social import GitHubLogin, GoogleLogin, MicrosoftLogin
 
 urlpatterns = [
@@ -59,4 +50,11 @@ urlpatterns = [
     path("otp/verify-setup/", SMSOTPVerifySetupView.as_view(), name="otp_verify_setup"),
     path("otp/verify-login/", OTPVerifyLoginView.as_view(), name="otp_verify_login"),
     path("otp/trigger/", OTPTriggerView.as_view(), name="otp_trigger"),
+    path("schools/", UserSchoolsView.as_view(), name="user_schools"),
+    # Password Reset Confirm (referenced by dj-rest-auth)
+    path(
+        "password/reset/confirm/<str:uidb64>/<str:token>/",
+        lambda r, **kwargs: JsonResponse({"detail": "Reset link valid"}, status=200),
+        name="password_reset_confirm",
+    ),
 ]

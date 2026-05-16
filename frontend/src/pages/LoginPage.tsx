@@ -13,7 +13,6 @@ import {
 import { PasswordInput } from "../components/ui/PasswordInput";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
-import client from "../api/client";
 import { authService } from "../api/services/authService";
 import { useAuthStore } from "../store/authStore";
 import { mobileService } from "../services/mobileService";
@@ -73,10 +72,10 @@ export const LoginPage = () => {
   const handleGoogleLogin = async (response: any) => {
     setIsLoading(true);
     try {
-      const res = await client.post("accounts/google/", {
+      const res = await authService.googleLogin({
         access_token: response.credential,
       });
-      const { access, refresh, user } = res.data;
+      const { access, refresh, user } = res;
       setAuth(user, access, refresh);
       toast.success(`Welcome, ${user.first_name}!`);
       navigate(
@@ -315,6 +314,7 @@ export const LoginPage = () => {
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted transition-colors group-focus-within:text-primary-400" />
                     <input
                       type="email"
+                      inputMode="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="name@school.com"
@@ -416,6 +416,8 @@ export const LoginPage = () => {
                 <div className="space-y-4">
                   <input
                     type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     value={otp}
                     onChange={(e) =>
                       setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
@@ -459,11 +461,10 @@ export const LoginPage = () => {
                         key={m}
                         type="button"
                         onClick={() => handleResendOTP(m)}
-                        className={`flex items-center justify-center gap-2 py-2.5 px-2 rounded-xl text-[10px] font-bold transition-all border ${
-                          activeMethod === m
+                        className={`flex items-center justify-center gap-2 py-2.5 px-2 rounded-xl text-[10px] font-bold transition-all border ${activeMethod === m
                             ? "bg-primary-500/20 border-primary-500/30 text-primary-400"
                             : "bg-white/5 border-white/5 text-muted hover:bg-white/10"
-                        }`}
+                          }`}
                       >
                         {m === "SMS" ? (
                           <Smartphone className="w-3 h-3" />

@@ -7,11 +7,12 @@ import {
   Trash2,
   Plus,
   BookOpen,
-  X,
   Settings,
   UserPlus,
   Filter,
   UploadCloud,
+  ShieldCheck,
+  ShieldAlert,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { teachersService, type Teacher } from "../api/services/teachersService";
@@ -70,22 +71,13 @@ export const TeachersPage = () => {
   const createTeacherMutation = useMutation({
     mutationFn: (data: any) => teachersService.create(data),
     onSuccess: () => {
-      toast.success("Teacher registered successfully!");
+      toast.success("Faculty induction successful");
       setIsModalOpen(false);
-      setFormData({
-        employee_id: "",
-        first_name: "",
-        last_name: "",
-        phone_number: "",
-        specialization: "",
-        joining_date: new Date().toISOString().split("T")[0],
-        email: "",
-        password: "",
-      });
+      resetForm();
       queryClient.invalidateQueries({ queryKey: ["teachers"] });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.detail || "Failed to register teacher");
+      toast.error(error.response?.data?.detail || "Induction failed");
     },
   });
 
@@ -93,25 +85,25 @@ export const TeachersPage = () => {
     mutationFn: ({ id, data }: { id: number; data: any }) =>
       teachersService.update(id, data),
     onSuccess: () => {
-      toast.success("Teacher updated successfully!");
+      toast.success("Identity records synchronized");
       setIsModalOpen(false);
       setEditingTeacher(null);
       resetForm();
       queryClient.invalidateQueries({ queryKey: ["teachers"] });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.detail || "Failed to update teacher");
+      toast.error(error.response?.data?.detail || "Synchronization failed");
     },
   });
 
   const deleteTeacherMutation = useMutation({
     mutationFn: (id: number) => teachersService.delete(id),
     onSuccess: () => {
-      toast.success("Teacher deleted successfully");
+      toast.success("Faculty record purged");
       queryClient.invalidateQueries({ queryKey: ["teachers"] });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.detail || "Failed to delete teacher");
+      toast.error(error.response?.data?.detail || "Purge protocol failed");
     },
   });
 
@@ -167,7 +159,7 @@ export const TeachersPage = () => {
 
   const handleBulkUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!csvFile) return toast.error("Please select a CSV file first.");
+    if (!csvFile) return toast.error("Select protocol file first.");
 
     const formDataObj = new FormData();
     formDataObj.append("file", csvFile);
@@ -180,9 +172,7 @@ export const TeachersPage = () => {
       setCsvFile(null);
       queryClient.invalidateQueries({ queryKey: ["teachers"] });
     } catch (error: any) {
-      toast.error(
-        error.response?.data?.detail || "Failed to bulk upload teachers",
-      );
+      toast.error(error.response?.data?.detail || "Mass induction failure");
     } finally {
       setIsUploading(false);
     }
@@ -190,174 +180,205 @@ export const TeachersPage = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-10 pb-12"
+      className="space-y-12 pb-20"
     >
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
-        <div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-primary tracking-tight mb-2">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+        <div className="space-y-2">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary tracking-tight leading-none">
             Faculty <span className="text-gradient">Network</span>
           </h1>
-          <p className="text-muted text-xs sm:text-sm md:text-base font-medium">
-            Coordinate educators and cross-functional assignments.
+          <p className="text-muted text-xs sm:text-sm md:text-base font-medium max-w-xl">
+            Coordinate elite educators and manage multi-functional academic
+            assignments.
           </p>
         </div>
-        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
           <Button
-            variant="secondary"
+            variant="ghost"
             onClick={() => setIsBulkModalOpen(true)}
-            className="gap-2 rounded-2xl h-12 px-6 font-black uppercase tracking-widest text-xs"
+            className="gap-2 h-14 px-8 rounded-2xl"
           >
-            <UploadCloud className="w-4 h-4" /> Import CSV
+            <UploadCloud className="w-5 h-5" /> Import Matrix
           </Button>
           <Button
             onClick={handleAddTeacher}
-            className="gap-2 rounded-2xl h-12 px-6 font-black uppercase tracking-widest text-xs shadow-premium"
+            className="gap-2 h-14 px-8 rounded-2xl"
           >
             <UserPlus className="w-5 h-5" />
-            Register Teacher
+            Induct Faculty
           </Button>
         </div>
       </div>
 
-      <div className="glass rounded-[40px] overflow-hidden border-white/5">
-        <div className="p-6 md:p-8 border-b border-white/5 flex flex-col md:flex-row gap-6 items-center justify-between">
+      <div className="premium-card !p-0 overflow-hidden border-white/5">
+        <div className="p-6 sm:p-8 border-b border-white/5 flex flex-col md:flex-row gap-6 items-center justify-between bg-white/[0.01]">
           <div className="relative w-full md:w-[450px]">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-200/30" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-200/20" />
             <Input
               type="text"
               placeholder="Query name, ID, or specialization..."
-              className="pl-11 h-12 bg-white/5 border-white/5 rounded-2xl focus:bg-white/10 transition-all font-medium text-sm"
+              className="pl-12 h-14 bg-white/5 border-white/5"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <Button
-            variant="outline"
-            className="gap-2 h-12 px-6 bg-white/5 border-white/5 text-primary-200/60 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:text-white transition-all"
-          >
-            <Filter className="w-4 h-4" /> Advanced Filters
-          </Button>
+          <div className="flex items-center gap-4 w-full md:w-auto">
+            <Button
+              variant="outline"
+              className="gap-2 h-12 flex-1 md:flex-none px-6 text-[10px]"
+            >
+              <Filter className="w-4 h-4" /> Filter Protocols
+            </Button>
+            <div className="hidden sm:flex h-12 items-center px-4 rounded-2xl bg-white/5 border border-white/5 text-[10px] font-black text-primary uppercase tracking-widest">
+              Active Nodes: {teachersData.length}
+            </div>
+          </div>
         </div>
 
         <div className="overflow-x-auto">
           <Table className="min-w-[1000px]">
-            <TableHeader className="bg-white/5">
-              <TableRow className="border-0 hover:bg-transparent h-16">
-                <TableHead className="text-muted text-[10px] font-black uppercase tracking-widest pl-8">
-                  Educator
+            <TableHeader className="bg-white/[0.02]">
+              <TableRow className="border-0 hover:bg-transparent h-20">
+                <TableHead className="text-muted text-[10px] font-black uppercase tracking-widest pl-10 w-[350px]">
+                  Faculty Identity
                 </TableHead>
-                <TableHead className="text-muted text-[10px] font-black uppercase tracking-widest">
+                <TableHead className="text-muted text-[10px] font-black uppercase tracking-widest w-[300px]">
                   Communication Channel
                 </TableHead>
                 <TableHead className="text-muted text-[10px] font-black uppercase tracking-widest">
-                  Core Domain
+                  Intelligence Domain
                 </TableHead>
                 <TableHead className="text-muted text-[10px] font-black uppercase tracking-widest">
                   Status
                 </TableHead>
-                <TableHead className="text-right text-muted text-[10px] font-black uppercase tracking-widest pr-8">
+                <TableHead className="text-right text-muted text-[10px] font-black uppercase tracking-widest pr-10">
                   Operations
                 </TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody className="divide-y divide-white/5">
-              {loading ? (
-                <TableSkeleton rows={10} cols={5} />
-              ) : teachersData.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={5}
-                    className="text-center py-32 opacity-20"
-                  >
-                    <UserPlus className="w-20 h-20 mx-auto mb-4" />
-                    <p className="text-lg font-black uppercase tracking-widest">
-                      No Faculty Records
-                    </p>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                teachersData.map((teacher: Teacher, idx: number) => (
-                  <motion.tr
-                    key={teacher.id}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.05 }}
-                    className="group transition-all h-20 border-white/5 hover:bg-white/5"
-                  >
-                    <TableCell className="pl-8">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-primary-600/20 flex items-center justify-center text-primary-400 font-black text-xs border border-primary-500/20 group-hover:scale-110 transition-transform">
-                          {teacher.first_name[0]}
-                          {teacher.last_name[0]}
-                        </div>
-                        <div>
-                          <div className="text-xs sm:text-sm font-black text-primary uppercase tracking-tight">
-                            {teacher.first_name} {teacher.last_name}
-                          </div>
-                          <div className="text-[9px] sm:text-[10px] font-black text-dim uppercase tracking-tighter">
-                            {teacher.employee_id}
-                          </div>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-col gap-1.5">
-                        <div className="flex items-center gap-2 text-[10px] font-black text-primary-200/50 uppercase tracking-tight">
-                          <Mail className="w-3 h-3 text-primary-500" />
-                          {teacher.email || "N/A"}
-                        </div>
-                        <div className="flex items-center gap-2 text-[10px] font-black text-primary-200/30 uppercase tracking-tight">
-                          <Phone className="w-3 h-3" />
-                          {teacher.phone_number}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="px-3 py-1.5 rounded-xl bg-white/5 text-muted text-[10px] font-black uppercase tracking-widest border border-white/5">
-                        {teacher.specialization || "Generalist"}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${
-                          teacher.is_active
-                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                            : "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                        }`}
+            <TableBody>
+              <AnimatePresence mode="popLayout">
+                {loading ? (
+                  <TableSkeleton rows={8} cols={5} />
+                ) : teachersData.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-40">
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="flex flex-col items-center"
                       >
-                        {teacher.is_active ? "Operational" : "Standby"}
-                      </span>
+                        <UserPlus className="w-20 h-20 text-primary-200/5 mb-6" />
+                        <p className="text-lg font-black uppercase tracking-[0.3em] text-primary-200/20">
+                          No Faculty Records Detected
+                        </p>
+                      </motion.div>
                     </TableCell>
-                    <TableCell className="text-right pr-8">
-                      <div className="flex items-center justify-end gap-1">
-                        <button
-                          onClick={() => {
-                            setAssignmentTeacher(teacher);
-                            setIsAssignmentModalOpen(true);
-                          }}
-                          className="p-3 hover:bg-white/10 text-primary-200/40 hover:text-white rounded-xl transition-all group-hover:scale-110"
+                  </TableRow>
+                ) : (
+                  teachersData.map((teacher: Teacher, idx: number) => (
+                    <motion.tr
+                      key={teacher.id}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.02 }}
+                      className="group transition-all h-24 border-white/5 hover:bg-white/[0.03]"
+                    >
+                      <TableCell className="pl-10">
+                        <div className="flex items-center gap-5">
+                          <div className="w-14 h-14 rounded-2xl bg-primary-600/10 flex items-center justify-center text-primary-400 font-black text-sm border border-primary-500/10 group-hover:scale-110 group-hover:bg-primary-600 group-hover:text-white transition-all duration-500 shrink-0">
+                            {teacher.first_name[0]}
+                            {teacher.last_name[0]}
+                          </div>
+                          <div>
+                            <div className="text-base font-black text-primary uppercase tracking-tight leading-none mb-1.5">
+                              {teacher.first_name} {teacher.last_name}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[9px] font-black text-dim uppercase tracking-[0.2em] bg-white/5 px-2 py-0.5 rounded-md">
+                                {teacher.employee_id}
+                              </span>
+                              <span className="text-[9px] font-black text-primary-400/40 uppercase tracking-[0.1em]">
+                                Joined{" "}
+                                {new Date(
+                                  teacher.joining_date || new Date(),
+                                ).toLocaleDateString()}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-3 text-[10px] font-black text-primary uppercase tracking-tight group/mail cursor-pointer">
+                            <div className="w-6 h-6 rounded-lg bg-white/5 flex items-center justify-center group-hover/mail:bg-primary-600 transition-colors">
+                              <Mail className="w-3 h-3 text-primary-400 group-hover/mail:text-white" />
+                            </div>
+                            {teacher.email || "MISSING_IDENTITY"}
+                          </div>
+                          <div className="flex items-center gap-3 text-[10px] font-black text-dim uppercase tracking-tight">
+                            <div className="w-6 h-6 rounded-lg bg-white/5 flex items-center justify-center">
+                              <Phone className="w-3 h-3 text-dim" />
+                            </div>
+                            {teacher.phone_number}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col gap-1.5">
+                          <span className="text-[10px] font-black text-primary uppercase tracking-widest flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-glow-sm" />
+                            {teacher.specialization || "Cross-Functional"}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div
+                          className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[10px] font-black uppercase tracking-widest ${
+                            teacher.is_active
+                              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                              : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                          }`}
                         >
-                          <BookOpen className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleEditTeacher(teacher)}
-                          className="p-3 hover:bg-white/10 text-primary-200/40 hover:text-white rounded-xl transition-all group-hover:scale-110"
-                        >
-                          <Settings className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => setTeacherToDelete(teacher.id)}
-                          className="p-3 hover:bg-rose-500/10 text-primary-200/40 hover:text-rose-400 rounded-xl transition-all group-hover:scale-110"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </TableCell>
-                  </motion.tr>
-                ))
-              )}
+                          {teacher.is_active ? (
+                            <ShieldCheck className="w-3 h-3" />
+                          ) : (
+                            <ShieldAlert className="w-3 h-3" />
+                          )}
+                          {teacher.is_active ? "Operational" : "Offline"}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right pr-10">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => {
+                              setAssignmentTeacher(teacher);
+                              setIsAssignmentModalOpen(true);
+                            }}
+                            className="p-3 hover:bg-white/10 text-primary-200/20 hover:text-primary-400 rounded-2xl transition-all group-hover:scale-110"
+                          >
+                            <BookOpen className="w-5 h-5" />
+                          </button>
+                          <button
+                            onClick={() => handleEditTeacher(teacher)}
+                            className="p-3 hover:bg-white/10 text-primary-200/20 hover:text-white rounded-2xl transition-all group-hover:scale-110"
+                          >
+                            <Settings className="w-5 h-5" />
+                          </button>
+                          <button
+                            onClick={() => setTeacherToDelete(teacher.id)}
+                            className="p-3 hover:bg-rose-500/10 text-primary-200/20 hover:text-rose-400 rounded-2xl transition-all group-hover:scale-110"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                        </div>
+                      </TableCell>
+                    </motion.tr>
+                  ))
+                )}
+              </AnimatePresence>
             </TableBody>
           </Table>
         </div>
@@ -371,23 +392,26 @@ export const TeachersPage = () => {
         }}
         title={
           editingTeacher
-            ? "Operational Identity Modification"
-            : "New Faculty Induction"
+            ? "Identity Synchronization"
+            : "Faculty Protocol Induction"
         }
-        className="max-w-3xl glass border-white/10"
+        className="max-w-4xl glass-morphic border-white/10 !rounded-[40px]"
       >
-        <form onSubmit={handleAddTeacher} className="space-y-10 mt-6 pb-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
-            <div className="space-y-6">
+        <form
+          onSubmit={handleAddTeacher}
+          className="space-y-8 sm:space-y-12 mt-6 sm:mt-8"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 sm:gap-y-10">
+            <div className="space-y-6 sm:space-y-8">
               <div className="flex items-center gap-3 pb-3 border-b border-white/5">
-                <Plus className="w-4 h-4 text-primary-400" />
-                <h3 className="text-xs font-black text-primary uppercase tracking-[0.2em]">
-                  Deployment Identity
+                <UserPlus className="w-5 h-5 text-primary-400" />
+                <h3 className="text-[10px] sm:text-xs font-black text-primary uppercase tracking-[0.3em]">
+                  Induction Parameters
                 </h3>
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">
-                  Identifier (Employee ID)
+                <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">
+                  Faculty Identifier (ID)
                 </label>
                 <Input
                   required
@@ -396,12 +420,12 @@ export const TeachersPage = () => {
                     setFormData({ ...formData, employee_id: e.target.value })
                   }
                   placeholder="EMP-XXX"
-                  className="bg-white/5 border-white/5 rounded-xl h-12"
+                  className="h-14"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-muted uppercase tracking-widest">
+                  <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">
                     First Name
                   </label>
                   <Input
@@ -410,11 +434,11 @@ export const TeachersPage = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, first_name: e.target.value })
                     }
-                    className="bg-white/5 border-white/5 rounded-xl h-12"
+                    className="h-14"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-muted uppercase tracking-widest">
+                  <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">
                     Last Name
                   </label>
                   <Input
@@ -423,21 +447,21 @@ export const TeachersPage = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, last_name: e.target.value })
                     }
-                    className="bg-white/5 border-white/5 rounded-xl h-12"
+                    className="h-14"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-6 sm:space-y-8">
               <div className="flex items-center gap-3 pb-3 border-b border-white/5">
-                <Settings className="w-4 h-4 text-accent-400" />
-                <h3 className="text-xs font-black text-primary uppercase tracking-[0.2em]">
-                  Operational Scope
+                <Settings className="w-5 h-5 text-indigo-400" />
+                <h3 className="text-[10px] sm:text-xs font-black text-primary uppercase tracking-[0.3em]">
+                  Operational Matrix
                 </h3>
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">
+                <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">
                   Domain Specialization
                 </label>
                 <Input
@@ -447,12 +471,12 @@ export const TeachersPage = () => {
                     setFormData({ ...formData, specialization: e.target.value })
                   }
                   placeholder="e.g. Theoretical Physics"
-                  className="bg-white/5 border-white/5 rounded-xl h-12"
+                  className="h-14"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">
-                  Induction Date
+                <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">
+                  Protocol Activation Date
                 </label>
                 <Input
                   required
@@ -461,20 +485,20 @@ export const TeachersPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, joining_date: e.target.value })
                   }
-                  className="bg-white/5 border-white/5 rounded-xl h-12 text-white"
+                  className="h-14"
                 />
               </div>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-6 sm:space-y-8">
               <div className="flex items-center gap-3 pb-3 border-b border-white/5">
-                <Phone className="w-4 h-4 text-emerald-400" />
-                <h3 className="text-xs font-black text-primary uppercase tracking-[0.2em]">
-                  Transmission Channel
+                <Phone className="w-5 h-5 text-emerald-400" />
+                <h3 className="text-[10px] sm:text-xs font-black text-primary uppercase tracking-[0.3em]">
+                  Transmission Line
                 </h3>
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">
+                <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">
                   Secure Line (Phone)
                 </label>
                 <Input
@@ -484,22 +508,22 @@ export const TeachersPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, phone_number: e.target.value })
                   }
-                  className="bg-white/5 border-white/5 rounded-xl h-12"
+                  className="h-14"
                 />
               </div>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-6 sm:space-y-8">
               <div className="flex items-center gap-3 pb-3 border-b border-white/5">
-                <Mail className="w-4 h-4 text-purple-400" />
-                <h3 className="text-xs font-black text-primary uppercase tracking-[0.2em]">
-                  Access Credentials
+                <Mail className="w-5 h-5 text-amber-400" />
+                <h3 className="text-[10px] sm:text-xs font-black text-primary uppercase tracking-[0.3em]">
+                  Access Encryption
                 </h3>
               </div>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-muted uppercase tracking-widest">
-                    System Email
+                  <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">
+                    System Node (Email)
                   </label>
                   <Input
                     required
@@ -508,11 +532,11 @@ export const TeachersPage = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
                     }
-                    className="bg-white/5 border-white/5 rounded-xl h-12"
+                    className="h-14"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-muted uppercase tracking-widest">
+                  <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">
                     Encryption Key (Password)
                   </label>
                   <Input
@@ -522,26 +546,26 @@ export const TeachersPage = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, password: e.target.value })
                     }
-                    placeholder={editingTeacher ? "Current" : "Min 8 chars"}
-                    className="bg-white/5 border-white/5 rounded-xl h-12"
+                    placeholder={editingTeacher ? "LOCKED" : "••••••••"}
+                    className="h-14"
                   />
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 pt-4">
+          <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t border-white/5">
             <Button
               type="button"
-              variant="outline"
-              className="flex-1 h-14 bg-white/5 border-white/5 text-primary-200/50 rounded-2xl font-black uppercase tracking-widest text-xs"
+              variant="ghost"
+              className="flex-1 h-14 text-[10px]"
               onClick={() => setIsModalOpen(false)}
             >
               Discard
             </Button>
             <Button
               type="submit"
-              className="flex-[2] h-14 rounded-2xl font-black uppercase tracking-widest text-xs shadow-premium"
+              className="flex-[2] h-14 text-[10px]"
               disabled={
                 createTeacherMutation.isPending ||
                 updateTeacherMutation.isPending
@@ -549,10 +573,10 @@ export const TeachersPage = () => {
             >
               {createTeacherMutation.isPending ||
               updateTeacherMutation.isPending
-                ? "Syncing..."
+                ? "Syncing Matrix..."
                 : editingTeacher
-                  ? "Commit Changes"
-                  : "Execute Induction"}
+                  ? "Execute Update"
+                  : "Confirm Induction"}
             </Button>
           </div>
         </form>
@@ -561,16 +585,15 @@ export const TeachersPage = () => {
       <Modal
         isOpen={isBulkModalOpen}
         onClose={() => setIsBulkModalOpen(false)}
-        title="Mass Protocol Induction"
-        description="Ingest multiple faculty records via CSV data stream."
-        className="max-w-xl glass border-white/10"
+        title="Mass Data Ingestion"
+        className="max-w-xl glass-morphic border-white/10 !rounded-[40px]"
       >
         <div className="mt-8 space-y-8">
           <div
-            className={`border-4 border-dashed rounded-[32px] p-8 sm:p-12 text-center transition-all cursor-pointer ${
+            className={`border-4 border-dashed rounded-[40px] p-12 text-center transition-all cursor-pointer ${
               csvFile
-                ? "border-primary-500 bg-primary-500/10"
-                : "border-white/5 bg-white/5 hover:border-white/10"
+                ? "border-primary-500 bg-primary-500/5 shadow-glow-sm"
+                : "border-white/5 bg-white/[0.02] hover:border-white/10"
             }`}
             onClick={() =>
               document.getElementById("teacher-csv-input")?.click()
@@ -584,34 +607,34 @@ export const TeachersPage = () => {
               onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
             />
             <UploadCloud
-              className={`w-16 h-16 mx-auto mb-6 ${csvFile ? "text-primary-400" : "text-primary-200/20"}`}
+              className={`w-16 h-16 mx-auto mb-6 ${csvFile ? "text-primary-400" : "text-primary-200/10"}`}
             />
             {csvFile ? (
-              <div className="animate-in fade-in zoom-in duration-300">
-                <p className="text-primary font-black uppercase tracking-widest text-sm mb-2">
+              <div className="animate-in fade-in zoom-in duration-500">
+                <p className="text-primary font-black uppercase tracking-[0.2em] text-sm mb-2">
                   {csvFile.name}
                 </p>
                 <p className="text-[10px] font-black text-muted uppercase tracking-widest">
-                  {(csvFile.size / 1024).toFixed(1)} KB Payload
+                  {(csvFile.size / 1024).toFixed(1)} KB DATA STREAM
                 </p>
               </div>
             ) : (
               <div>
-                <p className="text-primary font-black uppercase tracking-widest text-sm mb-2">
-                  Drop Protocol File
+                <p className="text-primary font-black uppercase tracking-[0.2em] text-sm mb-2">
+                  Drop Induction Protocol
                 </p>
                 <p className="text-[10px] font-black text-muted uppercase tracking-widest">
-                  CSV Data Only
+                  CSV RECORDS ONLY
                 </p>
               </div>
             )}
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 pt-2 pb-4">
+          <div className="flex flex-col sm:flex-row gap-4 pb-4">
             <Button
               type="button"
-              variant="outline"
-              className="flex-1 h-12 bg-white/5 border-white/5 text-primary-200/50 rounded-2xl font-black uppercase tracking-widest text-xs"
+              variant="ghost"
+              className="flex-1 h-14 text-[10px]"
               onClick={() => setIsBulkModalOpen(false)}
             >
               Abort
@@ -619,9 +642,9 @@ export const TeachersPage = () => {
             <Button
               onClick={handleBulkUpload}
               disabled={!csvFile || isUploading}
-              className="flex-1 h-12 rounded-2xl font-black uppercase tracking-widest text-xs shadow-premium"
+              className="flex-1 h-14 text-[10px]"
             >
-              {isUploading ? "Ingesting..." : "Execute Induction"}
+              {isUploading ? "Ingesting..." : "Execute Mass Induction"}
             </Button>
           </div>
         </div>
@@ -632,9 +655,10 @@ export const TeachersPage = () => {
         onClose={() => setTeacherToDelete(null)}
         onConfirm={() => {
           if (teacherToDelete) deleteTeacherMutation.mutate(teacherToDelete);
+          setTeacherToDelete(null);
         }}
         title="Faculty Termination"
-        description="This will permanently revoke all access and purge the educator's operational record from the network."
+        description="Permanently revoke all access and purge educator's operational records from the grid?"
       />
 
       <TeacherAssignmentsModal
@@ -675,7 +699,6 @@ const TeacherAssignmentsModal = ({
     enabled: isOpen,
     select: (data) => (Array.isArray(data) ? data : data.results || []),
   });
-
   const { data: grades = [] } = useQuery({
     queryKey: ["grades"],
     queryFn: () => classesService.getGrades(),
@@ -686,19 +709,19 @@ const TeacherAssignmentsModal = ({
   const createAssignmentMutation = useMutation({
     mutationFn: (data: any) => classesService.createAssignment(data),
     onSuccess: () => {
-      toast.success("Protocol Assigned");
+      toast.success("Assignment protocol synchronized");
       setSelectedSubject("");
       setSelectedStream("");
       queryClient.invalidateQueries({ queryKey: ["assignments", teacher?.id] });
     },
     onError: (err: any) =>
-      toast.error(err.response?.data?.detail || "Assignment Failure"),
+      toast.error(err.response?.data?.detail || "Sync failure"),
   });
 
   const deleteAssignmentMutation = useMutation({
     mutationFn: (id: number) => classesService.deleteAssignment(id),
     onSuccess: () => {
-      toast.success("Assignment Revoked");
+      toast.success("Assignment protocol revoked");
       queryClient.invalidateQueries({ queryKey: ["assignments", teacher?.id] });
     },
   });
@@ -716,38 +739,34 @@ const TeacherAssignmentsModal = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`Intelligence Scope: ${teacher?.first_name} ${teacher?.last_name}`}
-      className="max-w-3xl glass border-white/10"
+      title="Intelligence Scope Assignment"
+      className="max-w-4xl glass-morphic border-white/10 !rounded-[40px]"
     >
-      <div className="space-y-8 mt-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-white/5 rounded-3xl border border-white/5">
+      <div className="space-y-10 mt-8">
+        <div className="flex items-center gap-5 p-6 rounded-[32px] bg-primary-600/5 border border-primary-600/10">
+          <div className="w-16 h-16 rounded-2xl bg-primary-600/10 flex items-center justify-center text-primary-400 font-black border border-primary-500/10 shrink-0">
+            {teacher?.first_name[0]}
+            {teacher?.last_name[0]}
+          </div>
+          <div>
+            <h3 className="text-xl font-black text-primary uppercase tracking-tight leading-none mb-1">
+              {teacher?.first_name} {teacher?.last_name}
+            </h3>
+            <p className="text-[10px] font-black text-dim uppercase tracking-[0.2em]">
+              {teacher?.employee_id} • {teacher?.specialization || "GENERALIST"}
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-8 bg-white/[0.01] rounded-[32px] border border-white/5">
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">
-                Target Domain
-              </label>
-              <button
-                onClick={async () => {
-                  const name = prompt("New Domain Name:");
-                  if (name) {
-                    try {
-                      await classesService.createSubject({ name });
-                      queryClient.invalidateQueries({ queryKey: ["subjects"] });
-                      toast.success("Domain Added");
-                    } catch (_) {
-                      toast.error("Induction Failed");
-                    }
-                  }
-                }}
-                className="text-[10px] font-black text-primary-400 hover:text-primary-300 uppercase tracking-widest"
-              >
-                + Create Domain
-              </button>
-            </div>
+            <label className="text-[10px] font-black text-muted uppercase tracking-[0.2em] pl-1">
+              Target Intelligence Node
+            </label>
             <select
               value={selectedSubject}
               onChange={(e) => setSelectedSubject(e.target.value)}
-              className="w-full h-12 bg-white/5 border border-white/5 rounded-xl px-4 text-primary text-sm outline-none focus:border-primary-500 transition-all"
+              className="w-full h-14 bg-white/5 border border-white/5 rounded-xl px-4 text-primary text-sm outline-none focus:border-primary-500/50 transition-all"
             >
               <option value="" className="bg-bg-color">
                 Select Domain...
@@ -760,13 +779,13 @@ const TeacherAssignmentsModal = ({
             </select>
           </div>
           <div className="space-y-3">
-            <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">
-              Deployment Stream
+            <label className="text-[10px] font-black text-muted uppercase tracking-[0.2em] pl-1">
+              Operational Deployment Unit
             </label>
             <select
               value={selectedStream}
               onChange={(e) => setSelectedStream(e.target.value)}
-              className="w-full h-12 bg-white/5 border border-white/5 rounded-xl px-4 text-primary text-sm outline-none focus:border-primary-500 transition-all"
+              className="w-full h-14 bg-white/5 border border-white/5 rounded-xl px-4 text-primary text-sm outline-none focus:border-primary-500/50 transition-all"
             >
               <option value="" className="bg-bg-color">
                 Select Stream...
@@ -783,7 +802,7 @@ const TeacherAssignmentsModal = ({
             </select>
           </div>
           <Button
-            className="md:col-span-2 h-12 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-premium"
+            className="md:col-span-2 h-14 text-[10px]"
             onClick={handleAdd}
             disabled={
               !selectedSubject ||
@@ -791,74 +810,77 @@ const TeacherAssignmentsModal = ({
               createAssignmentMutation.isPending
             }
           >
-            <Plus className="w-4 h-4" /> Add Assignment Protocol
+            <Plus className="w-4 h-4" /> Initialize Assignment Protocol
           </Button>
         </div>
 
-        <div className="space-y-4 pb-4">
-          <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">
-            Active Intelligence Scope
-          </h3>
-          {loadingAssignments ? (
-            <div className="py-12 text-center">
-              <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary-500" />
-            </div>
-          ) : assignments.length === 0 ? (
-            <div className="text-center py-12 glass rounded-3xl border-dashed border-white/5 opacity-30">
-              <p className="text-xs font-black uppercase tracking-widest italic">
-                No Active Scope Defined
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <AnimatePresence mode="popLayout">
-                {assignments.map((as: any) => (
+        <div className="space-y-6">
+          <div className="flex items-center gap-3">
+            <div className="w-1.5 h-1.5 rounded-full bg-primary-500 shadow-glow-sm" />
+            <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">
+              Active Assignment Matrix
+            </h4>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <AnimatePresence mode="popLayout">
+              {loadingAssignments ? (
+                [1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="h-20 bg-white/5 rounded-2xl animate-pulse"
+                  />
+                ))
+              ) : assignments.length === 0 ? (
+                <div className="col-span-full py-12 text-center rounded-[32px] border border-dashed border-white/5 opacity-30">
+                  <p className="text-[10px] font-black uppercase tracking-widest">
+                    No Active Protocols
+                  </p>
+                </div>
+              ) : (
+                assignments.map((assignment: any) => (
                   <motion.div
-                    key={as.id}
+                    key={assignment.id}
                     layout
-                    initial={{ opacity: 0, scale: 0.9 }}
+                    initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9, x: -20 }}
-                    className="flex items-center justify-between p-5 glass border-white/5 rounded-[24px] hover:bg-white/5 transition-all group"
+                    className="flex items-center justify-between p-5 rounded-[24px] bg-white/[0.03] border border-white/5 group"
                   >
                     <div>
-                      <p className="text-xs font-black text-primary uppercase tracking-tight">
-                        {as.subject_name}
+                      <p className="text-[10px] font-black text-primary uppercase tracking-tight mb-1">
+                        {assignment.subject_name}
                       </p>
-                      <p className="text-[10px] font-black text-dim uppercase tracking-widest">
-                        {as.grade_name} • {as.stream_name}
+                      <p className="text-[9px] font-black text-dim uppercase tracking-widest">
+                        {assignment.grade_name} {assignment.stream_name}
                       </p>
                     </div>
                     <button
-                      onClick={() => deleteAssignmentMutation.mutate(as.id)}
-                      className="p-2.5 text-primary-200/30 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all"
+                      onClick={() =>
+                        deleteAssignmentMutation.mutate(assignment.id)
+                      }
+                      className="p-2.5 opacity-0 group-hover:opacity-100 hover:bg-rose-500/10 text-primary-200/20 hover:text-rose-400 rounded-xl transition-all"
                     >
-                      <X className="w-4 h-4" />
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-          )}
+                ))
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+
+        <div className="pt-6 border-t border-white/5 flex justify-end">
+          <Button
+            variant="ghost"
+            className="h-12 px-10 text-[10px]"
+            onClick={onClose}
+          >
+            Close Matrix
+          </Button>
         </div>
       </div>
     </Modal>
   );
 };
 
-const Loader2 = ({ className }: { className?: string }) => (
-  <svg
-    className={className}
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-  </svg>
-);
+export default TeachersPage;

@@ -25,6 +25,7 @@ import {
   Scale,
   BrainCircuit,
   Layers,
+  LifeBuoy,
 } from "lucide-react";
 import { useAuthStore, type User } from "../store/authStore";
 import { ThemeToggle } from "../components/ThemeToggle";
@@ -48,7 +49,7 @@ const NavItem = ({ to, icon: Icon, label, onClick }: NavItemProps) => (
     to={to}
     onClick={onClick}
     className={({ isActive }) =>
-      `flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-300 group relative ${
+      `flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2.5 md:py-3 min-h-[44px] rounded-2xl transition-all duration-300 group relative touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 ${
         isActive
           ? "text-primary-400"
           : "text-muted hover:bg-white/5 hover:text-primary"
@@ -65,9 +66,11 @@ const NavItem = ({ to, icon: Icon, label, onClick }: NavItemProps) => (
           />
         )}
         <Icon
-          className={`w-5 h-5 relative z-10 transition-transform duration-300 group-hover:scale-110 ${isActive ? "text-primary-400" : ""}`}
+          className={`w-4 h-4 md:w-5 md:h-5 relative z-10 transition-transform duration-300 group-hover:scale-110 ${isActive ? "text-primary-400" : ""}`}
         />
-        <span className="font-semibold text-sm relative z-10">{label}</span>
+        <span className="font-semibold text-xs md:text-sm relative z-10">
+          {label}
+        </span>
       </>
     )}
   </NavLink>
@@ -89,9 +92,9 @@ const SidebarContent = ({
   handleLogout,
 }: SidebarContentProps) => (
   <div className="flex flex-col h-full">
-    <div className="flex items-center justify-between mb-10 px-2">
+    <div className="flex items-center justify-between mb-6 md:mb-10 px-2">
       <div className="flex items-center gap-3">
-        <div className="w-12 h-12 bg-primary-600 rounded-2xl shadow-premium flex items-center justify-center overflow-hidden shrink-0 border border-white/10">
+        <div className="w-10 h-10 md:w-12 md:h-12 bg-primary-600 rounded-2xl shadow-premium flex items-center justify-center overflow-hidden shrink-0 border border-white/10">
           {schoolLogo ? (
             <img
               src={schoolLogo}
@@ -104,12 +107,12 @@ const SidebarContent = ({
         </div>
         <div className="min-w-0">
           <h1
-            className="text-lg font-black text-primary tracking-tight truncate w-32 font-serif"
+            className="text-sm md:text-lg font-black text-primary tracking-tight truncate w-24 md:w-32 font-serif"
             title={schoolName}
           >
             {schoolName || "ElimuHub"}
           </h1>
-          <p className="text-[10px] font-bold text-muted uppercase tracking-widest">
+          <p className="text-[9px] md:text-[10px] font-bold text-muted uppercase tracking-widest">
             {user?.role} PORTAL
           </p>
         </div>
@@ -117,6 +120,7 @@ const SidebarContent = ({
       <button
         onClick={() => setIsSidebarOpen(false)}
         className="lg:hidden p-2 text-primary-200/50 hover:text-white"
+        aria-label="Close navigation menu"
       >
         <CloseIcon className="w-6 h-6" />
       </button>
@@ -145,7 +149,7 @@ const SidebarContent = ({
         user?.role === ROLES.TEACHER ||
         user?.role === ROLES.HOD) && (
         <>
-          <div className="pt-4 pb-2 px-4 text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">
+          <div className="pt-3 md:pt-4 pb-2 px-3 md:px-4 text-[9px] md:text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">
             Academic
           </div>
           <NavItem
@@ -201,7 +205,7 @@ const SidebarContent = ({
         user?.role === ROLES.TEACHER ||
         user?.role === ROLES.HOD) && (
         <>
-          <div className="pt-4 pb-2 px-4 text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">
+          <div className="pt-3 md:pt-4 pb-2 px-3 md:px-4 text-[9px] md:text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">
             Operations
           </div>
 
@@ -264,7 +268,7 @@ const SidebarContent = ({
       {/* Intelligence & System Sections */}
       {(user?.role === ROLES.ADMIN || user?.role === ROLES.PRINCIPAL) && (
         <>
-          <div className="pt-4 pb-2 px-4 text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">
+          <div className="pt-3 md:pt-4 pb-2 px-3 md:px-4 text-[9px] md:text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">
             Intelligence
           </div>
           <NavItem
@@ -274,7 +278,7 @@ const SidebarContent = ({
             onClick={() => setIsSidebarOpen(false)}
           />
 
-          <div className="pt-4 pb-2 px-4 text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">
+          <div className="pt-3 md:pt-4 pb-2 px-3 md:px-4 text-[9px] md:text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">
             System
           </div>
           <NavItem
@@ -295,7 +299,7 @@ const SidebarContent = ({
       {/* Platform Level Section */}
       {user?.role === ROLES.SUPER_ADMIN && (
         <>
-          <div className="pt-4 pb-2 px-4 text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">
+          <div className="pt-3 md:pt-4 pb-2 px-3 md:px-4 text-[9px] md:text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">
             Platform Control
           </div>
           <NavItem
@@ -340,6 +344,12 @@ const SidebarContent = ({
 
     <div className="mt-auto border-t border-white/5 pt-6 space-y-1">
       <NavItem
+        to="/support"
+        icon={LifeBuoy}
+        label="Support Hub"
+        onClick={() => setIsSidebarOpen(false)}
+      />
+      <NavItem
         to="/settings"
         icon={Settings}
         label="Settings"
@@ -347,9 +357,9 @@ const SidebarContent = ({
       />
       <button
         onClick={handleLogout}
-        className="flex items-center gap-3 px-4 py-3 w-full text-primary-200/50 hover:text-rose-400 hover:bg-rose-500/10 rounded-2xl transition-all font-bold text-sm mb-4"
+        className="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2.5 md:py-3 min-h-[44px] w-full text-primary-200/50 hover:text-rose-400 hover:bg-rose-500/10 rounded-2xl transition-all font-bold text-xs md:text-sm mb-4 touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
       >
-        <LogOut className="w-5 h-5" />
+        <LogOut className="w-4 h-4 md:w-5 md:h-5" />
         Logout
       </button>
 
@@ -372,6 +382,8 @@ export const MainLayout = () => {
   const queryClient = useQueryClient();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const { schoolName, logoUrl } = useTheme();
   const logout = useAuthStore((state) => state.logout);
   const user = useAuthStore((state) => state.user);
@@ -413,6 +425,13 @@ export const MainLayout = () => {
 
   return (
     <div className="flex min-h-screen bg-transparent text-white selection:bg-primary-500/30">
+      {/* Skip to main content link for accessibility */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary-600 text-white px-4 py-2 rounded-lg z-[100] font-semibold"
+      >
+        Skip to main content
+      </a>
       <CommandPalette />
 
       {/* Mobile Sidebar Overlay */}
@@ -431,10 +450,18 @@ export const MainLayout = () => {
       {/* Sidebar */}
       <aside
         className={`
-        w-[280px] p-6 flex flex-col glass fixed h-[calc(100vh-2rem)] top-4 left-4 rounded-[32px] z-[50] transition-all duration-500 ease-in-out
-        lg:translate-x-0 ${isSidebarOpen ? "translate-x-0" : "-translate-x-[calc(100%+2rem)]"}
+        w-full max-w-[280px] p-4 md:p-6 flex flex-col glass fixed h-[calc(100vh-1rem)] md:h-[calc(100vh-2rem)] top-2 md:top-4 left-2 md:left-4 rounded-[24px] md:rounded-[32px] z-[50] transition-all duration-500 ease-in-out
+        lg:translate-x-0 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
         shadow-2xl lg:shadow-none
       `}
+        onTouchStart={(e) => setTouchStart(e.targetTouches[0].clientX)}
+        onTouchMove={(e) => setTouchEnd(e.targetTouches[0].clientX)}
+        onTouchEnd={() => {
+          if (!touchStart || !touchEnd) return;
+          const distance = touchStart - touchEnd;
+          const isLeftSwipe = distance > 50;
+          if (isLeftSwipe) setIsSidebarOpen(false);
+        }}
       >
         <SidebarContent
           user={user}
@@ -446,19 +473,20 @@ export const MainLayout = () => {
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 lg:ml-[312px]">
+      <div className="flex-1 flex flex-col min-w-0 lg:ml-[312px] ml-0">
         {/* Header Bar */}
-        <header className="sticky top-0 z-[40] px-4 md:px-6 lg:px-8 py-4">
+        <header className="sticky top-0 z-[40] px-4 py-3 md:px-6 md:py-4 lg:px-8">
           <div className="glass p-2 md:p-3 rounded-[24px] flex items-center justify-between gap-3 shadow-xl">
             <div className="flex items-center gap-2 lg:hidden">
               <button
                 onClick={() => setIsSidebarOpen(true)}
-                className="p-3 text-primary-200/50 hover:text-white bg-white/5 rounded-2xl border border-white/5 transition-all active:scale-95 shrink-0"
+                className="p-3 min-h-[44px] min-w-[44px] text-primary-200/50 hover:text-white bg-white/5 rounded-2xl border border-white/5 transition-all active:scale-95 shrink-0 touch-manipulation"
+                aria-label="Open navigation menu"
               >
                 <Menu className="w-5 h-5" />
               </button>
 
-              <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center overflow-hidden shrink-0 border border-white/10 shadow-sm ml-1">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 bg-primary-600 rounded-xl flex items-center justify-center overflow-hidden shrink-0 border border-white/10 shadow-sm ml-1">
                 {logoUrl ? (
                   <img
                     src={logoUrl}
@@ -466,7 +494,7 @@ export const MainLayout = () => {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <ElimuHubLogo className="w-6 h-6" showText={false} />
+                  <ElimuHubLogo className="w-5 h-5 sm:w-6 sm:h-6" showText={false} />
                 )}
               </div>
             </div>
@@ -477,11 +505,12 @@ export const MainLayout = () => {
                   new KeyboardEvent("keydown", { key: "k", ctrlKey: true }),
                 )
               }
-              className="flex items-center gap-3 px-4 py-2.5 bg-white/5 rounded-xl text-primary-200/40 hover:text-primary-200/60 transition-all border border-white/5 flex-1 lg:max-w-md text-sm font-medium group"
+              className="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 bg-white/5 rounded-xl text-primary-200/40 hover:text-primary-200/60 transition-all border border-white/5 flex-1 max-w-[200px] sm:max-w-none lg:max-w-md text-xs md:text-sm font-medium group"
+              aria-label="Open search command palette"
             >
               <Search className="w-4 h-4 group-hover:scale-110 transition-transform" />
-              <span className="hidden sm:inline">Quick Search...</span>
-              <kbd className="ml-auto bg-white/10 px-2 py-0.5 rounded text-[10px] font-bold border border-white/10 hidden sm:inline opacity-50">
+              <span className="hidden md:inline">Quick Search...</span>
+              <kbd className="ml-auto bg-white/10 px-2 py-0.5 rounded text-[10px] font-bold border border-white/10 hidden lg:inline opacity-50">
                 ⌘K
               </kbd>
             </button>
@@ -490,15 +519,21 @@ export const MainLayout = () => {
               <div className="relative">
                 <button
                   onClick={() => setShowNotifications(!showNotifications)}
-                  className={`p-2.5 rounded-xl border transition-all relative active:scale-95 ${
+                  className={`p-2.5 min-h-[44px] min-w-[44px] rounded-xl border transition-all relative active:scale-95 touch-manipulation ${
                     showNotifications
                       ? "bg-primary-600 border-primary-500 text-white shadow-premium"
                       : "bg-white/5 border-white/5 text-primary-200/50 hover:text-white"
                   }`}
+                  aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}
+                  aria-expanded={showNotifications}
                 >
                   <Bell className="w-5 h-5" />
                   {unreadCount > 0 && (
-                    <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-primary-950 animate-pulse shadow-glow" />
+                    <span
+                      className="absolute top-2 right-2 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-primary-950 animate-pulse shadow-glow"
+                      aria-live="polite"
+                      aria-label={`${unreadCount} unread notifications`}
+                    />
                   )}
                 </button>
 
@@ -583,13 +618,25 @@ export const MainLayout = () => {
                   )}
                 </AnimatePresence>
               </div>
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">
+                  Live
+                </span>
+              </div>
               <ThemeToggle />
             </div>
           </div>
         </header>
 
         {/* Content Wrapper */}
-        <main className="flex-1 px-4 md:px-6 lg:px-8 pb-12 relative min-h-0">
+        <main
+          id="main-content"
+          className="flex-1 px-3 md:px-4 lg:px-6 xl:px-8 pb-8 md:pb-12 relative min-h-0"
+        >
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}

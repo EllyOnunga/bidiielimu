@@ -1,5 +1,4 @@
 from django.db.models import Avg, Count, Q
-
 from exams.models import ExamRanking
 
 from .models import PeriodAttendance

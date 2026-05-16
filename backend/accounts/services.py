@@ -6,10 +6,24 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
-from .models import EmailVerificationToken, User
+from .models import EmailVerificationToken
 
 
 class EmailService:
+    @staticmethod
+    def _get_frontend_url(user):
+        """Helper to get the correct frontend base URL for a user's school"""
+        if user.school:
+            domain = user.school.domains.filter(is_primary=True).first()
+            if domain:
+                protocol = "http" if "localhost" in domain.domain else "https"
+                # Handle local dev port
+                if "localhost" in domain.domain:
+                    return f"{protocol}://{domain.domain}:5173"
+                return f"{protocol}://{domain.domain}"
+
+        return settings.FRONTEND_URL
+
     @staticmethod
     def send_verification_email(user):
         """Send email verification link to user"""
@@ -36,7 +50,8 @@ class EmailService:
 
         # Send email
         subject = "Verify Your Email - ElimuHub"
-        verification_url = f"{settings.FRONTEND_URL}/verify-email/{token}"
+        base_url = EmailService._get_frontend_url(user)
+        verification_url = f"{base_url}/verify-email/{token}"
 
         html_message = render_to_string(
             "emails/verify_email.html",

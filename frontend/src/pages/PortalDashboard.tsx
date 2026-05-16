@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   Book,
@@ -16,9 +16,14 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import client from "../api/client";
 import { useAuthStore } from "../store/authStore";
 import { TableSkeleton } from "../components/ui/Skeleton";
+import { studentsService } from "../api/services/studentsService";
+import { classesService } from "../api/services/classesService";
+import { feesService } from "../api/services/feesService";
+import { inventoryService } from "../api/services/inventoryService";
+import { notificationsService } from "../api/services/notificationsService";
+import { attendanceService } from "../api/services/attendanceService";
 
 interface PortalStatProps {
   label: string;
@@ -81,10 +86,7 @@ export const PortalDashboard = () => {
   // Fetch children if parent
   const { data: children = [], isLoading: loadingChildren } = useQuery({
     queryKey: ["my-children"],
-    queryFn: async () => {
-      const res = await client.get("students/my_children/");
-      return res.data;
-    },
+    queryFn: () => studentsService.getMyChildren(),
     enabled: user?.role === "PARENT",
   });
 
@@ -92,74 +94,59 @@ export const PortalDashboard = () => {
   const { data: studentProfile, isLoading: loadingProfile } = useQuery({
     queryKey: ["my-profile"],
     queryFn: async () => {
-      const res = await client.get("students/");
-      const data = Array.isArray(res.data) ? res.data : res.data.results || [];
-      return data[0];
+      const data = await studentsService.getAll();
+      const results = Array.isArray(data) ? data : data.results || [];
+      return results[0];
     },
     enabled: user?.role === "STUDENT",
   });
 
-  useEffect(() => {
-    if (user?.role === "PARENT" && children.length > 0 && !selectedStudentId) {
-      setSelectedStudentId(children[0].id);
-    } else if (user?.role === "STUDENT" && studentProfile) {
-      setSelectedStudentId(studentProfile.id);
+  const activeStudent = useMemo(() => {
+    if (user?.role === "PARENT") {
+      if (selectedStudentId) {
+        return children.find((c: any) => c.id === selectedStudentId);
+      }
+      return children[0];
     }
+    return studentProfile;
   }, [children, studentProfile, user, selectedStudentId]);
 
-  const activeStudent =
-    user?.role === "PARENT"
-      ? children.find((c: any) => c.id === selectedStudentId)
-      : studentProfile;
+  // Sync selectedStudentId when data loads
+  useMemo(() => {
+    if (!selectedStudentId) {
+      if (user?.role === "PARENT" && children.length > 0) {
+        setSelectedStudentId(children[0].id);
+      } else if (user?.role === "STUDENT" && studentProfile) {
+        setSelectedStudentId(studentProfile.id);
+      }
+    }
+  }, [children, studentProfile, user, selectedStudentId]);
 
   // Academic Summary
   const { data: reportCard, isLoading: loadingAcademic } = useQuery({
     queryKey: ["portal-report", selectedStudentId],
-    queryFn: async () => {
-      const res = await client.get(
-        `students/${selectedStudentId}/report_card/`,
-      );
-      return res.data;
-    },
+    queryFn: () => studentsService.getReportCard(selectedStudentId!),
     enabled: !!selectedStudentId,
   });
 
-  // Attendance Stats — per student from DB
+  // Attendance Stats
   const { data: attendanceStats, isLoading: loadingAttendance } = useQuery({
     queryKey: ["portal-attendance", selectedStudentId],
-    queryFn: async () => {
-      const res = await client.get(
-        `attendance/daily/student_stats/?student_id=${selectedStudentId}`,
-      );
-      return res.data;
-    },
+    queryFn: () => attendanceService.getStudentStats(selectedStudentId!),
     enabled: !!selectedStudentId,
   });
 
-  // Fee Summary — scoped to this student/parent from DB
+  // Fee Summary
   const { data: feeSummary } = useQuery({
     queryKey: ["portal-fees", selectedStudentId],
-    queryFn: async () => {
-      const params =
-        user?.role === "PARENT" && selectedStudentId
-          ? `?student_id=${selectedStudentId}`
-          : "";
-      const res = await client.get(`fees/payments/my_fee_summary/${params}`);
-      return res.data;
-    },
+    queryFn: () => feesService.getFeeSummary(selectedStudentId),
     enabled: !!selectedStudentId,
   });
 
-  // Library Books — from active issues
+  // Library Books
   const { data: myBooks = [] } = useQuery({
     queryKey: ["portal-library", selectedStudentId],
-    queryFn: async () => {
-      const params = selectedStudentId
-        ? `?student_id=${selectedStudentId}`
-        : "";
-      const res = await client.get(`inventory/book-issues/my_books/${params}`);
-      return res.data;
-    },
+    queryFn: () => inventoryService.getMyBooks(selectedStudentId),
     enabled: !!selectedStudentId,
   });
 
@@ -170,11 +157,10 @@ export const PortalDashboard = () => {
   const { data: schedule = [] } = useQuery({
     queryKey: ["portal-schedule", activeStudent?.stream],
     queryFn: async () => {
-      const res = await client.get(
-        `classes/schedule-slots/?stream=${activeStudent?.stream}`,
-      );
-      const data = Array.isArray(res.data) ? res.data : res.data.results || [];
-      return data.slice(0, 4);
+      const data = await classesService.getScheduleSlots();
+      const results = Array.isArray(data) ? data : data.results || [];
+      // Filter by stream on frontend if backend doesn't support it (service update suggested)
+      return results.filter((s: any) => s.stream === activeStudent?.stream).slice(0, 4);
     },
     enabled: !!activeStudent?.stream,
   });
@@ -476,13 +462,11 @@ export const PortalDashboard = () => {
 const NoticesWidget = () => {
   const { data: notices = [], isLoading } = useQuery({
     queryKey: ["school-notices"],
-    queryFn: async () => {
-      const res = await client.get(
-        "notifications/notices/?ordering=-published_at&page_size=3",
-      );
-      const data = Array.isArray(res.data) ? res.data : res.data.results || [];
-      return data.slice(0, 3);
-    },
+    queryFn: () => notificationsService.getNotices({ ordering: "-published_at", page_size: 3 }),
+    select: (data) => {
+      const results = Array.isArray(data) ? data : data.results || [];
+      return results.slice(0, 3);
+    }
   });
 
   const formatDate = (dateStr: string) => {

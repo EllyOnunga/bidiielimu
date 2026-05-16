@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Mail, ArrowLeft, Loader2, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
-import client from "../api/client";
+import { authService } from "../api/services/authService";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 
@@ -17,7 +17,7 @@ export const ForgotPasswordPage = () => {
     setLoading(true);
 
     try {
-      await client.post("auth/password/reset/", { email });
+      await authService.resetPasswordRequest(email);
       setSent(true);
       toast.success("Reset link sent to your email");
     } catch (error: any) {

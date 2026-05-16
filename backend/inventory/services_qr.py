@@ -2,7 +2,6 @@ import uuid
 from io import BytesIO
 
 import qrcode
-from django.core.files.base import ContentFile
 
 
 class AssetQRService:

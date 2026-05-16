@@ -1,9 +1,5 @@
-import numpy as np
-import pandas as pd
-from django.db.models import Avg
-from sklearn.ensemble import RandomForestClassifier
-
 from attendance.models import DailyAttendance
+from django.db.models import Avg
 from exams.models import Mark
 
 from .models import PredictiveRisk

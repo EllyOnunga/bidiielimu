@@ -2,7 +2,6 @@ import logging
 
 from celery import shared_task
 from django_tenants.utils import tenant_context
-
 from schools.models import School
 from students.models import Student
 
@@ -40,14 +39,14 @@ def run_nightly_risk_assessment():
                         EarlyWarningEngine.run_prediction_for_student(student)
                         school_count += 1
                     except Exception as e:
-                        logger.error(
-                            f"Failed to assess risk for student {student.id} in {school.name}: {str(e)}"
-                        )
+                        logger.error(f"Failed to assess risk for student {
+                                student.id} in {
+                                school.name}: {
+                                str(e)}")
 
                 total_processed += school_count
-                logger.info(
-                    f"Completed risk assessment for {school.name}. Processed {school_count} students."
-                )
+                logger.info(f"Completed risk assessment for {
+                        school.name}. Processed {school_count} students.")
             except Exception as e:
                 logger.error(f"Error processing school {school.name}: {str(e)}")
 
@@ -55,3 +54,20 @@ def run_nightly_risk_assessment():
         f"Nightly risk assessment complete. Total students processed across all tenants: {total_processed}"
     )
     return total_processed
+
+
+@shared_task
+def generate_analytics_report(report_id: int):
+    """Generate and cache a heavy analytics report in the background."""
+    from .models import AnalyticsReport
+
+    try:
+        report = AnalyticsReport.objects.get(id=report_id)
+        # Placeholder: In real implementation, call PerformanceAnalyticsService or ML engine
+        # and store results in report.data + report.insights
+        report.data = {"status": "generated", "kpis": {}}
+        report.insights = ["Report generated successfully"]
+        report.save()
+        return {"status": "success", "report_id": report_id}
+    except AnalyticsReport.DoesNotExist:
+        return {"status": "error", "message": "Report not found"}

@@ -27,14 +27,15 @@ export interface Student {
   gender: "M" | "F" | "O";
   stream?: number;
   is_active: boolean;
+  email?: string;
   grade_name?: string;
   stream_name?: string;
   guardians?: Guardian[];
 }
 
 export const studentsService = {
-  getAll: async (search?: string) => {
-    const response = await client.get("students/", { params: { search } });
+  getAll: async (params?: any) => {
+    const response = await client.get("students/", { params });
     return response.data;
   },
 
@@ -53,8 +54,13 @@ export const studentsService = {
     return response.data;
   },
 
-  delete: async (id: number) => {
+  delete: async (id: string | number) => {
     const response = await client.delete(`students/${id}/`);
+    return response.data;
+  },
+
+  getMyChildren: async () => {
+    const response = await client.get("students/my_children/");
     return response.data;
   },
 

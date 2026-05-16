@@ -18,7 +18,12 @@ class FeeStructure(models.Model):
         unique_together = ("grade_level", "term", "academic_year")
 
     def __str__(self):
-        return f"{self.grade_level.name} - {self.term} ({self.academic_year}): {self.currency} {self.amount}"
+        return f"{
+            self.grade_level.name} - {
+            self.term} ({
+            self.academic_year}): {
+                self.currency} {
+                    self.amount}"
 
 
 class Invoice(models.Model):

@@ -2,11 +2,11 @@ import os
 
 import django
 from django.db import connection
+from schools.models import Domain, School
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
-from schools.models import Domain, School
 
 print("--- Schools ---")
 for school in School.objects.all():

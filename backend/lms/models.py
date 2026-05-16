@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.db import models
 
 
@@ -136,3 +135,45 @@ class QuizAttempt(models.Model):
 
     def __str__(self):
         return f"{self.student} - {self.quiz} ({self.score})"
+
+
+# New scalable LMS models for robustness
+class StudentProgress(models.Model):
+    student = models.ForeignKey(
+        "students.Student", on_delete=models.CASCADE, related_name="progress"
+    )
+    subject = models.ForeignKey("classes.Subject", on_delete=models.CASCADE)
+    completion_percent = models.FloatField(default=0)
+    last_accessed = models.DateTimeField(auto_now=True)
+    streak_days = models.IntegerField(default=0)
+
+    class Meta:
+        unique_together = ("student", "subject")
+
+
+class VideoWatchTime(models.Model):
+    resource = models.ForeignKey(Resource, on_delete=models.CASCADE)
+    student = models.ForeignKey("students.Student", on_delete=models.CASCADE)
+    watched_seconds = models.IntegerField(default=0)
+    last_position = models.IntegerField(default=0)
+    completed = models.BooleanField(default=False)
+
+
+class Discussion(models.Model):
+    resource = models.ForeignKey(
+        Resource,
+        on_delete=models.CASCADE,
+        related_name="discussions",
+        null=True,
+        blank=True,
+    )
+    assignment = models.ForeignKey(
+        Assignment,
+        on_delete=models.CASCADE,
+        related_name="discussions",
+        null=True,
+        blank=True,
+    )
+    author = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)

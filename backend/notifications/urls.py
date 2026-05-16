@@ -1,12 +1,8 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from .views import (
-    NoticeViewSet,
-    NotificationViewSet,
-    PTMMeetingViewSet,
-    SchoolEventViewSet,
-)
+from .views import (NoticeViewSet, NotificationViewSet, PTMMeetingViewSet,
+                    SchoolEventViewSet)
 
 router = DefaultRouter()
 router.register(r"", NotificationViewSet, basename="notification")

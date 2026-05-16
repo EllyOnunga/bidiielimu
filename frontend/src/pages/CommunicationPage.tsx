@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Mail,
   Send,
@@ -9,16 +9,14 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import client from "../api/client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
+import { notificationsService } from "../api/services/notificationsService";
 
 export const CommunicationPage = () => {
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<"email" | "sms">("email");
-  const [sending, setSending] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState<any>(null);
-  const [groups, setGroups] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     subject: "",
     message: "",
@@ -26,80 +24,85 @@ export const CommunicationPage = () => {
     phones: "", // Comma separated phones
   });
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const { data: stats, isLoading: loadingStats } = useQuery({
+    queryKey: ["communication-stats"],
+    queryFn: notificationsService.getCommunicationStats,
+  });
 
-  const fetchData = async () => {
-    try {
-      const [statsRes, groupsRes] = await Promise.all([
-        client.get("notifications/communication_stats/"),
-        client.get("notifications/recipient_groups/"),
-      ]);
-      setStats(statsRes.data);
-      setGroups(groupsRes.data);
-    } catch (error) {
-      console.error("Failed to fetch communication data", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: groups = [], isLoading: loadingGroups } = useQuery({
+    queryKey: ["recipient-groups"],
+    queryFn: notificationsService.getRecipientGroups,
+  });
 
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSending(true);
-
-    try {
-      if (activeTab === "email") {
-        const emailList = formData.recipients
-          .split(",")
-          .map((e) => e.trim())
-          .filter(Boolean);
-        await client.post("notifications/bulk_email/", {
-          subject: formData.subject,
-          message: formData.message,
-          recipients: emailList,
-        });
-        toast.success(`Email sent to ${emailList.length} recipients`);
-      } else {
-        const phoneList = formData.phones
-          .split(",")
-          .map((p) => p.trim())
-          .filter(Boolean);
-        await client.post("notifications/bulk_sms/", {
-          message: formData.message,
-          phones: phoneList,
-        });
-        toast.success(`SMS sent to ${phoneList.length} recipients`);
-      }
+  const sendEmailMutation = useMutation({
+    mutationFn: (data: { subject: string; message: string; recipients: string[] }) =>
+      notificationsService.sendBulkEmail(data),
+    onSuccess: (_, variables) => {
+      toast.success(`Email sent to ${variables.recipients.length} recipients`);
       setFormData({ subject: "", message: "", recipients: "", phones: "" });
-    } catch (error: any) {
-      toast.error(error.response?.data?.detail || "Failed to send messages");
-    } finally {
-      setSending(false);
+      queryClient.invalidateQueries({ queryKey: ["communication-stats"] });
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.detail || "Failed to send email");
     }
-  };
+  });
 
-  const handleSelectGroup = async (groupId: string) => {
-    try {
+  const sendSmsMutation = useMutation({
+    mutationFn: (data: { message: string; phones: string[] }) =>
+      notificationsService.sendBulkSms(data),
+    onSuccess: (_, variables) => {
+      toast.success(`SMS sent to ${variables.phones.length} recipients`);
+      setFormData({ subject: "", message: "", recipients: "", phones: "" });
+      queryClient.invalidateQueries({ queryKey: ["communication-stats"] });
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.detail || "Failed to send SMS");
+    }
+  });
+
+  const fetchGroupMutation = useMutation({
+    mutationFn: ({ groupId, type }: { groupId: string; type: string }) =>
+      notificationsService.getGroupRecipients(groupId, type),
+    onMutate: () => {
       toast.loading("Fetching recipients...", { id: "group-fetch" });
-      const res = await client.get(
-        `notifications/${groupId}/group-recipients/`,
-        {
-          params: { type: activeTab },
-        },
-      );
-      const recipients = res.data.recipients.join(", ");
-
+    },
+    onSuccess: (data) => {
+      const recipients = data.recipients.join(", ");
       setFormData((prev) => ({
         ...prev,
         [activeTab === "email" ? "recipients" : "phones"]: recipients,
       }));
       toast.success("Recipients loaded", { id: "group-fetch" });
-    } catch (error) {
+    },
+    onError: () => {
       toast.error("Failed to load group recipients", { id: "group-fetch" });
     }
+  });
+
+  const handleSend = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (activeTab === "email") {
+      const emailList = formData.recipients.split(",").map((e) => e.trim()).filter(Boolean);
+      sendEmailMutation.mutate({
+        subject: formData.subject,
+        message: formData.message,
+        recipients: emailList,
+      });
+    } else {
+      const phoneList = formData.phones.split(",").map((p) => p.trim()).filter(Boolean);
+      sendSmsMutation.mutate({
+        message: formData.message,
+        phones: phoneList,
+      });
+    }
   };
+
+  const handleSelectGroup = (groupId: string) => {
+    fetchGroupMutation.mutate({ groupId, type: activeTab });
+  };
+
+  const loading = loadingStats || loadingGroups;
+  const sending = sendEmailMutation.isPending || sendSmsMutation.isPending;
 
   if (loading) {
     return (
@@ -123,22 +126,20 @@ export const CommunicationPage = () => {
       <div className="flex flex-wrap gap-2 p-1.5 bg-white/5 rounded-2xl w-fit border border-white/5">
         <button
           onClick={() => setActiveTab("email")}
-          className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
-            activeTab === "email"
+          className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === "email"
               ? "bg-primary-600 text-white shadow-lg"
               : "text-muted hover:text-primary"
-          }`}
+            }`}
         >
           <Mail className="w-4 h-4" />
           Bulk Email
         </button>
         <button
           onClick={() => setActiveTab("sms")}
-          className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
-            activeTab === "sms"
+          className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === "sms"
               ? "bg-primary-600 text-white shadow-lg"
               : "text-muted hover:text-primary"
-          }`}
+            }`}
         >
           <Phone className="w-4 h-4" />
           Bulk SMS
@@ -259,7 +260,7 @@ export const CommunicationPage = () => {
               Quick Select Groups
             </h3>
             <div className="space-y-3">
-              {groups.map((group) => (
+              {groups.map((group: any) => (
                 <button
                   key={group.id}
                   onClick={() => handleSelectGroup(group.id)}
@@ -301,11 +302,10 @@ export const CommunicationPage = () => {
                   <div
                     className="h-full bg-primary-500 transition-all duration-500"
                     style={{
-                      width: `${
-                        activeTab === "email"
+                      width: `${activeTab === "email"
                           ? (stats?.email_used / stats?.email_limit) * 100
                           : (stats?.sms_used / stats?.sms_limit) * 100
-                      }%`,
+                        }%`,
                     }}
                   ></div>
                 </div>

@@ -1,19 +1,20 @@
 import uuid
 
+from accounts.permissions import IsTeacher
+from config.tenant_security import (StrictTenantPermission,
+                                    TenantAwareViewSetMixin)
 from django.db.models import Sum
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from accounts.permissions import IsTeacher
-
 from .models import FeePayment, FeeStructure
 from .serializers import FeePaymentSerializer, FeeStructureSerializer
 
 
-class FeeStructureViewSet(viewsets.ModelViewSet):
+class FeeStructureViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
     serializer_class = FeeStructureSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, StrictTenantPermission]
     search_fields = ["grade_level__name"]
 
     def get_queryset(self):
@@ -23,9 +24,9 @@ class FeeStructureViewSet(viewsets.ModelViewSet):
         serializer.save()
 
 
-class FeePaymentViewSet(viewsets.ModelViewSet):
+class FeePaymentViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
     serializer_class = FeePaymentSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, StrictTenantPermission]
     filterset_fields = ["student", "payment_method"]
     search_fields = [
         "student__first_name",
@@ -54,7 +55,6 @@ class FeePaymentViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def student_balances(self, request):
         from django.db.models import DecimalField, OuterRef, Subquery
-
         from students.models import Student
 
         # Calculate total paid for each student
@@ -99,9 +99,13 @@ class FeePaymentViewSet(viewsets.ModelViewSet):
             data.append(
                 {
                     "student_id": student.id,
-                    "name": f"{student.first_name} {student.last_name}",
+                    "name": f"{
+                        student.first_name} {
+                        student.last_name}",
                     "admission_number": student.admission_number,
-                    "class": f"{student.stream.grade_level.name} {student.stream.name if student.stream else ''}",
+                    "class": f"{
+                        student.stream.grade_level.name} {
+                        student.stream.name if student.stream else ''}",
                     "expected_fees": float(expected_fees),
                     "total_paid": float(total_paid),
                     "balance": float(balance),
@@ -230,7 +234,8 @@ class FeePaymentViewSet(viewsets.ModelViewSet):
 
         # Mock M-Pesa delay and success
         # In a real app, this would call Daraja API and wait for a callback.
-        # Here we immediately create the payment to simulate a successful STK push callback.
+        # Here we immediately create the payment to simulate a successful STK push
+        # callback.
 
         transaction_id = f"MPESA{str(uuid.uuid4())[:8].upper()}"
 

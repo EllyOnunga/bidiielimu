@@ -32,9 +32,8 @@ class StaffProfileSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        from django.db import transaction
-
         from accounts.models import Role, User
+        from django.db import transaction
 
         email = validated_data.pop("email")
         first_name = validated_data.pop("first_name")

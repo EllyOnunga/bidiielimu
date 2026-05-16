@@ -1,6 +1,5 @@
-from django.core.management.base import BaseCommand
-
 from config.backup_manager import BackupManager
+from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):

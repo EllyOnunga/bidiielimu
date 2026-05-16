@@ -1,14 +1,15 @@
+from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
-
 from students.models import Student
 from teachers.models import Teacher
 
 from .models import EmailVerificationToken, User
-from .serializers import MyTokenObtainPairSerializer, RegisterSerializer, UserSerializer
+from .serializers import (MyTokenObtainPairSerializer, RegisterSerializer,
+                          UserSerializer)
 
 
 class RegisterView(generics.CreateAPIView):
@@ -74,17 +75,10 @@ class VerifyEmailView(generics.GenericAPIView):
         verification_token.delete()
 
         # Send Welcome Email
-        from django.conf import settings
-
-        domain_name = (
-            user.school.domains.filter(is_primary=True).first().domain
-            if user.school
-            else "elimuhub.com"
-        )
-        protocol = "http://" if "localhost" in domain_name else "https://"
-        login_url = f"{protocol}{domain_name}/login"
-
         from .services import EmailService
+
+        base_url = EmailService._get_frontend_url(user)
+        login_url = f"{base_url}/login"
 
         EmailService.send_welcome_email(user, login_url=login_url)
 
@@ -215,3 +209,53 @@ class GDPRDeleteView(generics.GenericAPIView):
             {"detail": "Account successfully deleted and anonymized."},
             status=status.HTTP_204_NO_CONTENT,
         )
+
+
+class UserSchoolsView(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def list(self, request, *args, **kwargs):
+        user = request.user
+        schools = []
+
+        # If super admin, get all schools
+        if user.is_superuser or user.role_name == "SUPER_ADMIN":
+            from schools.models import School
+
+            schools = School.objects.all()
+        else:
+            # Get schools based on user's roles
+            user_schools = set()
+            if user.school:
+                user_schools.add(user.school)
+
+            # If teacher, add schools from teacher profile
+            if hasattr(user, "teacher_profile") and user.teacher_profile:
+                user_schools.add(user.teacher_profile.school)
+
+            # If student, add school from student profile
+            if hasattr(user, "student_profile") and user.student_profile:
+                user_schools.add(user.student_profile.school)
+
+            schools = list(user_schools)
+
+        # Serialize schools with correct domain lookup
+        school_data = []
+        for school in schools:
+            domain_obj = school.domains.filter(is_primary=True).first()
+            domain = (
+                domain_obj.domain
+                if domain_obj
+                else f"{school.schema_name.replace('_', '-')}.{settings.TENANT_DOMAIN_SUFFIX}"
+            )
+
+            school_data.append(
+                {
+                    "id": school.id,
+                    "name": school.name,
+                    "schema_name": school.schema_name,
+                    "domain": domain,
+                }
+            )
+
+        return Response({"schools": school_data})

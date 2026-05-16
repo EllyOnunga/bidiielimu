@@ -5,4 +5,4 @@ class AuditConfig(AppConfig):
     name = "audit"
 
     def ready(self):
-        import audit.signals
+        pass

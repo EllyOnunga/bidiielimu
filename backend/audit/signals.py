@@ -1,7 +1,6 @@
+from attendance.models import DailyAttendance
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
-
-from attendance.models import DailyAttendance
 from exams.models import Mark
 from fees.models import FeePayment
 from students.models import Student

@@ -1,23 +1,11 @@
 from django.db.models import Count
 from rest_framework import permissions, viewsets
-from rest_framework.exceptions import ValidationError
 
-from .models import (
-    Classroom,
-    GradeLevel,
-    ScheduleSlot,
-    Stream,
-    Subject,
-    SubjectAssignment,
-)
-from .serializers import (
-    ClassroomSerializer,
-    GradeLevelSerializer,
-    ScheduleSlotSerializer,
-    StreamSerializer,
-    SubjectAssignmentSerializer,
-    SubjectSerializer,
-)
+from .models import (Classroom, GradeLevel, ScheduleSlot, Stream, Subject,
+                     SubjectAssignment)
+from .serializers import (ClassroomSerializer, GradeLevelSerializer,
+                          ScheduleSlotSerializer, StreamSerializer,
+                          SubjectAssignmentSerializer, SubjectSerializer)
 
 
 class SubjectAssignmentViewSet(viewsets.ModelViewSet):

@@ -56,4 +56,16 @@ export const examsService = {
     const response = await client.post(`exams/exams/${id}/compute_ranks/`);
     return response.data;
   },
+
+  getMarks: async (examId: string, subjectId: string) => {
+    const response = await client.get("exams/marks/", {
+      params: { exam: examId, subject: subjectId },
+    });
+    return response.data;
+  },
+
+  saveMarks: async (data: { exam: string; subject: string; marks: any[] }) => {
+    const response = await client.post("exams/marks/bulk_save/", data);
+    return response.data;
+  },
 };

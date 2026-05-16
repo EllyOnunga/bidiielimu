@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Shield,
   Building2,
@@ -11,8 +11,17 @@ import {
   AlertTriangle,
   ExternalLink,
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { schoolsService } from "../api/services/schoolsService";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "../components/ui/Table";
 import { TableSkeleton } from "../components/ui/Skeleton";
-import client from "../api/client";
 
 interface SchoolData {
   id: number;
@@ -24,50 +33,38 @@ interface SchoolData {
 }
 
 export const SuperAdminPage = () => {
-  const [schools, setSchools] = useState<SchoolData[]>([]);
-  const [stats, setStats] = useState({
-    total_schools: 0,
-    total_users: 0,
-    total_revenue: 0,
-    system_alerts: 0,
-  });
-  const [loading, setLoading] = useState(true);
-
+  const [searchTerm, setSearchTerm] = useState("");
   const [unauthorized, setUnauthorized] = useState(false);
 
-  const fetchStats = async () => {
-    try {
-      const [schoolsRes, statsRes] = await Promise.all([
-        client.get("schools/"),
-        client.get("schools/super_admin_stats/"),
-      ]);
-
-      const schoolsData = Array.isArray(schoolsRes.data)
-        ? schoolsRes.data
-        : schoolsRes.data.results || [];
-      const mapped = schoolsData.map((s: any) => ({
-        id: s.id,
-        name: s.name,
-        students: s.student_count || 0,
-        plan: s.subscription?.plan || "BASIC",
-        status: s.subscription?.status === "ACTIVE" ? "ACTIVE" : "EXPIRED",
-        revenue: `KSh ${Number(s.total_revenue || 0).toLocaleString()}`,
-      }));
-      setSchools(mapped);
-      setStats(statsRes.data);
-    } catch (error: any) {
-      if (error.response?.status === 403) {
-        setUnauthorized(true);
+  const { data: schools = [], isLoading } = useQuery<SchoolData[]>({
+    queryKey: ["super-admin-schools"],
+    queryFn: async () => {
+      try {
+        const res = await schoolsService.getAll();
+        const schoolsData = Array.isArray(res) ? res : (res as any).results || [];
+        return schoolsData.map((s: any) => ({
+          id: s.id,
+          name: s.name,
+          students: s.student_count || 0,
+          plan: s.subscription?.plan || "BASIC",
+          status: s.subscription?.status === "ACTIVE" ? "ACTIVE" : "EXPIRED",
+          revenue: `KSh ${Number(s.total_revenue || 0).toLocaleString()}`,
+        }));
+      } catch (error: any) {
+        if (error.response?.status === 403) setUnauthorized(true);
+        throw error;
       }
-      console.error("Failed to fetch super admin data", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+  });
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
+  const { data: stats } = useQuery({
+    queryKey: ["super-admin-stats"],
+    queryFn: () => schoolsService.getStats(),
+  });
+
+  const filteredSchools = schools.filter((school) =>
+    school.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (unauthorized) {
     return (
@@ -86,7 +83,7 @@ export const SuperAdminPage = () => {
         </div>
         <button
           onClick={() => (window.location.href = "/dashboard")}
-          className="px-6 py-3 bg-white/5 text-primary rounded-xl font-bold border border-white/10 hover:bg-white/10 transition-all"
+          className="px-6 py-3 bg-white/5 text-primary rounded-xl font-bold border border-white/10 hover:bg-white/10 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400"
         >
           Return to Dashboard
         </button>
@@ -118,96 +115,86 @@ export const SuperAdminPage = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
         <StatCard
           title="Total Schools"
-          value={stats.total_schools}
+          value={stats?.total_schools || 0}
           icon={Building2}
           color="bg-blue-500/20"
         />
         <StatCard
           title="Active Users"
-          value={(stats.total_users / 1000).toFixed(1) + "k"}
+          value={stats ? (stats.total_users / 1000).toFixed(1) + "k" : "0"}
           icon={Users}
           color="bg-purple-500/20"
         />
         <StatCard
           title="Monthly Revenue"
-          value={`KSh ${(stats.total_revenue / 1000000).toFixed(1)}M`}
+          value={stats ? `KSh ${(stats.total_revenue / 1000000).toFixed(1)}M` : "KSh 0M"}
           icon={CreditCard}
           color="bg-emerald-500/20"
         />
         <StatCard
           title="System Alerts"
-          value={stats.system_alerts}
+          value={stats?.system_alerts || 0}
           icon={AlertTriangle}
           color="bg-rose-500/20"
         />
       </div>
 
-      <div className="glass rounded-3xl border border-white/5 overflow-hidden">
+      <div className="glass rounded-[32px] sm:rounded-[40px] border border-white/5 overflow-hidden">
         <div className="p-4 md:p-6 border-b border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <h2 className="text-lg md:text-xl font-bold text-primary">
             Registered Schools
           </h2>
           <div className="relative w-full sm:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dim" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-dim" />
             <input
               placeholder="Search schools..."
-              className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-xl text-primary text-sm outline-none"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-primary text-sm outline-none focus:ring-2 focus:ring-primary-500 transition-all"
             />
           </div>
         </div>
 
-        <div className="overflow-x-auto custom-scrollbar">
-          <table className="w-full text-left min-w-[800px]">
-            <thead>
-              <tr className="bg-white/5">
-                <th className="px-8 py-4 text-xs font-bold text-muted uppercase">
-                  School Name
-                </th>
-                <th className="px-8 py-4 text-xs font-bold text-muted uppercase">
-                  Plan
-                </th>
-                <th className="px-8 py-4 text-xs font-bold text-muted uppercase text-center">
-                  Students
-                </th>
-                <th className="px-8 py-4 text-xs font-bold text-muted uppercase text-center">
-                  Status
-                </th>
-                <th className="px-8 py-4 text-xs font-bold text-muted uppercase text-right">
-                  Revenue
-                </th>
-                <th className="px-8 py-4 text-xs font-bold text-muted uppercase text-right">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5">
-              {loading ? (
+        <div className="relative">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-white/[0.02]">
+                <TableHead>School Name</TableHead>
+                <TableHead>Plan</TableHead>
+                <TableHead className="text-center">Students</TableHead>
+                <TableHead className="text-center">Status</TableHead>
+                <TableHead className="text-right">Revenue</TableHead>
+                <TableHead className="text-center">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
                 <TableSkeleton rows={8} cols={6} />
-              ) : schools.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-8 py-12 text-center text-muted">
-                    No schools found.
-                  </td>
-                </tr>
-              ) : (
-                schools.map((school) => (
-                  <tr
-                    key={school.id}
-                    className="hover:bg-white/[0.02] transition-all group"
+              ) : filteredSchools.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={6}
+                    className="py-12 text-center text-muted font-bold tracking-widest uppercase text-xs"
                   >
-                    <td className="px-8 py-4">
+                    No schools found.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredSchools.map((school) => (
+                  <TableRow key={school.id} className="group">
+                    <TableCell>
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/5 text-muted">
-                          <Building2 className="w-5 h-5" />
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/5 text-muted">
+                          <Building2 className="w-4 h-4 sm:w-5 sm:h-5" />
                         </div>
-                        <div className="text-sm font-bold text-primary">
+                        <div className="text-xs sm:text-sm font-bold text-primary whitespace-nowrap">
                           {school.name}
                         </div>
                       </div>
-                    </td>
-                    <td className="px-8 py-4">
+                    </TableCell>
+                    <TableCell>
                       <span
-                        className={`px-2 py-1 rounded-lg text-[10px] font-bold border ${
+                        className={`px-2.5 py-1 rounded-lg text-[9px] sm:text-[10px] font-black uppercase tracking-widest border ${
                           school.plan === "ENTERPRISE"
                             ? "bg-purple-500/10 text-purple-400 border-purple-500/20"
                             : school.plan === "PREMIUM"
@@ -217,46 +204,50 @@ export const SuperAdminPage = () => {
                       >
                         {school.plan}
                       </span>
-                    </td>
-                    <td className="px-8 py-4 text-center text-sm text-muted">
+                    </TableCell>
+                    <TableCell className="text-center text-xs sm:text-sm text-muted">
                       {school.students}
-                    </td>
-                    <td className="px-8 py-4">
+                    </TableCell>
+                    <TableCell className="text-center">
                       <div className="flex items-center justify-center gap-1.5">
                         {school.status === "ACTIVE" ? (
-                          <span className="flex items-center gap-1 text-emerald-400 text-[10px] font-bold uppercase">
-                            <CheckCircle className="w-3 h-3" />
+                          <span className="flex items-center gap-1.5 text-emerald-400 text-[9px] sm:text-[10px] font-black uppercase tracking-widest">
+                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                             Active
                           </span>
                         ) : (
-                          <span className="flex items-center gap-1 text-rose-400 text-[10px] font-bold uppercase">
-                            <AlertTriangle className="w-3 h-3" />
+                          <span className="flex items-center gap-1.5 text-rose-400 text-[9px] sm:text-[10px] font-black uppercase tracking-widest">
+                            <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4" />
                             Expired
                           </span>
                         )}
                       </div>
-                    </td>
-                    <td className="px-8 py-4 text-right font-bold text-primary text-sm">
+                    </TableCell>
+                    <TableCell className="text-right font-black tracking-tighter text-primary text-sm sm:text-base whitespace-nowrap">
                       {school.revenue}
-                    </td>
-                    <td className="px-8 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <div className="flex items-center justify-center gap-1">
                         <button
-                          className="p-2 hover:bg-white/10 rounded-lg text-muted transition-all"
+                          className="p-2 hover:bg-white/10 rounded-xl text-muted transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400"
+                          aria-label={`Manage school ${school.name}`}
                           title="Manage School"
                         >
-                          <ExternalLink className="w-4 h-4" />
+                          <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
                         </button>
-                        <button className="p-2 hover:bg-white/10 rounded-lg text-muted transition-all">
-                          <MoreHorizontal className="w-4 h-4" />
+                        <button
+                          className="p-2 hover:bg-white/10 rounded-xl text-muted transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400"
+                          aria-label={`More options for ${school.name}`}
+                        >
+                          <MoreHorizontal className="w-4 h-4 sm:w-5 sm:h-5" />
                         </button>
                       </div>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </div>
     </div>

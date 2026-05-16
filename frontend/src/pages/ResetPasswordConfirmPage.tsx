@@ -5,7 +5,7 @@ import { PasswordInput } from "../components/ui/PasswordInput";
 import { PasswordHint } from "../components/ui/PasswordHint";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
-import client from "../api/client";
+import { authService } from "../api/services/authService";
 import { Button } from "../components/ui/Button";
 
 export const ResetPasswordConfirmPage = () => {
@@ -28,7 +28,7 @@ export const ResetPasswordConfirmPage = () => {
     setLoading(true);
 
     try {
-      await client.post("auth/password/reset/confirm/", {
+      await authService.confirmPasswordReset({
         uid,
         token,
         new_password1: password,
