@@ -6,8 +6,9 @@ import {
   Send,
   HelpCircle,
 } from "lucide-react";
-import client from "../../api/client";
+import { lmsService } from "../../api/services/lmsService";
 import toast from "react-hot-toast";
+import { Button } from "../ui/Button";
 
 interface Question {
   id: string;
@@ -35,38 +36,41 @@ export const QuizInterface = ({
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [timeLeft, setTimeLeft] = useState(0); // in seconds
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [result, setResult] = useState<{ score: number; max_score: number } | null>(null);
 
-  useEffect(() => {
-    fetchQuiz();
-  }, [quizId]);
-
-  const fetchQuiz = async () => {
+  const fetchQuiz = useCallback(async () => {
     try {
-      const res = await client.get(`lms/quizzes/${quizId}/`);
-      if (res.data && Array.isArray(res.data.questions)) {
-        setQuiz(res.data);
-        setTimeLeft((res.data.duration_minutes || 30) * 60);
+      const res = await lmsService.getQuiz(quizId);
+      if (res && Array.isArray(res.questions)) {
+        setQuiz(res);
+        setTimeLeft((res.duration_minutes || 30) * 60);
       } else {
         toast.error("Invalid quiz data received");
       }
     } catch (err) {
       toast.error("Failed to load quiz");
     }
-  };
+  }, [quizId]);
+
+  useEffect(() => {
+    fetchQuiz();
+  }, [fetchQuiz]);
 
   const submitQuiz = useCallback(async () => {
     if (isSubmitting) return;
     setIsSubmitting(true);
     const toastId = toast.loading("Marking your quiz...");
     try {
-      const res = await client.post(`lms/quizzes/${quizId}/attempt/`, {
-        answers,
-      });
+      const res = await lmsService.submitQuiz(quizId, answers);
+      const resultData = {
+        score: res.score,
+        max_score: res.max_score,
+      };
+      setResult(resultData);
       toast.success(
-        `Quiz completed! Your score: ${res.data.score}/${res.data.max_score}`,
+        `Quiz completed! Your score: ${res.score}/${res.max_score}`,
         { id: toastId, duration: 5000 },
       );
-      onComplete();
     } catch (err) {
       toast.error("Failed to submit quiz", { id: toastId });
     } finally {
@@ -129,7 +133,7 @@ export const QuizInterface = ({
       <div className="flex-1 overflow-auto p-4 sm:p-8 lg:p-20 flex flex-col items-center">
         <div className="max-w-3xl w-full">
           <div className="glass p-6 sm:p-8 lg:p-12 rounded-[32px] sm:rounded-[48px] border border-white/10 shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-white/5">
+            <div className="absolute top-0 left-0 w-full h-1 bg-white/5" role="progressbar" aria-valuenow={currentIdx + 1} aria-valuemin={1} aria-valuemax={quiz.questions.length}>
               <div
                 className="h-full bg-primary-500 transition-all duration-500"
                 style={{
@@ -223,6 +227,20 @@ export const QuizInterface = ({
             />
           ))}
       </div>
+
+      {/* Results Screen */}
+      {result && (
+        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
+          <div className="glass p-10 rounded-3xl text-center max-w-md">
+            <h2 className="text-3xl font-black text-primary mb-4">Quiz Complete</h2>
+            <div className="text-6xl font-black text-white mb-2">
+              {result.score} <span className="text-2xl text-muted">/ {result.max_score}</span>
+            </div>
+            <p className="text-muted mb-8">Great effort!</p>
+            <Button onClick={onComplete} className="w-full">Return to LMS</Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

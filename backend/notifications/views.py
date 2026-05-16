@@ -3,12 +3,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from .models import Notice, Notification, PTMMeeting, SchoolEvent
-from .serializers import (
-    NoticeSerializer,
-    NotificationSerializer,
-    PTMMeetingSerializer,
-    SchoolEventSerializer,
-)
+from .serializers import (NoticeSerializer, NotificationSerializer,
+                          PTMMeetingSerializer, SchoolEventSerializer)
 from .services_sms import SMSService
 
 

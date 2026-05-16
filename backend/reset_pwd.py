@@ -1,11 +1,11 @@
 import os
 
 import django
+from accounts.models import User
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
-from accounts.models import User
 
 try:
     user = User.objects.get(email="onungae5@gmail.com")

@@ -10,7 +10,8 @@ import {
   Users,
   Download,
 } from "lucide-react";
-import client from "../../api/client";
+import { lmsService } from "../../api/services/lmsService";
+import { teachersService } from "../../api/services/teachersService";
 import toast from "react-hot-toast";
 import { useAuthStore } from "../../store/authStore";
 import { Modal } from "../ui/Modal";
@@ -101,8 +102,8 @@ export const AssignmentList = () => {
   const { data: teachers = [] } = useQuery({
     queryKey: ["teachers"],
     queryFn: async () => {
-      const res = await client.get("teachers/");
-      return Array.isArray(res.data) ? res.data : res.data.results || [];
+      const res = await teachersService.getAll();
+      return Array.isArray(res) ? res : res.results || [];
     },
     enabled: isTeacher && user?.role !== "TEACHER", // Only for admins
   });
@@ -137,8 +138,8 @@ export const AssignmentList = () => {
 
   const fetchAssignments = async () => {
     try {
-      const res = await client.get("lms/assignments/");
-      const data = res.data.results || res.data;
+      const res = await lmsService.getAssignments();
+      const data = res.results || res;
       setAssignments(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Assignment load error:", err);
@@ -149,10 +150,8 @@ export const AssignmentList = () => {
 
   const fetchSubmissions = async (assignmentId: string) => {
     try {
-      const res = await client.get(
-        `lms/student-submissions/?assignment=${assignmentId}`,
-      );
-      const data = res.data.results || res.data;
+      const res = await lmsService.getSubmissions(assignmentId);
+      const data = res.results || res;
       setSubmissions(Array.isArray(data) ? data : []);
     } catch (err) {
       toast.error("Failed to load submissions");
@@ -163,10 +162,11 @@ export const AssignmentList = () => {
     if (!selectedSubmission) return;
     setIsSubmitting(true);
     try {
-      await client.post(
-        `lms/student-submissions/${selectedSubmission.id}/grade/`,
-        gradingData,
-      );
+        await lmsService.gradeSubmission({
+          submission_id: selectedSubmission.id,
+          grade: gradingData.score,
+          feedback: gradingData.feedback,
+        });
       toast.success("Grade submitted successfully");
       setIsGradingModalOpen(false);
       setSelectedSubmission(null);
@@ -191,9 +191,7 @@ export const AssignmentList = () => {
         }
       });
 
-      await client.post("lms/assignments/", data, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await lmsService.createAssignment(data);
 
       toast.success("Assignment launched successfully!");
       setIsCreateModalOpen(false);
@@ -235,13 +233,7 @@ export const AssignmentList = () => {
         data.append("file", submissionFile);
       }
 
-      await client.post(
-        `lms/assignments/${selectedAssignment.id}/submit/`,
-        data,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        },
-      );
+      await lmsService.submitAssignment(selectedAssignment.id, data);
 
       toast.success("Assignment submitted successfully!", { id: toastId });
       setSelectedAssignment(null);

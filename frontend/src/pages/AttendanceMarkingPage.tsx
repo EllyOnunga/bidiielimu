@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { Check, X, Clock, Save, ChevronLeft, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import client from "../api/client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { attendanceService } from "../api/services/attendanceService";
+import { studentsService } from "../api/services/studentsService";
 
 interface StudentData {
   id: number;
@@ -13,44 +15,54 @@ interface StudentData {
 }
 
 export const AttendanceMarkingPage = () => {
-  const [students, setStudents] = useState<StudentData[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [selectedClass, setSelectedClass] = useState("Grade 4 - West");
-  const updateStatus = (id: number, status: string) => {
-    setStudents((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, status } : s)),
-    );
-  };
+  const [localAttendance, setLocalAttendance] = useState<Record<number, string>>({});
+  const [search, setSearch] = useState("");
 
-  const fetchStudents = async () => {
-    try {
-      const response = await client.get("students/");
-      const data = Array.isArray(response.data)
-        ? response.data
-        : response.data.results || [];
-      const mapped = data.map((s: any) => ({
+  const { data: studentsData, isLoading: loadingStudents } = useQuery({
+    queryKey: ["students-attendance"],
+    queryFn: () => studentsService.getAll(),
+  });
+
+  const students: StudentData[] = useMemo(() => {
+    const data = Array.isArray(studentsData) ? studentsData : studentsData?.results || [];
+    return data
+      .filter((s: any) => 
+        `${s.first_name} ${s.last_name}`.toLowerCase().includes(search.toLowerCase()) ||
+        s.admission_number.toLowerCase().includes(search.toLowerCase())
+      )
+      .map((s: any) => ({
         id: s.id,
         name: `${s.first_name} ${s.last_name}`,
         admission: s.admission_number,
-        status: "PRESENT",
+        status: localAttendance[s.id] || "PRESENT",
       }));
-      setStudents(mapped);
-    } catch (error) {
-      console.error("Failed to fetch students", error);
-      toast.error("Failed to fetch students");
-    } finally {
-      setLoading(false);
-    }
+  }, [studentsData, localAttendance, search]);
+
+  const updateStatus = (id: number, status: string) => {
+    setLocalAttendance(prev => ({ ...prev, [id]: status }));
   };
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchStudents();
-  }, []);
+  const saveAttendanceMutation = useMutation({
+    mutationFn: (data: any) => attendanceService.saveAttendance(data),
+    onSuccess: () => {
+      toast.success("Attendance saved successfully!");
+      queryClient.invalidateQueries({ queryKey: ["attendance-stats"] });
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.detail || "Failed to save attendance");
+    }
+  });
 
   const handleSave = () => {
-    toast.success("Attendance saved successfully!");
+    const payload = students.map(s => ({
+      student: s.id,
+      date,
+      status: s.status,
+    }));
+    saveAttendanceMutation.mutate(payload);
   };
 
   return (
@@ -118,6 +130,8 @@ export const AttendanceMarkingPage = () => {
             <input
               placeholder="Filter students by name..."
               className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-xl text-primary text-sm outline-none"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
           </div>
         </div>
@@ -135,7 +149,7 @@ export const AttendanceMarkingPage = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {loading ? (
+              {loadingStudents ? (
                 <tr>
                   <td colSpan={2} className="px-6 py-12 text-center text-muted">
                     Loading students...

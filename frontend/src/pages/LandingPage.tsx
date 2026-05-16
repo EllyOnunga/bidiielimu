@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { ElimuHubLogo } from "../components/ui/Logo";
 
 import {
   GraduationCap,
@@ -124,12 +125,7 @@ export const LandingPage = () => {
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group relative z-10">
-            <div className="p-2 sm:p-2.5 bg-primary-600 rounded-xl shadow-premium group-hover:rotate-12 transition-transform duration-500">
-              <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-            </div>
-            <span className="text-xl sm:text-2xl font-black tracking-tighter uppercase font-serif text-primary">
-              Elimu<span className="text-primary-500">Hub</span>
-            </span>
+            <ElimuHubLogo className="w-10 h-10 sm:w-12 h-12" showText={true} />
           </Link>
 
           <nav className="hidden lg:flex items-center gap-8 xl:gap-12 glass px-8 py-3 rounded-2xl border-white/5">
@@ -737,94 +733,6 @@ export const LandingPage = () => {
           </div>
         </div>
       </section>
-
-      {/* ── FOOTER ── */}
-      <footer className="pt-20 pb-12 px-4 border-t border-white/5">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 sm:gap-16 mb-20 text-center sm:text-left">
-            <div className="lg:col-span-1 space-y-6 flex flex-col items-center sm:items-start">
-              <Link to="/" className="flex items-center gap-3 group">
-                <div className="p-2 bg-primary-600 rounded-xl">
-                  <GraduationCap className="w-6 h-6 text-white" />
-                </div>
-                <span className="text-2xl font-black tracking-tighter uppercase font-serif text-primary">
-                  Elimu<span className="text-primary-500">Hub</span>
-                </span>
-              </Link>
-              <p className="text-muted text-xs font-black uppercase tracking-widest leading-loose max-w-xs">
-                The vanguard of institutional intelligence. Redefining school
-                management through advanced SaaS protocols.
-              </p>
-            </div>
-
-            {[
-              {
-                title: "Platform",
-                links: [
-                  ["Solutions", "/solutions"],
-                  ["Pricing", "/pricing"],
-                  ["Features", "#features"],
-                  ["Guide", "/guide"],
-                ],
-              },
-              {
-                title: "Intelligence",
-                links: [
-                  ["About Us", "/about"],
-                  ["Careers", "/careers"],
-                  ["Contact", "#contact"],
-                  ["News", "/blog"],
-                ],
-              },
-              {
-                title: "Legal",
-                links: [
-                  ["Terms of Service", "/terms"],
-                  ["Privacy Protocol", "/privacy"],
-                  ["Cookie Policy", "/cookies"],
-                ],
-              },
-            ].map((col) => (
-              <div key={col.title}>
-                <h4 className="font-black text-[10px] uppercase tracking-[0.4em] text-primary mb-8">
-                  {col.title}
-                </h4>
-                <ul className="space-y-4">
-                  {col.links.map((link) => (
-                    <li key={link[0]}>
-                      <Link
-                        to={link[1]}
-                        className="text-[10px] font-black uppercase tracking-[0.2em] text-muted hover:text-primary-500 transition-colors"
-                      >
-                        {link[0]}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-
-          <div className="pt-10 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="text-[9px] font-black text-muted uppercase tracking-[0.4em] text-center sm:text-left">
-              &copy; {new Date().getFullYear()} ELIMUHUB SYSTEM PROTOCOL.
-              SECURED TRANSMISSION.
-            </div>
-            <div className="flex items-center gap-8">
-              <div className="flex gap-4">
-                {[1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-muted hover:text-primary transition-all cursor-pointer"
-                  >
-                    <div className="w-4 h-4 bg-current rounded-sm opacity-20" />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </footer>
 
       {/* ── BACK TO TOP ── */}
       <button

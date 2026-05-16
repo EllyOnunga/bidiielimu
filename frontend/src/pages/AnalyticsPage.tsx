@@ -16,7 +16,8 @@ import {
   Area,
 } from "recharts";
 import { Users, Calendar, Award, FileDown } from "lucide-react";
-import client from "../api/client";
+
+import { analyticsService } from "../api/services/analyticsService";
 import { Skeleton } from "../components/ui/Skeleton";
 
 const COLORS = ["#3b82f6", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981"];
@@ -24,10 +25,7 @@ const COLORS = ["#3b82f6", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981"];
 export const AnalyticsPage = () => {
   const { data: analytics, isLoading } = useQuery({
     queryKey: ["analytics_detailed"],
-    queryFn: async () => {
-      const res = await client.get("schools/analytics_detailed/");
-      return res.data;
-    },
+    queryFn: () => analyticsService.getDetailedAnalytics(),
   });
 
   const handleExport = () => {
@@ -68,7 +66,7 @@ export const AnalyticsPage = () => {
         </div>
         <button
           onClick={handleExport}
-          className="w-full sm:w-auto flex items-center justify-center gap-3 h-12 sm:h-14 px-6 sm:px-8 bg-white/5 text-primary rounded-2xl font-black uppercase tracking-widest text-xs border border-white/5 hover:bg-white/10 transition-all shadow-premium shrink-0"
+          className="w-full sm:w-auto flex items-center justify-center gap-3 h-12 sm:h-14 px-6 sm:px-8 bg-white/5 text-primary rounded-2xl font-black uppercase tracking-widest text-xs border border-white/5 hover:bg-white/10 transition-all shadow-premium shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400"
         >
           <FileDown className="w-5 h-5 text-primary-400" />
           Export Intelligence Report

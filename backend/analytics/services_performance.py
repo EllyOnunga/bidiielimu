@@ -1,6 +1,4 @@
-from django.db.models import Avg, Count, Max, Min
-
-from classes.models import Subject
+from django.db.models import Avg
 from exams.models import ExamRanking, Mark
 from students.models import Student
 
@@ -46,9 +44,8 @@ class PerformanceAnalyticsService:
 
     @staticmethod
     def get_school_kpis():
-        from django.utils import timezone
-
         from attendance.models import DailyAttendance
+        from django.utils import timezone
 
         total_students = Student.objects.filter(status="ACTIVE").count()
 

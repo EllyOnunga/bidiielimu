@@ -1,7 +1,5 @@
 from rest_framework import serializers
 
-from schools.utils import TenantSerializerMixin
-
 from .models import Exam, ExamRanking, GradeThreshold, GradingSystem, Mark
 
 

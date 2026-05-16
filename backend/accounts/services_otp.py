@@ -1,11 +1,9 @@
 import logging
 import random
 import string
-from datetime import timedelta
 
 from django.core.cache import cache
 from django.utils import timezone
-
 from notifications.services_sms import SMSService
 
 from .models import SMSDevice

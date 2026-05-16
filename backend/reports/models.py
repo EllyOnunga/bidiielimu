@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.db import models
-
 from exams.models import Exam
 from students.models import Student
 

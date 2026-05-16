@@ -4,8 +4,6 @@ from datetime import datetime
 import requests
 from django.conf import settings
 
-from .models import FeePayment
-
 
 class MpesaService:
     CONSUMER_KEY = settings.MPESA_CONSUMER_KEY

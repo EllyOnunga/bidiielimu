@@ -2,15 +2,10 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.http import JsonResponse
-
 # Triggering reload to resolve 502 Bad Gateway
 from django.urls import include, path
-from drf_spectacular.views import (
-    SpectacularAPIView,
-    SpectacularRedocView,
-    SpectacularSwaggerView,
-)
-
+from drf_spectacular.views import (SpectacularAPIView, SpectacularRedocView,
+                                   SpectacularSwaggerView)
 from schools.views_theme import TenantThemeView
 
 
@@ -41,6 +36,7 @@ urlpatterns = [
     path("api/v1/reports/", include("reports.urls")),
     path("api/v1/hr/", include("hr.urls")),
     path("api/v1/schools/", include("schools.urls")),
+    path("api/v1/discipline/", include("discipline.urls")),
     # Auth endpoints
     path("api/v1/auth/registration/", include("dj_rest_auth.registration.urls")),
     path("api/v1/auth/social/", include("allauth.socialaccount.urls")),
@@ -58,12 +54,7 @@ urlpatterns = [
     path(
         "api/v1/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"
     ),
-    # Password Reset Confirm (Required by dj-rest-auth for reversing names)
-    path(
-        "reset-password/<uidb64>/<token>/",
-        lambda r, **kwargs: JsonResponse({"status": "reset_link_valid"}),
-        name="password_reset_confirm",
-    ),
+    path("health/", lambda r: JsonResponse({"status": "ok"}), name="health"),
 ]
 
 if settings.DEBUG:

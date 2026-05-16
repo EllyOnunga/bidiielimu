@@ -1,36 +1,23 @@
+from config.tenant_security import (StrictTenantPermission,
+                                    TenantAwareViewSetMixin)
+from django.db import models
 from django.utils import timezone
 from rest_framework import permissions, status, viewsets
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from rest_framework_simplejwt.authentication import JWTAuthentication
-
 from teachers.models import Teacher
 
-from .models import (
-    Assignment,
-    LessonNote,
-    NoteConfirmation,
-    Question,
-    Quiz,
-    QuizAttempt,
-    Resource,
-    Submission,
-)
-from .serializers import (
-    AssignmentSerializer,
-    LessonNoteSerializer,
-    QuizAttemptSerializer,
-    QuizSerializer,
-    ResourceSerializer,
-    SubmissionSerializer,
-)
+from .models import (Assignment, LessonNote, NoteConfirmation, Quiz,
+                     QuizAttempt, Resource, Submission)
+from .serializers import (AssignmentSerializer, LessonNoteSerializer,
+                          QuizSerializer, ResourceSerializer,
+                          SubmissionSerializer)
 
 
-class AssignmentViewSet(viewsets.ModelViewSet):
+class AssignmentViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
     serializer_class = AssignmentSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, StrictTenantPermission]
 
     def get_queryset(self):
         user = self.request.user
@@ -39,16 +26,24 @@ class AssignmentViewSet(viewsets.ModelViewSet):
         if user.role_name == "STUDENT":
             student = getattr(user, "student_profile", None)
             if student and student.stream:
+                # Only see assignments for their specific class/stream
                 qs = qs.filter(stream=student.stream)
             else:
                 qs = qs.none()
         elif user.role_name in ["TEACHER", "PRINCIPAL", "HOD"]:
             teacher = getattr(user, "teacher_profile", None)
             if teacher:
-                qs = qs.filter(teacher=teacher)
+                # Teachers only see what they assigned or are assigned to teach
+                from classes.models import SubjectAssignment
+
+                assigned_subjects = SubjectAssignment.objects.filter(
+                    teacher=teacher
+                ).values_list("subject_id", flat=True)
+                qs = qs.filter(
+                    models.Q(teacher=teacher)
+                    | models.Q(subject_id__in=assigned_subjects)
+                )
             else:
-                # If they have no profile, show nothing or admin view?
-                # For staff roles, usually they should only see theirs.
                 qs = qs.none()
 
         return qs
@@ -118,15 +113,68 @@ class AssignmentViewSet(viewsets.ModelViewSet):
         )
         return Response(SubmissionSerializer(submission).data)
 
+    @action(detail=True, methods=["get"])
+    def submissions(self, request, pk=None):
+        """List all submissions for this assignment (teachers only)"""
+        assignment = self.get_object()
+        if request.user.role_name not in ["TEACHER", "PRINCIPAL", "HOD", "ADMIN"]:
+            return Response({"detail": "Not allowed"}, status=403)
+        subs = assignment.submissions.select_related("student").all()
+        return Response(SubmissionSerializer(subs, many=True).data)
 
-class LessonNoteViewSet(viewsets.ModelViewSet):
+    @action(detail=False, methods=["post"])
+    def grade(self, request):
+        """Grade a submission"""
+        submission_id = request.data.get("submission_id")
+        grade = request.data.get("grade")
+        feedback = request.data.get("feedback", "")
+
+        try:
+            sub = Submission.objects.get(id=submission_id)
+        except Submission.DoesNotExist:
+            return Response({"detail": "Submission not found"}, status=404)
+
+        if request.user.role_name not in ["TEACHER", "PRINCIPAL", "HOD"]:
+            return Response({"detail": "Only teachers can grade"}, status=403)
+
+        sub.grade = grade
+        sub.feedback = feedback
+        sub.graded_at = timezone.now()
+        sub.save()
+        return Response(SubmissionSerializer(sub).data)
+
+
+class LessonNoteViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
     serializer_class = LessonNoteSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, StrictTenantPermission]
 
     def get_queryset(self):
         user = self.request.user
-        qs = LessonNote.objects.all()
-        # Add is_read annotation (pseudo-code/simplified)
+        qs = LessonNote.objects.all().select_related("subject")
+
+        if user.role_name == "STUDENT":
+            student = getattr(user, "student_profile", None)
+            if student and student.stream:
+                from classes.models import SubjectAssignment
+
+                assigned_subjects = SubjectAssignment.objects.filter(
+                    stream=student.stream
+                ).values_list("subject_id", flat=True)
+                qs = qs.filter(subject_id__in=assigned_subjects)
+            else:
+                qs = qs.none()
+        elif user.role_name in ["TEACHER", "PRINCIPAL", "HOD"]:
+            teacher = getattr(user, "teacher_profile", None)
+            if teacher:
+                from classes.models import SubjectAssignment
+
+                assigned_subjects = SubjectAssignment.objects.filter(
+                    teacher=teacher
+                ).values_list("subject_id", flat=True)
+                qs = qs.filter(subject_id__in=assigned_subjects)
+            else:
+                qs = qs.none()
+
         return qs
 
     @action(detail=True, methods=["post"])
@@ -144,12 +192,38 @@ class LessonNoteViewSet(viewsets.ModelViewSet):
         return Response({"status": "confirmed"})
 
 
-class QuizViewSet(viewsets.ModelViewSet):
+class QuizViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
     serializer_class = QuizSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, StrictTenantPermission]
 
     def get_queryset(self):
-        return Quiz.objects.filter(is_active=True)
+        user = self.request.user
+        qs = Quiz.objects.filter(is_active=True).select_related("subject")
+
+        if user.role_name == "STUDENT":
+            student = getattr(user, "student_profile", None)
+            if student and student.stream:
+                from classes.models import SubjectAssignment
+
+                assigned_subjects = SubjectAssignment.objects.filter(
+                    stream=student.stream
+                ).values_list("subject_id", flat=True)
+                qs = qs.filter(subject_id__in=assigned_subjects)
+            else:
+                qs = qs.none()
+        elif user.role_name in ["TEACHER", "PRINCIPAL", "HOD"]:
+            teacher = getattr(user, "teacher_profile", None)
+            if teacher:
+                from classes.models import SubjectAssignment
+
+                assigned_subjects = SubjectAssignment.objects.filter(
+                    teacher=teacher
+                ).values_list("subject_id", flat=True)
+                qs = qs.filter(subject_id__in=assigned_subjects)
+            else:
+                qs = qs.none()
+
+        return qs
 
     @action(detail=True, methods=["post"])
     def attempt(self, request, pk=None):
@@ -176,13 +250,62 @@ class QuizViewSet(viewsets.ModelViewSet):
             {"attempt_id": attempt.id, "score": total_score, "max_score": max_possible}
         )
 
+    @action(detail=True, methods=["get"])
+    def my_attempts(self, request, pk=None):
+        """Allow students to see their past quiz attempts and scores"""
+        quiz = self.get_object()
+        student = getattr(request.user, "student_profile", None)
+        if not student:
+            return Response({"detail": "Student profile required"}, status=400)
 
-class ResourceViewSet(viewsets.ModelViewSet):
+        attempts = quiz.attempts.filter(student=student).order_by("-completed_at")
+        data = [
+            {
+                "id": a.id,
+                "score": a.score,
+                "max_score": sum(q.points for q in quiz.questions.all()),
+                "completed_at": a.completed_at,
+            }
+            for a in attempts
+        ]
+        return Response(data)
+
+
+class ResourceViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
     serializer_class = ResourceSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, StrictTenantPermission]
 
     def get_queryset(self):
-        return Resource.objects.all().select_related("subject", "uploaded_by")
+        user = self.request.user
+        qs = Resource.objects.all().select_related("subject", "uploaded_by")
+
+        if user.role_name == "STUDENT":
+            student = getattr(user, "student_profile", None)
+            if student and student.stream:
+                from classes.models import SubjectAssignment
+
+                assigned_subjects = SubjectAssignment.objects.filter(
+                    stream=student.stream
+                ).values_list("subject_id", flat=True)
+                qs = qs.filter(subject_id__in=assigned_subjects)
+            else:
+                qs = qs.none()
+        elif user.role_name in ["TEACHER", "PRINCIPAL", "HOD"]:
+            teacher = getattr(user, "teacher_profile", None)
+            if teacher:
+                from classes.models import SubjectAssignment
+
+                assigned_subjects = SubjectAssignment.objects.filter(
+                    teacher=teacher
+                ).values_list("subject_id", flat=True)
+                qs = qs.filter(
+                    models.Q(uploaded_by=teacher)
+                    | models.Q(subject_id__in=assigned_subjects)
+                )
+            else:
+                qs = qs.none()
+
+        return qs
 
     def perform_create(self, serializer):
         user = self.request.user
@@ -190,11 +313,34 @@ class ResourceViewSet(viewsets.ModelViewSet):
         # Even if teacher is None, we save (admin might not have teacher profile)
         serializer.save(uploaded_by=teacher)
 
+    @action(detail=True, methods=["post"])
+    def track_watch(self, request, pk=None):
+        """Track video watch time for analytics"""
+        resource = self.get_object()
+        student = getattr(request.user, "student_profile", None)
+        if not student or resource.category != "VIDEO":
+            return Response({"detail": "Invalid"}, status=400)
 
-class SubmissionViewSet(viewsets.ModelViewSet):
+        from .models import VideoWatchTime
+
+        watched = int(request.data.get("watched_seconds", 0))
+        position = int(request.data.get("last_position", 0))
+
+        watch, _ = VideoWatchTime.objects.update_or_create(
+            resource=resource,
+            student=student,
+            defaults={
+                "watched_seconds": watched,
+                "last_position": position,
+                "completed": watched >= 300,  # example threshold
+            },
+        )
+        return Response({"status": "tracked", "watched": watch.watched_seconds})
+
+
+class SubmissionViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
     serializer_class = SubmissionSerializer
-    authentication_classes = [JWTAuthentication, SessionAuthentication]
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, StrictTenantPermission]
 
     def get_queryset(self):
         user = self.request.user
@@ -224,7 +370,8 @@ class SubmissionViewSet(viewsets.ModelViewSet):
         submission = self.get_object()
         user = request.user
 
-        # Security check: only the teacher who owns the assignment (or school admin) can grade
+        # Security check: only the teacher who owns the assignment (or school
+        # admin) can grade
         is_owner = False
         if user.role_name in ["TEACHER", "PRINCIPAL", "HOD"]:
             teacher = getattr(user, "teacher_profile", None)
@@ -251,9 +398,8 @@ class SubmissionViewSet(viewsets.ModelViewSet):
             grade_val = float(grade)
             if grade_val < 0 or grade_val > submission.assignment.max_score:
                 return Response(
-                    {
-                        "detail": f"Score must be between 0 and {submission.assignment.max_score}"
-                    },
+                    {"detail": f"Score must be between 0 and {
+                            submission.assignment.max_score}"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 

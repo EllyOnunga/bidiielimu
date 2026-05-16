@@ -1,6 +1,5 @@
 from django.core.validators import RegexValidator
 from django.db import models
-
 from schools.models import SoftDeleteModel
 
 
@@ -103,7 +102,11 @@ class Guardian(models.Model):
     is_emergency_contact = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name} ({self.relationship} of {self.student.first_name})"
+        return f"{
+            self.first_name} {
+            self.last_name} ({
+            self.relationship} of {
+                self.student.first_name})"
 
 
 class MedicalRecord(models.Model):

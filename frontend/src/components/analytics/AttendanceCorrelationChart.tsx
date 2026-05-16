@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { analyticsService } from "../../api/services/analyticsService";
 import {
   ScatterChart,
   Scatter,
@@ -10,28 +11,14 @@ import {
   ZAxis,
 } from "recharts";
 import { Target, Info, Download, BookOpen } from "lucide-react";
-import axios from "axios";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 
 export const AttendanceCorrelationChart = () => {
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    try {
-      const res = await axios.get("/api/v1/analytics/correlation/");
-      setData(res.data);
-    } catch (err) {
-      console.error("Failed to load correlation data");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data, isLoading: loading } = useQuery({
+    queryKey: ["analytics-correlation"],
+    queryFn: analyticsService.getCorrelation,
+  });
 
   const exportPDF = async () => {
     const element = document.getElementById("correlation-report");

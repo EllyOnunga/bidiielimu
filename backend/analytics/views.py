@@ -1,4 +1,5 @@
-from rest_framework import status
+from config.tenant_security import StrictTenantPermission
+from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -9,6 +10,8 @@ from .services_performance import PerformanceAnalyticsService
 
 
 class DashboardAnalyticsView(APIView):
+    permission_classes = [permissions.IsAuthenticated, StrictTenantPermission]
+
     def get(self, request):
         kpis = PerformanceAnalyticsService.get_school_kpis()
 
@@ -40,6 +43,8 @@ class DashboardAnalyticsView(APIView):
 
 
 class SubjectDistributionView(APIView):
+    permission_classes = [permissions.IsAuthenticated, StrictTenantPermission]
+
     def get(self, request, subject_id, exam_id):
         distribution = PerformanceAnalyticsService.get_subject_performance_distribution(
             subject_id, exam_id
@@ -50,12 +55,16 @@ class SubjectDistributionView(APIView):
 
 
 class TeacherPerformanceView(APIView):
+    permission_classes = [permissions.IsAuthenticated, StrictTenantPermission]
+
     def get(self, request, teacher_id):
         metrics = PerformanceAnalyticsService.get_teacher_effectiveness(teacher_id)
         return Response(metrics)
 
 
 class CorrelationAnalyticsView(APIView):
+    permission_classes = [permissions.IsAuthenticated, StrictTenantPermission]
+
     def get(self, request):
         data_points = CorrelationService.get_attendance_performance_data()
         correlation = CorrelationService.calculate_correlation_coefficient(data_points)

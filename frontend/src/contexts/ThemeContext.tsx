@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import client from "../api/client";
+import { themeService } from "../api/services/themeService";
 
 interface ThemeContextType {
   schoolName: string;
@@ -30,10 +30,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const fetchTheme = async () => {
       try {
-        // Assume API is served on the same domain or configured via base URL
-        const response = await client.get("theme/");
+        const data = await themeService.getTheme();
 
-        const { school_name, logo_url, primary_color } = response.data;
+        const { school_name, logo_url, primary_color } = data;
 
         setTheme({
           schoolName: school_name || "ElimuHub",

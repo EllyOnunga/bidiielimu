@@ -2,11 +2,10 @@ import random
 import string
 from datetime import timedelta
 
-from django.core.management.base import BaseCommand
-from django.utils import timezone
-
 from accounts.models import Role, User
 from classes.models import GradeLevel, Stream, Subject
+from django.core.management.base import BaseCommand
+from django.utils import timezone
 from fees.models import FeePayment, FeeStructure
 from schools.models import School, SchoolSetting
 from students.models import Student
@@ -21,7 +20,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.stdout.write(
-            f"Seeding data for schema: {School.objects.first().schema_name if School.objects.exists() else 'unknown'}"
+            f"Seeding data for schema: {
+                School.objects.first().schema_name if School.objects.exists() else 'unknown'}"
         )
 
         # 1. Create Grade Levels and Streams
@@ -46,7 +46,7 @@ class Command(BaseCommand):
         teacher_role, _ = Role.objects.get_or_create(name="TEACHER")
 
         for i in range(5):
-            email = f"teacher{i}_{random.randint(100,999)}@example.com"
+            email = f"teacher{i}_{random.randint(100, 999)}@example.com"
             if not User.objects.filter(email=email).exists():
                 user = User.objects.create_user(
                     email=email,
@@ -57,7 +57,7 @@ class Command(BaseCommand):
                 )
                 Teacher.objects.create(
                     user=user,
-                    employee_id=f"TCH{1000+i}{random.randint(10,99)}",
+                    employee_id=f"TCH{1000 + i}{random.randint(10, 99)}",
                     joining_date=timezone.now()
                     - timedelta(days=random.randint(100, 500)),
                 )
@@ -66,7 +66,7 @@ class Command(BaseCommand):
         for i in range(20):
             fname = random.choice(first_names)
             lname = random.choice(last_names)
-            admission_number = f"ADM{3000+i}"
+            admission_number = f"ADM{3000 + i}"
             if not Student.objects.filter(admission_number=admission_number).exists():
                 Student.objects.create(
                     first_name=fname,

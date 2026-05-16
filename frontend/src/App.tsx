@@ -8,9 +8,11 @@ import {
 import { ROLES } from "./constants/roles";
 import { Toaster } from "react-hot-toast";
 import { MainLayout } from "./layouts/MainLayout";
+import { PublicLayout } from "./layouts/PublicLayout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { PageLoader } from "./components/PageLoader";
+import { FloatingContact } from "./components/ui/FloatingContact";
 
 const LoginPage = lazy(() =>
   import("./pages/LoginPage").then((m) => ({ default: m.LoginPage })),
@@ -170,6 +172,14 @@ const AccessControlPage = lazy(() =>
     default: m.AccessControlPage,
   })),
 );
+const MySchoolsPage = lazy(() =>
+  import("./pages/MySchoolsPage").then((m) => ({
+    default: m.MySchoolsPage,
+  })),
+);
+const SupportPage = lazy(() =>
+  import("./pages/SupportPage").then((m) => ({ default: m.SupportPage })),
+);
 
 function App() {
   return (
@@ -197,27 +207,29 @@ function App() {
         <Suspense fallback={<PageLoader />}>
           <Routes>
             {/* ── Public / Marketing Routes ── */}
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route
-              path="/verify-email/:token"
-              element={<EmailVerificationPage />}
-            />
-            <Route path="/verify-email" element={<EmailVerificationPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route
-              path="/reset-password/:uid/:token"
-              element={<ResetPasswordConfirmPage />}
-            />
-            <Route path="/solutions" element={<SolutionsPage />} />
-            <Route path="/pricing" element={<PricingPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/careers" element={<CareersPage />} />
-            <Route path="/terms" element={<TermsPage />} />
-            <Route path="/privacy" element={<PrivacyPage />} />
-            <Route path="/cookies" element={<CookiePolicyPage />} />
-            <Route path="/guide" element={<GuidePage />} />
+            <Route element={<PublicLayout />}>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route
+                path="/verify-email/:token"
+                element={<EmailVerificationPage />}
+              />
+              <Route path="/verify-email" element={<EmailVerificationPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route
+                path="/reset-password/:uid/:token"
+                element={<ResetPasswordConfirmPage />}
+              />
+              <Route path="/solutions" element={<SolutionsPage />} />
+              <Route path="/pricing" element={<PricingPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/careers" element={<CareersPage />} />
+              <Route path="/terms" element={<TermsPage />} />
+              <Route path="/privacy" element={<PrivacyPage />} />
+              <Route path="/cookies" element={<CookiePolicyPage />} />
+              <Route path="/guide" element={<GuidePage />} />
+            </Route>
 
             <Route
               element={
@@ -308,6 +320,21 @@ function App() {
               />
               <Route
                 path="/classes/:streamId"
+                element={
+                  <ProtectedRoute
+                    allowedRoles={[
+                      ROLES.ADMIN,
+                      ROLES.PRINCIPAL,
+                      ROLES.HOD,
+                      ROLES.TEACHER,
+                    ]}
+                  >
+                    <ClassDetailPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/classes/grade/:gradeId"
                 element={
                   <ProtectedRoute
                     allowedRoles={[
@@ -611,6 +638,22 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/my-schools"
+                element={
+                  <ProtectedRoute>
+                    <MySchoolsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/support"
+                element={
+                  <ProtectedRoute>
+                    <SupportPage />
+                  </ProtectedRoute>
+                }
+              />
 
               {/* Legacy Redirects for Cached Links */}
               <Route
@@ -642,6 +685,7 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
+        <FloatingContact />
       </Router>
     </ErrorBoundary>
   );

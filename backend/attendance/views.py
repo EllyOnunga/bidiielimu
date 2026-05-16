@@ -1,18 +1,19 @@
-from django.utils import timezone
-from rest_framework import permissions, status, viewsets
-from rest_framework.decorators import action
-from rest_framework.response import Response
-
 from accounts.permissions import IsTeacher
 from config.caching import cache_tenant_page
+from config.tenant_security import (StrictTenantPermission,
+                                    TenantAwareViewSetMixin)
+from django.utils import timezone
+from rest_framework import permissions, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from .models import DailyAttendance
 from .serializers import DailyAttendanceSerializer
 
 
-class DailyAttendanceViewSet(viewsets.ModelViewSet):
+class DailyAttendanceViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
     serializer_class = DailyAttendanceSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, StrictTenantPermission]
 
     def get_permissions(self):
         if self.action in ["create", "update", "partial_update", "destroy"]:
@@ -35,7 +36,6 @@ class DailyAttendanceViewSet(viewsets.ModelViewSet):
     @cache_tenant_page(300)  # Cache for 5 minutes
     def stats(self, request):
         from django.db.models import Case, Count, IntegerField, When
-
         from students.models import Student
 
         today = timezone.now().date()

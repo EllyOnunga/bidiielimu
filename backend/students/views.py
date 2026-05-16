@@ -1,14 +1,10 @@
-import csv
-import io
-
+from config.tenant_security import (StrictTenantPermission,
+                                    TenantAwareViewSetMixin)
 from django.contrib.auth import get_user_model
-from django.db import transaction
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
-from accounts.permissions import IsTeacher
 
 from .models import Student
 from .serializers import StudentSerializer
@@ -25,9 +21,9 @@ class PortalDashboardView(APIView):
         return Response(data)
 
 
-class StudentViewSet(viewsets.ModelViewSet):
+class StudentViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
     serializer_class = StudentSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, StrictTenantPermission]
     search_fields = ["first_name", "last_name", "admission_number", "user__email"]
 
     def get_queryset(self):

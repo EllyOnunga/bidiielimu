@@ -1,7 +1,6 @@
 import io
 
 from django.db import connection
-
 from schools.models import SchoolSetting
 
 from .models import FeePayment

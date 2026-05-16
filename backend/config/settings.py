@@ -40,7 +40,11 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,.elimuhub.com").
 )
 
 # CORS Settings
-CORS_ALLOW_ALL_ORIGINS = DEBUG
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https?://[a-zA-Z0-9_-]+\.localhost$",
+    r"^https?://localhost$",
+]
 CORS_ALLOW_CREDENTIALS = True
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 TENANT_SUBFOLDER_PREFIX = os.getenv("TENANT_SUBFOLDER_PREFIX", "school")
@@ -156,6 +160,8 @@ TENANT_APPS = [
     "hr",
     "analytics",
     "reports",
+    "support",
+    "discipline",
 ]
 
 INSTALLED_APPS = list(SHARED_APPS) + [
@@ -181,19 +187,18 @@ SITE_ID = 1
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
-    "django_tenants.middleware.TenantSubfolderMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django_tenants.middleware.TenantMainMiddleware",
+    "config.middleware.TenantConnectionSyncMiddleware",
     "config.middleware.RequestCorrelationMiddleware",
     "config.middleware.RequestLoggingMiddleware",
     "config.middleware_security.APIKeyAuthenticationMiddleware",
-    "config.middleware_security.SecurityHeadersMiddleware",
-    "config.middleware_security.RequestEncryptionMiddleware",
-    "config.middleware_security.InputValidationMiddleware",
+    "config.middleware_security.SecurityMiddleware",
     "config.middleware_monitoring.PerformanceMonitoringMiddleware",
     "config.middleware_monitoring.ErrorTrackingMiddleware",
     "audit.middleware.RequestTrackingMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -208,6 +213,11 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "config.urls_tenant"
 PUBLIC_SCHEMA_URLCONF = "config.urls_public"
+
+# Custom error handlers
+handler404 = "config.views_error.handler404"
+handler500 = "config.views_error.handler500"
+handler403 = "config.views_error.handler403"
 
 TEMPLATES = [
     {
@@ -271,7 +281,7 @@ for db_name, options in DATABASE_OPTIONS.items():
 # Database routing for read/write splitting and tenant isolation
 DATABASE_ROUTERS = [
     "django_tenants.routers.TenantSyncRouter",
-    # 'config.database_router.DatabaseRouter', # Disabled to fix tenant schema isolation on reads
+    "config.database_router.DatabaseRouter",
 ]
 
 
@@ -492,6 +502,7 @@ CACHES = {
         ),
         "KEY_PREFIX": "elimuhub",
         "TIMEOUT": 3600,  # 1 hour default
+        "KEY_FUNCTION": "config.cache_utils.make_tenant_aware_key",
     },
     "session": {
         "BACKEND": (
@@ -729,7 +740,16 @@ LOGGING = {
     },
 }
 
-if not IS_RENDER:
+
+def is_writable(path):
+    return (
+        os.access(path, os.W_OK)
+        if os.path.exists(path)
+        else os.access(os.path.dirname(path), os.W_OK)
+    )
+
+
+if not IS_RENDER and is_writable(BASE_DIR / "logs"):
     # Add file handlers only when not on Render
     LOGS_DIR = BASE_DIR / "logs"
     LOGS_DIR.mkdir(parents=True, exist_ok=True)

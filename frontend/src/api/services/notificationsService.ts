@@ -24,4 +24,45 @@ export const notificationsService = {
     const response = await client.post("notifications/mark_all_as_read/");
     return response.data;
   },
+  getCommunicationStats: async () => {
+    const response = await client.get("notifications/communication_stats/");
+    return response.data;
+  },
+
+  getRecipientGroups: async () => {
+    const response = await client.get("notifications/recipient_groups/");
+    return response.data;
+  },
+
+  sendBulkEmail: async (data: { subject: string; message: string; recipients: string[] }) => {
+    const response = await client.post("notifications/bulk_email/", data);
+    return response.data;
+  },
+
+  sendBulkSms: async (data: { message: string; phones: string[] }) => {
+    const response = await client.post("notifications/bulk_sms/", data);
+    return response.data;
+  },
+
+  getGroupRecipients: async (groupId: string, type: string) => {
+    const response = await client.get(`notifications/${groupId}/group-recipients/`, {
+      params: { type },
+    });
+    return response.data;
+  },
+
+  getNotices: async (params?: any) => {
+    const response = await client.get("notifications/notices/", { params });
+    return response.data;
+  },
+
+  getEvents: async () => {
+    const response = await client.get("notifications/events/");
+    return response.data;
+  },
+
+  broadcastSms: async (data: { message: string }) => {
+    const response = await client.post("notifications/notices/broadcast_sms/", data);
+    return response.data;
+  },
 };

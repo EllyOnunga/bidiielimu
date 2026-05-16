@@ -103,8 +103,8 @@ export const ElimuHubLogo: React.FC<LogoProps> = ({
       {/* Typography */}
       {showText && (
         <span
-          className="mt-2 font-['Inter'] font-bold tracking-tight text-[#0B132B] dark:text-white"
-          style={{ fontSize: "clamp(1rem, 2.5vw, 1.5rem)" }}
+          className="mt-1.5 sm:mt-2 font-['Inter'] font-bold tracking-tight text-[#0B132B] dark:text-white"
+          style={{ fontSize: "clamp(0.875rem, 2.2vw, 1.35rem)" }}
         >
           Elimu<span className="text-[#22c55e]">Hub</span>
         </span>

@@ -1,18 +1,9 @@
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
-
 from teachers.models import Teacher
 
-from .models import (
-    Assignment,
-    LessonNote,
-    NoteConfirmation,
-    Question,
-    Quiz,
-    QuizAttempt,
-    Resource,
-    Submission,
-)
+from .models import (Assignment, LessonNote, Question, Quiz, QuizAttempt,
+                     Resource, Submission)
 
 
 class ResourceSerializer(serializers.ModelSerializer):
@@ -50,7 +41,7 @@ class SubmissionSerializer(serializers.ModelSerializer):
     def get_student_name(self, obj):
         try:
             return f"{obj.student.first_name} {obj.student.last_name}"
-        except:
+        except BaseException:
             return "Unknown Student"
 
     def get_is_graded(self, obj):
@@ -104,9 +95,28 @@ class AssignmentSerializer(serializers.ModelSerializer):
                 if student:
                     submission = obj.submissions.filter(student=student).first()
                     return submission.grade if submission else None
-        except:
+        except BaseException:
             return None
         return None
+
+
+# New serializers for scalable LMS features
+class StudentProgressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = "lms.StudentProgress"
+        fields = "__all__"
+
+
+class VideoWatchTimeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = "lms.VideoWatchTime"
+        fields = "__all__"
+
+
+class DiscussionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = "lms.Discussion"
+        fields = "__all__"
 
     def get_student_feedback(self, obj):
         try:
@@ -120,7 +130,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
                 if student:
                     submission = obj.submissions.filter(student=student).first()
                     return submission.feedback if submission else None
-        except:
+        except BaseException:
             return None
         return None
 
@@ -133,19 +143,19 @@ class AssignmentSerializer(serializers.ModelSerializer):
     def get_stream_name(self, obj):
         try:
             return obj.stream.name if obj.stream else "All Classes"
-        except:
+        except BaseException:
             return "All Classes"
 
     def get_teacher_name(self, obj):
         try:
             return obj.teacher.full_name if obj.teacher else ""
-        except:
+        except BaseException:
             return "Unknown Teacher"
 
     def get_submission_count(self, obj):
         try:
             return obj.submissions.count()
-        except:
+        except BaseException:
             return 0
 
     def get_status(self, obj):

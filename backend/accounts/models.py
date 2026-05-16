@@ -11,7 +11,8 @@ class UserManager(BaseUserManager):
         email = self.normalize_email(email)
 
         # If is_email_verified is not explicitly passed as False (e.g., self-registration),
-        # default to True so internally provisioned accounts (Teachers, Students) can log in immediately.
+        # default to True so internally provisioned accounts (Teachers, Students)
+        # can log in immediately.
         is_email_verified = extra_fields.pop("is_email_verified", True)
 
         user = self.model(

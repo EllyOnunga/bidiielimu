@@ -5,11 +5,13 @@ class DatabaseRouter:
 
     def db_for_read(self, model, **hints):
         """
-        Direct read operations to read database
+        Direct read operations to read database if available
         """
-        # For now, use default database
-        # In production with replication, this would route to read replicas
-        return "read"
+        from django.conf import settings
+
+        if "read" in settings.DATABASES:
+            return "read"
+        return "default"
 
     def db_for_write(self, model, **hints):
         """

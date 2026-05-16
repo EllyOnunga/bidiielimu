@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Search, FileText, Video, Book, Download, Tag } from "lucide-react";
-import client from "../../api/client";
+import { lmsService } from "../../api/services/lmsService";
 import toast from "react-hot-toast";
 import { useAuthStore } from "../../store/authStore";
 import { Button } from "../ui/Button";
@@ -70,8 +70,8 @@ export const ResourceLibrary = () => {
 
   const fetchResources = async () => {
     try {
-      const res = await client.get("lms/resources/");
-      setResources(Array.isArray(res.data) ? res.data : res.data.results || []);
+      const res = await lmsService.getResources();
+      setResources(Array.isArray(res) ? res : res.results || []);
     } catch (err) {
       toast.error("Failed to load resources");
     }
@@ -90,9 +90,7 @@ export const ResourceLibrary = () => {
     formData.append("file", uploadData.file);
 
     try {
-      await client.post("lms/resources/", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await lmsService.createResource(formData);
       toast.success("Resource uploaded successfully");
       setIsUploadModalOpen(false);
       setUploadData({ title: "", category: "NOTE", subject: "", file: null });

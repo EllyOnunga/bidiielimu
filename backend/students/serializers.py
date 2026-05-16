@@ -1,8 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from schools.utils import TenantSerializerMixin
-
 from .models import Guardian, MedicalRecord, Student, StudentTransfer
 
 User = get_user_model()

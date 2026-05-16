@@ -1,25 +1,32 @@
 import axios from "axios";
+import { toast } from "react-hot-toast";
 import { useAuthStore } from "../store/authStore";
 
 const getBaseURL = () => {
   const envURL = import.meta.env.VITE_API_URL;
-  if (envURL) return envURL.endsWith("/") ? envURL : `${envURL}/`;
-
-  const { protocol, hostname, port, pathname } = window.location;
-
-  // Detect if we are in a tenant subfolder (e.g., /school/tenant1/)
-  // Path parts: ["", "school", "tenant1", "dashboard"] -> ["school", "tenant1", "dashboard"]
-  const pathParts = pathname.split("/").filter(Boolean);
-  let tenantPrefix = "";
-
-  if (pathParts[0] === "school" && pathParts.length >= 2) {
-    tenantPrefix = `/school/${pathParts[1]}`;
+  if (envURL && envURL.startsWith("http") && !envURL.includes("localhost")) {
+    return envURL.endsWith("/") ? envURL : `${envURL}/`;
   }
 
-  const host = `${protocol}//${hostname}${
-    port && port !== "80" && port !== "443" ? `:${port}` : ""
-  }`;
-  return `${host}${tenantPrefix}/api/v1/`;
+  const { protocol, hostname, port } = window.location;
+
+  // Strict subdomain detection for multi-tenancy
+  // const hostParts = hostname.split(".");
+  // if (hostname.endsWith(".localhost") && hostParts.length === 2) {
+  //   // tenantName = hostParts[0];
+  // } else if (hostParts.length > 2 && !["www", "api", "app"].includes(hostParts[0])) {
+  //   // tenantName = hostParts[0];
+  // }
+
+  const envBase = import.meta.env.VITE_API_BASE;
+  const host =
+    envBase ||
+    `${protocol}//${hostname}${
+      port && port !== "80" && port !== "443" ? `:${port}` : ""
+    }`;
+
+  // Since we use subdomains, we don't need subfolder prefixes in the URL
+  return `${host}/api/v1/`;
 };
 
 const baseURL = getBaseURL();
@@ -35,20 +42,10 @@ client.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
-  } else {
-    const isAuthRequest =
-      config.url?.includes("accounts/login/") ||
-      config.url?.includes("accounts/register/") ||
-      config.url?.includes("accounts/verify-email/") ||
-      config.url?.includes("theme/");
-    if (!isAuthRequest) {
-      console.warn(`[API] No token found for request to ${config.url}`);
-    }
   }
   return config;
 });
 
-// Catch "False Successes" where the server returns index.html instead of JSON
 client.interceptors.response.use(
   (response) => {
     const contentType = response.headers["content-type"];
@@ -67,14 +64,30 @@ client.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // If error is 401 and we haven't retried yet
+    // 1. Handle Security/Tenant Violations (403)
+    if (error.response?.status === 403) {
+      const message =
+        error.response.data?.message ||
+        error.response.data?.error ||
+        "Access Denied";
+      toast.error(`Security Alert: ${message}`, {
+        id: "security-error",
+        duration: 5000,
+        icon: "🛡️",
+      });
+      // Optionally redirect if it's a persistent tenant mismatch
+      if (message.toLowerCase().includes("tenant")) {
+        // window.location.href = "/";
+      }
+    }
+
+    // 2. Handle Token Expiration (401)
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       const refreshToken = localStorage.getItem("refreshToken");
 
       if (refreshToken) {
         try {
-          // Use base axios to avoid interceptor loops
           const res = await axios.post(`${baseURL}accounts/token/refresh/`, {
             refresh: refreshToken,
           });
@@ -86,17 +99,26 @@ client.interceptors.response.use(
 
           return client(originalRequest);
         } catch (refreshError) {
-          // Refresh token failed or expired
           useAuthStore.getState().logout();
           window.location.href = "/login";
           return Promise.reject(refreshError);
         }
       } else {
-        // No refresh token available
         useAuthStore.getState().logout();
         window.location.href = "/login";
       }
     }
+
+    // 3. Handle Server Errors (500)
+    if (error.response?.status >= 500) {
+      toast.error(
+        "Systems Offline: We are experiencing technical difficulties. Please try again later.",
+        {
+          id: "server-error",
+        },
+      );
+    }
+
     return Promise.reject(error);
   },
 );

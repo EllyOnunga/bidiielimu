@@ -1,10 +1,8 @@
 import hashlib
-import json
 from functools import wraps
 
 from django.core.cache import cache
 from django.http import HttpResponse
-from django.utils.cache import get_cache_key
 
 
 def _ensure_rendered(response):

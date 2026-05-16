@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useMemo } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "../store/authStore";
 import { ROLES } from "../constants/roles";
 import {
@@ -16,12 +17,13 @@ import {
   Phone,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import client from "../api/client";
 import { toast } from "react-hot-toast";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { PasswordInput } from "../components/ui/PasswordInput";
 import { PasswordHint } from "../components/ui/PasswordHint";
+import { authService } from "../api/services/authService";
+import { schoolsService } from "../api/services/schoolsService";
 
 type ActiveTab =
   | "profile"
@@ -33,8 +35,23 @@ type ActiveTab =
 
 export const SettingsPage = () => {
   const { user } = useAuthStore();
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<ActiveTab>("profile");
-  const [loading, setLoading] = useState(false);
+
+  // Queries
+  const { data: settingsData } = useQuery({
+    queryKey: ["school-settings"],
+    queryFn: schoolsService.getSettings,
+    enabled: !!user && user.role !== ROLES.SUPER_ADMIN,
+  });
+
+  const { data: schoolProfileData } = useQuery({
+    queryKey: ["school-profile", user?.school],
+    queryFn: () => schoolsService.getProfile(user!.school!),
+    enabled: !!user?.school && user.role === ROLES.ADMIN,
+  });
+
+  // Local state for forms
   const [settings, setSettings] = useState({
     current_term: "Term 1",
     academic_year: "2026",
@@ -58,118 +75,106 @@ export const SettingsPage = () => {
     phone_number: user?.phone_number || "",
   });
 
+  // Sync data to local state when loaded
+  useMemo(() => {
+    if (settingsData) setSettings(settingsData);
+  }, [settingsData]);
+
+  useMemo(() => {
+    if (schoolProfileData) {
+      setSchoolProfile({
+        name: schoolProfileData.name,
+        address: schoolProfileData.address || "",
+        contact_email: schoolProfileData.contact_email || "",
+        contact_phone: schoolProfileData.contact_phone || "",
+      });
+    }
+  }, [schoolProfileData]);
+
   const [passwordData, setPasswordData] = useState({
     old_password: "",
     new_password: "",
     confirm_password: "",
   });
 
-  const fetchSettings = useCallback(async () => {
-    if (!user || user.role === ROLES.SUPER_ADMIN) return;
-    try {
-      const response = await client.get("schools/settings/");
-      setSettings(response.data);
-    } catch (error) {
-      console.error("Failed to fetch settings", error);
-    }
-  }, [user]);
-
-  const fetchSchoolProfile = useCallback(async () => {
-    if (!user || !user.school) return;
-    try {
-      const response = await client.get(`schools/${user.school}/`);
-      setSchoolProfile({
-        name: response.data.name,
-        address: response.data.address || "",
-        contact_email: response.data.contact_email || "",
-        contact_phone: response.data.contact_phone || "",
-      });
-    } catch (error) {
-      console.error("Failed to fetch school profile", error);
-    }
-  }, [user]);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchSettings();
-    if (user?.role === ROLES.ADMIN) {
-      fetchSchoolProfile();
-    }
-  }, [user?.role, fetchSettings, fetchSchoolProfile]);
-
-  const handleUpdateSettings = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await client.patch("schools/settings/", settings);
+  // Mutations
+  const updateSettingsMutation = useMutation({
+    mutationFn: (data: any) => schoolsService.updateSettings(data),
+    onSuccess: () => {
       toast.success("Settings updated successfully");
-    } catch {
-      toast.error("Failed to update settings");
-    } finally {
-      setLoading(false);
-    }
-  };
+      queryClient.invalidateQueries({ queryKey: ["school-settings"] });
+    },
+    onError: () => toast.error("Failed to update settings"),
+  });
 
-  const handleUpdatePersonalInfo = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await client.patch("accounts/me/", personalInfo);
+  const updatePersonalInfoMutation = useMutation({
+    mutationFn: (data: any) => authService.updateMe(data),
+    onSuccess: () => {
       toast.success("Personal profile updated successfully");
-    } catch {
-      toast.error("Failed to update personal profile");
-    } finally {
-      setLoading(false);
-    }
-  };
+      // Optionally refresh user store if needed
+    },
+    onError: () => toast.error("Failed to update personal profile"),
+  });
 
-  const handleUpdateSchoolProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await client.patch(`schools/${user?.school}/`, schoolProfile);
+  const updateSchoolProfileMutation = useMutation({
+    mutationFn: (data: any) => schoolsService.updateProfile(user!.school!, data),
+    onSuccess: () => {
       toast.success("School profile updated successfully");
-    } catch {
-      toast.error("Failed to update school profile");
-    } finally {
-      setLoading(false);
-    }
-  };
+      queryClient.invalidateQueries({ queryKey: ["school-profile", user?.school] });
+    },
+    onError: () => toast.error("Failed to update school profile"),
+  });
 
-  const handleChangePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (passwordData.new_password !== passwordData.confirm_password) {
-      toast.error("New passwords do not match");
-      return;
-    }
-    setLoading(true);
-    try {
-      await client.post("auth/password/change/", {
-        old_password: passwordData.old_password,
-        new_password1: passwordData.new_password,
-        new_password2: passwordData.new_password,
-      });
+  const changePasswordMutation = useMutation({
+    mutationFn: (data: any) => authService.changePassword(data),
+    onSuccess: () => {
       toast.success("Password changed successfully");
       setPasswordData({
         old_password: "",
         new_password: "",
         confirm_password: "",
       });
-    } catch (error: any) {
+    },
+    onError: (error: any) => {
       const errorData = error.response?.data;
       if (errorData) {
-        // Extract the first error message from any field (old_password, new_password, or non_field_errors)
         const firstError = Object.values(errorData)[0];
         const message = Array.isArray(firstError)
           ? firstError[0]
           : errorData.detail || "Failed to change password.";
         toast.error(message);
       } else {
-        toast.error("Failed to change password. Please check your connection.");
+        toast.error("Failed to change password.");
       }
-    } finally {
-      setLoading(false);
+    },
+  });
+
+  const handleUpdateSettings = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateSettingsMutation.mutate(settings);
+  };
+
+  const handleUpdatePersonalInfo = (e: React.FormEvent) => {
+    e.preventDefault();
+    updatePersonalInfoMutation.mutate(personalInfo);
+  };
+
+  const handleUpdateSchoolProfile = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateSchoolProfileMutation.mutate(schoolProfile);
+  };
+
+  const handleChangePassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passwordData.new_password !== passwordData.confirm_password) {
+      toast.error("New passwords do not match");
+      return;
     }
+    changePasswordMutation.mutate({
+      old_password: passwordData.old_password,
+      new_password1: passwordData.new_password,
+      new_password2: passwordData.new_password,
+    });
   };
 
   const tabs = [
@@ -268,7 +273,7 @@ export const SettingsPage = () => {
                       </div>
                       <Button
                         type="submit"
-                        disabled={loading}
+                        disabled={updatePersonalInfoMutation.isPending}
                         className="gap-2 h-11 px-5 bg-primary-600 rounded-2xl font-black uppercase tracking-widest text-[10px] shrink-0 w-full sm:w-auto"
                       >
                         <Save className="w-4 h-4" />
@@ -418,7 +423,7 @@ export const SettingsPage = () => {
 
                     <Button
                       type="submit"
-                      disabled={loading}
+                      disabled={changePasswordMutation.isPending}
                       className="gap-2 h-14 px-10 bg-accent-600 hover:bg-accent-500 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-premium"
                     >
                       <Lock className="w-4 h-4" />
@@ -444,7 +449,7 @@ export const SettingsPage = () => {
                     </div>
                     <Button
                       type="submit"
-                      disabled={loading}
+                      disabled={updateSchoolProfileMutation.isPending}
                       className="gap-2 h-14 px-8 bg-primary-600 hover:bg-primary-500 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-premium disabled:opacity-50 transition-all shrink-0"
                     >
                       <Save className="w-4 h-4" />
@@ -518,7 +523,7 @@ export const SettingsPage = () => {
                     </div>
                     <Button
                       type="submit"
-                      disabled={loading}
+                      disabled={updateSettingsMutation.isPending}
                       className="gap-2 h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-xs shadow-premium"
                     >
                       <Save className="w-4 h-4" />
@@ -600,7 +605,7 @@ export const SettingsPage = () => {
                     </div>
                     <Button
                       type="submit"
-                      disabled={loading}
+                      disabled={updateSettingsMutation.isPending}
                       className="gap-2 h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-xs shadow-premium"
                     >
                       <Save className="w-4 h-4" />
@@ -657,7 +662,7 @@ export const SettingsPage = () => {
                     </div>
                     <Button
                       type="submit"
-                      disabled={loading}
+                      disabled={updateSettingsMutation.isPending}
                       className="gap-2 h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-xs shadow-premium"
                     >
                       <Palette className="w-4 h-4" />
@@ -718,7 +723,7 @@ export const SettingsPage = () => {
                     </div>
                     <Button
                       type="submit"
-                      disabled={loading}
+                      disabled={updateSettingsMutation.isPending}
                       className="gap-2 h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-xs shadow-premium"
                     >
                       <Save className="w-4 h-4" />

@@ -1,7 +1,6 @@
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.socialaccount.models import SocialAccount
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
 
 User = get_user_model()
 

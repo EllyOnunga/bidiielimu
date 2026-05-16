@@ -1,9 +1,6 @@
 from celery import shared_task
 from django.utils import timezone
-
 from notifications.models import Notification
-
-from .models import DailyAttendance, PeriodAttendance
 
 
 @shared_task
@@ -23,7 +20,8 @@ def process_absence_alert(student_id, date_str):
         # Check if the student has any 'ABSENT' marks today
         # Send SMS/Push to parent
         parent_phone = student.parent_phone
-        message = f"Alert: {student.first_name} was marked ABSENT for their morning session. Please contact the school for details."
+        message = f"Alert: {
+            student.first_name} was marked ABSENT for their morning session. Please contact the school for details."
 
         # In a real system, we'd call an SMS gateway here
         # send_sms(parent_phone, message)

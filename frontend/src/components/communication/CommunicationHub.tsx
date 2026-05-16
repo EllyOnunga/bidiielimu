@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Send,
   Calendar,
@@ -10,50 +10,54 @@ import {
   Loader2,
   Sparkles,
 } from "lucide-react";
-import axios from "axios";
 import toast from "react-hot-toast";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { notificationsService } from "../../api/services/notificationsService";
 
 export const CommunicationHub = () => {
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<"notices" | "sms" | "calendar">(
     "notices",
   );
-  const [notices, setNotices] = useState<any[]>([]);
-  const [events, setEvents] = useState<any[]>([]);
   const [smsMessage, setSmsMessage] = useState("");
-  const [isSending, setIsSending] = useState(false);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const { data: notices = [], isLoading: loadingNotices } = useQuery({
+    queryKey: ["notices"],
+    queryFn: notificationsService.getNotices,
+  });
 
-  const fetchData = async () => {
-    try {
-      const [noticeRes, eventRes] = await Promise.all([
-        axios.get("/api/v1/notifications/notices/"),
-        axios.get("/api/v1/notifications/events/"),
-      ]);
-      setNotices(noticeRes.data);
-      setEvents(eventRes.data);
-    } catch (err) {
-      toast.error("Failed to load communication data");
-    }
-  };
+  const { data: events = [], isLoading: loadingEvents } = useQuery({
+    queryKey: ["events"],
+    queryFn: notificationsService.getEvents,
+  });
 
-  const handleSendSMS = async () => {
-    if (!smsMessage) return toast.error("Please enter a message");
-    setIsSending(true);
-    try {
-      await axios.post("/api/v1/notifications/notices/broadcast_sms/", {
-        message: smsMessage,
-      });
+  const broadcastSmsMutation = useMutation({
+    mutationFn: (data: { message: string }) => notificationsService.broadcastSms(data),
+    onSuccess: () => {
       toast.success("Mass SMS Broadcast initiated!");
       setSmsMessage("");
-    } catch (err) {
+      queryClient.invalidateQueries({ queryKey: ["communication-stats"] });
+    },
+    onError: () => {
       toast.error("SMS Broadcast failed");
-    } finally {
-      setIsSending(false);
     }
+  });
+
+  const handleSendSMS = () => {
+    if (!smsMessage) return toast.error("Please enter a message");
+    broadcastSmsMutation.mutate({ message: smsMessage });
   };
+
+  const isSending = broadcastSmsMutation.isPending;
+  const isLoading = loadingNotices || loadingEvents;
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -100,7 +104,7 @@ export const CommunicationHub = () => {
                 </button>
               </div>
               <div className="grid grid-cols-1 gap-4">
-                {notices.map((notice) => (
+                {notices.map((notice: any) => (
                   <div
                     key={notice.id}
                     className="glass p-8 rounded-[32px] border border-white/5 hover:border-white/10 transition-all group"
@@ -134,7 +138,7 @@ export const CommunicationHub = () => {
                 </h3>
               </div>
               <div className="grid grid-cols-1 gap-6">
-                {events.map((event) => (
+                {events.map((event: any) => (
                   <div key={event.id} className="flex gap-8 group">
                     <div className="w-20 text-center">
                       <p className="text-2xl font-black text-white tracking-tighter">

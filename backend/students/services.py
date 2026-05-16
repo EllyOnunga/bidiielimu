@@ -2,8 +2,6 @@ import csv
 import io
 from datetime import datetime
 
-from django.core.exceptions import ValidationError
-
 from classes.models import GradeLevel, Stream
 
 from .models import Guardian, Student

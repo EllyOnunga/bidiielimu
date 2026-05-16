@@ -104,8 +104,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - "80:80"
-    environment:
-      - VITE_API_URL=/api/v1/
     depends_on:
       - backend
 

@@ -15,15 +15,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 
-const mockDailyData = [
-  { day: "Mon", amount: 120000 },
-  { day: "Tue", amount: 450000 },
-  { day: "Wed", amount: 890000 },
-  { day: "Thu", amount: 230000 },
-  { day: "Fri", amount: 670000 },
-  { day: "Sat", amount: 340000 },
-  { day: "Sun", amount: 150000 },
-];
+const mockDailyData: any[] = []; // TODO: Replace with real API data from fees/m-pesa analytics
 
 export const MPesaDashboard = () => {
   return (

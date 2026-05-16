@@ -1,10 +1,20 @@
-import { useState, useEffect } from "react";
-import { Save, ChevronLeft } from "lucide-react";
+import { useState, useEffect, useMemo, type ChangeEvent } from "react";
+import { Save, ChevronLeft, Download, Upload } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import client from "../api/client";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { examsService } from "../api/services/examsService";
+import { classesService } from "../api/services/classesService";
+import { studentsService } from "../api/services/studentsService";
 import { TableSkeleton } from "../components/ui/Skeleton";
 
 interface StudentData {
@@ -16,133 +26,146 @@ interface StudentData {
 }
 
 export const ExamMarksEntryPage = () => {
-  const [students, setStudents] = useState<StudentData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [fetchingStudents, setFetchingStudents] = useState(false);
-  const [saving, setSaving] = useState(false);
-
-  const [exams, setExams] = useState<any[]>([]);
-  const [assignments, setAssignments] = useState<any[]>([]);
+  const queryClient = useQueryClient();
   const [selectedExam, setSelectedExam] = useState<string>("");
   const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [selectedStream, setSelectedStream] = useState<string>("");
-  const [selectedAssignmentName, setSelectedAssignmentName] =
-    useState<string>("");
+  const [selectedAssignmentName, setSelectedAssignmentName] = useState<string>("");
+  const [localMarks, setLocalMarks] = useState<Record<number, number>>({});
+
+  const { data: examsData, isLoading: loadingExams } = useQuery({
+    queryKey: ["exams"],
+    queryFn: () => examsService.getExams(),
+  });
+
+  const { data: assignmentsData, isLoading: loadingAssignments } = useQuery({
+    queryKey: ["subject-assignments"],
+    queryFn: () => classesService.getAssignments(),
+  });
+
+  const exams = useMemo(() =>
+    Array.isArray(examsData) ? examsData : examsData?.results || []
+    , [examsData]);
+
+  const assignments = useMemo(() =>
+    Array.isArray(assignmentsData) ? assignmentsData : assignmentsData?.results || []
+    , [assignmentsData]);
+
+  useEffect(() => {
+    if (exams.length > 0 && !selectedExam) setSelectedExam(exams[0].id.toString());
+  }, [exams, selectedExam]);
+
+  useEffect(() => {
+    if (assignments.length > 0 && !selectedSubject) {
+      setSelectedSubject(assignments[0].subject.toString());
+      setSelectedStream(assignments[0].stream.toString());
+      setSelectedAssignmentName(
+        `${assignments[0].subject_name} - ${assignments[0].grade_name} ${assignments[0].stream_name}`,
+      );
+    }
+  }, [assignments, selectedSubject]);
+
+  const { data: studentsRaw, isLoading: loadingStudents } = useQuery({
+    queryKey: ["students", selectedStream],
+    queryFn: () => studentsService.getAll({ stream: selectedStream }),
+    enabled: !!selectedStream,
+  });
+
+  const { data: marksRaw, isLoading: loadingMarks } = useQuery({
+    queryKey: ["marks", selectedExam, selectedSubject],
+    queryFn: () => examsService.getMarks(selectedExam, selectedSubject),
+    enabled: !!selectedExam && !!selectedSubject,
+  });
+
+  const students: StudentData[] = useMemo(() => {
+    const sData = Array.isArray(studentsRaw) ? studentsRaw : studentsRaw?.results || [];
+    const mData = Array.isArray(marksRaw) ? marksRaw : marksRaw?.results || [];
+
+    return sData.map((s: any) => {
+      const mark = mData.find((m: any) => m.student === s.id);
+      const score = localMarks[s.id] !== undefined
+        ? localMarks[s.id]
+        : (mark ? parseFloat(mark.score) : 0);
+
+      return {
+        id: s.id,
+        name: `${s.first_name} ${s.last_name}`,
+        admission: s.admission_number,
+        score,
+        grade: mark ? mark.grade : "-",
+      };
+    });
+  }, [studentsRaw, marksRaw, localMarks]);
 
   const updateScore = (id: number, score: string) => {
     const val = parseFloat(score) || 0;
-    setStudents((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, score: val } : s)),
-    );
+    setLocalMarks(prev => ({ ...prev, [id]: val }));
   };
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      console.log("[ExamMarksEntry] Initializing page data...");
-      const [examsDataRaw, assignmentsRes] = await Promise.all([
-        examsService.getExams(),
-        client.get("classes/subject-assignments/"),
-      ]);
-
-      const examsData = Array.isArray(examsDataRaw)
-        ? examsDataRaw
-        : examsDataRaw.results || [];
-      const assData = Array.isArray(assignmentsRes.data)
-        ? assignmentsRes.data
-        : assignmentsRes.data.results || [];
-
-      console.log(
-        `[ExamMarksEntry] Loaded ${examsData.length} exams and ${assData.length} assignments.`,
-      );
-
-      setExams(examsData);
-      setAssignments(assData);
-
-      if (examsData.length > 0) setSelectedExam(examsData[0].id.toString());
-      if (assData.length > 0) {
-        setSelectedSubject(assData[0].subject.toString());
-        setSelectedStream(assData[0].stream.toString());
-        setSelectedAssignmentName(
-          `${assData[0].subject_name} - ${assData[0].grade_name} ${assData[0].stream_name}`,
-        );
-      }
-    } catch (error) {
-      console.error("[ExamMarksEntry] Failed to initialize:", error);
-      toast.error("Failed to initialize page");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchStudentsAndMarks = async () => {
-    if (!selectedStream || !selectedSubject || !selectedExam) return;
-
-    try {
-      setFetchingStudents(true);
-      console.log(
-        `[ExamMarksEntry] Fetching students for stream ${selectedStream} and marks for subject ${selectedSubject}...`,
-      );
-      const [studentsRes, marksRes] = await Promise.all([
-        client.get(`students/?stream=${selectedStream}`),
-        client.get(
-          `exams/marks/?exam=${selectedExam}&subject=${selectedSubject}`,
-        ),
-      ]);
-
-      const studentsData = Array.isArray(studentsRes.data)
-        ? studentsRes.data
-        : studentsRes.data.results || [];
-      const existingMarks = Array.isArray(marksRes.data)
-        ? marksRes.data
-        : marksRes.data.results || [];
-
-      const mapped = studentsData.map((s: any) => {
-        const mark = existingMarks.find((m: any) => m.student === s.id);
-        return {
-          id: s.id,
-          name: `${s.first_name} ${s.last_name}`,
-          admission: s.admission_number,
-          score: mark ? parseFloat(mark.score) : 0,
-          grade: mark ? mark.grade : "-",
-        };
-      });
-      console.log(
-        `[ExamMarksEntry] Found ${studentsData.length} students and ${existingMarks.length} existing marks.`,
-      );
-      setStudents(mapped);
-    } catch (error) {
-      toast.error("Failed to load students");
-    } finally {
-      setFetchingStudents(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    fetchStudentsAndMarks();
-  }, [selectedExam, selectedSubject, selectedStream]);
-
-  const handleSave = async () => {
-    try {
-      setSaving(true);
-      await client.post("exams/marks/bulk_save/", {
-        exam: selectedExam,
-        subject: selectedSubject,
-        marks: students.map((s) => ({
-          student_id: s.id,
-          score: s.score,
-        })),
-      });
+  const saveMarksMutation = useMutation({
+    mutationFn: (data: any) => examsService.saveMarks(data),
+    onSuccess: () => {
       toast.success("Marks saved successfully!");
-    } catch (error) {
+      queryClient.invalidateQueries({ queryKey: ["marks", selectedExam, selectedSubject] });
+      setLocalMarks({});
+    },
+    onError: () => {
       toast.error("Failed to save marks");
-    } finally {
-      setSaving(false);
     }
+  });
+
+  const handleSave = () => {
+    saveMarksMutation.mutate({
+      exam: selectedExam,
+      subject: selectedSubject,
+      marks: students.map((s) => ({
+        student_id: s.id,
+        score: s.score,
+      })),
+    });
+  };
+
+  const loading = loadingExams || loadingAssignments;
+  const fetchingStudents = loadingStudents || loadingMarks;
+  const saving = saveMarksMutation.isPending;
+
+  const exportToCSV = () => {
+    if (students.length === 0) return;
+    const csvContent = [
+      ["Admission", "Name", "Score"].join(","),
+      ...students.map((s) => [s.admission, `"${s.name}"`, s.score].join(",")),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `marks_${selectedExam}.csv`;
+    a.click();
+  };
+
+  const importFromCSV = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result as string;
+      const lines = text.trim().split("\n").slice(1); // skip header
+      const newMarks = { ...localMarks };
+      lines.forEach((line) => {
+        const [admission, , scoreStr] = line.split(",");
+        const score = parseFloat(scoreStr);
+        const student = students.find((s) => s.admission === admission.trim());
+        if (student && !isNaN(score)) {
+          newMarks[student.id] = score;
+        }
+      });
+      setLocalMarks(newMarks);
+      toast.success("CSV imported successfully");
+    };
+    reader.readAsText(file);
+    event.target.value = ""; // reset input
   };
 
   return (
@@ -187,7 +210,7 @@ export const ExamMarksEntryPage = () => {
                 <option value="" className="bg-bg-color">
                   Select an examination
                 </option>
-                {exams.map((e) => (
+                {exams.map((e: any) => (
                   <option key={e.id} value={e.id} className="bg-bg-color">
                     {e.name} ({e.academic_year})
                   </option>
@@ -208,7 +231,7 @@ export const ExamMarksEntryPage = () => {
               setSelectedSubject(subjectId);
               setSelectedStream(streamId);
               const selected = assignments.find(
-                (a) =>
+                (a: any) =>
                   a.subject.toString() === subjectId &&
                   a.stream.toString() === streamId,
               );
@@ -233,7 +256,7 @@ export const ExamMarksEntryPage = () => {
                 <option value="" className="bg-bg-color">
                   Select subject &amp; class
                 </option>
-                {assignments.map((as) => (
+                {assignments.map((as: any) => (
                   <option
                     key={as.id}
                     value={`${as.subject}-${as.stream}`}
@@ -248,16 +271,54 @@ export const ExamMarksEntryPage = () => {
         </div>
 
         <div className="glass p-5 md:p-6 rounded-3xl border border-white/5 flex items-end sm:col-span-2 lg:col-span-2">
-          <button
-            onClick={handleSave}
-            disabled={saving || fetchingStudents}
-            className="w-full py-2.5 md:py-3 bg-primary-600 hover:bg-primary-500 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm md:text-base disabled:opacity-50"
-          >
-            <Save className="w-5 h-5" />
-            {saving ? "Saving..." : "Save All Marks"}
-          </button>
+          <div className="flex gap-2 w-full">
+            <button
+              onClick={handleSave}
+              disabled={saving || fetchingStudents}
+              className="flex-1 py-2.5 md:py-3 bg-primary-600 hover:bg-primary-500 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm md:text-base disabled:opacity-50"
+            >
+              <Save className="w-5 h-5" />
+              {saving ? "Saving..." : "Save All Marks"}
+            </button>
+            <button
+              onClick={exportToCSV}
+              disabled={students.length === 0}
+              className="px-4 py-2.5 md:py-3 bg-white/5 hover:bg-white/10 text-primary rounded-xl border border-white/10 flex items-center gap-2 text-sm"
+            >
+              <Download className="w-4 h-4" /> Export
+            </button>
+            <label className="px-4 py-2.5 md:py-3 bg-white/5 hover:bg-white/10 text-primary rounded-xl border border-white/10 flex items-center gap-2 text-sm cursor-pointer">
+              <Upload className="w-4 h-4" /> Import
+              <input type="file" accept=".csv" onChange={importFromCSV} className="hidden" />
+            </label>
+          </div>
         </div>
       </div>
+
+      {/* Grade Distribution Chart */}
+      {students.length > 0 && (
+        <div className="glass p-6 rounded-3xl border border-white/5">
+          <h3 className="text-sm font-bold text-muted mb-4">Grade Distribution</h3>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={Object.entries(
+                  students.reduce((acc: any, s) => {
+                    const g = s.grade || "N/A";
+                    acc[g] = (acc[g] || 0) + 1;
+                    return acc;
+                  }, {})
+                ).map(([grade, count]) => ({ grade, count }))}
+              >
+                <XAxis dataKey="grade" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="count" fill="#3b82f6" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
 
       <div className="glass rounded-3xl border border-white/5 overflow-hidden">
         <div className="overflow-x-auto custom-scrollbar">
@@ -330,15 +391,14 @@ export const ExamMarksEntryPage = () => {
                     </td>
                     <td className="px-6 md:px-8 py-4">
                       <span
-                        className={`px-2 md:px-3 py-1 rounded-lg text-[10px] md:text-xs font-bold border ${
-                          student.grade === "A" || student.grade === "A-"
+                        className={`px-2 md:px-3 py-1 rounded-lg text-[10px] md:text-xs font-bold border ${student.grade === "A" || student.grade === "A-"
                             ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
                             : student.grade?.startsWith("B")
                               ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
                               : student.grade?.startsWith("C")
                                 ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
                                 : "bg-rose-500/10 text-rose-400 border-rose-500/20"
-                        }`}
+                          }`}
                       >
                         {student.grade || "-"}
                       </span>

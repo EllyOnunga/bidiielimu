@@ -92,7 +92,8 @@ def process_bulk_upload(csv_content, school_id, user_id):
         Notification.objects.create(
             user_id=user_id,
             title="Student Bulk Import Complete",
-            message=f"Successfully imported {created_count} students. {len(errors)} errors encountered.",
+            message=f"Successfully imported {created_count} students. {
+                len(errors)} errors encountered.",
             notification_type="success" if created_count > 0 else "error",
         )
     except Exception as e:

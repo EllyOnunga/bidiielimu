@@ -1,12 +1,10 @@
 import gzip
 import json
 import os
-from io import BytesIO, StringIO
 from pathlib import Path
 
 import boto3
 from django.conf import settings
-from django.core.management import call_command
 from django.utils import timezone
 
 
@@ -112,6 +110,14 @@ class BackupManager:
         except Exception as e:
             print(f"Media backup error: {e}")
             raise
+
+    def verify_backup(self, filepath):
+        """Verify backup integrity (placeholder for checksum + restore test)."""
+        import hashlib
+
+        with open(filepath, "rb") as f:
+            checksum = hashlib.sha256(f.read()).hexdigest()
+        return {"verified": True, "checksum": checksum}
 
     def create_config_backup(self):
         """

@@ -9,6 +9,7 @@ import {
   Loader2,
   ChevronLeft,
 } from "lucide-react";
+import { ElimuHubLogo } from "../components/ui/Logo";
 import { PasswordInput } from "../components/ui/PasswordInput";
 import { PasswordHint } from "../components/ui/PasswordHint";
 import { motion } from "framer-motion";
@@ -94,7 +95,7 @@ export const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-transparent relative overflow-hidden px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center bg-transparent relative overflow-hidden px-4 py-8 sm:py-12">
       <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-primary-500/10 rounded-full blur-[120px] animate-pulse-slow" />
       <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-accent-500/10 rounded-full blur-[120px] animate-pulse-slow" />
 
@@ -113,15 +114,11 @@ export const RegisterPage = () => {
         </Link>
 
         <div className="glass p-8 md:p-12 rounded-[40px]">
+          <div className="flex justify-center mb-6">
+            <ElimuHubLogo className="w-12 h-12" showText={true} />
+          </div>
+
           <div className="text-center mb-10">
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="inline-flex p-4 bg-primary-600 rounded-3xl mb-6 shadow-premium"
-            >
-              <GraduationCap className="w-10 h-10 text-white" />
-            </motion.div>
             <h1 className="text-3xl md:text-4xl font-black text-primary tracking-tight mb-2">
               Register School
             </h1>

@@ -73,15 +73,18 @@ class SubjectAssignment(models.Model):
     stream = models.ForeignKey(
         Stream, on_delete=models.CASCADE, related_name="subject_assignments"
     )
+    academic_year = models.CharField(max_length=20, default="2026")
+    periods_per_week = models.PositiveIntegerField(default=5)
 
     class Meta:
         unique_together = (
             "stream",
             "subject",
-        )  # Only one teacher per subject per stream
+            "academic_year",
+        )
 
     def __str__(self):
-        return f"{self.teacher} - {self.subject} ({self.stream})"
+        return f"{self.teacher} - {self.subject} ({self.stream} - {self.academic_year})"
 
 
 class Classroom(models.Model):
@@ -182,7 +185,10 @@ class CurriculumRequirement(models.Model):
         unique_together = ("grade_level", "subject")
 
     def __str__(self):
-        return f"{self.grade_level.name} - {self.subject.name} ({self.weekly_periods} periods)"
+        return f"{
+            self.grade_level.name} - {
+            self.subject.name} ({
+            self.weekly_periods} periods)"
 
 
 class Substitution(models.Model):
@@ -200,4 +206,7 @@ class Substitution(models.Model):
     is_confirmed = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Substitution: {self.substitute_teacher} for {self.original_teacher} on {self.date}"
+        return f"Substitution: {
+            self.substitute_teacher} for {
+            self.original_teacher} on {
+            self.date}"

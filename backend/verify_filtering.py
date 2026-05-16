@@ -1,17 +1,14 @@
 import os
 
 import django
+from accounts.models import User
+from classes.views import SubjectAssignmentViewSet
+from django_tenants.utils import schema_context
+from rest_framework.test import APIRequestFactory, force_authenticate
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
-import json
-
-from django_tenants.utils import schema_context
-from rest_framework.test import APIRequestFactory, force_authenticate
-
-from accounts.models import User
-from classes.views import SubjectAssignmentViewSet
 
 factory = APIRequestFactory()
 

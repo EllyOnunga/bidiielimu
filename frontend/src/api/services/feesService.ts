@@ -30,12 +30,25 @@ export const feesService = {
     return response.data;
   },
 
+  getFeeStructures: async (search?: string) => {
+    const response = await client.get("fees/structures/", {
+      params: { search },
+    });
+    return response.data;
+  },
+
   initiateMpesa: async (data: {
     student_id: string;
     amount: string;
     phone: string;
   }) => {
     const response = await client.post("fees/payments/initiate_mpesa/", data);
+    return response.data;
+  },
+
+  getFeeSummary: async (studentId?: number | null) => {
+    const params = studentId ? { student_id: studentId } : {};
+    const response = await client.get(`fees/payments/my_fee_summary/`, { params });
     return response.data;
   },
 };

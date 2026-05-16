@@ -1,10 +1,9 @@
-from django.db.models import Sum
-
 from attendance.models import DailyAttendance
-from exams.models import ExamRanking, Mark
+from django.db.models import Sum
+from exams.models import ExamRanking
 from fees.models import FeePayment, FeeStructure
 
-from .models import Guardian, Student
+from .models import Guardian
 
 
 class PortalService:
@@ -26,7 +25,8 @@ class PortalService:
                 .first()
             )
 
-            # 2. Financials — look up expected fees from FeeStructure for student's grade
+            # 2. Financials — look up expected fees from FeeStructure for student's
+            # grade
             total_paid = (
                 FeePayment.objects.filter(student=student).aggregate(Sum("amount"))[
                     "amount__sum"

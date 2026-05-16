@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { inventoryService } from "../../api/services/inventoryService";
 import {
   Package,
   Search,
@@ -9,8 +11,6 @@ import {
   Wrench,
   MapPin,
 } from "lucide-react";
-import axios from "axios";
-import toast from "react-hot-toast";
 
 interface Asset {
   id: string;
@@ -24,21 +24,16 @@ interface Asset {
 }
 
 export const AssetList = () => {
-  const [assets, setAssets] = useState<Asset[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
 
-  useEffect(() => {
-    fetchAssets();
-  }, []);
+  const { data: assetsData, isLoading } = useQuery({
+    queryKey: ["inventory-assets", searchTerm],
+    queryFn: () => inventoryService.getAssets(searchTerm),
+  });
 
-  const fetchAssets = async () => {
-    try {
-      const res = await axios.get("/api/v1/inventory/assets/");
-      setAssets(res.data);
-    } catch (err) {
-      toast.error("Failed to load assets");
-    }
-  };
+  const assets: Asset[] = useMemo(() => {
+    return Array.isArray(assetsData) ? assetsData : assetsData?.results || [];
+  }, [assetsData]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -128,7 +123,20 @@ export const AssetList = () => {
               </tr>
             </thead>
             <tbody className="text-white">
-              {assets.map((asset) => (
+              {isLoading ? (
+                <tr>
+                  <td colSpan={5} className="px-8 py-12 text-center text-primary-200/30 font-bold">
+                    Scanning inventory database...
+                  </td>
+                </tr>
+              ) : assets.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-8 py-12 text-center text-primary-200/30 font-bold">
+                    No assets found.
+                  </td>
+                </tr>
+              ) : (
+                assets.map((asset) => (
                 <tr
                   key={asset.id}
                   className="border-t border-white/5 hover:bg-white/[0.02] transition-all group"
@@ -175,7 +183,7 @@ export const AssetList = () => {
                     </div>
                   </td>
                 </tr>
-              ))}
+              )))}
             </tbody>
           </table>
         </div>

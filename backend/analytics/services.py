@@ -1,14 +1,11 @@
 import logging
 from datetime import timedelta
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 
 import numpy as np
-from django.db.models import Avg, Count, Q
+from django.db.models import Count, Q
 from django.utils import timezone
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
 
 logger = logging.getLogger(__name__)
 
@@ -25,9 +22,7 @@ class AdvancedAnalyticsService:
         """
         Predict student performance in a subject using historical data
         """
-        from attendance.models import DailyAttendance
         from exams.models import Mark
-        from students.models import Student
 
         # Get student's historical performance
         marks = (
@@ -78,9 +73,7 @@ class AdvancedAnalyticsService:
         """
         Identify students at risk of poor attendance
         """
-        from django.db.models import Case, IntegerField, Sum, When
 
-        from attendance.models import DailyAttendance
         from students.models import Student
 
         # Get attendance data for the last 30 days
@@ -134,9 +127,7 @@ class AdvancedAnalyticsService:
         Generate AI-powered insights from performance data
         """
         from django.db.models import Avg, StdDev
-
-        from classes.models import Subject
-        from exams.models import Exam, Mark
+        from exams.models import Mark
 
         insights = []
 
@@ -160,8 +151,11 @@ class AdvancedAnalyticsService:
                 insights.append(
                     {
                         "type": "subject_performance",
-                        "title": f"High Performance Variance in {subject_data['subject__name']}",
-                        "description": f"Students show significant performance differences in {subject_data['subject__name']} (SD: {subject_data['std_dev']:.1f}). Consider additional support or curriculum review.",
+                        "title": f"High Performance Variance in {
+                            subject_data['subject__name']}",
+                        "description": f"Students show significant performance differences in {
+                            subject_data['subject__name']} (SD: {
+                            subject_data['std_dev']:.1f}). Consider additional support or curriculum review.",
                         "severity": "medium",
                         "data": subject_data,
                     }
@@ -190,7 +184,11 @@ class AdvancedAnalyticsService:
                     {
                         "type": "class_comparison",
                         "title": "Significant Performance Gap Between Classes",
-                        "description": f"{top_class['stream__name']} leads with {top_class['avg_score']:.1f} avg score, while {bottom_class['stream__name']} trails at {bottom_class['avg_score']:.1f}. Consider resource redistribution.",
+                        "description": f"{
+                            top_class['stream__name']} leads with {
+                            top_class['avg_score']:.1f} avg score, while {
+                            bottom_class['stream__name']} trails at {
+                            bottom_class['avg_score']:.1f}. Consider resource redistribution.",
                         "severity": "high",
                         "data": {"top_class": top_class, "bottom_class": bottom_class},
                     }
@@ -216,7 +214,8 @@ class AdvancedAnalyticsService:
                     {
                         "type": "teacher_feedback",
                         "title": "Low Teacher Feedback Rate",
-                        "description": f"Only {remarks_percentage:.1f}% of marks have teacher comments. Encourage more detailed feedback for student improvement.",
+                        "description": f"Only {
+                            remarks_percentage:.1f}% of marks have teacher comments. Encourage more detailed feedback for student improvement.",
                         "severity": "low",
                         "data": {"remarks_percentage": remarks_percentage},
                     }
@@ -340,7 +339,8 @@ class AdvancedAnalyticsService:
                     {
                         "type": "high_absenteeism",
                         "title": "High Absenteeism Alert",
-                        "description": f"{absent_rate:.1f}% of students were absent yesterday. Investigate possible issues.",
+                        "description": f"{
+                            absent_rate:.1f}% of students were absent yesterday. Investigate possible issues.",
                         "severity": "high",
                         "data": {"absent_rate": absent_rate},
                     }

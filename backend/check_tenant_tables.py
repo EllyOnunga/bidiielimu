@@ -2,11 +2,11 @@ import os
 
 import django
 from django.db import connection
+from schools.models import School
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
-from schools.models import School
 
 tenant = School.objects.get(schema_name="allain_academy")
 connection.set_tenant(tenant)
