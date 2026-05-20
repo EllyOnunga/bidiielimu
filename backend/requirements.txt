@@ -31,7 +31,7 @@ django-graphql-jwt>=0.3.4
 
 # Real-time Support (Channels)
 channels>=4.0.0
-channels-redis>=4.0.0
+channels-redis>=4.3.0
 daphne>=4.0.0
 
 # Environment
