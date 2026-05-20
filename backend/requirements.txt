@@ -27,7 +27,7 @@ drf-spectacular>=0.26.0
 
 # GraphQL Support
 graphene-django>=3.1.0
-django-graphql-jwt>=0.3.4
+django-graphql-jwt>=0.4.0
 
 # Real-time Support (Channels)
 channels>=4.0.0
