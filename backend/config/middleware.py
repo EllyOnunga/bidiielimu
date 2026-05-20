@@ -26,8 +26,24 @@ class TenantAccessMiddleware(MiddlewareMixin):
     def process_request(self, request):
         from django.http import JsonResponse
 
-        # If user is not authenticated, let normal auth middleware handle it or
-        # proceed to login views
+        # If user is not authenticated, check if we have a JWT authorization header
+        if not request.user.is_authenticated:
+            auth_header = request.META.get("HTTP_AUTHORIZATION", "")
+            if auth_header.startswith("Bearer "):
+                try:
+                    from rest_framework_simplejwt.authentication import (
+                        JWTAuthentication,
+                    )
+
+                    authenticator = JWTAuthentication()
+                    auth_result = authenticator.authenticate(request)
+                    if auth_result:
+                        request.user, request.auth = auth_result
+                except Exception:
+                    pass
+
+        # If user is still not authenticated, let normal auth middleware handle it or
+        # proceed to login/public views
         if not request.user.is_authenticated:
             return None
 

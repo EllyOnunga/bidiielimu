@@ -2,6 +2,7 @@ import os
 
 import django
 from django.db import connection
+
 from schools.models import Domain, School
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")

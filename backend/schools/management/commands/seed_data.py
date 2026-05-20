@@ -2,10 +2,11 @@ import random
 import string
 from datetime import timedelta
 
-from accounts.models import Role, User
-from classes.models import GradeLevel, Stream, Subject
 from django.core.management.base import BaseCommand
 from django.utils import timezone
+
+from accounts.models import Role, User
+from classes.models import GradeLevel, Stream, Subject
 from fees.models import FeePayment, FeeStructure
 from schools.models import School, SchoolSetting
 from students.models import Student

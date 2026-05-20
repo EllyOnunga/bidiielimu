@@ -3,7 +3,6 @@ import { useNavigate, Link } from "react-router-dom";
 import {
   Mail,
   User,
-  GraduationCap,
   School,
   ArrowRight,
   Loader2,
@@ -15,6 +14,7 @@ import { PasswordHint } from "../components/ui/PasswordHint";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { authService } from "../api/services/authService";
+import { Select } from "../components/ui/Select";
 
 export const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -167,36 +167,27 @@ export const RegisterPage = () => {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-primary-200/70 ml-1">
-                Curriculum System
-              </label>
-              <div className="relative group">
-                <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-400/50 group-focus-within:text-primary-400" />
-                <select
-                  required
-                  value={formData.curriculum}
-                  onChange={(e) =>
-                    setFormData({ ...formData, curriculum: e.target.value })
-                  }
-                  className="w-full bg-white/5 border border-white/10 text-primary pl-12 pr-4 py-4 rounded-2xl outline-none focus:border-primary-500 transition-all text-base appearance-none cursor-pointer"
-                >
-                  <option value="CBC" className="bg-bg-color">
-                    Kenya CBC (Competency Based Curriculum)
-                  </option>
-                  <option value="844" className="bg-bg-color">
-                    Kenya 8-4-4 System
-                  </option>
-                  <option value="IGCSE_EDEXCEL" className="bg-bg-color">
-                    Pearson Edexcel IGCSE
-                  </option>
-                  <option value="IGCSE_CAMBRIDGE" className="bg-bg-color">
-                    Cambridge IGCSE
-                  </option>
-                </select>
-                <ArrowRight className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-400/50 pointer-events-none rotate-90" />
-              </div>
-            </div>
+            <Select
+              label="Curriculum System"
+              required
+              value={formData.curriculum}
+              onChange={(e) =>
+                setFormData({ ...formData, curriculum: e.target.value })
+              }
+            >
+              <option value="CBC" className="bg-bg-color">
+                Kenya CBC (Competency Based Curriculum)
+              </option>
+              <option value="844" className="bg-bg-color">
+                Kenya 8-4-4 System
+              </option>
+              <option value="IGCSE_EDEXCEL" className="bg-bg-color">
+                Pearson Edexcel IGCSE
+              </option>
+              <option value="IGCSE_CAMBRIDGE" className="bg-bg-color">
+                Cambridge IGCSE
+              </option>
+            </Select>
 
             <div className="space-y-2">
               <label className="text-sm font-semibold text-primary-200/70 ml-1">

@@ -1,5 +1,6 @@
-from attendance.models import DailyAttendance
 from django.db.models import Sum
+
+from attendance.models import DailyAttendance
 from exams.models import ExamRanking
 from fees.models import FeePayment, FeeStructure
 

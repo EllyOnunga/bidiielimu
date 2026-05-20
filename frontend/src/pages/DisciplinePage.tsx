@@ -7,7 +7,9 @@ import { StudentProfile } from "../components/discipline/StudentProfile";
 
 export const DisciplinePage = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
+  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(
+    null,
+  );
 
   return (
     <motion.div
@@ -17,12 +19,16 @@ export const DisciplinePage = () => {
     >
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black text-white tracking-tight">Discipline & Conduct</h1>
-          <p className="text-sm text-primary-200/40 font-medium">Manage student incidents, conduct profiles and disciplinary actions</p>
+          <h1 className="text-3xl font-black text-white tracking-tight">
+            Discipline & Conduct
+          </h1>
+          <p className="text-sm text-primary-200/40 font-medium">
+            Manage student incidents, conduct profiles and disciplinary actions
+          </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button 
-            onClick={() => setIsFormOpen(true)} 
+          <Button
+            onClick={() => setIsFormOpen(true)}
             className="uppercase tracking-[0.2em] text-[10px] font-black px-6 py-3 bg-primary-500 hover:bg-primary-600 border-none shadow-xl shadow-primary-500/20 transition-all active:scale-95"
           >
             New Incident
@@ -37,10 +43,7 @@ export const DisciplinePage = () => {
         />
       </div>
 
-      <IncidentForm 
-        open={isFormOpen} 
-        onClose={() => setIsFormOpen(false)} 
-      />
+      <IncidentForm open={isFormOpen} onClose={() => setIsFormOpen(false)} />
 
       <StudentProfile
         studentId={selectedStudentId}

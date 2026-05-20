@@ -1,8 +1,9 @@
 import os
 
 import django
-from accounts.models import User
 from django_tenants.utils import schema_context
+
+from accounts.models import User
 from teachers.models import Teacher
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")

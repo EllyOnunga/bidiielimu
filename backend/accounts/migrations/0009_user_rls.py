@@ -1,5 +1,6 @@
-from config.rls_migrations import CreateTenantRLSPolicy, EnableRLS
 from django.db import migrations
+
+from config.rls_migrations import CreateTenantRLSPolicy, EnableRLS
 
 
 class Migration(migrations.Migration):

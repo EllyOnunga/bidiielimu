@@ -57,7 +57,7 @@ export const AnalyticsPage = () => {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-primary tracking-tight mb-2">
-            Institutional <span className="text-gradient">Intelligence</span>
+            Institutional <span className="text-gradient">Analysis</span>
           </h1>
           <p className="text-muted text-xs sm:text-sm md:text-base font-medium">
             Deep-spectrum analysis of academic performance and operational
@@ -69,7 +69,7 @@ export const AnalyticsPage = () => {
           className="w-full sm:w-auto flex items-center justify-center gap-3 h-12 sm:h-14 px-6 sm:px-8 bg-white/5 text-primary rounded-2xl font-black uppercase tracking-widest text-xs border border-white/5 hover:bg-white/10 transition-all shadow-premium shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400"
         >
           <FileDown className="w-5 h-5 text-primary-400" />
-          Export Intelligence Report
+          Export Analysis Report
         </button>
       </div>
 
@@ -86,7 +86,7 @@ export const AnalyticsPage = () => {
               </div>
               <div>
                 <h2 className="text-xl font-black text-primary uppercase tracking-tight">
-                  Academic Domain Mastery
+                  Performance Insights
                 </h2>
                 <p className="text-[10px] font-black text-muted uppercase tracking-widest">
                   Aggregate performance across core subjects
@@ -183,7 +183,7 @@ export const AnalyticsPage = () => {
             </div>
             <div>
               <h2 className="text-xl font-black text-primary uppercase tracking-tight">
-                Operational Density
+                Operational Depth
               </h2>
               <p className="text-[10px] font-black text-muted uppercase tracking-widest">
                 Student allocation across academic phases
@@ -261,7 +261,7 @@ export const AnalyticsPage = () => {
                 Engagement Trajectory
               </h2>
               <p className="text-[10px] font-black text-muted uppercase tracking-widest">
-                30-day operational attendance tracking
+                30-day operational attendance Overview
               </p>
             </div>
           </div>

@@ -3,13 +3,18 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
 from students.models import Student
 from teachers.models import Teacher
 
 from .models import EmailVerificationToken, User
-from .serializers import (MyTokenObtainPairSerializer, RegisterSerializer,
-                          UserSerializer)
+from .serializers import (
+    MyTokenObtainPairSerializer,
+    MyTokenRefreshSerializer,
+    RegisterSerializer,
+    UserSerializer,
+)
 
 
 class RegisterView(generics.CreateAPIView):
@@ -54,6 +59,12 @@ class MyTokenObtainPairView(TokenObtainPairView):
                 }
                 return Response(flat_detail, status=status.HTTP_400_BAD_REQUEST)
             raise e
+
+
+class MyTokenRefreshView(TokenRefreshView):
+    serializer_class = MyTokenRefreshSerializer
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
 
 
 class VerifyEmailView(generics.GenericAPIView):

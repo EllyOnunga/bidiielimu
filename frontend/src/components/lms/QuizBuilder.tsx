@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Plus, Trash2, CheckCircle2, Save, X, HelpCircle } from "lucide-react";
 import { Button } from "../ui/Button";
 import { Modal } from "../ui/Modal";
+import { Select } from "../ui/Select";
 import { lmsService } from "../../api/services/lmsService";
 import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
@@ -112,15 +113,15 @@ export const QuizBuilder = ({
     try {
       if (initialData?.id) {
         await lmsService.updateQuiz(initialData.id, formData);
-        toast.success("Assessment updated successfully");
+        toast.success("Quiz updated successfully");
       } else {
         await lmsService.createQuiz(formData);
-        toast.success("New assessment deployed successfully");
+        toast.success("New quiz created successfully");
       }
       onSuccess();
       onClose();
     } catch (err: any) {
-      toast.error(err.response?.data?.detail || "Failed to save assessment");
+      toast.error(err.response?.data?.detail || "Failed to save quiz");
     } finally {
       setIsSubmitting(false);
     }
@@ -130,10 +131,8 @@ export const QuizBuilder = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={
-        initialData ? "Reconfigure Assessment" : "Intelligence Module Synthesis"
-      }
-      description="Design a complex assessment with weighted scoring and adaptive parameters."
+      title={initialData ? "Edit Quiz" : "Create New Quiz"}
+      description="Create practice quiz questions, choices, and set the duration."
       className="max-w-4xl glass border-white/10"
     >
       <form
@@ -145,7 +144,7 @@ export const QuizBuilder = ({
           <div className="space-y-4">
             <div className="space-y-2">
               <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest ml-1">
-                Assessment Title
+                Quiz Title
               </label>
               <input
                 required
@@ -160,7 +159,7 @@ export const QuizBuilder = ({
             </div>
             <div className="space-y-2">
               <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest ml-1">
-                Contextual Description
+                Description
               </label>
               <textarea
                 value={formData.description}
@@ -174,29 +173,26 @@ export const QuizBuilder = ({
           </div>
 
           <div className="space-y-4">
+            <Select
+              label="Select Subject"
+              required
+              value={formData.subject}
+              onChange={(e) =>
+                setFormData({ ...formData, subject: e.target.value })
+              }
+            >
+              <option value="" className="bg-bg-color">
+                Select Subject...
+              </option>
+              {subjects.map((s: any) => (
+                <option key={s.id} value={s.id} className="bg-bg-color">
+                  {s.name}
+                </option>
+              ))}
+            </Select>
             <div className="space-y-2">
               <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest ml-1">
-                Target Subject Domain
-              </label>
-              <select
-                required
-                value={formData.subject}
-                onChange={(e) =>
-                  setFormData({ ...formData, subject: e.target.value })
-                }
-                className="w-full h-14 bg-slate-900 border border-white/10 rounded-2xl px-5 text-white text-sm outline-none focus:border-amber-500"
-              >
-                <option value="">Select Domain...</option>
-                {subjects.map((s: any) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest ml-1">
-                Mission Duration (Minutes)
+                Duration (Minutes)
               </label>
               <input
                 required
@@ -219,7 +215,7 @@ export const QuizBuilder = ({
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
             <h3 className="text-xl font-black text-white uppercase tracking-tight flex items-center gap-3">
               <HelpCircle className="text-amber-500" />
-              Question Matrix
+              Questions
             </h3>
             <Button
               type="button"
@@ -228,7 +224,7 @@ export const QuizBuilder = ({
               className="gap-2 border-amber-500/20 text-amber-500 hover:bg-amber-500 hover:text-white rounded-xl text-[10px] font-black uppercase w-full sm:w-auto justify-center"
             >
               <Plus className="w-4 h-4" />
-              Insert Question
+              Add Question
             </Button>
           </div>
 
@@ -253,7 +249,7 @@ export const QuizBuilder = ({
                     </div>
                     <div className="flex-1 space-y-2">
                       <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">
-                        Question Payload
+                        Question Text
                       </label>
                       <input
                         required
@@ -263,12 +259,12 @@ export const QuizBuilder = ({
                           updateQuestion(qIndex, { text: e.target.value })
                         }
                         className="w-full bg-transparent border-b border-white/10 py-2 text-white font-bold outline-none focus:border-amber-500 transition-all"
-                        placeholder="Define the prompt for this question..."
+                        placeholder="Enter the question here..."
                       />
                     </div>
                     <div className="w-32 space-y-2">
                       <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">
-                        Weight (Pts)
+                        Points
                       </label>
                       <input
                         required
@@ -286,9 +282,9 @@ export const QuizBuilder = ({
 
                   <div className="space-y-4 ml-12">
                     <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest flex items-center justify-between">
-                      Option Set
+                      Answer Choices
                       <span className="text-[9px] text-amber-500/50">
-                        Mark the correct answer using the radio selection
+                        Mark the correct answer using the round selector
                       </span>
                     </label>
                     <div className="grid grid-cols-1 gap-3">
@@ -343,7 +339,7 @@ export const QuizBuilder = ({
                         className="w-fit ml-10 text-[10px] font-black text-amber-500/40 hover:text-amber-500 uppercase tracking-widest flex items-center gap-2 transition-all"
                       >
                         <Plus className="w-3 h-3" />
-                        Append Option
+                        Add Choice
                       </button>
                     </div>
                   </div>
@@ -360,7 +356,7 @@ export const QuizBuilder = ({
             onClick={onClose}
             className="flex-1 rounded-2xl h-14 border border-white/5"
           >
-            Discard Draft
+            Cancel
           </Button>
           <Button
             type="submit"
@@ -372,7 +368,7 @@ export const QuizBuilder = ({
             ) : (
               <Save className="w-6 h-6" />
             )}
-            {initialData ? "Synchronize Matrix" : "Deploy Assessment"}
+            {initialData ? "Save Changes" : "Create Quiz"}
           </Button>
         </div>
       </form>

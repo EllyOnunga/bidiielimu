@@ -14,6 +14,7 @@ import toast from "react-hot-toast";
 import { examsService } from "../../api/services/examsService";
 import { classesService } from "../../api/services/classesService";
 import { studentsService } from "../../api/services/studentsService";
+import { Select } from "../ui/Select";
 
 interface StudentMark {
   id: string;
@@ -57,9 +58,7 @@ export const MarkEntryPage = () => {
         classesService.getAssignments(),
       ]);
       return {
-        exams: Array.isArray(examsRes)
-          ? examsRes
-          : examsRes.results || [],
+        exams: Array.isArray(examsRes) ? examsRes : examsRes.results || [],
         assignments: Array.isArray(assignmentsRes)
           ? assignmentsRes
           : assignmentsRes.results || [],
@@ -243,53 +242,43 @@ export const MarkEntryPage = () => {
 
       {/* Toolbar */}
       <div className="glass p-4 sm:p-6 rounded-[28px] border border-white/5 flex flex-wrap gap-4 sm:gap-6 items-end">
-        <div className="flex-1 min-w-[140px] space-y-2">
-          <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">
-            Examination
-          </label>
-          <select
-            value={selectedExam}
-            onChange={(e) => setSelectedExam(e.target.value)}
-            className="w-full bg-white/5 border border-white/5 rounded-2xl py-2.5 sm:py-3 px-3 sm:px-4 text-primary text-sm outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
-          >
-            <option value="" className="bg-bg-color">
-              Select Exam
+        <Select
+          label="Examination"
+          value={selectedExam}
+          onChange={(e) => setSelectedExam(e.target.value)}
+        >
+          <option value="" className="bg-bg-color">
+            Select Exam
+          </option>
+          {exams.map((e: Exam) => (
+            <option key={e.id} value={e.id} className="bg-bg-color">
+              {e.name}
             </option>
-            {exams.map((e: Exam) => (
-              <option key={e.id} value={e.id} className="bg-bg-color">
-                {e.name}
-              </option>
-            ))}
-          </select>
-        </div>
+          ))}
+        </Select>
 
-        <div className="flex-1 min-w-[140px] space-y-2">
-          <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">
-            Subject & Stream
-          </label>
-          <select
-            value={`${selectedSubject}-${selectedStream}`}
-            onChange={(e) => {
-              const [subjectId, streamId] = e.target.value.split("-");
-              setSelectedSubject(subjectId);
-              setSelectedStream(streamId);
-            }}
-            className="w-full bg-white/5 border border-white/5 rounded-2xl py-2.5 sm:py-3 px-3 sm:px-4 text-primary text-sm outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
-          >
-            <option value="" className="bg-bg-color">
-              Select Class
+        <Select
+          label="Subject & Stream"
+          value={`${selectedSubject}-${selectedStream}`}
+          onChange={(e) => {
+            const [subjectId, streamId] = e.target.value.split("-");
+            setSelectedSubject(subjectId);
+            setSelectedStream(streamId);
+          }}
+        >
+          <option value="" className="bg-bg-color">
+            Select Class
+          </option>
+          {assignments.map((as: Assignment) => (
+            <option
+              key={as.id}
+              value={`${as.subject}-${as.stream}`}
+              className="bg-bg-color"
+            >
+              {as.subject_name} - {as.grade_name} {as.stream_name}
             </option>
-            {assignments.map((as: Assignment) => (
-              <option
-                key={as.id}
-                value={`${as.subject}-${as.stream}`}
-                className="bg-bg-color"
-              >
-                {as.subject_name} - {as.grade_name} {as.stream_name}
-              </option>
-            ))}
-          </select>
-        </div>
+          ))}
+        </Select>
 
         <div className="relative w-full sm:flex-[2] sm:min-w-[240px] space-y-2">
           <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">

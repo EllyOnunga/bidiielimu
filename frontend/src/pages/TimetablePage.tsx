@@ -8,13 +8,13 @@ import {
   User,
   MapPin,
   Plus,
-  Filter,
   X,
   ShieldCheck,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { Button } from "../components/ui/Button";
+import { Select } from "../components/ui/Select";
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 const TIME_SLOTS = [
@@ -75,7 +75,7 @@ interface Classroom {
 
 export const TimetablePage = () => {
   const queryClient = useQueryClient();
-  const [selectedClass, setSelectedClass] = useState("Loading...");
+  const [selectedClass, setSelectedClass] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     day_of_week: 0,
@@ -87,34 +87,59 @@ export const TimetablePage = () => {
     stream: "",
   });
 
-  const { data: streams = [] } = useQuery<Stream[]>({
+  const { data: streamsData } = useQuery({
     queryKey: ["streams"],
     queryFn: classesService.getStreams,
   });
+  const streams: Stream[] = useMemo(() => {
+    return Array.isArray(streamsData)
+      ? streamsData
+      : (streamsData as any)?.results || [];
+  }, [streamsData]);
 
-  const { data: subjects = [] } = useQuery<Subject[]>({
+  const selectedClassLabel = useMemo(() => {
+    const stream = streams.find((s) => s.id.toString() === selectedClass);
+    return stream ? `${stream.grade_name} ${stream.name}` : "Loading...";
+  }, [streams, selectedClass]);
+
+  const { data: subjectsData } = useQuery({
     queryKey: ["subjects"],
     queryFn: () => classesService.getSubjects(),
   });
+  const subjects: Subject[] = useMemo(() => {
+    return Array.isArray(subjectsData)
+      ? subjectsData
+      : (subjectsData as any)?.results || [];
+  }, [subjectsData]);
 
   const { data: teachersData } = useQuery({
     queryKey: ["teachers"],
     queryFn: () => teachersService.getAll(),
   });
-  const teachers: Teacher[] = Array.isArray(teachersData) ? teachersData : (teachersData as any)?.results || [];
+  const teachers: Teacher[] = Array.isArray(teachersData)
+    ? teachersData
+    : (teachersData as any)?.results || [];
 
-  const { data: classrooms = [] } = useQuery<Classroom[]>({
+  const { data: classroomsData } = useQuery({
     queryKey: ["classrooms"],
     queryFn: classesService.getClassrooms,
   });
+  const classrooms: Classroom[] = useMemo(() => {
+    return Array.isArray(classroomsData)
+      ? classroomsData
+      : (classroomsData as any)?.results || [];
+  }, [classroomsData]);
 
   const { data: scheduleData } = useQuery({
-    queryKey: ["schedule-slots"],
-    queryFn: classesService.getScheduleSlots,
+    queryKey: ["schedule-slots", selectedClass],
+    queryFn: () => classesService.getScheduleSlots(selectedClass),
+    enabled: selectedClass !== "",
   });
 
   const schedule: ScheduleSlot[] = useMemo(() => {
-    const data = Array.isArray(scheduleData) ? scheduleData : (scheduleData as any)?.results || [];
+    const data = Array.isArray(scheduleData)
+      ? scheduleData
+      : (scheduleData as any)?.results || [];
     return data.map((slot: any, idx: number) => ({
       id: slot.id,
       day: slot.day_of_week_name,
@@ -127,8 +152,8 @@ export const TimetablePage = () => {
   }, [scheduleData]);
 
   useEffect(() => {
-    if (streams.length > 0 && selectedClass === "Loading...") {
-      setSelectedClass(`${streams[0].grade_name} ${streams[0].name}`);
+    if (streams.length > 0 && !selectedClass) {
+      setSelectedClass(streams[0].id.toString());
       setFormData((prev) => ({ ...prev, stream: streams[0].id.toString() }));
     }
   }, [streams, selectedClass]);
@@ -136,12 +161,12 @@ export const TimetablePage = () => {
   const addSlotMutation = useMutation({
     mutationFn: (data: any) => classesService.createScheduleSlot(data),
     onSuccess: () => {
-      toast.success("Operational slot synchronized");
+      toast.success("Class scheduled successfully");
       setIsModalOpen(false);
       queryClient.invalidateQueries({ queryKey: ["schedule-slots"] });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.detail || "Node synchronization failed");
+      toast.error(error.response?.data?.detail || "Failed to schedule class");
     },
   });
 
@@ -166,22 +191,34 @@ export const TimetablePage = () => {
             Smart <span className="text-gradient">Timetable</span>
           </h1>
           <p className="text-muted text-xs sm:text-sm md:text-base font-medium max-w-xl">
-            Conflict-free spectral scheduling and operational grid management
-            for {selectedClass}.
+            View and manage school lessons, subject schedules, and class
+            assignments for {selectedClassLabel}.
           </p>
         </div>
-        <div className="flex items-center gap-3 w-full lg:w-auto">
-          <Button
-            variant="ghost"
-            className="flex-1 lg:flex-none h-14 px-8 rounded-2xl"
-          >
-            <Filter className="w-5 h-5 mr-2" /> Filter Grid
-          </Button>
+        <div className="flex flex-col sm:flex-row items-end gap-3 w-full lg:w-auto">
+          <div className="w-full sm:w-64">
+            <Select
+              label="Class/Stream"
+              value={selectedClass}
+              onChange={(e) => setSelectedClass(e.target.value)}
+              className="h-14 text-sm"
+            >
+              {streams.map((s) => (
+                <option
+                  key={s.id}
+                  value={s.id.toString()}
+                  className="bg-bg-color"
+                >
+                  {s.grade_name} - {s.name}
+                </option>
+              ))}
+            </Select>
+          </div>
           <Button
             onClick={handleAddSlot}
-            className="flex-1 lg:flex-none h-14 px-8 rounded-2xl gap-2"
+            className="w-full sm:w-auto h-14 px-8 rounded-2xl gap-2"
           >
-            <Plus className="w-5 h-5" /> Initialize Slot
+            <Plus className="w-5 h-5" /> Add Timetable Slot
           </Button>
         </div>
       </div>
@@ -191,7 +228,7 @@ export const TimetablePage = () => {
           <div className="min-w-[1200px]">
             <div className="grid grid-cols-6 bg-white/[0.02] border-b border-white/5">
               <div className="p-6 border-r border-white/5 text-[10px] font-black text-muted uppercase tracking-[0.3em] flex items-center justify-center bg-white/[0.01]">
-                Temporal Axis
+                Time
               </div>
               {DAYS.map((day) => (
                 <div
@@ -266,18 +303,18 @@ export const TimetablePage = () => {
         <div className="premium-card p-8 group overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 blur-[80px] -mr-16 -mt-16 group-hover:bg-primary-500/20 transition-all duration-700" />
           <h2 className="text-[10px] font-black text-primary-400 uppercase tracking-[0.3em] mb-8">
-            Operational Metrics
+            Timetable Summary
           </h2>
           <div className="space-y-4 relative z-10">
             <MetricRow
               icon={BookOpen}
-              label="Total Weekly Sessions"
+              label="Total Lessons per Week"
               value={schedule.length}
               color="blue"
             />
             <MetricRow
               icon={Clock}
-              label="Grid Utilization"
+              label="Timetable Utilization"
               value="94%"
               color="emerald"
             />
@@ -287,7 +324,7 @@ export const TimetablePage = () => {
         <div className="premium-card p-8 group overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-[80px] -mr-16 -mt-16 group-hover:bg-emerald-500/20 transition-all duration-700" />
           <h2 className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.3em] mb-8">
-            Conflict Telemetry
+            Schedule Checker
           </h2>
           <div className="flex items-center gap-6 relative z-10">
             <div className="w-16 h-16 rounded-[24px] bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/20 shadow-glow-sm">
@@ -295,10 +332,10 @@ export const TimetablePage = () => {
             </div>
             <div>
               <p className="text-base font-black text-primary uppercase tracking-tight mb-1">
-                Operational Integrity Nominal
+                No Schedule Conflicts
               </p>
               <p className="text-[10px] font-black text-muted uppercase tracking-widest opacity-60">
-                No scheduling overlaps detected in the current cycle.
+                All lessons are perfectly scheduled without any timing overlaps.
               </p>
             </div>
           </div>
@@ -308,13 +345,13 @@ export const TimetablePage = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Initialize Schedule Node"
+        title="Schedule a Class"
         className="max-w-2xl glass-morphic border-white/10 !rounded-[40px]"
       >
         <form onSubmit={handleAddSlot} className="space-y-10 mt-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <FormField
-              label="Temporal Day"
+              label="Day of the Week"
               select
               value={formData.day_of_week}
               onChange={(val: any) =>
@@ -328,7 +365,7 @@ export const TimetablePage = () => {
               ))}
             </FormField>
             <FormField
-              label="Target Stream"
+              label="Class Stream"
               select
               value={formData.stream}
               onChange={(val: any) => setFormData({ ...formData, stream: val })}
@@ -340,7 +377,7 @@ export const TimetablePage = () => {
               ))}
             </FormField>
             <FormField
-              label="Start Ingress"
+              label="Start Time"
               type="time"
               value={formData.start_time}
               onChange={(val: any) =>
@@ -348,7 +385,7 @@ export const TimetablePage = () => {
               }
             />
             <FormField
-              label="End Egress"
+              label="End Time"
               type="time"
               value={formData.end_time}
               onChange={(val: any) =>
@@ -356,7 +393,7 @@ export const TimetablePage = () => {
               }
             />
             <FormField
-              label="Subject Matrix"
+              label="Subject"
               select
               value={formData.subject}
               onChange={(val: any) =>
@@ -364,7 +401,7 @@ export const TimetablePage = () => {
               }
             >
               <option value="" className="bg-bg-color">
-                Select Matrix...
+                Select Subject...
               </option>
               {subjects.map((s) => (
                 <option key={s.id} value={s.id} className="bg-bg-color">
@@ -373,7 +410,7 @@ export const TimetablePage = () => {
               ))}
             </FormField>
             <FormField
-              label="Faculty Node"
+              label="Teacher"
               select
               value={formData.teacher}
               onChange={(val: any) =>
@@ -381,7 +418,7 @@ export const TimetablePage = () => {
               }
             >
               <option value="" className="bg-bg-color">
-                Select Node...
+                Select Teacher...
               </option>
               {teachers.map((t) => (
                 <option key={t.id} value={t.id} className="bg-bg-color">
@@ -390,7 +427,7 @@ export const TimetablePage = () => {
               ))}
             </FormField>
             <FormField
-              label="Spatial Unit (Room)"
+              label="Classroom"
               select
               value={formData.classroom}
               onChange={(val: any) =>
@@ -398,7 +435,7 @@ export const TimetablePage = () => {
               }
             >
               <option value="" className="bg-bg-color">
-                Select Unit...
+                Select Room...
               </option>
               {classrooms.map((c) => (
                 <option key={c.id} value={c.id} className="bg-bg-color">
@@ -414,14 +451,14 @@ export const TimetablePage = () => {
               className="flex-1 h-16 text-[10px]"
               onClick={() => setIsModalOpen(false)}
             >
-              Abort Process
+              Cancel
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="flex-[2] h-16 text-[10px]"
               disabled={addSlotMutation.isPending}
             >
-              {addSlotMutation.isPending ? "Executing Node..." : "Execute Node Ingress"}
+              {addSlotMutation.isPending ? "Scheduling..." : "Schedule Class"}
             </Button>
           </div>
         </form>
@@ -455,29 +492,33 @@ const FormField = ({
   type = "text",
   value,
   onChange,
-}: any) => (
-  <div className="space-y-3">
-    <label className="text-[10px] font-black text-muted uppercase tracking-[0.3em] pl-1">
-      {label}
-    </label>
-    {select ? (
-      <select
+}: any) => {
+  if (select) {
+    return (
+      <Select
+        label={label}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full h-16 bg-white/5 border border-white/5 rounded-2xl px-6 text-primary text-base font-black outline-none focus:border-primary-500 transition-all appearance-none"
       >
         {children}
-      </select>
-    ) : (
+      </Select>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <label className="text-[10px] font-black text-muted uppercase tracking-[0.3em] pl-1">
+        {label}
+      </label>
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="w-full h-16 bg-white/5 border border-white/5 rounded-2xl px-6 text-primary text-base font-black outline-none focus:border-primary-500 transition-all"
       />
-    )}
-  </div>
-);
+    </div>
+  );
+};
 
 const Modal = ({ isOpen, onClose, title, children, className }: any) => (
   <AnimatePresence>

@@ -101,6 +101,7 @@ export const TimetableGrid = ({ streamId }: { streamId: string }) => {
 
   useEffect(() => {
     fetchSlots();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [streamId]);
 
   const fetchSlots = async () => {

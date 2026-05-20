@@ -26,6 +26,7 @@ import {
   BrainCircuit,
   Layers,
   LifeBuoy,
+  School,
 } from "lucide-react";
 import { useAuthStore, type User } from "../store/authStore";
 import { ThemeToggle } from "../components/ThemeToggle";
@@ -36,6 +37,7 @@ import { notificationsService } from "../api/services/notificationsService";
 import { useState } from "react";
 import { useTheme } from "../contexts/ThemeContext";
 import { ElimuHubLogo } from "../components/ui/Logo";
+import { systemService } from "../api/services/systemService";
 
 interface NavItemProps {
   to: string;
@@ -90,8 +92,15 @@ const SidebarContent = ({
   schoolLogo,
   setIsSidebarOpen,
   handleLogout,
-}: SidebarContentProps) => (
-  <div className="flex flex-col h-full">
+}: SidebarContentProps) => {
+  const { data: systemStatus } = useQuery({
+    queryKey: ["systemStatus"],
+    queryFn: systemService.getSystemStatus,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  return (
+    <div className="flex flex-col h-full">
     <div className="flex items-center justify-between mb-6 md:mb-10 px-2">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 md:w-12 md:h-12 bg-primary-600 rounded-2xl shadow-premium flex items-center justify-center overflow-hidden shrink-0 border border-white/10">
@@ -155,7 +164,7 @@ const SidebarContent = ({
           <NavItem
             to="/students"
             icon={Users}
-            label="Student Info (SIS)"
+            label="Students"
             onClick={() => setIsSidebarOpen(false)}
           />
           <NavItem
@@ -167,7 +176,7 @@ const SidebarContent = ({
           <NavItem
             to="/classes"
             icon={BookOpen}
-            label="Academic Structure"
+            label="Classes"
             onClick={() => setIsSidebarOpen(false)}
           />
           <NavItem
@@ -224,7 +233,7 @@ const SidebarContent = ({
             <NavItem
               to="/hr/directory"
               icon={UserSquare2}
-              label="Staff & HR"
+              label="Staff"
               onClick={() => setIsSidebarOpen(false)}
             />
           )}
@@ -274,7 +283,7 @@ const SidebarContent = ({
           <NavItem
             to="/analytics"
             icon={BrainCircuit}
-            label="AI Analytics"
+            label="Analytics"
             onClick={() => setIsSidebarOpen(false)}
           />
 
@@ -323,13 +332,13 @@ const SidebarContent = ({
           <NavItem
             to="/portal"
             icon={LayoutDashboard}
-            label="Portal View"
+            label="Portal"
             onClick={() => setIsSidebarOpen(false)}
           />
           <NavItem
             to="/lms"
             icon={GraduationCap}
-            label="Learning Portal (LMS)"
+            label="Learning Portal"
             onClick={() => setIsSidebarOpen(false)}
           />
           <NavItem
@@ -344,9 +353,15 @@ const SidebarContent = ({
 
     <div className="mt-auto border-t border-white/5 pt-6 space-y-1">
       <NavItem
+        to="/my-schools"
+        icon={School}
+        label="My Schools"
+        onClick={() => setIsSidebarOpen(false)}
+      />
+      <NavItem
         to="/support"
         icon={LifeBuoy}
-        label="Support Hub"
+        label="Support"
         onClick={() => setIsSidebarOpen(false)}
       />
       <NavItem
@@ -369,13 +384,22 @@ const SidebarContent = ({
         <p className="text-[9px] font-bold text-white mt-2 uppercase tracking-[0.2em]">
           Powered by
         </p>
-        <p className="text-xs font-black text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-[#22c55e]">
+        <p className="text-xs font-black text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-[#22c55e] mb-2">
           ElimuHub
         </p>
+        {/* Elegant Platform Version Badge */}
+        <div className="px-3 py-1 rounded-full text-[9px] font-mono font-bold tracking-wider bg-primary-500/10 border border-primary-500/20 text-primary-300 hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shadow-sm">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary-500"></span>
+          </span>
+          {systemStatus?.version ? `v${systemStatus.version}` : "v1.0.0"}
+        </div>
       </div>
     </div>
   </div>
-);
+  );
+};
 
 export const MainLayout = () => {
   const navigate = useNavigate();
@@ -396,10 +420,11 @@ export const MainLayout = () => {
     refetchInterval: 30000,
   });
 
-  const markAllReadMutation = useMutation({
-    mutationFn: notificationsService.markAllAsRead,
+  const clearAllMutation = useMutation({
+    mutationFn: notificationsService.clearAll,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      toast.success("Notification archive cleared");
     },
   });
 
@@ -416,7 +441,7 @@ export const MainLayout = () => {
     toast.success("Logged out successfully");
   };
 
-  const markAllAsRead = () => markAllReadMutation.mutate();
+  const clearAllNotifications = () => clearAllMutation.mutate();
   const markAsRead = (id: number) => markAsReadMutation.mutate(id);
 
   const unreadCount = Array.isArray(notifications)
@@ -494,7 +519,10 @@ export const MainLayout = () => {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <ElimuHubLogo className="w-5 h-5 sm:w-6 sm:h-6" showText={false} />
+                  <ElimuHubLogo
+                    className="w-5 h-5 sm:w-6 sm:h-6"
+                    showText={false}
+                  />
                 )}
               </div>
             </div>
@@ -530,10 +558,12 @@ export const MainLayout = () => {
                   <Bell className="w-5 h-5" />
                   {unreadCount > 0 && (
                     <span
-                      className="absolute top-2 right-2 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-primary-950 animate-pulse shadow-glow"
+                      className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1.5 flex items-center justify-center bg-rose-500 rounded-full border-2 border-[#020617] animate-pulse text-[9px] font-black text-white shadow-glow"
                       aria-live="polite"
                       aria-label={`${unreadCount} unread notifications`}
-                    />
+                    >
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
                   )}
                 </button>
 
@@ -545,13 +575,13 @@ export const MainLayout = () => {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={() => setShowNotifications(false)}
-                        className="fixed inset-0 z-[-1]"
+                        className="fixed inset-0 z-[55]"
                       />
                       <motion.div
                         initial={{ opacity: 0, y: 15, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 15, scale: 0.95 }}
-                        className="absolute right-0 mt-4 w-[calc(100vw-2rem)] sm:w-96 glass rounded-[24px] shadow-2xl overflow-hidden p-2 z-[60]"
+                        className="fixed top-20 left-4 right-4 sm:absolute sm:top-auto sm:left-auto sm:right-0 sm:mt-4 w-auto sm:w-96 glass rounded-[24px] shadow-2xl overflow-hidden p-2 z-[60]"
                       >
                         <div className="p-4 flex items-center justify-between border-b border-white/5 mb-2">
                           <h3 className="font-bold text-white">
@@ -567,7 +597,7 @@ export const MainLayout = () => {
                           {!Array.isArray(notifications) ||
                           notifications.length === 0 ? (
                             <div className="p-10 text-center text-primary-200/30 text-xs font-medium italic">
-                              No new transmissions
+                              No new notifications
                             </div>
                           ) : (
                             notifications.map((n) => (
@@ -608,7 +638,7 @@ export const MainLayout = () => {
                           )}
                         </div>
                         <button
-                          onClick={markAllAsRead}
+                          onClick={clearAllNotifications}
                           className="w-full py-3 text-[10px] font-black text-primary-400 hover:text-primary-300 transition-all border-t border-white/5 mt-2 uppercase tracking-[0.2em]"
                         >
                           Clear Archive

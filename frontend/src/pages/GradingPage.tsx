@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2, Layers, ChevronRight, Zap, Target } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -20,7 +20,7 @@ export const GradingPage = () => {
   const queryClient = useQueryClient();
   const [isSystemModalOpen, setIsSystemModalOpen] = useState(false);
   const [systemName, setSystemName] = useState("");
-  const [activeSystem, setActiveSystem] = useState<any>(null);
+  const [activeSystemId, setActiveSystemId] = useState<number | null>(null);
   const [isThresholdModalOpen, setIsThresholdModalOpen] = useState(false);
   const [thresholdData, setThresholdData] = useState({
     grade: "",
@@ -36,10 +36,15 @@ export const GradingPage = () => {
     select: (data) => (Array.isArray(data) ? data : data.results || []),
   });
 
+  const activeSystem = useMemo(() => {
+    if (!activeSystemId) return null;
+    return systems.find((sys: any) => sys.id === activeSystemId) || null;
+  }, [systems, activeSystemId]);
+
   const createSystemMutation = useMutation({
     mutationFn: (data: any) => examsService.createGradingSystem(data),
     onSuccess: () => {
-      toast.success("Grading matrix initialized");
+      toast.success("Grading system successfully created");
       setIsSystemModalOpen(false);
       setSystemName("");
       queryClient.invalidateQueries({ queryKey: ["grading-systems"] });
@@ -49,7 +54,7 @@ export const GradingPage = () => {
   const createThresholdMutation = useMutation({
     mutationFn: (data: any) => examsService.createThreshold(data),
     onSuccess: () => {
-      toast.success("Grade threshold synchronized");
+      toast.success("Grade range added successfully");
       setIsThresholdModalOpen(false);
       setThresholdData({
         grade: "",
@@ -65,7 +70,7 @@ export const GradingPage = () => {
   const deleteThresholdMutation = useMutation({
     mutationFn: (id: number) => examsService.deleteThreshold(id),
     onSuccess: () => {
-      toast.success("Threshold purged");
+      toast.success("Grade range deleted");
       queryClient.invalidateQueries({ queryKey: ["grading-systems"] });
     },
   });
@@ -88,11 +93,11 @@ export const GradingPage = () => {
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
         <div className="space-y-2">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary tracking-tight leading-none">
-            Grading <span className="text-gradient">Architect</span>
+            Grading <span className="text-gradient">Systems</span>
           </h1>
           <p className="text-muted text-xs sm:text-sm md:text-base font-medium max-w-xl">
-            Design sophisticated academic assessment frameworks and performance
-            conversion matrices.
+            Create and configure the grading scales, grade ranges, and points
+            for your school.
           </p>
         </div>
         <Button
@@ -100,7 +105,7 @@ export const GradingPage = () => {
           className="gap-2 h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-xs shadow-premium w-full lg:w-auto"
         >
           <Layers className="w-5 h-5" />
-          Initialize System
+          Add Grading System
         </Button>
       </div>
 
@@ -109,7 +114,7 @@ export const GradingPage = () => {
           <div className="flex items-center gap-3 px-2">
             <div className="w-1.5 h-1.5 rounded-full bg-primary-500 shadow-glow-sm" />
             <h2 className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">
-              Operational Frameworks
+              Grading Systems
             </h2>
           </div>
           <div className="space-y-4">
@@ -124,7 +129,7 @@ export const GradingPage = () => {
               <div className="premium-card p-12 text-center opacity-20 border-dashed border-white/10">
                 <Layers className="w-12 h-12 mx-auto mb-4" />
                 <p className="text-[10px] font-black uppercase tracking-widest">
-                  No Frameworks Detected
+                  No Grading Systems Found
                 </p>
               </div>
             ) : (
@@ -132,7 +137,7 @@ export const GradingPage = () => {
                 <motion.div
                   key={system.id}
                   whileHover={{ scale: 1.02 }}
-                  onClick={() => setActiveSystem(system)}
+                  onClick={() => setActiveSystemId(system.id)}
                   className={`p-8 rounded-[32px] border transition-all cursor-pointer group relative overflow-hidden ${
                     activeSystem?.id === system.id
                       ? "bg-primary-600/10 border-primary-500 shadow-glow-sm"
@@ -145,7 +150,7 @@ export const GradingPage = () => {
                         {system.name}
                       </h3>
                       <p className="text-[10px] font-black text-muted uppercase tracking-widest">
-                        {system.thresholds?.length || 0} Intelligence Nodes
+                        {system.thresholds?.length || 0} Grade Ranges
                       </p>
                     </div>
                     <ChevronRight
@@ -174,10 +179,10 @@ export const GradingPage = () => {
                 <div className="p-8 border-b border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white/[0.01]">
                   <div>
                     <h2 className="text-xl font-black text-primary uppercase tracking-[0.2em]">
-                      {activeSystem.name} Matrix
+                      {activeSystem.name} Ranges
                     </h2>
                     <p className="text-[10px] font-black text-muted uppercase tracking-widest mt-1">
-                      Threshold-to-Grade conversion parameters
+                      Set the marks range for each grade (e.g. A is 80 to 100).
                     </p>
                   </div>
                   <Button
@@ -185,7 +190,7 @@ export const GradingPage = () => {
                     onClick={() => setIsThresholdModalOpen(true)}
                     className="gap-2 h-12 px-6 rounded-xl text-[10px] bg-white/5 border-white/5"
                   >
-                    <Plus className="w-4 h-4" /> Add Threshold
+                    <Plus className="w-4 h-4" /> Add Grade Range
                   </Button>
                 </div>
 
@@ -194,19 +199,19 @@ export const GradingPage = () => {
                     <TableHeader className="bg-white/[0.02]">
                       <TableRow className="border-0 hover:bg-transparent h-20">
                         <TableHead className="text-muted text-[10px] font-black uppercase tracking-widest pl-10">
-                          Grade Identity
+                          Grade
                         </TableHead>
                         <TableHead className="text-muted text-[10px] font-black uppercase tracking-widest text-center">
-                          Spectral Range (Min — Max)
+                          Score Range (Min — Max)
                         </TableHead>
                         <TableHead className="text-muted text-[10px] font-black uppercase tracking-widest text-center">
-                          Intelligence Points
+                          Points
                         </TableHead>
                         <TableHead className="text-muted text-[10px] font-black uppercase tracking-widest">
-                          Descriptor (Remarks)
+                          Remarks
                         </TableHead>
                         <TableHead className="text-right text-muted text-[10px] font-black uppercase tracking-widest pr-10">
-                          Operations
+                          Actions
                         </TableHead>
                       </TableRow>
                     </TableHeader>
@@ -217,7 +222,7 @@ export const GradingPage = () => {
                             <div className="flex flex-col items-center opacity-20">
                               <Target className="w-20 h-20 mb-6" />
                               <p className="text-lg font-black uppercase tracking-[0.3em]">
-                                Threshold Matrix Depleted
+                                No Grade Ranges Added
                               </p>
                             </div>
                           </TableCell>
@@ -278,11 +283,11 @@ export const GradingPage = () => {
                   <Zap className="w-10 h-10 text-primary-400 opacity-20 group-hover:opacity-100 transition-opacity" />
                 </div>
                 <h3 className="text-2xl font-black text-primary uppercase tracking-tight leading-none mb-3">
-                  Initialize Operational View
+                  Select a Grading System
                 </h3>
                 <p className="text-muted text-[11px] font-black uppercase tracking-[0.2em] max-w-sm leading-relaxed">
-                  Select a target grading framework from the operational grid to
-                  access and modify its spectral thresholds.
+                  Please select one of the grading systems from the list to view
+                  and manage its grade ranges.
                 </p>
               </div>
             )}
@@ -293,16 +298,16 @@ export const GradingPage = () => {
       <Modal
         isOpen={isSystemModalOpen}
         onClose={() => setIsSystemModalOpen(false)}
-        title="Initialize Assessment Framework"
+        title="Create Grading System"
         className="max-w-xl glass-morphic border-white/10 !rounded-[40px]"
       >
         <div className="space-y-10 mt-8">
           <div className="space-y-3">
             <label className="text-[10px] font-black text-muted uppercase tracking-[0.3em] pl-1">
-              Framework Identity (System Name)
+              Grading System Name
             </label>
             <Input
-              placeholder="e.g. Standard 8-4-4, CBC Grid, Cambridge Advanced"
+              placeholder="e.g. KCSE Grading, CBC Level, Cambridge Scale"
               value={systemName}
               onChange={(e) => setSystemName(e.target.value)}
               className="h-16 font-black text-lg"
@@ -314,7 +319,7 @@ export const GradingPage = () => {
               className="flex-1 h-14 text-[10px]"
               onClick={() => setIsSystemModalOpen(false)}
             >
-              Abort
+              Cancel
             </Button>
             <Button
               className="flex-[2] h-14 text-[10px]"
@@ -322,8 +327,8 @@ export const GradingPage = () => {
               disabled={!systemName || createSystemMutation.isPending}
             >
               {createSystemMutation.isPending
-                ? "Initializing..."
-                : "Commit Framework Identity"}
+                ? "Creating..."
+                : "Create Grading System"}
             </Button>
           </div>
         </div>
@@ -332,14 +337,14 @@ export const GradingPage = () => {
       <Modal
         isOpen={isThresholdModalOpen}
         onClose={() => setIsThresholdModalOpen(false)}
-        title="Synchronize Grade Threshold"
+        title="Add Grade Range"
         className="max-w-2xl glass-morphic border-white/10 !rounded-[40px]"
       >
         <form onSubmit={handleAddThreshold} className="space-y-10 mt-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-3">
               <label className="text-[10px] font-black text-muted uppercase tracking-[0.3em] pl-1">
-                Grade Identity (e.g. A)
+                Grade Name (e.g. A, B, C)
               </label>
               <Input
                 required
@@ -355,7 +360,7 @@ export const GradingPage = () => {
             </div>
             <div className="space-y-3">
               <label className="text-[10px] font-black text-muted uppercase tracking-[0.3em] pl-1">
-                Intelligence Points
+                Points
               </label>
               <Input
                 required
@@ -372,7 +377,7 @@ export const GradingPage = () => {
             </div>
             <div className="space-y-3">
               <label className="text-[10px] font-black text-muted uppercase tracking-[0.3em] pl-1">
-                Spectral Minimum
+                Minimum Score
               </label>
               <Input
                 required
@@ -389,7 +394,7 @@ export const GradingPage = () => {
             </div>
             <div className="space-y-3">
               <label className="text-[10px] font-black text-muted uppercase tracking-[0.3em] pl-1">
-                Spectral Maximum
+                Maximum Score
               </label>
               <Input
                 required
@@ -406,11 +411,11 @@ export const GradingPage = () => {
             </div>
             <div className="col-span-full space-y-3">
               <label className="text-[10px] font-black text-muted uppercase tracking-[0.3em] pl-1">
-                Node Descriptor (Remarks)
+                Remarks
               </label>
               <Input
                 required
-                placeholder="e.g. EXCELLENT PROTOCOL"
+                placeholder="e.g. EXCELLENT WORK"
                 value={thresholdData.remarks}
                 onChange={(e) =>
                   setThresholdData({
@@ -429,16 +434,14 @@ export const GradingPage = () => {
               className="flex-1 h-14 text-[10px]"
               onClick={() => setIsThresholdModalOpen(false)}
             >
-              Abort Process
+              Cancel
             </Button>
             <Button
               type="submit"
               disabled={createThresholdMutation.isPending}
               className="flex-[2] h-14 text-[10px]"
             >
-              {createThresholdMutation.isPending
-                ? "Syncing..."
-                : "Execute Matrix Update"}
+              {createThresholdMutation.isPending ? "Saving..." : "Add Range"}
             </Button>
           </div>
         </form>

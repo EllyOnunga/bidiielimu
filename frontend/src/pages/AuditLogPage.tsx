@@ -93,34 +93,34 @@ export const AuditLogPage = () => {
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-primary tracking-tight">
-              Security <span className="text-gradient">Audit Logs</span>
+              School <span className="text-gradient">Activity Logs</span>
             </h1>
             <p className="text-muted text-xs sm:text-sm uppercase tracking-widest font-bold mt-1">
-              System Activity History
+              A history of updates and actions in the school platform.
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/5 rounded-xl border border-white/10 text-muted text-xs font-bold uppercase tracking-widest self-start sm:self-auto">
           <Database className="w-4 h-4" />
-          Live Monitoring
+          Live Updates
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
         <AuditStat
-          label="Total Actions (24h)"
+          label="Total Updates (24h)"
           value={stats.total_actions_24h}
           icon={Activity}
           color="text-primary-400"
         />
         <AuditStat
-          label="Sensitive Changes"
+          label="Important Changes"
           value={stats.sensitive_changes}
           icon={ShieldAlert}
           color="text-rose-400"
         />
         <AuditStat
-          label="Active Admins"
+          label="Active Administrators"
           value={stats.active_admins}
           icon={User}
           color="text-blue-400"
@@ -132,7 +132,7 @@ export const AuditLogPage = () => {
           <div className="relative w-full sm:w-96">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-dim" />
             <input
-              placeholder="Search logs by user, model or action..."
+              placeholder="Search activity by name, module, or action..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-primary text-sm outline-none focus:ring-2 focus:ring-primary-500 transition-all"
@@ -140,7 +140,7 @@ export const AuditLogPage = () => {
           </div>
           <button className="flex items-center justify-center gap-2 px-6 py-3 bg-white/5 text-muted rounded-2xl border border-white/10 hover:bg-white/10 transition-all text-sm w-full sm:w-auto font-bold">
             <Filter className="w-4 h-4" />
-            Advanced Filter
+            Filter Logs
           </button>
         </div>
 
@@ -225,8 +225,8 @@ export const AuditLogPage = () => {
       <Modal
         isOpen={selectedLog !== null}
         onClose={() => setSelectedLog(null)}
-        title="Audit Log Entry"
-        description="Detailed record of system activity"
+        title="Log Details"
+        description="Full details of this school platform activity"
         className="max-w-2xl"
       >
         {selectedLog && (
@@ -234,7 +234,7 @@ export const AuditLogPage = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-1">
                 <p className="text-[10px] font-black text-muted uppercase tracking-widest">
-                  Actor
+                  User
                 </p>
                 <p className="text-primary font-bold text-sm sm:text-base">
                   {selectedLog.user_name}
@@ -260,7 +260,7 @@ export const AuditLogPage = () => {
               </div>
               <div className="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-1">
                 <p className="text-[10px] font-black text-muted uppercase tracking-widest">
-                  IP Source
+                  IP Address
                 </p>
                 <p className="text-primary font-mono text-xs sm:text-sm">
                   {selectedLog.ip_address}
@@ -270,7 +270,7 @@ export const AuditLogPage = () => {
 
             <div className="p-6 bg-white/5 rounded-3xl border border-white/5">
               <p className="text-[10px] font-black text-primary-200/40 uppercase tracking-widest mb-3">
-                Payload Delta
+                Changes Made
               </p>
               {selectedLog.changes &&
               Object.keys(selectedLog.changes).length > 0 ? (
@@ -282,8 +282,7 @@ export const AuditLogPage = () => {
               ) : (
                 <div className="bg-[#0A0F1A] p-4 rounded-2xl border border-white/5">
                   <p className="text-xs text-muted font-mono italic">
-                    {/* No delta recorded */} No mutations detected for this
-                    event.
+                    No changes detected for this event.
                   </p>
                 </div>
               )}

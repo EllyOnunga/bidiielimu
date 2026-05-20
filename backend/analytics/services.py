@@ -127,6 +127,7 @@ class AdvancedAnalyticsService:
         Generate AI-powered insights from performance data
         """
         from django.db.models import Avg, StdDev
+
         from exams.models import Mark
 
         insights = []

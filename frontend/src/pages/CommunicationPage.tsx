@@ -35,8 +35,11 @@ export const CommunicationPage = () => {
   });
 
   const sendEmailMutation = useMutation({
-    mutationFn: (data: { subject: string; message: string; recipients: string[] }) =>
-      notificationsService.sendBulkEmail(data),
+    mutationFn: (data: {
+      subject: string;
+      message: string;
+      recipients: string[];
+    }) => notificationsService.sendBulkEmail(data),
     onSuccess: (_, variables) => {
       toast.success(`Email sent to ${variables.recipients.length} recipients`);
       setFormData({ subject: "", message: "", recipients: "", phones: "" });
@@ -44,7 +47,7 @@ export const CommunicationPage = () => {
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.detail || "Failed to send email");
-    }
+    },
   });
 
   const sendSmsMutation = useMutation({
@@ -57,7 +60,7 @@ export const CommunicationPage = () => {
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.detail || "Failed to send SMS");
-    }
+    },
   });
 
   const fetchGroupMutation = useMutation({
@@ -76,20 +79,26 @@ export const CommunicationPage = () => {
     },
     onError: () => {
       toast.error("Failed to load group recipients", { id: "group-fetch" });
-    }
+    },
   });
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
     if (activeTab === "email") {
-      const emailList = formData.recipients.split(",").map((e) => e.trim()).filter(Boolean);
+      const emailList = formData.recipients
+        .split(",")
+        .map((e) => e.trim())
+        .filter(Boolean);
       sendEmailMutation.mutate({
         subject: formData.subject,
         message: formData.message,
         recipients: emailList,
       });
     } else {
-      const phoneList = formData.phones.split(",").map((p) => p.trim()).filter(Boolean);
+      const phoneList = formData.phones
+        .split(",")
+        .map((p) => p.trim())
+        .filter(Boolean);
       sendSmsMutation.mutate({
         message: formData.message,
         phones: phoneList,
@@ -126,20 +135,22 @@ export const CommunicationPage = () => {
       <div className="flex flex-wrap gap-2 p-1.5 bg-white/5 rounded-2xl w-fit border border-white/5">
         <button
           onClick={() => setActiveTab("email")}
-          className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === "email"
+          className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
+            activeTab === "email"
               ? "bg-primary-600 text-white shadow-lg"
               : "text-muted hover:text-primary"
-            }`}
+          }`}
         >
           <Mail className="w-4 h-4" />
           Bulk Email
         </button>
         <button
           onClick={() => setActiveTab("sms")}
-          className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === "sms"
+          className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
+            activeTab === "sms"
               ? "bg-primary-600 text-white shadow-lg"
               : "text-muted hover:text-primary"
-            }`}
+          }`}
         >
           <Phone className="w-4 h-4" />
           Bulk SMS
@@ -302,10 +313,11 @@ export const CommunicationPage = () => {
                   <div
                     className="h-full bg-primary-500 transition-all duration-500"
                     style={{
-                      width: `${activeTab === "email"
+                      width: `${
+                        activeTab === "email"
                           ? (stats?.email_used / stats?.email_limit) * 100
                           : (stats?.sms_used / stats?.sms_limit) * 100
-                        }%`,
+                      }%`,
                     }}
                   ></div>
                 </div>

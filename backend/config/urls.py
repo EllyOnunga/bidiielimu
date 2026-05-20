@@ -15,21 +15,29 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-from config.views_health import (HealthCheckView, LivenessCheckView,
-                                 MetricsView, ReadinessCheckView)
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import include, path
-from drf_spectacular.views import (SpectacularAPIView, SpectacularRedocView,
-                                   SpectacularSwaggerView)
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularRedocView,
+    SpectacularSwaggerView,
+)
 from graphene_django.views import GraphQLView
+
+from config.views_health import (
+    HealthCheckView,
+    LivenessCheckView,
+    MetricsView,
+    ReadinessCheckView,
+)
 from schools.views_theme import TenantThemeView
 
 
 def health_check(request):
-    return JsonResponse({"status": "ok", "version": "1.0.0"})
+    return JsonResponse({"status": "ok", "version": settings.VERSION})
 
 
 urlpatterns = [
@@ -42,7 +50,11 @@ urlpatterns = [
     path("graphql/", GraphQLView.as_view(graphiql=True)),
     path(
         "api/v1/ping/",
-        lambda r: JsonResponse({"status": "ping-main"}),
+        lambda r: JsonResponse({
+            "status": "ping-main",
+            "version": settings.VERSION,
+            "environment": "development" if settings.DEBUG else "production",
+        }),
         name="ping-main",
     ),
     path("api/v1/theme/", TenantThemeView.as_view(), name="theme"),

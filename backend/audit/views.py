@@ -1,8 +1,8 @@
-from config.tenant_security import (StrictTenantPermission,
-                                    TenantAwareViewSetMixin)
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
+from config.tenant_security import StrictTenantPermission, TenantAwareViewSetMixin
 
 from .models import AuditLog
 from .serializers import AuditLogSerializer

@@ -80,6 +80,18 @@ export const authService = {
     return response.data;
   },
 
+  setupSMSOTP: async (phoneNumber: string) => {
+    const response = await client.post("accounts/otp/setup/", {
+      phone_number: phoneNumber,
+    });
+    return response.data;
+  },
+
+  verifySMSOTPSetup: async (otp: string) => {
+    const response = await client.post("accounts/otp/verify-setup/", { otp });
+    return response.data;
+  },
+
   updateMe: async (data: any) => {
     const response = await client.patch("accounts/me/", data);
     return response.data;

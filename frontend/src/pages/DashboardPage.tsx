@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   Users,
@@ -123,20 +124,36 @@ const StatCard = ({
 export const DashboardPage = () => {
   const user = useAuthStore((state) => state.user);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user?.role === "SUPER_ADMIN") {
+      navigate("/super-admin", { replace: true });
+    }
+  }, [user, navigate]);
+
   const { data: stats, isLoading: loadingStats } = useQuery({
     queryKey: ["dashboard-stats"],
     queryFn: async () => {
-      const [studentsRes, teachersRes, classesRes, paymentsRes] = await Promise.all([
-        studentsService.getAll(),
-        teachersService.getAll(),
-        classesService.getGrades(),
-        feesService.getPayments(),
-      ]);
+      const [studentsRes, teachersRes, classesRes, paymentsRes] =
+        await Promise.all([
+          studentsService.getAll().catch(() => []),
+          teachersService.getAll().catch(() => []),
+          classesService.getGrades().catch(() => []),
+          feesService.getPayments().catch(() => []),
+        ]);
 
-      const studentsData = Array.isArray(studentsRes) ? studentsRes : (studentsRes as any).results || [];
-      const teachersData = Array.isArray(teachersRes) ? teachersRes : (teachersRes as any).results || [];
-      const classesData = Array.isArray(classesRes) ? classesRes : (classesRes as any).results || [];
-      const paymentsData = Array.isArray(paymentsRes) ? paymentsRes : (paymentsRes as any).results || [];
+      const studentsData = Array.isArray(studentsRes)
+        ? studentsRes
+        : (studentsRes as any).results || [];
+      const teachersData = Array.isArray(teachersRes)
+        ? teachersRes
+        : (teachersRes as any).results || [];
+      const classesData = Array.isArray(classesRes)
+        ? classesRes
+        : (classesRes as any).results || [];
+      const paymentsData = Array.isArray(paymentsRes)
+        ? paymentsRes
+        : (paymentsRes as any).results || [];
 
       const totalRevenue = paymentsData
         .filter((p: any) => p.status === "COMPLETED")
@@ -158,34 +175,39 @@ export const DashboardPage = () => {
   const { data: revenueData = [] } = useQuery({
     queryKey: ["revenue-chart"],
     queryFn: async () => {
-      const res = await feesService.getPayments();
+      const res = await feesService.getPayments().catch(() => []);
       const payments = Array.isArray(res) ? res : (res as any).results || [];
-      
+
       const monthly = payments.reduce((acc: any, p: any) => {
-        const month = new Date(p.payment_date).toLocaleString("default", { month: "short" });
+        const month = new Date(p.payment_date).toLocaleString("default", {
+          month: "short",
+        });
         acc[month] = (acc[month] || 0) + Number(p.amount);
         return acc;
       }, {});
 
-      return ["Jan", "Feb", "Mar", "Apr", "May", "Jun"].map(month => ({
+      return ["Jan", "Feb", "Mar", "Apr", "May", "Jun"].map((month) => ({
         name: month,
-        value: monthly[month] || 0
+        value: monthly[month] || 0,
       }));
-    }
+    },
   });
 
   const { data: activities = [] } = useQuery({
     queryKey: ["dashboard-activities"],
     queryFn: async () => {
-      const res = await auditService.getLogs();
+      const res = await auditService.getLogs().catch(() => []);
       const logs = Array.isArray(res) ? res : (res as any).results || [];
       return logs.slice(0, 5).map((log: any) => ({
         id: log.id,
-        label: log.action_type || "System Event",
-        detail: log.description || "System protocol executed",
-        time: new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        label: log.action_type || "School Activity",
+        detail: log.description || "School update recorded",
+        time: new Date(log.timestamp).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
       }));
-    }
+    },
   });
 
   return (
@@ -197,11 +219,11 @@ export const DashboardPage = () => {
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
         <div className="space-y-2">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary tracking-tight leading-none">
-            Institutional <span className="text-gradient">Intelligence</span>
+            School <span className="text-gradient">Overview</span>
           </h1>
           <p className="text-muted text-xs sm:text-sm md:text-base font-medium max-w-xl">
-            Centralized operational monitoring and strategic data visualization
-            for elite academic management.
+            A simple and clear overview of our school, teachers, students, and
+            activities.
           </p>
         </div>
         <div className="flex gap-3 w-full lg:w-auto">
@@ -210,13 +232,13 @@ export const DashboardPage = () => {
             className="flex-1 lg:flex-none gap-2 h-14 px-8 rounded-2xl"
             onClick={() => window.print()}
           >
-            <FileText className="w-5 h-5" /> Export Intelligence
+            <FileText className="w-5 h-5" /> Export Report
           </Button>
           <Button
             className="flex-1 lg:flex-none gap-2 h-14 px-8 rounded-2xl"
             onClick={() => navigate("/analytics")}
           >
-            <Zap className="w-5 h-5" /> Deep Insights
+            <Zap className="w-5 h-5" /> Detailed Insights
           </Button>
         </div>
       </div>
@@ -228,19 +250,51 @@ export const DashboardPage = () => {
             <Zap className="w-5 h-5 text-primary-400" />
           </div>
           <div>
-            <h3 className="text-sm font-black text-primary uppercase tracking-[3px]">Quick Access</h3>
-            <p className="text-[10px] text-muted">Jump to frequent operations</p>
+            <h3 className="text-sm font-black text-primary uppercase tracking-[3px]">
+              Quick Access
+            </h3>
+            <p className="text-[10px] text-muted">Go to daily tasks quickly</p>
           </div>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
           {[
-            { label: "Students", to: "/students", icon: Users, roles: ["ADMIN", "TEACHER", "PRINCIPAL"] },
-            { label: "Classes", to: "/classes", icon: BookOpen, roles: ["ADMIN", "TEACHER", "PRINCIPAL"] },
-            { label: "Exams", to: "/exams", icon: FileText, roles: ["ADMIN", "TEACHER", "PRINCIPAL"] },
-            { label: "Fees", to: "/fees", icon: Wallet, roles: ["ADMIN", "PRINCIPAL"] },
-            { label: "LMS", to: "/lms", icon: BookOpen, roles: ["ADMIN", "TEACHER", "STUDENT"] },
-            { label: "Analytics", to: "/analytics", icon: TrendingUp, roles: ["ADMIN", "PRINCIPAL"] },
+            {
+              label: "Students",
+              to: "/students",
+              icon: Users,
+              roles: ["ADMIN", "TEACHER", "PRINCIPAL"],
+            },
+            {
+              label: "Classes",
+              to: "/classes",
+              icon: BookOpen,
+              roles: ["ADMIN", "TEACHER", "PRINCIPAL"],
+            },
+            {
+              label: "Exams",
+              to: "/exams",
+              icon: FileText,
+              roles: ["ADMIN", "TEACHER", "PRINCIPAL"],
+            },
+            {
+              label: "Fees",
+              to: "/fees",
+              icon: Wallet,
+              roles: ["ADMIN", "PRINCIPAL"],
+            },
+            {
+              label: "LMS",
+              to: "/lms",
+              icon: BookOpen,
+              roles: ["ADMIN", "TEACHER", "STUDENT"],
+            },
+            {
+              label: "Analytics",
+              to: "/analytics",
+              icon: TrendingUp,
+              roles: ["ADMIN", "PRINCIPAL"],
+            },
           ]
             .filter((link) => link.roles.includes(user?.role || ""))
             .map((link, index) => {
@@ -275,7 +329,7 @@ export const DashboardPage = () => {
           <>
             <StatCard
               to={user?.role === "SUPER_ADMIN" ? "/super-admin" : "/students"}
-              title="Academic Population"
+              title="Total Students"
               value={stats?.students || 0}
               icon={Users}
               color="bg-blue-600"
@@ -286,8 +340,8 @@ export const DashboardPage = () => {
               to={user?.role === "SUPER_ADMIN" ? "/super-admin" : "/teachers"}
               title={
                 user?.role === "SUPER_ADMIN"
-                  ? "System Nodes"
-                  : "Faculty Network"
+                  ? "School Accounts"
+                  : "Total Teachers"
               }
               value={stats?.teachers || 0}
               icon={UserSquare2}
@@ -299,8 +353,8 @@ export const DashboardPage = () => {
               to={user?.role === "SUPER_ADMIN" ? "/super-admin" : "/classes"}
               title={
                 user?.role === "SUPER_ADMIN"
-                  ? "Institutional Grid"
-                  : "Operational Units"
+                  ? "Active Classes"
+                  : "Total Classes"
               }
               value={stats?.classes || 0}
               icon={user?.role === "SUPER_ADMIN" ? Shield : BookOpen}
@@ -311,7 +365,7 @@ export const DashboardPage = () => {
               user?.role === ROLES.FINANCE) && (
               <StatCard
                 to={user?.role === "SUPER_ADMIN" ? "/super-admin" : "/fees"}
-                title="Gross Revenue"
+                title="Fees Collected"
                 value={stats.fees}
                 icon={Wallet}
                 color="bg-emerald-600"
@@ -329,10 +383,10 @@ export const DashboardPage = () => {
             <div>
               <h2 className="text-2xl font-black text-primary flex items-center gap-3">
                 <TrendingUp className="w-6 h-6 text-emerald-400" />
-                Revenue Matrix
+                School Fees Tracker
               </h2>
               <p className="text-[10px] font-black text-muted uppercase tracking-[0.3em] mt-2">
-                Financial Flow Dynamics
+                Money received over the past few months
               </p>
             </div>
             <div className="flex p-1 bg-white/5 rounded-2xl">
@@ -340,7 +394,7 @@ export const DashboardPage = () => {
                 6 Months
               </button>
               <button className="px-5 py-2.5 text-muted hover:text-primary text-[10px] font-black uppercase tracking-widest rounded-xl transition-all">
-                Cycle Yearly
+                Full Year
               </button>
             </div>
           </div>
@@ -408,23 +462,27 @@ export const DashboardPage = () => {
         <div className="lg:col-span-4 space-y-8">
           <div className="premium-card p-8">
             <h2 className="text-[10px] font-black text-primary-400 mb-6 uppercase tracking-[0.3em]">
-              Operational Protocols
+              Daily Tasks
             </h2>
             <div className="space-y-3">
               <QuickActionButton
                 to="/students"
-                label="Induct Student"
+                label="Register New Student"
                 icon={UserSquare2}
               />
               <QuickActionButton
                 to="/teachers"
-                label="Induct Faculty"
+                label="Register New Teacher"
                 icon={Shield}
               />
-              <QuickActionButton to="/fees" label="Revenue Log" icon={Wallet} />
+              <QuickActionButton
+                to="/fees"
+                label="Fees & Payments"
+                icon={Wallet}
+              />
               <QuickActionButton
                 to="/attendance/mark"
-                label="Activity Tracking"
+                label="Mark Attendance"
                 icon={Calendar}
               />
             </div>
@@ -433,13 +491,13 @@ export const DashboardPage = () => {
           <div className="premium-card p-8">
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.3em]">
-                System Telemetry
+                Recent Updates
               </h2>
               <Link
                 to="/audit-logs"
                 className="text-[10px] font-black text-primary-200/20 hover:text-primary-400 uppercase tracking-widest transition-colors"
               >
-                Archive
+                Past Log
               </Link>
             </div>
             <div className="space-y-4">
@@ -447,7 +505,7 @@ export const DashboardPage = () => {
                 <div className="py-12 text-center opacity-10">
                   <Activity className="w-10 h-10 mx-auto mb-4" />
                   <p className="text-[10px] font-black uppercase tracking-widest">
-                    No Signals Detected
+                    No school updates today
                   </p>
                 </div>
               ) : (

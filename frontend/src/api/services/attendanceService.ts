@@ -28,7 +28,9 @@ export const attendanceService = {
   },
 
   getStudentStats: async (studentId: number | string) => {
-    const response = await client.get(`attendance/daily/student_stats/?student_id=${studentId}`);
+    const response = await client.get(
+      `attendance/daily/student_stats/?student_id=${studentId}`,
+    );
     return response.data;
   },
 };

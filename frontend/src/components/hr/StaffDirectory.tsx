@@ -16,9 +16,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { teachersService } from "../../api/services/teachersService";
 import { hrService } from "../../api/services/hrService";
 import { Modal } from "../ui/Modal";
+import { Select } from "../ui/Select";
 
 interface StaffMember {
   id: number;
+  uniqueId?: string;
   name: string;
   first_name: string;
   last_name: string;
@@ -38,7 +40,9 @@ export const StaffDirectory = () => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [activeTab, setActiveTab] = useState<"All" | "Teachers" | "Other">("All");
+  const [activeTab, setActiveTab] = useState<"All" | "Teachers" | "Other">(
+    "All",
+  );
   const [editingStaff, setEditingStaff] = useState<StaffMember | null>(null);
 
   // Form State
@@ -62,32 +66,39 @@ export const StaffDirectory = () => {
   }, [search]);
 
   const { data: staff = [], isLoading: loading } = useQuery({
-    queryKey: ["staff", activeTab, debouncedSearch],
+    queryKey: ["staff", debouncedSearch],
     queryFn: async () => {
-      if (activeTab === "Teachers") {
-        const res = await teachersService.getAll(debouncedSearch);
-        return Array.isArray(res) ? res : res.results || [];
-      } else if (activeTab === "Other") {
-        const res = await hrService.getStaffProfiles({ search: debouncedSearch });
-        return Array.isArray(res) ? res : res.results || [];
-      } else {
-        // All - merge both
-        const [teachersRes, staffRes] = await Promise.all([
-          teachersService.getAll(debouncedSearch),
-          hrService.getStaffProfiles({ search: debouncedSearch }),
-        ]);
-        const teachers = Array.isArray(teachersRes) ? teachersRes : teachersRes.results || [];
-        const otherStaff = Array.isArray(staffRes) ? staffRes : staffRes.results || [];
-        return [...teachers, ...otherStaff];
-      }
+      const [teachersRes, staffRes] = await Promise.all([
+        teachersService.getAll(debouncedSearch),
+        hrService.getStaffProfiles({ search: debouncedSearch }),
+      ]);
+      const teachers = Array.isArray(teachersRes)
+        ? teachersRes
+        : teachersRes.results || [];
+      const otherStaff = Array.isArray(staffRes)
+        ? staffRes
+        : staffRes.results || [];
+
+      const teachersList = teachers.map((t: any) => ({
+        ...t,
+        uniqueId: `teacher-${t.id}`,
+        role: t.role || "TEACHER",
+      }));
+      const otherStaffList = otherStaff.map((s: any) => ({
+        ...s,
+        uniqueId: `staff-${s.id}`,
+        role: s.role || "ADMIN",
+      }));
+
+      return [...teachersList, ...otherStaffList];
     },
   });
 
   const createMutation = useMutation({
     mutationFn: (data: any) => {
-      return activeTab === "Other" 
-        ? hrService.createStaffProfile(data) 
-        : teachersService.create(data);
+      return data.role === "TEACHER"
+        ? teachersService.create(data)
+        : hrService.createStaffProfile({ ...data, role_name: data.role });
     },
     onSuccess: () => {
       toast.success("Staff onboarded successfully!");
@@ -100,12 +111,11 @@ export const StaffDirectory = () => {
     },
   });
 
-
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: any }) => {
-      return activeTab === "Other"
-        ? hrService.updateStaffProfile(id, data)
-        : teachersService.update(id, data);
+      return data.role === "TEACHER"
+        ? teachersService.update(id, data)
+        : hrService.updateStaffProfile(id, { ...data, role_name: data.role });
     },
     onSuccess: () => {
       toast.success("Staff updated");
@@ -138,7 +148,9 @@ export const StaffDirectory = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const payload = editingStaff ? { ...formData, id: editingStaff.id } : formData;
+    const payload = editingStaff
+      ? { ...formData, id: editingStaff.id }
+      : formData;
     if (editingStaff) {
       updateMutation.mutate({ id: editingStaff.id, data: payload });
     } else {
@@ -165,8 +177,15 @@ export const StaffDirectory = () => {
     setIsModalOpen(true);
   };
 
-
-  const filteredStaff = staff; // Filtering now handled server-side via tabs
+  const filteredStaff = staff.filter((member) => {
+    if (activeTab === "Teachers") {
+      return member.role === "TEACHER";
+    }
+    if (activeTab === "Other") {
+      return member.role !== "TEACHER";
+    }
+    return true;
+  });
 
   return (
     <div className="space-y-8 pb-20">
@@ -229,7 +248,7 @@ export const StaffDirectory = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              key={member.id}
+              key={member.uniqueId}
               className="glass rounded-[40px] border border-white/5 overflow-hidden group hover:border-primary-500/30 transition-all"
             >
               <div className="p-8 space-y-6">
@@ -237,15 +256,15 @@ export const StaffDirectory = () => {
                   <div className="w-16 h-16 rounded-[24px] bg-white/5 flex items-center justify-center text-primary-400 group-hover:bg-primary-500 group-hover:text-white transition-all shadow-inner">
                     <Users className="w-8 h-8" />
                   </div>
-                   <button
-                     onClick={() => handleEdit(member)}
-                     className="p-2 text-primary-200/20 hover:text-primary-400 transition-all"
-                   >
-                     <Edit2 className="w-4 h-4" />
-                   </button>
-                   <button className="p-2 text-primary-200/20 hover:text-white transition-all">
-                     <MoreHorizontal className="w-5 h-5" />
-                   </button>
+                  <button
+                    onClick={() => handleEdit(member)}
+                    className="p-2 text-primary-200/20 hover:text-primary-400 transition-all"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </button>
+                  <button className="p-2 text-primary-200/20 hover:text-white transition-all">
+                    <MoreHorizontal className="w-5 h-5" />
+                  </button>
                 </div>
 
                 <div>
@@ -299,15 +318,15 @@ export const StaffDirectory = () => {
       )}
 
       {/* Onboard Modal */}
-        <Modal
-          isOpen={isModalOpen}
-          onClose={() => {
-            setIsModalOpen(false);
-            setEditingStaff(null);
-            resetForm();
-          }}
-          title={editingStaff ? "Edit Staff Member" : "Onboard New Staff"}
-        >
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingStaff(null);
+          resetForm();
+        }}
+        title={editingStaff ? "Edit Staff Member" : "Onboard New Staff"}
+      >
         <form
           onSubmit={handleSubmit}
           className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-2"
@@ -392,38 +411,31 @@ export const StaffDirectory = () => {
               }
             />
           </div>
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">
-              System Role
-            </label>
-            <select
-              required
-              className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-primary outline-none focus:ring-2 focus:ring-primary-500/20 transition-all appearance-none text-sm"
-              value={formData.role}
-              onChange={(e) =>
-                setFormData({ ...formData, role: e.target.value })
-              }
-            >
-              <option value="TEACHER" className="bg-bg-color">
-                Teacher
-              </option>
-              <option value="ADMIN" className="bg-bg-color">
-                Administrator
-              </option>
-              <option value="PRINCIPAL" className="bg-bg-color">
-                Principal
-              </option>
-              <option value="HOD" className="bg-bg-color">
-                Head of Department
-              </option>
-              <option value="LIBRARIAN" className="bg-bg-color">
-                Librarian
-              </option>
-              <option value="FINANCE" className="bg-bg-color">
-                Finance / Bursar
-              </option>
-            </select>
-          </div>
+          <Select
+            label="System Role"
+            required
+            value={formData.role}
+            onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+          >
+            <option value="TEACHER" className="bg-bg-color">
+              Teacher
+            </option>
+            <option value="ADMIN" className="bg-bg-color">
+              Administrator
+            </option>
+            <option value="PRINCIPAL" className="bg-bg-color">
+              Principal
+            </option>
+            <option value="HOD" className="bg-bg-color">
+              Head of Department
+            </option>
+            <option value="LIBRARIAN" className="bg-bg-color">
+              Librarian
+            </option>
+            <option value="FINANCE" className="bg-bg-color">
+              Finance / Bursar
+            </option>
+          </Select>
           <div className="space-y-1.5">
             <label className="text-[10px] font-black text-primary-200/40 uppercase tracking-widest ml-1">
               Designation

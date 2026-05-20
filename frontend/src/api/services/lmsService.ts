@@ -32,7 +32,9 @@ export const lmsService = {
   },
 
   submitQuiz: async (id: number | string, answers: any) => {
-    const response = await client.post(`lms/quizzes/${id}/attempt/`, { answers });
+    const response = await client.post(`lms/quizzes/${id}/attempt/`, {
+      answers,
+    });
     return response.data;
   },
 
@@ -44,7 +46,9 @@ export const lmsService = {
   },
 
   getSubmissions: async (assignmentId: string) => {
-    const response = await client.get(`lms/student-submissions/?assignment=${assignmentId}`);
+    const response = await client.get(
+      `lms/student-submissions/?assignment=${assignmentId}`,
+    );
     return response.data;
   },
 
@@ -61,9 +65,13 @@ export const lmsService = {
   },
 
   submitAssignment: async (id: string, formData: FormData) => {
-    const response = await client.post(`lms/assignments/${id}/submit/`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const response = await client.post(
+      `lms/assignments/${id}/submit/`,
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      },
+    );
     return response.data;
   },
 };

@@ -1,8 +1,15 @@
 from rest_framework import serializers
+
 from schools.utils import TenantSerializerMixin
 
-from .models import (Classroom, GradeLevel, ScheduleSlot, Stream, Subject,
-                     SubjectAssignment)
+from .models import (
+    Classroom,
+    GradeLevel,
+    ScheduleSlot,
+    Stream,
+    Subject,
+    SubjectAssignment,
+)
 
 
 class StreamSerializer(TenantSerializerMixin, serializers.ModelSerializer):

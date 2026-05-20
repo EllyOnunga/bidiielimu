@@ -1,6 +1,6 @@
-from config.tenant_security import (StrictTenantPermission,
-                                    TenantAwareViewSetMixin)
 from rest_framework import permissions, viewsets
+
+from config.tenant_security import StrictTenantPermission, TenantAwareViewSetMixin
 
 from .models import Ticket
 from .serializers import TicketSerializer

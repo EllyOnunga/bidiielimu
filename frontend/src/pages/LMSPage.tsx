@@ -47,21 +47,21 @@ export const LMSPage = () => {
   const tabs = [
     {
       id: "assignments",
-      label: "Operational Tasks",
+      label: "Assignments",
       icon: FileText,
       color: "text-primary-400",
       glow: "shadow-primary-500/20",
     },
     {
       id: "resources",
-      label: "Intelligence Hub",
+      label: "Study Materials",
       icon: BookOpen,
       color: "text-emerald-400",
       glow: "shadow-emerald-500/20",
     },
     {
       id: "quizzes",
-      label: "Assessment Matrix",
+      label: "Quizzes",
       icon: HelpCircle,
       color: "text-amber-400",
       glow: "shadow-amber-500/20",
@@ -72,16 +72,16 @@ export const LMSPage = () => {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-12 pb-20"
+      className="space-y-12 pb-36 lg:pb-20"
     >
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
         <div className="space-y-2">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary tracking-tight leading-none">
-            Learning <span className="text-gradient">Ecosystem</span>
+            Learning <span className="text-gradient">Portal</span>
           </h1>
           <p className="text-muted text-xs sm:text-sm md:text-base font-medium max-w-xl leading-relaxed">
-            Proprietary educational environment for elite knowledge distribution
-            and cognitive assessment.
+            A simple page for assignments, school study materials, and practice
+            quizzes.
           </p>
         </div>
 
@@ -135,10 +135,10 @@ export const LMSPage = () => {
                 <div>
                   <h2 className="text-2xl font-black text-primary uppercase tracking-tight flex items-center gap-3">
                     <Target className="w-6 h-6 text-amber-400" />
-                    Active Assessment Matrix
+                    Practice Quizzes
                   </h2>
                   <p className="text-[10px] font-black text-muted uppercase tracking-[0.2em] mt-1">
-                    Temporal examinations and intelligence validation modules
+                    Take practice quizzes to test your knowledge.
                   </p>
                 </div>
                 {isTeacher && (
@@ -151,7 +151,7 @@ export const LMSPage = () => {
                   >
                     <Plus className="w-5 h-5" />
                     <span className="text-[10px] font-black uppercase tracking-widest">
-                      Initialize Node
+                      Create New Quiz
                     </span>
                   </Button>
                 )}
@@ -170,7 +170,7 @@ export const LMSPage = () => {
                 <div className="premium-card p-24 border-dashed border-white/10 text-center flex flex-col items-center">
                   <Zap className="w-16 h-16 text-amber-500/20 mb-6" />
                   <p className="text-lg font-black uppercase tracking-[0.3em] opacity-20 italic">
-                    No Assessment Signals Detected
+                    No Quizzes Available Yet
                   </p>
                 </div>
               ) : (
@@ -203,7 +203,7 @@ export const LMSPage = () => {
                       </h3>
                       <p className="text-xs font-medium text-muted mb-8 leading-relaxed line-clamp-2 uppercase tracking-wide opacity-60">
                         {q.description ||
-                          "Spectral validation of core conceptual frameworks within this operational module."}
+                          "Test your knowledge with practice questions on this subject."}
                       </p>
 
                       <div className="flex items-center gap-4 mb-10">
@@ -216,7 +216,7 @@ export const LMSPage = () => {
                         <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/5">
                           <FileText className="w-3.5 h-3.5 text-primary-400" />
                           <span className="text-[10px] font-black text-primary uppercase tracking-widest">
-                            {q.question_count || 0} Nodes
+                            {q.question_count || 0} Questions
                           </span>
                         </div>
                       </div>
@@ -227,7 +227,7 @@ export const LMSPage = () => {
                         className="w-full h-14 rounded-2xl border border-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-white group-hover:shadow-amber-500/20"
                       >
                         <span className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                          Launch Ingress Protocol{" "}
+                          Start Quiz{" "}
                           <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </span>
                       </Button>
@@ -274,7 +274,9 @@ export const LMSPage = () => {
               className={`flex flex-col items-center p-2 ${isActive ? "text-primary" : "text-muted"}`}
             >
               <Icon className="w-5 h-5" />
-              <span className="text-[9px] mt-0.5">{tab.label.split(" ")[0]}</span>
+              <span className="text-[9px] mt-0.5">
+                {tab.label.split(" ")[0]}
+              </span>
             </button>
           );
         })}

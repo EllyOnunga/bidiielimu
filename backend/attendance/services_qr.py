@@ -29,11 +29,10 @@ class AttendanceQRService:
             return False, "Invalid or expired token"
 
         # 1. GPS Geofencing Check
-        # Assuming school coordinates are stored in the school model or settings
-        # For now, let's assume we have a school_location utility
-        # from schools.utils import verify_location
-        # if not verify_location(student_lat, student_lon, student.school):
-        #     return False, "You must be on school premises to check-in"
+        from schools.utils import verify_location
+
+        if not verify_location(student_lat, student_lon):
+            return False, "You must be on school premises to check-in"
 
         # 2. Create Attendance Record
         PeriodAttendance.objects.update_or_create(

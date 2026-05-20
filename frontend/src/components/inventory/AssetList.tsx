@@ -125,65 +125,72 @@ export const AssetList = () => {
             <tbody className="text-white">
               {isLoading ? (
                 <tr>
-                  <td colSpan={5} className="px-8 py-12 text-center text-primary-200/30 font-bold">
+                  <td
+                    colSpan={5}
+                    className="px-8 py-12 text-center text-primary-200/30 font-bold"
+                  >
                     Scanning inventory database...
                   </td>
                 </tr>
               ) : assets.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-8 py-12 text-center text-primary-200/30 font-bold">
+                  <td
+                    colSpan={5}
+                    className="px-8 py-12 text-center text-primary-200/30 font-bold"
+                  >
                     No assets found.
                   </td>
                 </tr>
               ) : (
                 assets.map((asset) => (
-                <tr
-                  key={asset.id}
-                  className="border-t border-white/5 hover:bg-white/[0.02] transition-all group"
-                >
-                  <td className="px-8 py-6">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-primary-400 group-hover:scale-110 transition-transform">
-                        <Package className="w-5 h-5" />
+                  <tr
+                    key={asset.id}
+                    className="border-t border-white/5 hover:bg-white/[0.02] transition-all group"
+                  >
+                    <td className="px-8 py-6">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-primary-400 group-hover:scale-110 transition-transform">
+                          <Package className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <p className="font-bold">{asset.name}</p>
+                          <p className="text-xs text-primary-200/30 mt-0.5">
+                            {asset.category_name} • {asset.barcode_id}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-bold">{asset.name}</p>
-                        <p className="text-xs text-primary-200/30 mt-0.5">
-                          {asset.category_name} • {asset.barcode_id}
-                        </p>
+                    </td>
+                    <td className="px-8 py-6">
+                      <span
+                        className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${getStatusColor(asset.status)}`}
+                      >
+                        {asset.status.replace("_", " ")}
+                      </span>
+                    </td>
+                    <td className="px-8 py-6">
+                      <div className="flex items-center gap-2 text-primary-200/60">
+                        <MapPin className="w-4 h-4" />
+                        <span className="text-sm">{asset.location}</span>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-8 py-6">
-                    <span
-                      className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${getStatusColor(asset.status)}`}
-                    >
-                      {asset.status.replace("_", " ")}
-                    </span>
-                  </td>
-                  <td className="px-8 py-6">
-                    <div className="flex items-center gap-2 text-primary-200/60">
-                      <MapPin className="w-4 h-4" />
-                      <span className="text-sm">{asset.location}</span>
-                    </div>
-                  </td>
-                  <td className="px-8 py-6">
-                    <p className="font-mono font-bold text-emerald-400">
-                      KES {asset.current_value.toLocaleString()}
-                    </p>
-                  </td>
-                  <td className="px-8 py-6 text-right">
-                    <div className="flex justify-end gap-2">
-                      <button className="p-2 hover:bg-primary-500/20 rounded-lg text-primary-400 transition-all">
-                        <Wrench className="w-4 h-4" />
-                      </button>
-                      <button className="p-2 hover:bg-white/10 rounded-lg text-white/40 transition-all">
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              )))}
+                    </td>
+                    <td className="px-8 py-6">
+                      <p className="font-mono font-bold text-emerald-400">
+                        KES {asset.current_value.toLocaleString()}
+                      </p>
+                    </td>
+                    <td className="px-8 py-6 text-right">
+                      <div className="flex justify-end gap-2">
+                        <button className="p-2 hover:bg-primary-500/20 rounded-lg text-primary-400 transition-all">
+                          <Wrench className="w-4 h-4" />
+                        </button>
+                        <button className="p-2 hover:bg-white/10 rounded-lg text-white/40 transition-all">
+                          <MoreVertical className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

@@ -1,8 +1,7 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from .views import (BookIssueViewSet, InventoryItemViewSet,
-                    ProcurementLogViewSet)
+from .views import BookIssueViewSet, InventoryItemViewSet, ProcurementLogViewSet
 
 router = DefaultRouter()
 router.register(r"items", InventoryItemViewSet, basename="inventoryitem")

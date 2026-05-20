@@ -2,8 +2,9 @@ import os
 import sys
 
 import django
-from classes.models import Stream, Subject, SubjectAssignment
 from django_tenants.utils import schema_context
+
+from classes.models import Stream, Subject, SubjectAssignment
 from exams.models import Exam, GradingSystem
 from schools.models import School
 from students.models import Student

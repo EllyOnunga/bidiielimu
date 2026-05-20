@@ -30,4 +30,14 @@ export const schoolsService = {
     const response = await client.get("schools/super_admin_stats/");
     return response.data;
   },
+
+  getSubscription: async () => {
+    const response = await client.get("schools/billing/subscription/");
+    return response.data;
+  },
+
+  paySubscription: async (plan: string, phone: string) => {
+    const response = await client.post("schools/billing/pay/", { plan, phone });
+    return response.data;
+  },
 };

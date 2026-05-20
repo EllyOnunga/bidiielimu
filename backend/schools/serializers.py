@@ -36,6 +36,7 @@ class SchoolSerializer(serializers.ModelSerializer):
 
     def get_student_count(self, obj):
         from django_tenants.utils import tenant_context
+
         from students.models import Student
 
         if obj.schema_name == "public":
@@ -49,6 +50,7 @@ class SchoolSerializer(serializers.ModelSerializer):
     def get_total_revenue(self, obj):
         from django.db.models import Sum
         from django_tenants.utils import tenant_context
+
         from fees.models import FeePayment
 
         if obj.schema_name == "public":

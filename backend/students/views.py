@@ -1,10 +1,10 @@
-from config.tenant_security import (StrictTenantPermission,
-                                    TenantAwareViewSetMixin)
 from django.contrib.auth import get_user_model
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from config.tenant_security import StrictTenantPermission, TenantAwareViewSetMixin
 
 from .models import Student
 from .serializers import StudentSerializer
@@ -38,11 +38,11 @@ class StudentViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
         )
 
         stream_id = self.request.query_params.get("stream")
-        if stream_id:
+        if stream_id and stream_id.isdigit():
             qs = qs.filter(stream_id=stream_id)
 
         grade_id = self.request.query_params.get("grade")
-        if grade_id:
+        if grade_id and grade_id.isdigit():
             qs = qs.filter(stream__grade_level_id=grade_id)
 
         return qs
@@ -87,14 +87,29 @@ class StudentViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
                 exam = Exam.objects.get(id=exam_id)
             except Exam.DoesNotExist:
                 return Response(
-                    {"detail": "Exam not found."}, status=status.HTTP_404_NOT_FOUND
+                    {
+                        "exam": None,
+                        "results": [],
+                        "summary": {},
+                        "attendance": {},
+                        "remarks": {},
+                        "show_positions": False,
+                    },
+                    status=status.HTTP_200_OK,
                 )
         else:
             exam = Exam.objects.order_by("-start_date").first()
             if not exam:
                 return Response(
-                    {"detail": "No exams found for this school."},
-                    status=status.HTTP_404_NOT_FOUND,
+                    {
+                        "exam": None,
+                        "results": [],
+                        "summary": {},
+                        "attendance": {},
+                        "remarks": {},
+                        "show_positions": False,
+                    },
+                    status=status.HTTP_200_OK,
                 )
 
         # Get all marks for this student and exam
@@ -165,9 +180,17 @@ class StudentViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
         from exams.models import ExamRanking
 
         ranking = ExamRanking.objects.filter(student=student, exam=exam).first()
+        if not ranking:
+            try:
+                from exams.services_ranking import RankingService
 
-        # Determine if we should show positions (Only for non-CBC)
-        show_positions = student.curriculum != "CBC"
+                RankingService.compute_exam_ranks(exam.id)
+                ranking = ExamRanking.objects.filter(student=student, exam=exam).first()
+            except Exception:
+                pass
+
+        # Determine if we should show positions (Always display positions if computed)
+        show_positions = True
 
         summary = {
             "total_score": float(ranking.total_marks) if ranking else total_score,
@@ -238,7 +261,7 @@ class StudentViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
                         if (student.stream and student.stream.teacher)
                         else "Not Assigned"
                     ),
-                    "email": student.user.email,
+                    "email": student.user.email if student.user else "",
                     "photo": student.photo.url if student.photo else None,
                     "curriculum": student.curriculum,
                     "guardians": [

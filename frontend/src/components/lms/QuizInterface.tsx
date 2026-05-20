@@ -36,7 +36,10 @@ export const QuizInterface = ({
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [timeLeft, setTimeLeft] = useState(0); // in seconds
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [result, setResult] = useState<{ score: number; max_score: number } | null>(null);
+  const [result, setResult] = useState<{
+    score: number;
+    max_score: number;
+  } | null>(null);
 
   const fetchQuiz = useCallback(async () => {
     try {
@@ -133,7 +136,13 @@ export const QuizInterface = ({
       <div className="flex-1 overflow-auto p-4 sm:p-8 lg:p-20 flex flex-col items-center">
         <div className="max-w-3xl w-full">
           <div className="glass p-6 sm:p-8 lg:p-12 rounded-[32px] sm:rounded-[48px] border border-white/10 shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-white/5" role="progressbar" aria-valuenow={currentIdx + 1} aria-valuemin={1} aria-valuemax={quiz.questions.length}>
+            <div
+              className="absolute top-0 left-0 w-full h-1 bg-white/5"
+              role="progressbar"
+              aria-valuenow={currentIdx + 1}
+              aria-valuemin={1}
+              aria-valuemax={quiz.questions.length}
+            >
               <div
                 className="h-full bg-primary-500 transition-all duration-500"
                 style={{
@@ -232,12 +241,17 @@ export const QuizInterface = ({
       {result && (
         <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
           <div className="glass p-10 rounded-3xl text-center max-w-md">
-            <h2 className="text-3xl font-black text-primary mb-4">Quiz Complete</h2>
+            <h2 className="text-3xl font-black text-primary mb-4">
+              Quiz Complete
+            </h2>
             <div className="text-6xl font-black text-white mb-2">
-              {result.score} <span className="text-2xl text-muted">/ {result.max_score}</span>
+              {result.score}{" "}
+              <span className="text-2xl text-muted">/ {result.max_score}</span>
             </div>
             <p className="text-muted mb-8">Great effort!</p>
-            <Button onClick={onComplete} className="w-full">Return to LMS</Button>
+            <Button onClick={onComplete} className="w-full">
+              Return to LMS
+            </Button>
           </div>
         </div>
       )}

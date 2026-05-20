@@ -32,7 +32,8 @@ export const CommunicationHub = () => {
   });
 
   const broadcastSmsMutation = useMutation({
-    mutationFn: (data: { message: string }) => notificationsService.broadcastSms(data),
+    mutationFn: (data: { message: string }) =>
+      notificationsService.broadcastSms(data),
     onSuccess: () => {
       toast.success("Mass SMS Broadcast initiated!");
       setSmsMessage("");
@@ -40,7 +41,7 @@ export const CommunicationHub = () => {
     },
     onError: () => {
       toast.error("SMS Broadcast failed");
-    }
+    },
   });
 
   const handleSendSMS = () => {

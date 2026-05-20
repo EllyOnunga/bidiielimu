@@ -1,8 +1,9 @@
 import os
 
 import django
-from classes.models import Stream, Subject, SubjectAssignment
 from django_tenants.utils import schema_context
+
+from classes.models import Stream, Subject, SubjectAssignment
 from exams.models import Exam, Mark
 from students.models import Student
 from teachers.models import Teacher

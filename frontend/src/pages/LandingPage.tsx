@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import { useQuery } from "@tanstack/react-query";
+import { blogService } from "../api/services/blogService";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { ElimuHubLogo } from "../components/ui/Logo";
 
@@ -22,6 +24,9 @@ import {
   Rocket,
   ShieldCheck,
   ChevronDown,
+  BookOpen,
+  Tag,
+  Calendar,
 } from "lucide-react";
 
 /* ─── Reusable sub-components ─── */
@@ -87,12 +92,29 @@ const StatItem = ({
 export const LandingPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const { data: blogPosts = [], isLoading: blogLoading } = useQuery({
+    queryKey: ["latest-blog-posts", selectedCategory],
+    queryFn: async () => {
+      const res = await blogService.getPosts(selectedCategory || undefined);
+      return Array.isArray(res) ? res : (res as any).results || [];
+    },
+  });
+
+  const { data: categories = [] } = useQuery({
+    queryKey: ["blog-categories"],
+    queryFn: async () => {
+      const res = await blogService.getCategories();
+      return Array.isArray(res) ? res : (res as any).results || [];
+    },
+  });
 
   const scrollTo = (id: string) => {
     const element = document.getElementById(id);
@@ -159,7 +181,7 @@ export const LandingPage = () => {
               to="/register"
               className="px-6 py-3 bg-primary-600 hover:bg-primary-500 text-white rounded-xl font-black uppercase tracking-widest text-[10px] shadow-premium active:scale-95 transition-all"
             >
-              Join the Future
+              Get Started
             </Link>
           </div>
 
@@ -240,7 +262,8 @@ export const LandingPage = () => {
               transition={{ delay: 0.5 }}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-500 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] mb-8"
             >
-              <Sparkles className="w-3 h-3" /> The Vanguard of African Education
+              <Sparkles className="w-3 h-3" /> The Easiest Way to Manage Your
+              School
             </motion.div>
 
             <h1 className="text-5xl sm:text-7xl md:text-8xl font-black tracking-tighter mb-8 leading-[0.9] text-primary font-serif">
@@ -249,10 +272,9 @@ export const LandingPage = () => {
             </h1>
 
             <p className="text-base sm:text-xl text-muted mb-12 font-medium leading-relaxed max-w-xl">
-              ElimuHub is the most advanced multi-tenant SaaS architecture
-              engineered to power the next generation of academic excellence.
-              Streamline operations, amplify learning, and secure your
-              institutional legacy.
+              ElimuHub is a simple, modern app designed to power school
+              operations. Manage students, track fees, simplify classes, and
+              support your teachers.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
@@ -260,14 +282,14 @@ export const LandingPage = () => {
                 to="/register"
                 className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-primary-600 hover:bg-primary-500 text-white rounded-2xl sm:rounded-[24px] font-black uppercase tracking-widest text-xs shadow-premium active:scale-[0.98] transition-all flex items-center justify-center gap-3"
               >
-                Deploy System <Rocket className="w-5 h-5" />
+                Get Started <Rocket className="w-5 h-5" />
               </Link>
               <Link
                 to="/solutions"
                 className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 glass hover:bg-white/10 text-primary rounded-2xl sm:rounded-[24px] font-black uppercase tracking-widest text-xs border border-white/10 transition-all flex items-center justify-center gap-3 group"
               >
                 <Play className="w-4 h-4 fill-primary-500 text-primary-500 group-hover:scale-125 transition-transform" />{" "}
-                Tactical Briefing
+                Watch Demo
               </Link>
             </div>
 
@@ -298,7 +320,7 @@ export const LandingPage = () => {
               <div className="relative z-10 animate-float">
                 <img
                   src="/hero-mockup.png"
-                  alt="ElimuHub Command Center"
+                  alt="School Management Dashboard"
                   className="w-full h-auto rounded-[24px] sm:rounded-[48px] object-cover"
                 />
               </div>
@@ -331,7 +353,7 @@ export const LandingPage = () => {
 
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-30 animate-bounce">
           <p className="text-[8px] font-black uppercase tracking-[0.3em] text-muted">
-            Operational Scroll
+            Scroll Down
           </p>
           <ChevronDown className="w-4 h-4" />
         </div>
@@ -341,7 +363,7 @@ export const LandingPage = () => {
       <section className="py-20 border-y border-white/5 bg-white/[0.01] overflow-hidden">
         <div className="max-w-7xl mx-auto px-6">
           <p className="text-center text-[10px] font-black text-muted uppercase tracking-[0.4em] mb-12">
-            Global Strategic Partners
+            Trusted By Leading Institutions
           </p>
           <div className="flex flex-wrap items-center justify-center gap-12 md:gap-24 opacity-30 grayscale hover:grayscale-0 transition-all duration-700">
             {["Azure", "Stripe", "Google", "Safaricom", "Equity"].map(
@@ -369,19 +391,18 @@ export const LandingPage = () => {
                 viewport={{ once: true }}
                 className="text-4xl sm:text-5xl md:text-7xl font-black text-primary mb-6 leading-tight"
               >
-                Infinite <span className="text-gradient">Capabilities.</span>
+                Everything You <span className="text-gradient">Need.</span>
               </motion.h2>
               <p className="text-base sm:text-lg text-muted font-medium leading-relaxed">
-                A unified ecosystem designed to eliminate administrative
-                friction and catalyze student success across every academic
-                dimension.
+                A simple tool that helps you manage students, fees, classes, and
+                teachers all in one place.
               </p>
             </div>
             <Link
               to="/solutions"
               className="text-xs font-black uppercase tracking-widest text-primary-500 hover:text-primary-400 flex items-center gap-2 transition-all"
             >
-              Explore All Modules <ArrowRight className="w-4 h-4" />
+              See All Features <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
@@ -389,38 +410,38 @@ export const LandingPage = () => {
             <FeatureCard
               delay={0.1}
               icon={Users}
-              title="Student SIS"
-              desc="Complete lifecycle management with real-time performance analytics and behavioral mapping."
+              title="Student Directory"
+              desc="Manage student profiles, details, and follow their school journey from one screen."
             />
             <FeatureCard
               delay={0.2}
               icon={BarChart3}
-              title="Capital Core"
-              desc="Intelligent fee collection with automated invoicing and real-time bank reconciliation hooks."
+              title="Fees Tracker"
+              desc="Easy fee collection, automatic school invoices, and simple money tracking."
             />
             <FeatureCard
               delay={0.3}
               icon={ShieldCheck}
-              title="Multi-Tenant"
-              desc="Bank-grade data isolation ensuring your institution's digital intelligence remains strictly private."
+              title="Safe & Secure"
+              desc="Advanced security to ensure your school's records and files remain strictly private."
             />
             <FeatureCard
               delay={0.4}
               icon={Globe}
-              title="Cloud Portal"
-              desc="Ultra-responsive interfaces for students and parents, accessible from any device, anywhere."
+              title="Parent & Student Portal"
+              desc="Easy-to-use page for parents and students on phones, tablets, or computers."
             />
             <FeatureCard
               delay={0.5}
               icon={CheckCircle2}
-              title="Omni-Attendance"
-              desc="Biometric-ready tracking with instant multi-channel alerts for guardians and staff."
+              title="Daily Attendance"
+              desc="Quick attendance marking with instant message alerts to parents."
             />
             <FeatureCard
               delay={0.6}
               icon={GraduationCap}
-              title="Matrix Grading"
-              desc="Sophisticated result processing with dynamic report cards and academic trend identification."
+              title="Grades & Report Cards"
+              desc="Easily calculate grades and print beautiful report cards for your students."
             />
           </div>
         </div>
@@ -434,24 +455,22 @@ export const LandingPage = () => {
           <div className="grid lg:grid-cols-2 gap-16 items-center relative z-10">
             <div>
               <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-primary mb-8 leading-tight">
-                Master the <br />{" "}
-                <span className="text-gradient italic">
-                  Institutional Flow.
-                </span>
+                Simple School <br />{" "}
+                <span className="text-gradient italic">Operations.</span>
               </h2>
               <div className="space-y-8">
                 {[
                   {
-                    t: "Automated Timetabling",
-                    d: "Resolve 10,000+ schedule nodes in seconds with our algorithmic engine.",
+                    t: "Class Schedules",
+                    d: "Create conflict-free school and exam timetables in seconds.",
                   },
                   {
-                    t: "Secure Communication",
-                    d: "Omni-channel messaging that connects staff, parents, and students instantly.",
+                    t: "Send Messages",
+                    d: "Easily send announcements to teachers, parents, and students instantly.",
                   },
                   {
-                    t: "Financial Intelligence",
-                    d: "Real-time cashflow dashboards with predictive revenue modeling.",
+                    t: "Fee Reports",
+                    d: "Track school fees collected and see pending balance reports.",
                   },
                 ].map((item, i) => (
                   <motion.div
@@ -476,7 +495,7 @@ export const LandingPage = () => {
               </div>
 
               <button className="mt-12 px-10 py-5 bg-primary-600 text-white rounded-[24px] font-black uppercase tracking-widest text-xs shadow-premium hover:bg-primary-500 transition-all">
-                Request Deployment Briefing
+                Contact Us for a Free Demo
               </button>
             </div>
 
@@ -497,10 +516,10 @@ export const LandingPage = () => {
       <section className="py-20 sm:py-32 px-4 overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-12 sm:gap-20 text-center">
-            <StatItem value="150+" label="Active Institutions" delay={0.1} />
-            <StatItem value="85k+" label="Daily Active Users" delay={0.2} />
-            <StatItem value="99.99%" label="Operational Uptime" delay={0.3} />
-            <StatItem value="24/7" label="Strategic Support" delay={0.4} />
+            <StatItem value="150+" label="Active Schools" delay={0.1} />
+            <StatItem value="85k+" label="Happy Users" delay={0.2} />
+            <StatItem value="99.99%" label="Reliability" delay={0.3} />
+            <StatItem value="24/7" label="Customer Care" delay={0.4} />
           </div>
         </div>
       </section>
@@ -510,50 +529,57 @@ export const LandingPage = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-24">
             <h2 className="text-4xl sm:text-6xl font-black text-primary mb-6 uppercase tracking-tight">
-              System <span className="text-gradient">Investment.</span>
+              School <span className="text-gradient">Pricing Plans.</span>
             </h2>
             <p className="text-muted text-base sm:text-lg font-medium max-w-2xl mx-auto">
-              Transparent pricing designed to scale with your institution's
-              growth trajectory.
+              Simple pricing that grows with your school.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
-                name: "Standard",
+                name: "Starter",
                 price: "3,500",
-                for: "Emerging Schools",
+                for: "Small primary schools",
                 features: [
-                  "Core SIS",
-                  "Attendance",
-                  "Messaging",
-                  "Up to 200 Students",
+                  "Up to 200 students",
+                  "5 teacher accounts",
+                  "Student & attendance management",
+                  "Basic exam & grading",
+                  "Email support",
+                  "Mobile-friendly interface",
+                ],
+              },
+              {
+                name: "Professional",
+                price: "9,500",
+                for: "Growing secondary schools",
+                highlight: true,
+                features: [
+                  "Up to 800 students",
+                  "20 teacher accounts",
+                  "Everything in Starter",
+                  "Fee management & M-Pesa",
+                  "Smart timetabling",
+                  "Parent portal access",
+                  "Activity logs",
+                  "Priority support",
                 ],
               },
               {
                 name: "Enterprise",
-                price: "9,500",
-                for: "Elite Institutions",
-                highlight: true,
+                price: "Custom",
+                for: "School groups & counties",
                 features: [
-                  "Full LMS",
-                  "Fee Management",
-                  "Advanced Analytics",
-                  "Unlimited Students",
-                  "Premium Support",
-                ],
-              },
-              {
-                name: "Custom",
-                price: "TBA",
-                for: "Multi-Campus",
-                features: [
-                  "System Integration",
-                  "Dedicated Database",
-                  "Custom Branding",
-                  "API Access",
-                  "On-Site Training",
+                  "Unlimited students & schools",
+                  "Unlimited teacher accounts",
+                  "Everything in Professional",
+                  "Multi-school dashboard",
+                  "Custom branding & domain",
+                  "Dedicated account manager",
+                  "Guaranteed Uptime & SLA",
+                  "On-site training",
                 ],
               },
             ].map((plan, idx) => (
@@ -567,7 +593,7 @@ export const LandingPage = () => {
               >
                 {plan.highlight && (
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary-500 text-white text-[10px] font-black px-6 py-2 rounded-full uppercase tracking-[0.2em] shadow-lg">
-                    Recommended Vector
+                    Most Popular Plan
                   </div>
                 )}
                 <div className="mb-10">
@@ -580,15 +606,23 @@ export const LandingPage = () => {
                 </div>
 
                 <div className="mb-10 flex items-baseline gap-2">
-                  <span className="text-[10px] font-black text-muted uppercase">
-                    KES
-                  </span>
-                  <span className="text-5xl font-black text-primary">
-                    {plan.price}
-                  </span>
-                  <span className="text-[10px] font-black text-muted uppercase">
-                    /month
-                  </span>
+                  {plan.price !== "Custom" ? (
+                    <>
+                      <span className="text-[10px] font-black text-muted uppercase">
+                        KES
+                      </span>
+                      <span className="text-5xl font-black text-primary">
+                        {plan.price}
+                      </span>
+                      <span className="text-[10px] font-black text-muted uppercase">
+                        /month
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-5xl font-black text-primary">
+                      Custom
+                    </span>
+                  )}
                 </div>
 
                 <ul className="space-y-4 mb-10 flex-1">
@@ -610,10 +644,147 @@ export const LandingPage = () => {
                       : "bg-white/5 text-primary hover:bg-white/10"
                   }`}
                 >
-                  Initialize Access
+                  {plan.price === "Custom"
+                    ? "Contact Sales"
+                    : "Start Free Trial"}
                 </Link>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── BLOG FEED ── */}
+      <section
+        id="blog"
+        className="py-32 sm:py-48 px-4 bg-white/[0.005] border-t border-white/5"
+      >
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-24">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="inline-flex items-center gap-2 bg-primary-500/10 border border-primary-500/30 px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest text-primary-400"
+            >
+              <Sparkles className="w-3.5 h-3.5" /> Insights & Resources
+            </motion.div>
+            <h2 className="text-4xl sm:text-6xl font-black text-primary mt-6 mb-6 uppercase tracking-tight">
+              Latest from <span className="text-gradient">Our Blog.</span>
+            </h2>
+            <p className="text-muted text-base sm:text-lg font-medium max-w-2xl mx-auto">
+              Read guides, news, and pedagogical tips directly from our team of
+              educators and engineers.
+            </p>
+
+            {/* Categories Selector */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.15 }}
+              className="flex flex-wrap gap-2 justify-center pt-8 animate-fade-in"
+            >
+              <button
+                onClick={() => setSelectedCategory("")}
+                className={`px-5 py-2.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all duration-300 cursor-pointer ${
+                  selectedCategory === ""
+                    ? "bg-primary-500 text-white shadow-lg shadow-primary-500/20 scale-105 border border-primary-400/20"
+                    : "bg-white/5 hover:bg-white/10 text-muted hover:text-primary border border-white/10"
+                }`}
+              >
+                All Articles
+              </button>
+              {categories.map((cat: any) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(cat.slug)}
+                  className={`px-5 py-2.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all duration-300 cursor-pointer ${
+                    selectedCategory === cat.slug
+                      ? "bg-primary-500 text-white shadow-lg shadow-primary-500/20 scale-105 border border-primary-400/20"
+                      : "bg-white/5 hover:bg-white/10 text-muted hover:text-primary border border-white/10"
+                  }`}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </motion.div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {blogLoading ? (
+              <div className="col-span-3 text-center py-12 text-muted font-bold animate-pulse">
+                Loading latest articles...
+              </div>
+            ) : blogPosts && blogPosts.length > 0 ? (
+              blogPosts.slice(0, 3).map((post: any, idx: number) => (
+                <motion.article
+                  key={post.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                  className="glass-interactive rounded-[32px] overflow-hidden flex flex-col justify-between group border border-white/5 hover:border-primary-500/20"
+                >
+                  <div>
+                    <div className="aspect-[16/10] bg-black/45 overflow-hidden relative">
+                      {post.featured_image ? (
+                        <img
+                          src={post.featured_image}
+                          alt={post.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-black/20">
+                          <BookOpen className="w-12 h-12 text-primary-500/20" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-6 space-y-4">
+                      <div className="flex items-center gap-4 text-[9px] text-muted font-black uppercase tracking-wider">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-3.5 h-3.5" />
+                          {new Date(post.created_at).toLocaleDateString()}
+                        </span>
+                        {post.category && (
+                          <span className="flex items-center gap-1 text-primary-500">
+                            <Tag className="w-3.5 h-3.5" />
+                            {post.category.name}
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="text-lg font-black text-primary group-hover:text-primary-500 transition-colors leading-tight">
+                        {post.title}
+                      </h3>
+                      <p className="text-xs text-muted font-medium line-clamp-3">
+                        {post.excerpt || post.content.substring(0, 150)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="p-6 pt-0">
+                    <Link
+                      to={`/blog/${post.slug}`}
+                      className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary-400 hover:text-primary-300 transition-colors"
+                    >
+                      Read Article <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                </motion.article>
+              ))
+            ) : (
+              <div className="col-span-3 text-center py-12 text-muted font-bold">
+                No articles published yet. Stay tuned!
+              </div>
+            )}
+          </div>
+
+          <div className="text-center mt-16">
+            <Link
+              to="/blog"
+              className="inline-flex items-center gap-2 px-8 py-4 glass hover:bg-white/10 text-primary rounded-2xl font-black uppercase tracking-widest text-xs border border-white/10 transition-all shadow-premium"
+            >
+              Read All Articles <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </section>
@@ -629,25 +800,24 @@ export const LandingPage = () => {
             <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
             <div className="relative z-10">
               <h2 className="text-4xl md:text-5xl font-black mb-10 leading-tight uppercase tracking-tighter">
-                Inaugurate Your <br /> Digital Era.
+                Get Started <br /> Today.
               </h2>
               <p className="text-white/60 font-medium mb-12 max-w-md">
-                Our strategic advisors are ready to help you blueprint the
-                perfect implementation for your school.
+                We are here to help you set up the perfect app for your school.
               </p>
 
               <div className="space-y-8">
                 {[
                   {
                     icon: Mail,
-                    label: "Intel Channel",
+                    label: "Email Us",
                     value: "comms@elimuhub.app",
                   },
-                  { icon: Phone, label: "Hotline", value: "+254 700 888 999" },
+                  { icon: Phone, label: "Call Us", value: "+254 700 888 999" },
                   {
                     icon: MapPin,
-                    label: "Headquarters",
-                    value: "Orbital Complex, Nairobi, KE",
+                    label: "Our Location",
+                    value: "Tech Plaza, Kilimani, Nairobi, Kenya",
                   },
                 ].map((item) => (
                   <div
@@ -675,14 +845,14 @@ export const LandingPage = () => {
               onSubmit={(e) => {
                 e.preventDefault();
                 toast.success(
-                  "Mission Brief Received. Standing by for response.",
+                  "Thank you! Your message has been received. We will get back to you shortly.",
                 );
               }}
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-muted uppercase tracking-[0.2em] ml-1">
-                    Agent Name
+                    Your Name
                   </label>
                   <input
                     type="text"
@@ -693,19 +863,19 @@ export const LandingPage = () => {
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-muted uppercase tracking-[0.2em] ml-1">
-                    Intel Channel (Email)
+                    Your Email
                   </label>
                   <input
                     type="email"
                     required
                     className="w-full bg-white/5 border border-white/5 p-4 rounded-2xl outline-none focus:border-primary-500 text-primary transition-all text-sm font-bold"
-                    placeholder="you@agency.com"
+                    placeholder="you@school.com"
                   />
                 </div>
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-muted uppercase tracking-[0.2em] ml-1">
-                  Institutional Profile
+                  School Name
                 </label>
                 <input
                   type="text"
@@ -715,19 +885,19 @@ export const LandingPage = () => {
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-muted uppercase tracking-[0.2em] ml-1">
-                  Mission Brief (Message)
+                  Your Message
                 </label>
                 <textarea
                   rows={4}
                   className="w-full bg-white/5 border border-white/5 p-4 rounded-2xl outline-none focus:border-primary-500 text-primary transition-all text-sm font-bold resize-none"
-                  placeholder="How can we assist your transition?"
+                  placeholder="How can we assist your school?"
                 ></textarea>
               </div>
               <button
                 type="submit"
                 className="w-full py-5 bg-primary-600 hover:bg-primary-500 text-white font-black uppercase tracking-widest text-xs rounded-2xl shadow-premium transition-all active:scale-95"
               >
-                Transmit Briefing
+                Send Message
               </button>
             </form>
           </div>

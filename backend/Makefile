@@ -21,7 +21,7 @@ docker-down:
 	cd .. && make docker-down
 
 migrate:
-	python manage.py migrate_schemas --noinput
+	docker-compose exec -T backend python manage.py migrate_schemas --noinput || python manage.py migrate_schemas --noinput
 
 test:
 	python manage.py test

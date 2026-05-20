@@ -15,6 +15,11 @@ import sys
 from datetime import timedelta
 from pathlib import Path
 
+from config import __version__ as config_version
+
+VERSION = config_version
+
+
 import dj_database_url
 from dotenv import load_dotenv
 
@@ -31,13 +36,18 @@ IS_RENDER = os.environ.get("RENDER", "False") == "true"
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ["SECRET_KEY"]  # Required - no default for security
+from django.core.exceptions import ImproperlyConfigured
+
+try:
+    SECRET_KEY = os.environ["SECRET_KEY"]  # Required - no default for security
+except KeyError:
+    raise ImproperlyConfigured("SECRET_KEY must be set in the environment")
 
 # Force Debug and Allowed Hosts for Local Dev
 DEBUG = os.getenv("DEBUG", "False") == "True"
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,.elimuhub.com").split(
-    ","
-)
+ALLOWED_HOSTS = os.getenv(
+    "ALLOWED_HOSTS", "localhost,127.0.0.1,.elimuhub.com,testserver,test_tenant"
+).split(",")
 
 # CORS Settings
 CORS_ALLOW_ALL_ORIGINS = False
@@ -128,6 +138,7 @@ SHARED_APPS = [
     "dj_rest_auth.registration",
     "django_otp",
     "django_otp.plugins.otp_totp",
+    "django_otp.plugins.otp_static",
     "allauth_2fa",
     # Local apps
     "accounts",
@@ -135,6 +146,7 @@ SHARED_APPS = [
     "channels",
     "graphene_django",
     "storages",
+    "blog",
 ]
 
 TENANT_APPS = [
@@ -162,6 +174,7 @@ TENANT_APPS = [
     "reports",
     "support",
     "discipline",
+    "blog",
 ]
 
 INSTALLED_APPS = list(SHARED_APPS) + [
@@ -190,6 +203,7 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django_tenants.middleware.TenantMainMiddleware",
     "config.middleware.TenantConnectionSyncMiddleware",
+    "config.middleware_subscription.SubscriptionEnforcementMiddleware",
     "config.middleware.RequestCorrelationMiddleware",
     "config.middleware.RequestLoggingMiddleware",
     "config.middleware_security.APIKeyAuthenticationMiddleware",
@@ -261,15 +275,15 @@ DATABASES = {
     "read": read_db_config,  # Read database (can be same as default for now)
 }
 
-# Database Optimization Settings
+# Database Optimization Settings (Reuses connections in production, isolates in dev)
 DATABASE_OPTIONS = {
     "default": {
-        "CONN_MAX_AGE": 0,
-        "CONN_HEALTH_CHECKS": False,
+        "CONN_MAX_AGE": 0 if DEBUG else 600,
+        "CONN_HEALTH_CHECKS": not DEBUG,
     },
     "read": {
-        "CONN_MAX_AGE": 0,
-        "CONN_HEALTH_CHECKS": False,
+        "CONN_MAX_AGE": 0 if DEBUG else 600,
+        "CONN_HEALTH_CHECKS": not DEBUG,
     },
 }
 
@@ -330,6 +344,7 @@ ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = True
 ACCOUNT_PRESERVE_USERNAME_CASING = False
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
 ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_ADAPTER = "accounts.adapters.CustomAccountAdapter"
 
 # Social Account Settings
 SOCIALACCOUNT_ADAPTER = "accounts.adapters.SocialAccountAdapter"
@@ -467,7 +482,7 @@ AUTHENTICATION_BACKENDS += [
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-    "ROTATE_REFRESH_TOKENS": False,
+    "ROTATE_REFRESH_TOKENS": True,
     "ALGORITHM": "HS256",
     "AUTH_HEADER_TYPES": ("Bearer", "JWT"),
     "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
@@ -568,7 +583,7 @@ CELERY_RESULT_BACKEND = os.getenv(
 SPECTACULAR_SETTINGS = {
     "TITLE": "ElimuHub API",
     "DESCRIPTION": "Official API for ElimuHub School Management Platform",
-    "VERSION": "1.0.0",
+    "VERSION": VERSION,
     "SERVE_INCLUDE_SCHEMA": False,
 }
 

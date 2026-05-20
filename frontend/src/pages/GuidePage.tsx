@@ -13,6 +13,7 @@ import {
   Activity,
   ArrowLeft,
 } from "lucide-react";
+import { Select } from "../components/ui/Select";
 
 const GUIDE_SECTIONS = [
   { id: "getting-started", title: "Getting Started", icon: BookOpen },
@@ -120,17 +121,17 @@ export const GuidePage = () => {
 
         {/* MOBILE NAV DROPDOWN (Simplified for mobile) */}
         <div className="md:hidden p-4 border-b border-white/5 bg-slate-900/90 sticky top-20 z-40 backdrop-blur-md">
-          <select
-            className="w-full bg-slate-800 border border-slate-700 text-white text-xs font-bold p-3 rounded-xl outline-none"
+          <Select
             value={activeSection}
             onChange={(e) => scrollToSection(e.target.value)}
+            className="h-12 text-xs"
           >
             {GUIDE_SECTIONS.map((s) => (
-              <option key={s.id} value={s.id}>
+              <option key={s.id} value={s.id} className="bg-bg-color">
                 {s.title}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
 
         {/* CONTENT AREA */}

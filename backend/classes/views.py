@@ -1,11 +1,22 @@
 from django.db.models import Count
 from rest_framework import permissions, viewsets
 
-from .models import (Classroom, GradeLevel, ScheduleSlot, Stream, Subject,
-                     SubjectAssignment)
-from .serializers import (ClassroomSerializer, GradeLevelSerializer,
-                          ScheduleSlotSerializer, StreamSerializer,
-                          SubjectAssignmentSerializer, SubjectSerializer)
+from .models import (
+    Classroom,
+    GradeLevel,
+    ScheduleSlot,
+    Stream,
+    Subject,
+    SubjectAssignment,
+)
+from .serializers import (
+    ClassroomSerializer,
+    GradeLevelSerializer,
+    ScheduleSlotSerializer,
+    StreamSerializer,
+    SubjectAssignmentSerializer,
+    SubjectSerializer,
+)
 
 
 class SubjectAssignmentViewSet(viewsets.ModelViewSet):
@@ -76,7 +87,7 @@ class StreamViewSet(viewsets.ModelViewSet):
         )
 
         grade_id = self.request.query_params.get("grade")
-        if grade_id:
+        if grade_id and grade_id.isdigit():
             qs = qs.filter(grade_level_id=grade_id)
         return qs
 
@@ -121,4 +132,9 @@ class ScheduleSlotViewSet(viewsets.ModelViewSet):
         if user.role_name == "STUDENT":
             # Students only see slots for their own stream
             qs = qs.filter(stream__students__user=user)
+
+        stream_id = self.request.query_params.get("stream")
+        if stream_id and stream_id.isdigit():
+            qs = qs.filter(stream_id=stream_id)
+
         return qs

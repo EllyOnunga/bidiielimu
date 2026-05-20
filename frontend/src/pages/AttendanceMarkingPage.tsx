@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Check, X, Clock, Save, ChevronLeft, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -6,6 +6,8 @@ import toast from "react-hot-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { attendanceService } from "../api/services/attendanceService";
 import { studentsService } from "../api/services/studentsService";
+import { classesService } from "../api/services/classesService";
+import { Select } from "../components/ui/Select";
 
 interface StudentData {
   id: number;
@@ -17,21 +19,43 @@ interface StudentData {
 export const AttendanceMarkingPage = () => {
   const queryClient = useQueryClient();
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const [selectedClass, setSelectedClass] = useState("Grade 4 - West");
-  const [localAttendance, setLocalAttendance] = useState<Record<number, string>>({});
+  const [selectedClass, setSelectedClass] = useState("");
+  const [localAttendance, setLocalAttendance] = useState<
+    Record<number, string>
+  >({});
   const [search, setSearch] = useState("");
 
+  const { data: streamsRaw = [] } = useQuery({
+    queryKey: ["streams"],
+    queryFn: () => classesService.getStreams(),
+  });
+  const streams = useMemo(
+    () => (Array.isArray(streamsRaw) ? streamsRaw : streamsRaw.results || []),
+    [streamsRaw],
+  );
+
+  const selectedClassLabel = useMemo(() => {
+    const stream = streams.find((s: any) => s.id.toString() === selectedClass);
+    return stream ? `${stream.grade_name} ${stream.name}` : "Loading...";
+  }, [streams, selectedClass]);
+
   const { data: studentsData, isLoading: loadingStudents } = useQuery({
-    queryKey: ["students-attendance"],
-    queryFn: () => studentsService.getAll(),
+    queryKey: ["students-attendance", selectedClass],
+    queryFn: () => studentsService.getAll({ stream: selectedClass }),
+    enabled: selectedClass !== "",
   });
 
   const students: StudentData[] = useMemo(() => {
-    const data = Array.isArray(studentsData) ? studentsData : studentsData?.results || [];
+    const data = Array.isArray(studentsData)
+      ? studentsData
+      : studentsData?.results || [];
     return data
-      .filter((s: any) => 
-        `${s.first_name} ${s.last_name}`.toLowerCase().includes(search.toLowerCase()) ||
-        s.admission_number.toLowerCase().includes(search.toLowerCase())
+      .filter(
+        (s: any) =>
+          `${s.first_name} ${s.last_name}`
+            .toLowerCase()
+            .includes(search.toLowerCase()) ||
+          s.admission_number.toLowerCase().includes(search.toLowerCase()),
       )
       .map((s: any) => ({
         id: s.id,
@@ -42,7 +66,7 @@ export const AttendanceMarkingPage = () => {
   }, [studentsData, localAttendance, search]);
 
   const updateStatus = (id: number, status: string) => {
-    setLocalAttendance(prev => ({ ...prev, [id]: status }));
+    setLocalAttendance((prev) => ({ ...prev, [id]: status }));
   };
 
   const saveAttendanceMutation = useMutation({
@@ -53,17 +77,23 @@ export const AttendanceMarkingPage = () => {
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.detail || "Failed to save attendance");
-    }
+    },
   });
 
   const handleSave = () => {
-    const payload = students.map(s => ({
+    const payload = students.map((s) => ({
       student: s.id,
       date,
       status: s.status,
     }));
     saveAttendanceMutation.mutate(payload);
   };
+
+  useEffect(() => {
+    if (streams.length > 0 && !selectedClass) {
+      setSelectedClass(streams[0].id.toString());
+    }
+  }, [streams, selectedClass]);
 
   return (
     <div className="space-y-6 md:space-y-8 pb-20">
@@ -79,26 +109,23 @@ export const AttendanceMarkingPage = () => {
             Mark Attendance
           </h1>
           <p className="text-muted text-sm md:text-base">
-            Recording attendance for {selectedClass}
+            Recording attendance for {selectedClassLabel}
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-        <div className="glass p-5 md:p-6 rounded-3xl border border-white/5 space-y-3 md:space-y-4">
-          <label className="block text-xs md:text-sm font-medium text-muted">
-            Class/Stream
-          </label>
-          <select
-            value={selectedClass}
-            onChange={(e) => setSelectedClass(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 md:py-3 text-primary text-sm outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option className="bg-bg-color">Grade 4 - West</option>
-            <option className="bg-bg-color">Grade 4 - East</option>
-            <option className="bg-bg-color">Grade 5 - North</option>
-          </select>
-        </div>
+        <Select
+          label="Class Stream"
+          value={selectedClass}
+          onChange={(e) => setSelectedClass(e.target.value)}
+        >
+          {streams.map((s: any) => (
+            <option key={s.id} value={s.id.toString()} className="bg-bg-color">
+              {s.grade_name} - {s.name}
+            </option>
+          ))}
+        </Select>
 
         <div className="glass p-5 md:p-6 rounded-3xl border border-white/5 space-y-3 md:space-y-4">
           <label className="block text-xs md:text-sm font-medium text-muted">
@@ -128,7 +155,7 @@ export const AttendanceMarkingPage = () => {
           <div className="relative max-w-md w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dim" />
             <input
-              placeholder="Filter students by name..."
+              placeholder="Find a student by name..."
               className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-xl text-primary text-sm outline-none"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -141,7 +168,7 @@ export const AttendanceMarkingPage = () => {
             <thead>
               <tr className="border-b border-white/5">
                 <th className="px-6 md:px-8 py-4 text-xs font-semibold text-muted uppercase tracking-wider">
-                  Student Details
+                  Student Name & Admission
                 </th>
                 <th className="px-6 md:px-8 py-4 text-xs font-semibold text-muted uppercase tracking-wider text-center">
                   Status
@@ -152,7 +179,7 @@ export const AttendanceMarkingPage = () => {
               {loadingStudents ? (
                 <tr>
                   <td colSpan={2} className="px-6 py-12 text-center text-muted">
-                    Loading students...
+                    Loading student list...
                   </td>
                 </tr>
               ) : (
