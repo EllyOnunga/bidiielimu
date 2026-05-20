@@ -5,8 +5,19 @@ class DatabaseRouter:
 
     def db_for_read(self, model, **hints):
         """
-        Direct read operations to read database if available
+        Direct read operations to read database if available.
+        Tenant-specific models MUST use the 'default' connection since schema
+        switching only affects the active connection.
         """
+        import sys
+
+        if "test" in sys.argv:
+            return "default"
+
+        # If the app is not a shared public app, it must use the active schema on 'default'
+        if model._meta.app_label not in ["schools", "accounts", "audit"]:
+            return "default"
+
         from django.conf import settings
 
         if "read" in settings.DATABASES:

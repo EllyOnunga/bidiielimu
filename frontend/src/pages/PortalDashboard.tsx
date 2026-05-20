@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   Book,
@@ -112,7 +112,7 @@ export const PortalDashboard = () => {
   }, [children, studentProfile, user, selectedStudentId]);
 
   // Sync selectedStudentId when data loads
-  useMemo(() => {
+  useEffect(() => {
     if (!selectedStudentId) {
       if (user?.role === "PARENT" && children.length > 0) {
         setSelectedStudentId(children[0].id);
@@ -160,16 +160,16 @@ export const PortalDashboard = () => {
       const data = await classesService.getScheduleSlots();
       const results = Array.isArray(data) ? data : data.results || [];
       // Filter by stream on frontend if backend doesn't support it (service update suggested)
-      return results.filter((s: any) => s.stream === activeStudent?.stream).slice(0, 4);
+      return results
+        .filter((s: any) => s.stream === activeStudent?.stream)
+        .slice(0, 4);
     },
     enabled: !!activeStudent?.stream,
   });
 
   if (loadingChildren || loadingProfile) {
     return (
-      <div className="p-8 text-center text-slate-500">
-        Initializing Portal...
-      </div>
+      <div className="p-8 text-center text-slate-500">Loading Dashboard...</div>
     );
   }
 
@@ -258,15 +258,19 @@ export const PortalDashboard = () => {
           }
           icon={CheckSquare}
           color="bg-emerald-500/20"
-          to="/attendance"
-          trend={attendanceStats?.as_of ? `As of ${attendanceStats.as_of}` : ""}
+          to={undefined}
+          trend={
+            attendanceStats?.as_of ? `Checked on ${attendanceStats.as_of}` : ""
+          }
         />
         <PortalStat
-          label="Academic Mean"
+          label="Mean Grade"
           value={reportCard?.summary?.mean_grade || "—"}
           icon={TrendingUp}
           color="bg-blue-500/20"
-          to="/exams"
+          to={
+            activeStudent ? `/students/${activeStudent.id}/report` : undefined
+          }
           trend={
             reportCard?.summary?.mean_score
               ? `${reportCard.summary.mean_score} pts`
@@ -312,10 +316,10 @@ export const PortalDashboard = () => {
             <div className="p-5 sm:p-8 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
               <div>
                 <h2 className="text-lg sm:text-xl font-black text-white">
-                  Recent Performance
+                  Recent Exam Scores
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-500">
-                  Breakdown of the latest examination scores.
+                  Your scores from the latest school exams.
                 </p>
               </div>
               <Link
@@ -384,10 +388,10 @@ export const PortalDashboard = () => {
             <div className="flex items-center justify-between mb-5 sm:mb-8">
               <div>
                 <h2 className="text-lg sm:text-xl font-black text-white">
-                  Today's Schedule
+                  Today's Timetable
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-500">
-                  Upcoming classes and activities.
+                  Your class schedule for today.
                 </p>
               </div>
               <div className="p-3 bg-primary-600/10 rounded-2xl text-primary-400">
@@ -437,7 +441,11 @@ export const PortalDashboard = () => {
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-1 gap-3">
               <PortalAction
-                to="/exams"
+                to={
+                  activeStudent
+                    ? `/students/${activeStudent.id}/report`
+                    : "/portal"
+                }
                 label="View Report Card"
                 icon={ClipboardList}
               />
@@ -462,11 +470,15 @@ export const PortalDashboard = () => {
 const NoticesWidget = () => {
   const { data: notices = [], isLoading } = useQuery({
     queryKey: ["school-notices"],
-    queryFn: () => notificationsService.getNotices({ ordering: "-published_at", page_size: 3 }),
+    queryFn: () =>
+      notificationsService.getNotices({
+        ordering: "-published_at",
+        page_size: 3,
+      }),
     select: (data) => {
       const results = Array.isArray(data) ? data : data.results || [];
       return results.slice(0, 3);
-    }
+    },
   });
 
   const formatDate = (dateStr: string) => {

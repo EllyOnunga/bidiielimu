@@ -24,6 +24,11 @@ export const notificationsService = {
     const response = await client.post("notifications/mark_all_as_read/");
     return response.data;
   },
+
+  clearAll: async () => {
+    const response = await client.post("notifications/clear_all/");
+    return response.data;
+  },
   getCommunicationStats: async () => {
     const response = await client.get("notifications/communication_stats/");
     return response.data;
@@ -34,7 +39,11 @@ export const notificationsService = {
     return response.data;
   },
 
-  sendBulkEmail: async (data: { subject: string; message: string; recipients: string[] }) => {
+  sendBulkEmail: async (data: {
+    subject: string;
+    message: string;
+    recipients: string[];
+  }) => {
     const response = await client.post("notifications/bulk_email/", data);
     return response.data;
   },
@@ -45,9 +54,12 @@ export const notificationsService = {
   },
 
   getGroupRecipients: async (groupId: string, type: string) => {
-    const response = await client.get(`notifications/${groupId}/group-recipients/`, {
-      params: { type },
-    });
+    const response = await client.get(
+      `notifications/${groupId}/group-recipients/`,
+      {
+        params: { type },
+      },
+    );
     return response.data;
   },
 
@@ -62,7 +74,10 @@ export const notificationsService = {
   },
 
   broadcastSms: async (data: { message: string }) => {
-    const response = await client.post("notifications/notices/broadcast_sms/", data);
+    const response = await client.post(
+      "notifications/notices/broadcast_sms/",
+      data,
+    );
     return response.data;
   },
 };

@@ -1,9 +1,10 @@
 import graphene
 import graphql_jwt
-from classes.models import Stream, Subject
-from exams.models import Exam, Mark
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
+
+from classes.models import Stream, Subject
+from exams.models import Exam, Mark
 from students.models import Student
 
 

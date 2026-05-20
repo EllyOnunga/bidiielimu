@@ -5,11 +5,11 @@ const Table = React.forwardRef<
   HTMLTableElement,
   React.HTMLAttributes<HTMLTableElement>
 >(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-x-auto custom-scrollbar">
+  <div className="relative w-full overflow-x-auto custom-scrollbar rounded-2xl sm:rounded-3xl border border-white/5 bg-white/[0.01] backdrop-blur-md">
     <table
       ref={ref}
       className={cn(
-        "w-full min-w-[500px] sm:min-w-[640px] caption-bottom text-sm border-separate border-spacing-0",
+        "w-full min-w-[500px] sm:min-w-[640px] caption-bottom text-sm border-collapse",
         className,
       )}
       {...props}
@@ -24,7 +24,10 @@ const TableHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <thead
     ref={ref}
-    className={cn("bg-white/5 sticky top-0 z-10", className)}
+    className={cn(
+      "bg-white/5 sticky top-0 z-10 border-b border-white/10",
+      className,
+    )}
     {...props}
   />
 ));
@@ -61,7 +64,7 @@ const TableRow = React.forwardRef<
   <tr
     ref={ref}
     className={cn(
-      "border-b border-white/5 transition-all hover:bg-white/[0.03] data-[state=selected]:bg-primary-500/10",
+      "border-b border-white/5 last:border-b-0 transition-all hover:bg-white/[0.02] data-[state=selected]:bg-primary-500/10",
       className,
     )}
     {...props}
@@ -76,7 +79,7 @@ const TableHead = React.forwardRef<
   <th
     ref={ref}
     className={cn(
-      "h-12 sm:h-14 px-4 sm:px-6 text-left align-middle font-black text-muted text-[10px] uppercase tracking-[0.2em] [&:has([role=checkbox])]:pr-0",
+      "h-12 sm:h-14 px-3 sm:px-6 text-left align-middle font-black text-muted text-[10px] uppercase tracking-[0.2em] [&:has([role=checkbox])]:pr-0",
       className,
     )}
     {...props}
@@ -91,7 +94,7 @@ const TableCell = React.forwardRef<
   <td
     ref={ref}
     className={cn(
-      "px-4 sm:px-6 py-3 sm:py-4 align-middle [&:has([role=checkbox])]:pr-0 text-sm",
+      "px-3 sm:px-6 py-2.5 sm:py-4 align-middle [&:has([role=checkbox])]:pr-0 text-sm text-primary",
       className,
     )}
     {...props}

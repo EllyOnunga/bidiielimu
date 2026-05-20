@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-hot-toast";
 import {
   Box,
   Search,
@@ -20,14 +21,68 @@ import {
   TableCell,
 } from "../ui/Table";
 import { TableSkeleton } from "../ui/Skeleton";
+import { Modal } from "../ui/Modal";
+import { Button } from "../ui/Button";
+import { Input } from "../ui/Input";
+import { Select } from "../ui/Select";
+import { ProcurementForm } from "./ProcurementForm";
 import {
   inventoryService,
   type StockItem,
 } from "../../api/services/inventoryService";
 
+type AddItemForm = {
+  name: string;
+  category: StockItem["category"];
+  quantity: number;
+  unit: string;
+  min_threshold: number;
+};
+
+const INITIAL_FORM: AddItemForm = {
+  name: "",
+  category: "GENERAL",
+  quantity: 0,
+  unit: "",
+  min_threshold: 5,
+};
+
 export const InventoryManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("All");
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isProcurementModalOpen, setIsProcurementModalOpen] = useState(false);
+  const [form, setForm] = useState<AddItemForm>(INITIAL_FORM);
+
+  const queryClient = useQueryClient();
+
+  const createItemMutation = useMutation({
+    mutationFn: inventoryService.createItem,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["inventory"] });
+      toast.success("Item added successfully!");
+      setIsAddModalOpen(false);
+      setForm(INITIAL_FORM);
+    },
+    onError: (err: any) => {
+      const msg = err?.response?.data?.detail || "Failed to add item.";
+      toast.error(msg);
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (
+      !form.name ||
+      !form.unit ||
+      form.quantity < 0 ||
+      form.min_threshold < 0
+    ) {
+      toast.error("Please fill in all fields correctly.");
+      return;
+    }
+    createItemMutation.mutate(form);
+  };
 
   const { data: rawStock = [], isLoading } = useQuery({
     queryKey: ["inventory", activeTab],
@@ -63,11 +118,17 @@ export const InventoryManager = () => {
         </div>
 
         <div className="flex flex-wrap gap-3 sm:gap-4 w-full sm:w-auto">
-          <button className="flex-1 sm:flex-none px-4 sm:px-6 py-3 bg-white/5 border border-white/10 text-white rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-white/10 transition-all text-xs sm:text-sm">
+          <button
+            onClick={() => setIsProcurementModalOpen(true)}
+            className="flex-1 sm:flex-none px-4 sm:px-6 py-3 bg-white/5 border border-white/10 text-white rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-white/10 transition-all text-xs sm:text-sm"
+          >
             <Truck className="w-4 h-4 sm:w-5 sm:h-5" />
             Procurement
           </button>
-          <button className="flex-1 sm:flex-none px-6 sm:px-8 py-3 bg-primary-500 text-white rounded-2xl font-black flex items-center justify-center gap-3 hover:bg-primary-400 shadow-premium transition-all text-xs sm:text-sm">
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="flex-1 sm:flex-none px-6 sm:px-8 py-3 bg-primary-500 text-white rounded-2xl font-black flex items-center justify-center gap-3 hover:bg-primary-400 shadow-premium transition-all text-xs sm:text-sm"
+          >
             <Plus className="w-5 h-5 sm:w-6 sm:h-6" />
             Add Item
           </button>
@@ -237,6 +298,134 @@ export const InventoryManager = () => {
           </TableBody>
         </Table>
       </div>
+
+      <Modal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        title="Add New Inventory Item"
+        description="Insert new stationery, laboratory, library or general assets to stock."
+      >
+        <form onSubmit={handleSubmit} className="space-y-6 mt-4">
+          <div className="space-y-2">
+            <label className="text-xs font-black uppercase tracking-widest text-primary-200/50">
+              Item Name
+            </label>
+            <Input
+              type="text"
+              required
+              placeholder="e.g. A4 Graph Books, Pipettes, etc."
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-xs font-black uppercase tracking-widest text-primary-200/50">
+                Category
+              </label>
+              <Select
+                value={form.category}
+                onChange={(e) =>
+                  setForm({ ...form, category: e.target.value as any })
+                }
+              >
+                <option
+                  value="STATIONERY"
+                  className="bg-[var(--card-bg)] text-[var(--text-color)]"
+                >
+                  Stationery
+                </option>
+                <option
+                  value="LAB"
+                  className="bg-[var(--card-bg)] text-[var(--text-color)]"
+                >
+                  Laboratory
+                </option>
+                <option
+                  value="LIBRARY"
+                  className="bg-[var(--card-bg)] text-[var(--text-color)]"
+                >
+                  Library Book
+                </option>
+                <option
+                  value="GENERAL"
+                  className="bg-[var(--card-bg)] text-[var(--text-color)]"
+                >
+                  General Stock
+                </option>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-black uppercase tracking-widest text-primary-200/50">
+                Unit of Measure
+              </label>
+              <Input
+                type="text"
+                required
+                placeholder="e.g. PCS, BOX, PACK"
+                value={form.unit}
+                onChange={(e) => setForm({ ...form, unit: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-xs font-black uppercase tracking-widest text-primary-200/50">
+                Initial Quantity
+              </label>
+              <Input
+                type="number"
+                required
+                min={0}
+                placeholder="e.g. 50"
+                value={form.quantity}
+                onChange={(e) =>
+                  setForm({ ...form, quantity: parseInt(e.target.value) || 0 })
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-black uppercase tracking-widest text-primary-200/50">
+                Min Stock Warning Level
+              </label>
+              <Input
+                type="number"
+                required
+                min={0}
+                placeholder="e.g. 5"
+                value={form.min_threshold}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    min_threshold: parseInt(e.target.value) || 0,
+                  })
+                }
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-white/5">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsAddModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={createItemMutation.isPending}>
+              {createItemMutation.isPending ? "Adding Item..." : "Add Item"}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {isProcurementModalOpen && (
+        <ProcurementForm onClose={() => setIsProcurementModalOpen(false)} />
+      )}
     </div>
   );
 };

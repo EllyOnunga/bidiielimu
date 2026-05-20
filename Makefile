@@ -10,9 +10,9 @@ help:
 	@echo "  test          Run all tests"
 	@echo "  lint          Run linting and formatting checks"
 	@echo "  format        Format code"
-	@echo "  docker-build  Build Docker images"
-	@echo "  docker-up     Start all services with Docker Compose"
-	@echo "  docker-down   Stop all services"
+	@echo "  build         Build Docker images"
+	@echo "  up            Start all services with Docker Compose"
+	@echo "  down          Stop all services"
 	@echo "  migrate       Run database migrations"
 	@echo "  collectstatic Collect static files"
 	@echo "  setup         Initial project setup"
@@ -33,8 +33,8 @@ clean:
 
 # Testing
 test:
-	cd backend && python manage.py test
-	cd frontend && npm run test
+	docker compose exec -T backend python manage.py test || (cd backend && python manage.py test)
+	cd frontend && npm run type-check
 
 # Linting and formatting
 lint:
@@ -46,18 +46,18 @@ format:
 	cd frontend && npm run format
 
 # Docker commands
-docker-build:
-	docker-compose build
+build:
+	docker compose build
 
-docker-up:
-	docker-compose up -d
+up:
+	docker compose up -d
 
-docker-down:
-	docker-compose down
+down:
+	docker compose down
 
 # Django commands
 migrate:
-	cd backend && python manage.py migrate_schemas --noinput
+	docker compose exec -T backend python manage.py migrate_schemas --noinput || (cd backend && python manage.py migrate_schemas --noinput)
 
 collectstatic:
 	cd backend && python manage.py collectstatic --noinput

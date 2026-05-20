@@ -1,15 +1,19 @@
-from config.caching import cache_tenant_page
-from config.tenant_security import (StrictTenantPermission,
-                                    TenantAwareViewSetMixin)
 from django.db import transaction
 from django.db.models import Avg
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from config.caching import cache_tenant_page
+from config.tenant_security import StrictTenantPermission, TenantAwareViewSetMixin
+
 from .models import Exam, GradeThreshold, GradingSystem, Mark
-from .serializers import (ExamSerializer, GradeThresholdSerializer,
-                          GradingSystemSerializer, MarkSerializer)
+from .serializers import (
+    ExamSerializer,
+    GradeThresholdSerializer,
+    GradingSystemSerializer,
+    MarkSerializer,
+)
 
 
 class GradingSystemViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
@@ -80,7 +84,7 @@ class ExamViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
         from .tasks import compute_ranks_task
 
         # Dispatch to Celery background task
-        compute_ranks_task.delay(pk)
+        compute_ranks_task.delay(request.tenant.schema_name, pk)
         return Response(
             {"detail": "Ranking computation started in background."},
             status=status.HTTP_202_ACCEPTED,
@@ -174,8 +178,7 @@ class MarkViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
                 saved_marks.append(mark.id)
 
                 # Simple audit log
-                from django.contrib.admin.models import (ADDITION, CHANGE,
-                                                         LogEntry)
+                from django.contrib.admin.models import ADDITION, CHANGE, LogEntry
                 from django.contrib.contenttypes.models import ContentType
 
                 LogEntry.objects.log_action(

@@ -1,12 +1,12 @@
 import uuid
 
-from accounts.permissions import IsTeacher
-from config.tenant_security import (StrictTenantPermission,
-                                    TenantAwareViewSetMixin)
 from django.db.models import Sum
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
+from accounts.permissions import IsTeacher
+from config.tenant_security import StrictTenantPermission, TenantAwareViewSetMixin
 
 from .models import FeePayment, FeeStructure
 from .serializers import FeePaymentSerializer, FeeStructureSerializer
@@ -55,6 +55,7 @@ class FeePaymentViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def student_balances(self, request):
         from django.db.models import DecimalField, OuterRef, Subquery
+
         from students.models import Student
 
         # Calculate total paid for each student
@@ -216,6 +217,7 @@ class FeePaymentViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
         student_id = request.data.get("student_id")
         amount = request.data.get("amount")
         phone = request.data.get("phone")
+        invoice_id = request.data.get("invoice_id")
 
         if not all([student_id, amount, phone]):
             return Response(
@@ -223,7 +225,11 @@ class FeePaymentViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        from django.conf import settings
+
         from students.models import Student
+
+        from .services_payments import MpesaService
 
         try:
             student = Student.objects.get(id=student_id)
@@ -232,11 +238,37 @@ class FeePaymentViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
                 {"detail": "Student not found."}, status=status.HTTP_404_NOT_FOUND
             )
 
-        # Mock M-Pesa delay and success
-        # In a real app, this would call Daraja API and wait for a callback.
-        # Here we immediately create the payment to simulate a successful STK push
-        # callback.
+        # Check if live M-Pesa is configured
+        if (
+            settings.MPESA_CONSUMER_KEY
+            and settings.MPESA_CONSUMER_SECRET
+            and settings.MPESA_PASSKEY
+        ):
+            # Trigger actual Safaricom STK Push
+            response = MpesaService.initiate_stk_push(
+                phone=phone,
+                amount=amount,
+                invoice_id=invoice_id,
+                student_id=student_id,
+            )
+            if response.get("ResponseCode") == "0":
+                return Response(
+                    {
+                        "detail": "STK Push request sent successfully. Please check your phone for the M-Pesa PIN prompt.",
+                        "checkout_request_id": response.get("CheckoutRequestID"),
+                        "amount": amount,
+                    },
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                return Response(
+                    {
+                        "detail": f"M-Pesa STK Push failed: {response.get('ResponseDescription', 'Unknown error')}"
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
+        # Smart Dev Fallback: Create mock payment directly
         transaction_id = f"MPESA{str(uuid.uuid4())[:8].upper()}"
 
         payment = FeePayment.objects.create(
@@ -245,16 +277,32 @@ class FeePaymentViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
             payment_method="MPESA",
             transaction_id=transaction_id,
             received_by=request.user,
-            notes=f"Auto-generated via Mock M-Pesa STK Push to {phone}",
+            notes=f"Auto-generated via Mock M-Pesa STK Push to {phone} (Daraja keys not set)",
         )
 
         return Response(
             {
-                "detail": "Payment processed successfully.",
+                "detail": "Payment processed successfully (Mock Mode).",
                 "transaction_id": transaction_id,
                 "amount": amount,
             },
             status=status.HTTP_200_OK,
+        )
+
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="mpesa-callback",
+        permission_classes=[permissions.AllowAny],
+    )
+    def mpesa_callback(self, request):
+        from .services_payments import MpesaService
+
+        # Hand off payload parsing to services_payments.py
+        MpesaService.handle_webhook(request.data)
+        # Safaricom requires this exact response format
+        return Response(
+            {"ResultCode": 0, "ResultDesc": "Success"}, status=status.HTTP_200_OK
         )
 
     @action(detail=True, methods=["get"])
@@ -275,3 +323,66 @@ class FeePaymentViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
             f'attachment; filename="receipt_{payment.transaction_id}.pdf"'
         )
         return response
+
+    @action(detail=False, methods=["post"], url_path="bulk-print")
+    def bulk_print(self, request):
+        """
+        Action to compile and print multiple receipts.
+        If size is small (<= 5), returns combined PDF synchronously.
+        If large (> 5), spawns background Celery compilation.
+        """
+        from django.http import HttpResponse
+        from .tasks import generate_bulk_receipts_pdf, generate_bulk_receipts_pdf_task
+
+        payment_ids = request.data.get("payment_ids", [])
+        if not payment_ids:
+            return Response(
+                {"detail": "No payment_ids provided."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            payment_ids = [int(pid) for pid in payment_ids]
+        except (ValueError, TypeError):
+            return Response(
+                {"detail": "payment_ids must be a list of integers."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Strict Authorization Check: Only fetch payments authorized for the active user session.
+        # This completely prevents multi-tenant leaks.
+        authorized_payments = self.get_queryset().filter(id__in=payment_ids)
+        authorized_ids = list(authorized_payments.values_list("id", flat=True))
+
+        if not authorized_ids:
+            return Response(
+                {"detail": "No authorized payments found for the provided IDs."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        schema_name = request.tenant.schema_name
+
+        # For small requests, generate synchronously for optimal UX
+        if len(authorized_ids) <= 5:
+            try:
+                pdf_bytes = generate_bulk_receipts_pdf(authorized_ids)
+                response = HttpResponse(pdf_bytes, content_type="application/pdf")
+                response["Content-Disposition"] = 'attachment; filename="bulk_receipts.pdf"'
+                return response
+            except Exception as e:
+                return Response(
+                    {"detail": f"Failed to generate receipts: {str(e)}"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+        else:
+            # Asynchronous generation for larger print batches
+            task = generate_bulk_receipts_pdf_task.delay(schema_name, authorized_ids)
+            return Response(
+                {
+                    "task_id": task.id,
+                    "detail": "Bulk receipt PDF generation started in the background.",
+                    "status": "PENDING"
+                },
+                status=status.HTTP_202_ACCEPTED
+            )
+

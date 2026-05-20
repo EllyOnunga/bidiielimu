@@ -17,9 +17,7 @@ class EmailService:
             domain = user.school.domains.filter(is_primary=True).first()
             if domain:
                 protocol = "http" if "localhost" in domain.domain else "https"
-                # Handle local dev port
-                if "localhost" in domain.domain:
-                    return f"{protocol}://{domain.domain}:5173"
+                # Keep link directly on port 80/443 without React dev port 5173
                 return f"{protocol}://{domain.domain}"
 
         return settings.FRONTEND_URL

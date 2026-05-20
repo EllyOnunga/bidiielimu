@@ -102,6 +102,14 @@ const CookiePolicyPage = lazy(() =>
     default: m.CookiePolicyPage,
   })),
 );
+const BlogPage = lazy(() =>
+  import("./pages/public/BlogPage").then((m) => ({ default: m.BlogPage })),
+);
+const BlogPostPage = lazy(() =>
+  import("./pages/public/BlogPostPage").then((m) => ({
+    default: m.BlogPostPage,
+  })),
+);
 const AnalyticsPage = lazy(() =>
   import("./pages/AnalyticsPage").then((m) => ({ default: m.AnalyticsPage })),
 );
@@ -218,7 +226,7 @@ function App() {
               <Route path="/verify-email" element={<EmailVerificationPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route
-                path="/reset-password/:uid/:token"
+                path="/reset-password/:uid?/:token?"
                 element={<ResetPasswordConfirmPage />}
               />
               <Route path="/solutions" element={<SolutionsPage />} />
@@ -229,6 +237,8 @@ function App() {
               <Route path="/privacy" element={<PrivacyPage />} />
               <Route path="/cookies" element={<CookiePolicyPage />} />
               <Route path="/guide" element={<GuidePage />} />
+              <Route path="/blog" element={<BlogPage />} />
+              <Route path="/blog/:slug" element={<BlogPostPage />} />
             </Route>
 
             <Route
@@ -357,6 +367,8 @@ function App() {
                       ROLES.ADMIN,
                       ROLES.PRINCIPAL,
                       ROLES.FINANCE,
+                      ROLES.PARENT,
+                      ROLES.STUDENT,
                     ]}
                   >
                     <FeesPage />
@@ -501,6 +513,8 @@ function App() {
                       ROLES.SUPER_ADMIN,
                       ROLES.ADMIN,
                       ROLES.PRINCIPAL,
+                      ROLES.HOD,
+                      ROLES.TEACHER,
                     ]}
                   >
                     <GradingPage />

@@ -98,12 +98,13 @@ class SecurityMiddleware(MiddlewareMixin):
 
         # Content Security Policy
         csp = (
-            "default-src 'self'; "
+            "default-src 'self' blob:; "
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.google.com https://*.googletagmanager.com; "
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-            "font-src 'self' https://fonts.gstatic.com; "
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://api.fontshare.com; "
+            "font-src 'self' https://fonts.gstatic.com https://api.fontshare.com https://cdn.fontshare.com data:; "
             "img-src 'self' data: https: blob:; "
-            "connect-src 'self' https://*.google.com https://*.microsoft.com;"
+            "connect-src 'self' http: https: ws: wss: https://*.google.com https://*.microsoft.com; "
+            "object-src 'self' blob:;"
         )
         response["Content-Security-Policy"] = csp
 
@@ -113,8 +114,10 @@ class SecurityMiddleware(MiddlewareMixin):
                 "max-age=31536000; includeSubDomains"
             )
 
-        # Cache control for sensitive endpoints
-        if any(endpoint in request.path for endpoint in self.SENSITIVE_ENDPOINTS):
+        # Cache control for sensitive endpoints and all API responses
+        if any(
+            endpoint in request.path for endpoint in self.SENSITIVE_ENDPOINTS
+        ) or request.path.startswith("/api/"):
             response["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
             response["Pragma"] = "no-cache"
 

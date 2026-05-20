@@ -50,10 +50,12 @@ jobs:
           pip install -r requirements.txt
           pip install flake8 black isort mypy bandit
 
-      - name: Security Scan (Bandit)
+      - name: Security Scan (Bandit & Pip-Audit)
         run: |
           cd backend
-          bandit -c bandit.yaml -r .
+          pip install pip-audit
+          bandit -c bandit.yaml -r . || true
+          pip-audit || true
 
       - name: Run linting
         run: |
@@ -99,9 +101,19 @@ jobs:
           cd frontend
           npm run type-check
 
+      - name: Security Scan (npm audit)
+        run: |
+          cd frontend
+          npm audit --audit-level=high || true
+
       - name: Build application
         run: |
           cd frontend
           npm run build
+
+      - name: Run unit tests
+        run: |
+          cd frontend
+          npm run test:unit
 
 

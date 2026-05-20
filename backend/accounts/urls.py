@@ -1,19 +1,30 @@
 from django.http import JsonResponse
 from django.urls import path
-from rest_framework_simplejwt.views import TokenRefreshView
 
-from .views import (GDPRDeleteView, GDPRExportView, MyTokenObtainPairView,
-                    RegisterView, ResendVerificationView, UserDetailView,
-                    UserSchoolsView, VerifyEmailView)
+from .views import (
+    GDPRDeleteView,
+    GDPRExportView,
+    MyTokenObtainPairView,
+    MyTokenRefreshView,
+    RegisterView,
+    ResendVerificationView,
+    UserDetailView,
+    UserSchoolsView,
+    VerifyEmailView,
+)
 from .views_api import APIKeyViewSet
-from .views_otp import (OTPTriggerView, OTPVerifyLoginView, SMSOTPSetupView,
-                        SMSOTPVerifySetupView)
+from .views_otp import (
+    OTPTriggerView,
+    OTPVerifyLoginView,
+    SMSOTPSetupView,
+    SMSOTPVerifySetupView,
+)
 from .views_social import GitHubLogin, GoogleLogin, MicrosoftLogin
 
 urlpatterns = [
     path("register/", RegisterView.as_view(), name="register"),
     path("login/", MyTokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("token/refresh/", MyTokenRefreshView.as_view(), name="token_refresh"),
     path("me/", UserDetailView.as_view(), name="user_detail"),
     path("verify-email/<str:token>/", VerifyEmailView.as_view(), name="verify_email"),
     path(

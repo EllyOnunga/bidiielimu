@@ -67,6 +67,7 @@ export const LoginPage = () => {
         console.warn("Google Login failed to initialize:", err);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleGoogleLogin = async (response: any) => {
@@ -81,7 +82,9 @@ export const LoginPage = () => {
       navigate(
         user.role === "STUDENT" || user.role === "PARENT"
           ? "/portal"
-          : "/dashboard",
+          : user.role === "SUPER_ADMIN"
+            ? "/super-admin"
+            : "/dashboard",
       );
     } catch (error: any) {
       toast.error("Google login failed. Please try again.");
@@ -119,7 +122,9 @@ export const LoginPage = () => {
       navigate(
         user.role === "STUDENT" || user.role === "PARENT"
           ? "/portal"
-          : "/dashboard",
+          : user.role === "SUPER_ADMIN"
+            ? "/super-admin"
+            : "/dashboard",
       );
     } catch (error: any) {
       const errorData = error.response?.data;
@@ -206,7 +211,9 @@ export const LoginPage = () => {
       navigate(
         user.role === "STUDENT" || user.role === "PARENT"
           ? "/portal"
-          : "/dashboard",
+          : user.role === "SUPER_ADMIN"
+            ? "/super-admin"
+            : "/dashboard",
       );
     } catch (error: any) {
       toast.error(error.response?.data?.error || "Invalid or expired code.", {
@@ -292,7 +299,7 @@ export const LoginPage = () => {
               Welcome Back
             </h1>
             <p className="text-muted font-medium text-xs sm:text-sm md:text-base">
-              Experience the next generation of school management
+              A simple and beautiful way to manage your school
             </p>
           </div>
 
@@ -461,10 +468,11 @@ export const LoginPage = () => {
                         key={m}
                         type="button"
                         onClick={() => handleResendOTP(m)}
-                        className={`flex items-center justify-center gap-2 py-2.5 px-2 rounded-xl text-[10px] font-bold transition-all border ${activeMethod === m
+                        className={`flex items-center justify-center gap-2 py-2.5 px-2 rounded-xl text-[10px] font-bold transition-all border ${
+                          activeMethod === m
                             ? "bg-primary-500/20 border-primary-500/30 text-primary-400"
                             : "bg-white/5 border-white/5 text-muted hover:bg-white/10"
-                          }`}
+                        }`}
                       >
                         {m === "SMS" ? (
                           <Smartphone className="w-3 h-3" />

@@ -24,6 +24,7 @@ import { Input } from "../components/ui/Input";
 import { Modal } from "../components/ui/Modal";
 import { ConfirmModal } from "../components/ui/ConfirmModal";
 import { Skeleton } from "../components/ui/Skeleton";
+import { Select } from "../components/ui/Select";
 
 export const ClassesPage = () => {
   const navigate = useNavigate();
@@ -64,47 +65,51 @@ export const ClassesPage = () => {
   const createGradeMutation = useMutation({
     mutationFn: classesService.createGrade,
     onSuccess: () => {
-      toast.success("Grade level initialized");
+      toast.success("Grade level successfully created");
       setShowGradeModal(false);
       setGradeName("");
       queryClient.invalidateQueries({ queryKey: ["grades"] });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.detail || "Initialization failed");
+      toast.error(
+        error.response?.data?.detail || "Failed to create grade level",
+      );
     },
   });
 
   const createStreamMutation = useMutation({
     mutationFn: classesService.createStream,
     onSuccess: () => {
-      toast.success(`Stream deployed to ${targetGradeName}`);
+      toast.success(`Stream successfully added to ${targetGradeName}`);
       setShowStreamModal(false);
       queryClient.invalidateQueries({ queryKey: ["grades"] });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.detail || "Deployment failed");
+      toast.error(error.response?.data?.detail || "Failed to add stream");
     },
   });
 
   const deleteGradeMutation = useMutation({
     mutationFn: classesService.deleteGrade,
     onSuccess: () => {
-      toast.success("Grade system decommissioned");
+      toast.success("Grade level deleted");
       queryClient.invalidateQueries({ queryKey: ["grades"] });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.detail || "Decommissioning failed");
+      toast.error(
+        error.response?.data?.detail || "Failed to delete grade level",
+      );
     },
   });
 
   const deleteStreamMutation = useMutation({
     mutationFn: classesService.deleteStream,
     onSuccess: () => {
-      toast.success("Operational stream terminated");
+      toast.success("Stream deleted");
       queryClient.invalidateQueries({ queryKey: ["grades"] });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.detail || "Termination failed");
+      toast.error(error.response?.data?.detail || "Failed to delete stream");
     },
   });
 
@@ -112,12 +117,14 @@ export const ClassesPage = () => {
     mutationFn: ({ id, data }: { id: number; data: any }) =>
       classesService.updateStream(id, data),
     onSuccess: () => {
-      toast.success("Operational metrics synchronized");
+      toast.success("Stream details successfully updated");
       setEditingStream(null);
       queryClient.invalidateQueries({ queryKey: ["grades"] });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.detail || "Synchronization failed");
+      toast.error(
+        error.response?.data?.detail || "Failed to update stream details",
+      );
     },
   });
 
@@ -149,7 +156,6 @@ export const ClassesPage = () => {
     }
   };
 
-
   const [showSubjectModal, setShowSubjectModal] = useState(false);
   const [subjectData, setSubjectData] = useState({ name: "", code: "" });
   const [subjectToDelete, setSubjectToDelete] = useState<{
@@ -166,7 +172,7 @@ export const ClassesPage = () => {
   const createSubjectMutation = useMutation({
     mutationFn: classesService.createSubject,
     onSuccess: () => {
-      toast.success("Intelligence domain established");
+      toast.success("Subject successfully created");
       setShowSubjectModal(false);
       setSubjectData({ name: "", code: "" });
       queryClient.invalidateQueries({ queryKey: ["subjects"] });
@@ -176,7 +182,7 @@ export const ClassesPage = () => {
   const deleteSubjectMutation = useMutation({
     mutationFn: classesService.deleteSubject,
     onSuccess: () => {
-      toast.success("Domain record purged");
+      toast.success("Subject deleted");
       queryClient.invalidateQueries({ queryKey: ["subjects"] });
     },
   });
@@ -195,18 +201,18 @@ export const ClassesPage = () => {
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
         <div className="space-y-2">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary tracking-tight leading-none">
-            Academic <span className="text-gradient">Architecture</span>
+            Classes & <span className="text-gradient">Subjects</span>
           </h1>
           <p className="text-muted text-xs sm:text-sm md:text-base font-medium max-w-xl">
-            Engineer your school's structural hierarchy from core grades to
-            specialized learning streams.
+            Manage your school's structural hierarchy, grades, streams, and
+            subjects.
           </p>
         </div>
         <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
           <div className="relative w-full lg:w-80">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-200/20" />
             <Input
-              placeholder="Query systems..."
+              placeholder="Search grades..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-12 bg-white/5 border-white/5 h-14"
@@ -216,7 +222,7 @@ export const ClassesPage = () => {
             onClick={() => setShowGradeModal(true)}
             className="gap-2 w-full lg:w-auto h-14 px-8 rounded-2xl"
           >
-            <Plus className="w-5 h-5" /> Initialize Level
+            <Plus className="w-5 h-5" /> Add Grade Level
           </Button>
         </div>
       </div>
@@ -250,17 +256,16 @@ export const ClassesPage = () => {
           >
             <GraduationCap className="w-20 h-20 text-primary-200/10 mx-auto mb-8" />
             <h3 className="text-xl md:text-2xl font-black text-primary uppercase tracking-widest mb-4">
-              Academic Blueprint Required
+              No Grades Found
             </h3>
             <p className="text-muted text-xs sm:text-sm font-medium mb-10 max-w-md mx-auto leading-relaxed">
-              Establish your institution's foundation by defining the primary
-              grade levels and their operational streams.
+              Get started by creating your primary grade levels and classes.
             </p>
             <Button
               onClick={() => setShowGradeModal(true)}
               className="h-14 px-10 rounded-2xl"
             >
-              Launch Grade Protocol
+              Add Grade Level
             </Button>
           </motion.div>
         ) : (
@@ -273,7 +278,7 @@ export const ClassesPage = () => {
                 transition={{ delay: gi * 0.05 }}
                 className="premium-card !p-0 overflow-hidden group border-white/5"
               >
-                <div 
+                <div
                   onClick={() => navigate(`/classes/grade/${grade.id}`)}
                   className="flex flex-col sm:flex-row sm:items-center justify-between p-6 sm:p-8 gap-6 bg-white/[0.02] border-b border-white/5 cursor-pointer hover:bg-white/[0.04] transition-all"
                 >
@@ -288,11 +293,11 @@ export const ClassesPage = () => {
                       <div className="flex flex-wrap items-center gap-3 mt-2">
                         <span className="flex items-center gap-1.5 text-[10px] font-black text-primary-200/40 uppercase tracking-widest bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">
                           <Users className="w-3.5 h-3.5 text-primary-400" />
-                          {grade.student_count} Assets
+                          {grade.student_count} Students
                         </span>
                         <span className="flex items-center gap-1.5 text-[10px] font-black text-primary-200/40 uppercase tracking-widest bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">
                           <LayoutGrid className="w-3.5 h-3.5 text-indigo-400" />
-                          {grade.streams.length} Units
+                          {grade.streams.length} Streams
                         </span>
                       </div>
                     </div>
@@ -300,13 +305,19 @@ export const ClassesPage = () => {
                   <div className="flex items-center gap-3">
                     <Button
                       variant="outline"
-                      onClick={() => openAddStream(grade)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openAddStream(grade);
+                      }}
                       className="gap-2 h-12 px-6 text-[10px]"
                     >
                       <Plus className="w-4 h-4" /> Add Stream
                     </Button>
                     <button
-                      onClick={() => setGradeToDelete(grade)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setGradeToDelete(grade);
+                      }}
                       className="p-3.5 hover:bg-rose-500/10 text-primary-200/20 hover:text-rose-400 rounded-2xl transition-all border border-transparent hover:border-rose-500/10"
                     >
                       <Trash2 className="w-5 h-5" />
@@ -315,7 +326,7 @@ export const ClassesPage = () => {
                 </div>
 
                 <div className="p-6 sm:p-8 text-center text-muted text-xs">
-                  Click card to manage streams and units inside {grade.name}
+                  Click card to manage streams inside {grade.name}
                 </div>
               </motion.div>
             ))}
@@ -331,10 +342,10 @@ export const ClassesPage = () => {
             </div>
             <div>
               <h2 className="text-2xl sm:text-3xl font-black text-primary uppercase tracking-tight">
-                Intelligence <span className="text-gradient">Domains</span>
+                School <span className="text-gradient">Subjects</span>
               </h2>
               <p className="text-muted text-[10px] font-black uppercase tracking-[0.2em] mt-1">
-                Manage core curriculum infrastructure.
+                Manage the subjects taught in your school.
               </p>
             </div>
           </div>
@@ -343,7 +354,7 @@ export const ClassesPage = () => {
             variant="outline"
             className="gap-2 h-12 px-6 rounded-2xl text-[10px]"
           >
-            <Plus className="w-4 h-4" /> Add Knowledge Node
+            <Plus className="w-4 h-4" /> Add Subject
           </Button>
         </div>
 
@@ -352,7 +363,7 @@ export const ClassesPage = () => {
             {subjects.length === 0 ? (
               <div className="col-span-full py-16 text-center premium-card border-dashed border-white/5 opacity-40">
                 <p className="text-[10px] font-black uppercase tracking-[0.4em]">
-                  No Knowledge Nodes Established
+                  No Subjects Created Yet
                 </p>
               </div>
             ) : (
@@ -391,14 +402,14 @@ export const ClassesPage = () => {
       <Modal
         isOpen={showSubjectModal}
         onClose={() => setShowSubjectModal(false)}
-        title="Establish Knowledge Node"
+        title="Create Subject"
         className="max-w-md glass-morphic border-white/10 !rounded-[32px]"
       >
         <form onSubmit={handleAddSubject} className="space-y-8 mt-6">
           <div className="space-y-4">
             <div className="space-y-2">
               <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">
-                Domain Identity
+                Subject Name
               </label>
               <Input
                 required
@@ -407,20 +418,20 @@ export const ClassesPage = () => {
                 onChange={(e) =>
                   setSubjectData((prev) => ({ ...prev, name: e.target.value }))
                 }
-                placeholder="e.g. Quantum Computing"
+                placeholder="e.g. Mathematics, Science"
                 className="h-14"
               />
             </div>
             <div className="space-y-2">
               <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">
-                Registry Code
+                Subject Code
               </label>
               <Input
                 value={subjectData.code}
                 onChange={(e) =>
                   setSubjectData((prev) => ({ ...prev, code: e.target.value }))
                 }
-                placeholder="e.g. QNT"
+                placeholder="e.g. MATH, SCI"
                 className="h-14 uppercase"
               />
             </div>
@@ -432,14 +443,14 @@ export const ClassesPage = () => {
               className="flex-1 h-12 text-[10px]"
               onClick={() => setShowSubjectModal(false)}
             >
-              Discard
+              Cancel
             </Button>
             <Button
               type="submit"
               className="flex-[2] h-12 text-[10px]"
               disabled={createSubjectMutation.isPending}
             >
-              {createSubjectMutation.isPending ? "Syncing..." : "Commit Domain"}
+              {createSubjectMutation.isPending ? "Saving..." : "Create Subject"}
             </Button>
           </div>
         </form>
@@ -448,7 +459,7 @@ export const ClassesPage = () => {
       <Modal
         isOpen={showStreamModal}
         onClose={() => setShowStreamModal(false)}
-        title="Deploy Learning Unit"
+        title="Add Stream"
         className="max-w-md glass-morphic border-white/10 !rounded-[32px]"
       >
         <form onSubmit={handleAddStream} className="space-y-8 mt-6">
@@ -461,14 +472,14 @@ export const ClassesPage = () => {
             </div>
             <div className="space-y-2">
               <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">
-                Unit Identifier
+                Stream Name
               </label>
               <Input
                 required
                 autoFocus
                 value={streamName}
                 onChange={(e) => setStreamName(e.target.value)}
-                placeholder="e.g. Alpha-X, Omega"
+                placeholder="e.g. North, East"
                 className="h-14"
               />
             </div>
@@ -480,16 +491,14 @@ export const ClassesPage = () => {
               className="flex-1 h-12 text-[10px]"
               onClick={() => setShowStreamModal(false)}
             >
-              Discard
+              Cancel
             </Button>
             <Button
               type="submit"
               className="flex-[2] h-12 text-[10px]"
               disabled={createStreamMutation.isPending}
             >
-              {createStreamMutation.isPending
-                ? "Deploying..."
-                : "Execute Deployment"}
+              {createStreamMutation.isPending ? "Creating..." : "Create Stream"}
             </Button>
           </div>
         </form>
@@ -498,7 +507,7 @@ export const ClassesPage = () => {
       <Modal
         isOpen={editingStream !== null}
         onClose={() => setEditingStream(null)}
-        title="Unit Modification"
+        title="Edit Stream"
         className="max-w-md glass-morphic border-white/10 !rounded-[32px]"
       >
         <form
@@ -521,7 +530,7 @@ export const ClassesPage = () => {
           <div className="space-y-4">
             <div className="space-y-2">
               <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">
-                Unit Title
+                Stream Name
               </label>
               <Input
                 required
@@ -535,30 +544,25 @@ export const ClassesPage = () => {
                 className="h-14"
               />
             </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">
-                Commanding Officer
-              </label>
-              <select
-                value={editStreamData.teacher}
-                onChange={(e) =>
-                  setEditStreamData((prev) => ({
-                    ...prev,
-                    teacher: e.target.value,
-                  }))
-                }
-                className="w-full h-14 bg-white/5 border border-white/5 rounded-xl px-4 text-primary text-sm outline-none focus:border-primary-500/50 transition-all"
-              >
-                <option value="" className="bg-bg-color">
-                  Unassigned
+            <Select
+              label="Class Teacher"
+              value={editStreamData.teacher}
+              onChange={(e) =>
+                setEditStreamData((prev) => ({
+                  ...prev,
+                  teacher: e.target.value,
+                }))
+              }
+            >
+              <option value="" className="bg-bg-color">
+                Unassigned
+              </option>
+              {teachers.map((t: any) => (
+                <option key={t.id} value={t.id} className="bg-bg-color">
+                  {t.first_name} {t.last_name}
                 </option>
-                {teachers.map((t: any) => (
-                  <option key={t.id} value={t.id} className="bg-bg-color">
-                    {t.first_name} {t.last_name}
-                  </option>
-                ))}
-              </select>
-            </div>
+              ))}
+            </Select>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-white/5">
             <Button
@@ -567,14 +571,14 @@ export const ClassesPage = () => {
               className="flex-1 h-12 text-[10px]"
               onClick={() => setEditingStream(null)}
             >
-              Abort
+              Cancel
             </Button>
             <Button
               type="submit"
               className="flex-[2] h-12 text-[10px]"
               disabled={updateStreamMutation.isPending}
             >
-              {updateStreamMutation.isPending ? "Syncing..." : "Commit Changes"}
+              {updateStreamMutation.isPending ? "Saving..." : "Save Changes"}
             </Button>
           </div>
         </form>
@@ -583,20 +587,20 @@ export const ClassesPage = () => {
       <Modal
         isOpen={showGradeModal}
         onClose={() => setShowGradeModal(false)}
-        title="Initialize System Level"
+        title="Add Grade Level"
         className="max-w-md glass-morphic border-white/10 !rounded-[32px]"
       >
         <form onSubmit={handleAddGrade} className="space-y-8 mt-6">
           <div className="space-y-2">
             <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">
-              Level Identifier
+              Grade Name
             </label>
             <Input
               required
               autoFocus
               value={gradeName}
               onChange={(e) => setGradeName(e.target.value)}
-              placeholder="e.g. Senior Phase, Level 9"
+              placeholder="e.g. Form 1, Grade 4"
               className="h-14"
             />
           </div>
@@ -607,16 +611,14 @@ export const ClassesPage = () => {
               className="flex-1 h-12 text-[10px]"
               onClick={() => setShowGradeModal(false)}
             >
-              Discard
+              Cancel
             </Button>
             <Button
               type="submit"
               className="flex-[2] h-12 text-[10px]"
               disabled={createGradeMutation.isPending}
             >
-              {createGradeMutation.isPending
-                ? "Initializing..."
-                : "Confirm Protocol"}
+              {createGradeMutation.isPending ? "Creating..." : "Create Grade"}
             </Button>
           </div>
         </form>
@@ -629,8 +631,8 @@ export const ClassesPage = () => {
           if (gradeToDelete) deleteGradeMutation.mutate(gradeToDelete.id);
           setGradeToDelete(null);
         }}
-        title="System Decommission"
-        description={`Permanently purge ${gradeToDelete?.name} and all operational units from the grid?`}
+        title="Delete Grade"
+        description={`Are you sure you want to permanently delete ${gradeToDelete?.name} and all its streams? This action cannot be undone.`}
       />
 
       <ConfirmModal
@@ -640,8 +642,8 @@ export const ClassesPage = () => {
           if (streamToDelete) deleteStreamMutation.mutate(streamToDelete.id);
           setStreamToDelete(null);
         }}
-        title="Unit Termination"
-        description={`Execute termination protocol for operational unit ${streamToDelete?.name}?`}
+        title="Delete Stream"
+        description={`Are you sure you want to delete the stream ${streamToDelete?.name}? This action cannot be undone.`}
       />
 
       <ConfirmModal
@@ -651,8 +653,8 @@ export const ClassesPage = () => {
           if (subjectToDelete) deleteSubjectMutation.mutate(subjectToDelete.id);
           setSubjectToDelete(null);
         }}
-        title="Domain Purge"
-        description={`Permanently terminate Knowledge Domain "${subjectToDelete?.name}"?`}
+        title="Delete Subject"
+        description={`Are you sure you want to permanently delete the subject "${subjectToDelete?.name}"? This action cannot be undone.`}
       />
     </motion.div>
   );

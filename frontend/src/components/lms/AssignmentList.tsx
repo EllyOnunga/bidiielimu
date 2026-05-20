@@ -16,6 +16,7 @@ import toast from "react-hot-toast";
 import { useAuthStore } from "../../store/authStore";
 import { Modal } from "../ui/Modal";
 import { Button } from "../ui/Button";
+import { Select } from "../ui/Select";
 import { useQuery } from "@tanstack/react-query";
 import { classesService } from "../../api/services/classesService";
 
@@ -43,6 +44,8 @@ interface Assignment {
   status?: string;
   student_grade?: number;
   student_feedback?: string;
+  student_text_content?: string;
+  student_file_url?: string;
   created_at?: string;
 }
 
@@ -131,8 +134,16 @@ export const AssignmentList = () => {
   }, []);
 
   useEffect(() => {
-    if (isTeacher && selectedAssignment) {
-      fetchSubmissions(selectedAssignment.id);
+    if (selectedAssignment) {
+      if (isTeacher) {
+        fetchSubmissions(selectedAssignment.id);
+      } else {
+        setSubmissionText(selectedAssignment.student_text_content || "");
+        setSubmissionFile(null);
+      }
+    } else {
+      setSubmissionText("");
+      setSubmissionFile(null);
     }
   }, [selectedAssignment, isTeacher]);
 
@@ -162,11 +173,11 @@ export const AssignmentList = () => {
     if (!selectedSubmission) return;
     setIsSubmitting(true);
     try {
-        await lmsService.gradeSubmission({
-          submission_id: selectedSubmission.id,
-          grade: gradingData.score,
-          feedback: gradingData.feedback,
-        });
+      await lmsService.gradeSubmission({
+        submission_id: selectedSubmission.id,
+        grade: gradingData.score,
+        feedback: gradingData.feedback,
+      });
       toast.success("Grade submitted successfully");
       setIsGradingModalOpen(false);
       setSelectedSubmission(null);
@@ -193,7 +204,7 @@ export const AssignmentList = () => {
 
       await lmsService.createAssignment(data);
 
-      toast.success("Assignment launched successfully!");
+      toast.success("Assignment created successfully!");
       setIsCreateModalOpen(false);
       setFormData({
         subject: "",
@@ -262,7 +273,7 @@ export const AssignmentList = () => {
               className="gap-2 rounded-2xl px-6 w-full sm:w-auto shrink-0"
             >
               <Plus className="w-5 h-5" />
-              Prepare Assignment
+              Create Assignment
             </Button>
           )}
         </div>
@@ -493,56 +504,131 @@ export const AssignmentList = () => {
               )}
 
               {!isTeacher && (
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <label className="text-xs font-bold text-dim mb-2 block ml-1">
-                      Your Submission
-                    </label>
-                    <textarea
-                      value={submissionText}
-                      onChange={(e) => setSubmissionText(e.target.value)}
-                      placeholder="Type your response here..."
-                      className="w-full h-40 bg-white/5 border border-white/10 rounded-2xl p-4 text-primary placeholder:text-dim focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all resize-none"
-                      required
-                    />
-                  </div>
+                <div className="space-y-6">
+                  {selectedAssignment?.status === "graded" ? (
+                    <div className="space-y-6">
+                      <div className="p-5 bg-rose-500/10 border border-rose-500/20 rounded-3xl text-rose-400 text-sm font-bold flex flex-col gap-2">
+                        <div className="flex items-center gap-3">
+                          <div className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse" />
+                          <span>Submission Locked</span>
+                        </div>
+                        <span className="text-xs text-muted font-normal">
+                          This assignment has been graded. Further submissions
+                          or modifications are disabled.
+                        </span>
+                      </div>
 
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-dim mb-2 block ml-1">
-                      Attachment (Optional)
-                    </label>
-                    <div
-                      onClick={() =>
-                        document.getElementById("submission-file")?.click()
-                      }
-                      className="flex items-center gap-3 p-4 border-2 border-dashed border-white/10 rounded-2xl hover:border-primary-500/30 cursor-pointer transition-all group"
-                    >
-                      <Upload className="w-5 h-5 text-dim group-hover:text-primary-400" />
-                      <span className="text-xs font-bold text-muted group-hover:text-primary">
-                        {submissionFile
-                          ? submissionFile.name
-                          : "Attach files (PDF/Image)"}
-                      </span>
-                      <input
-                        id="submission-file"
-                        type="file"
-                        className="hidden"
-                        onChange={(e) =>
-                          setSubmissionFile(e.target.files?.[0] || null)
-                        }
-                      />
+                      <div className="glass p-6 rounded-3xl border border-white/5 space-y-4">
+                        <h4 className="text-[10px] font-black uppercase text-muted tracking-wider">
+                          Your Final Response
+                        </h4>
+                        <p className="text-xs text-primary bg-white/5 p-4 rounded-2xl whitespace-pre-wrap leading-relaxed">
+                          {selectedAssignment.student_text_content ||
+                            "No response text submitted."}
+                        </p>
+                        {selectedAssignment.student_file_url && (
+                          <div className="flex items-center justify-between border-t border-white/5 pt-4">
+                            <span className="text-[10px] uppercase font-black text-muted tracking-wider">
+                              Final Attachment
+                            </span>
+                            <a
+                              href={getFileUrl(
+                                selectedAssignment.student_file_url,
+                              )}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-primary-400 hover:text-primary-300 font-bold flex items-center gap-2"
+                            >
+                              <Download className="w-4 h-4" /> Download File
+                            </a>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      {selectedAssignment?.status === "submitted" && (
+                        <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-400 text-xs font-bold flex items-center gap-3">
+                          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                          <span>
+                            Submitted! You can update your response until it is
+                            graded.
+                          </span>
+                        </div>
+                      )}
 
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full py-4 bg-primary-600 hover:bg-primary-500 text-white rounded-2xl font-black shadow-premium transition-all flex items-center justify-center gap-3 disabled:opacity-50"
-                  >
-                    <Send className="w-5 h-5" />
-                    Submit Assignment
-                  </button>
-                </form>
+                      <div>
+                        <label className="text-xs font-bold text-dim mb-2 block ml-1">
+                          Your Submission
+                        </label>
+                        <textarea
+                          value={submissionText}
+                          onChange={(e) => setSubmissionText(e.target.value)}
+                          placeholder="Type your response here..."
+                          className="w-full h-40 bg-white/5 border border-white/10 rounded-2xl p-4 text-primary placeholder:text-dim focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all resize-none"
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-3">
+                        <label className="text-xs font-bold text-dim mb-2 block ml-1">
+                          Attachment (Optional)
+                        </label>
+                        <div
+                          onClick={() =>
+                            document.getElementById("submission-file")?.click()
+                          }
+                          className="flex items-center gap-3 p-4 border-2 border-dashed border-white/10 rounded-2xl hover:border-primary-500/30 cursor-pointer transition-all group"
+                        >
+                          <Upload className="w-5 h-5 text-dim group-hover:text-primary-400" />
+                          <span className="text-xs font-bold text-muted group-hover:text-primary">
+                            {submissionFile
+                              ? submissionFile.name
+                              : "Attach new file (PDF/Image)"}
+                          </span>
+                          <input
+                            id="submission-file"
+                            type="file"
+                            className="hidden"
+                            onChange={(e) =>
+                              setSubmissionFile(e.target.files?.[0] || null)
+                            }
+                          />
+                        </div>
+
+                        {selectedAssignment?.student_file_url && (
+                          <div className="flex items-center justify-between px-2">
+                            <span className="text-[10px] text-muted font-bold uppercase tracking-wider">
+                              Current File Attachment:
+                            </span>
+                            <a
+                              href={getFileUrl(
+                                selectedAssignment.student_file_url,
+                              )}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-primary-400 hover:underline flex items-center gap-1 font-bold"
+                            >
+                              <Download className="w-3.5 h-3.5" /> View Current
+                              Attachment
+                            </a>
+                          </div>
+                        )}
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full py-4 bg-primary-600 hover:bg-primary-500 text-white rounded-2xl font-black shadow-premium transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                      >
+                        <Send className="w-5 h-5" />
+                        {selectedAssignment?.status === "submitted"
+                          ? "Update Submission"
+                          : "Submit Assignment"}
+                      </button>
+                    </form>
+                  )}
+                </div>
               )}
             </div>
           ) : (
@@ -569,80 +655,65 @@ export const AssignmentList = () => {
       >
         <form onSubmit={handleCreate} className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-xs font-black uppercase text-muted ml-1">
-                Subject
-              </label>
-              <select
-                required
-                value={formData.subject}
-                onChange={(e) =>
-                  setFormData({ ...formData, subject: e.target.value })
-                }
-                className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-primary outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="" className="bg-bg-color">
-                  Select Subject
+            <Select
+              label="Subject"
+              required
+              value={formData.subject}
+              onChange={(e) =>
+                setFormData({ ...formData, subject: e.target.value })
+              }
+            >
+              <option value="" className="bg-bg-color">
+                Select Subject
+              </option>
+              {subjects.map((s: any) => (
+                <option key={s.id} value={s.id} className="bg-bg-color">
+                  {s.name}
                 </option>
-                {subjects.map((s: any) => (
-                  <option key={s.id} value={s.id} className="bg-bg-color">
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+              ))}
+            </Select>
 
             {(user?.role === "ADMIN" || user?.role === "SUPER_ADMIN") && (
-              <div className="space-y-2">
-                <label className="text-xs font-black uppercase text-primary-400 ml-1">
-                  Assigned Teacher
-                </label>
-                <select
-                  required
-                  value={formData.teacher}
-                  onChange={(e) =>
-                    setFormData({ ...formData, teacher: e.target.value })
-                  }
-                  className="w-full bg-white/5 border border-primary-500/30 rounded-2xl px-4 py-3 text-primary outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value="" className="bg-bg-color">
-                    Select Teacher
+              <Select
+                label="Assigned Teacher"
+                required
+                value={formData.teacher}
+                onChange={(e) =>
+                  setFormData({ ...formData, teacher: e.target.value })
+                }
+              >
+                <option value="" className="bg-bg-color">
+                  Select Teacher
+                </option>
+                {teachers.map((t: any) => (
+                  <option key={t.id} value={t.id} className="bg-bg-color">
+                    {t.full_name || `${t.first_name} ${t.last_name}`}
                   </option>
-                  {teachers.map((t: any) => (
-                    <option key={t.id} value={t.id} className="bg-bg-color">
-                      {t.full_name || `${t.first_name} ${t.last_name}`}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                ))}
+              </Select>
             )}
           </div>
 
-          <div className="space-y-2">
-            <label className="text-xs font-black uppercase text-muted ml-1">
-              Target Class
-            </label>
-            <select
-              value={formData.stream}
-              onChange={(e) =>
-                setFormData({ ...formData, stream: e.target.value })
-              }
-              className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-primary outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              <option value="" className="bg-bg-color">
-                Select Class
-              </option>
-              {grades.map((g: any) => (
-                <optgroup key={g.id} label={g.name} className="bg-bg-color">
-                  {g.streams.map((s: any) => (
-                    <option key={s.id} value={s.id} className="bg-bg-color">
-                      {g.name} {s.name}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
-          </div>
+          <Select
+            label="Target Class"
+            value={formData.stream}
+            onChange={(e) =>
+              setFormData({ ...formData, stream: e.target.value })
+            }
+          >
+            <option value="" className="bg-bg-color">
+              Select Class
+            </option>
+            {grades.map((g: any) => (
+              <optgroup key={g.id} label={g.name} className="bg-bg-color">
+                {g.streams.map((s: any) => (
+                  <option key={s.id} value={s.id} className="bg-bg-color">
+                    {g.name} {s.name}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </Select>
 
           <div className="space-y-2">
             <label className="text-xs font-black uppercase text-muted ml-1">
@@ -727,7 +798,7 @@ export const AssignmentList = () => {
             disabled={isSubmitting}
             className="w-full h-14 rounded-2xl font-black uppercase tracking-widest"
           >
-            {isSubmitting ? "Creating..." : "Launch Assignment"}
+            {isSubmitting ? "Creating..." : "Create Assignment"}
           </Button>
         </form>
       </Modal>

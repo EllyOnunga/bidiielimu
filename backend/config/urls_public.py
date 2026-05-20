@@ -2,13 +2,17 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.http import JsonResponse
 from django.urls import include, path, re_path
-from drf_spectacular.views import (SpectacularAPIView, SpectacularRedocView,
-                                   SpectacularSwaggerView)
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularRedocView,
+    SpectacularSwaggerView,
+)
+
 from schools.views_theme import TenantThemeView
 
 
 def health_check(request):
-    return JsonResponse({"status": "ok", "version": "1.0.0", "schema": "public"})
+    return JsonResponse({"status": "ok", "version": settings.VERSION, "schema": "public"})
 
 
 urlpatterns = [
@@ -19,10 +23,15 @@ urlpatterns = [
     ),
     path("health/", health_check, name="health_check"),
     re_path(
-        r"ping", lambda r: JsonResponse({"status": "ping-regex"}), name="ping-regex"
+        r"ping", lambda r: JsonResponse({
+            "status": "ping-regex",
+            "version": settings.VERSION,
+            "environment": "development" if settings.DEBUG else "production"
+        }), name="ping-regex"
     ),
     path("api/v1/accounts/", include("accounts.urls")),
     path("api/v1/schools/", include("schools.urls")),
+    path("api/v1/blog/", include("blog.urls")),
     path("api/v1/theme/", TenantThemeView.as_view(), name="public-theme"),
     # These routes are now dynamically switched by Middleware if accessed on
     # public domain

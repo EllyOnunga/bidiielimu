@@ -95,3 +95,42 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         """
         # Allow auto signup for social logins
         return True
+
+
+from allauth.account.adapter import DefaultAccountAdapter
+from django.conf import settings
+
+
+class CustomAccountAdapter(DefaultAccountAdapter):
+    """
+    Custom account adapter for ElimuHub to standardize frontend URLs.
+    """
+
+    def get_email_confirmation_url(self, request, emailconfirmation):
+        token = emailconfirmation.key
+        frontend_url = settings.FRONTEND_URL
+
+        if request:
+            host = request.get_host()
+            if host and ".localhost" in host:
+                frontend_url = f"http://{host}"
+
+        return f"{frontend_url.rstrip('/')}/verify-email/{token}"
+
+    def send_mail(self, template_prefix, email, context):
+        if template_prefix == "account/email/password_reset_key":
+            uid = context.get("uid")
+            key = context.get("key") or context.get("token")
+            frontend_url = settings.FRONTEND_URL
+
+            request = context.get("request")
+            if request:
+                host = request.get_host()
+                if host and ".localhost" in host:
+                    frontend_url = f"http://{host}"
+
+            context["password_reset_url"] = (
+                f"{frontend_url.rstrip('/')}/reset-password/{uid}/{key}"
+            )
+
+        super().send_mail(template_prefix, email, context)

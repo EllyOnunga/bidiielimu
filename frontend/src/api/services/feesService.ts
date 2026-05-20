@@ -48,7 +48,30 @@ export const feesService = {
 
   getFeeSummary: async (studentId?: number | null) => {
     const params = studentId ? { student_id: studentId } : {};
-    const response = await client.get(`fees/payments/my_fee_summary/`, { params });
+    const response = await client.get(`fees/payments/my_fee_summary/`, {
+      params,
+    });
+    return response.data;
+  },
+
+  bulkPrint: async (paymentIds: number[]) => {
+    const response = await client.post(
+      "fees/payments/bulk-print/",
+      { payment_ids: paymentIds },
+      { responseType: "blob" }
+    );
+    return response;
+  },
+
+  getTaskStatus: async (taskId: string) => {
+    const response = await client.get(`system/tasks/${taskId}/`);
+    return response.data;
+  },
+
+  downloadReceipt: async (paymentId: number) => {
+    const response = await client.get(`fees/payments/${paymentId}/download_receipt/`, {
+      responseType: "blob",
+    });
     return response.data;
   },
 };

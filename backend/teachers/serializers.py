@@ -61,6 +61,7 @@ class TeacherSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         if instance.user:
             data["email"] = instance.user.email
+            data["role"] = "TEACHER"
         return data
 
     def create(self, validated_data):
@@ -93,6 +94,7 @@ class TeacherSerializer(serializers.ModelSerializer):
                 last_name=validated_data.get("last_name"),
                 phone_number=validated_data.get("phone_number"),
                 school=school,
+                is_email_verified=True,
             )
         except IntegrityError:
             raise serializers.ValidationError(

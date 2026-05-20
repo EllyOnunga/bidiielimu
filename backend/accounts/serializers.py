@@ -1,7 +1,13 @@
 from dj_rest_auth.serializers import PasswordResetSerializer
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.exceptions import InvalidToken
+from rest_framework_simplejwt.serializers import (
+    TokenObtainPairSerializer,
+    TokenRefreshSerializer,
+)
+
 from schools.models import School
 
 from .models import Role, User
@@ -46,9 +52,26 @@ class SchoolBasicSerializer(serializers.ModelSerializer):
 
 
 class SchoolSerializer(serializers.ModelSerializer):
+    domain = serializers.SerializerMethodField()
+
     class Meta:
         model = School
-        fields = ["id", "name", "address", "contact_email", "contact_phone", "logo"]
+        fields = [
+            "id",
+            "name",
+            "address",
+            "contact_email",
+            "contact_phone",
+            "logo",
+            "schema_name",
+            "domain",
+        ]
+
+    def get_domain(self, obj):
+        domain = obj.domains.filter(is_primary=True).first()
+        if domain:
+            return domain.domain
+        return f"{obj.schema_name.replace('_', '-')}.{settings.TENANT_DOMAIN_SUFFIX}"
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -264,11 +287,8 @@ class CustomPasswordResetSerializer(PasswordResetSerializer):
                 domain = tenant.domains.filter(is_primary=True).first()
                 if domain:
                     protocol = "http" if "localhost" in domain.domain else "https"
-                    # Handle local dev port
-                    if "localhost" in domain.domain:
-                        frontend_url = f"{protocol}://{domain.domain}:5173"
-                    else:
-                        frontend_url = f"{protocol}://{domain.domain}"
+                    # Keep link directly on port 80/443 without React dev port 5173
+                    frontend_url = f"{protocol}://{domain.domain}"
 
         return {
             "email_template_name": "registration/password_reset_email.html",
@@ -276,3 +296,11 @@ class CustomPasswordResetSerializer(PasswordResetSerializer):
                 "frontend_url": frontend_url,
             },
         }
+
+
+class MyTokenRefreshSerializer(TokenRefreshSerializer):
+    def validate(self, attrs):
+        try:
+            return super().validate(attrs)
+        except User.DoesNotExist:
+            raise InvalidToken(_("No active account found for the given token."))

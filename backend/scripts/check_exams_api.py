@@ -2,10 +2,11 @@ import json
 import os
 
 import django
-from accounts.models import User
 from django_tenants.utils import schema_context
-from exams.views import ExamViewSet
 from rest_framework.test import APIRequestFactory, force_authenticate
+
+from accounts.models import User
+from exams.views import ExamViewSet
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()

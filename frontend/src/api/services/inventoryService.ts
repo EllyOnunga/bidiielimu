@@ -21,6 +21,11 @@ export const inventoryService = {
     return response.data;
   },
 
+  createItem: async (data: Omit<StockItem, "id" | "last_restock">) => {
+    const response = await client.post("inventory/items/", data);
+    return response.data;
+  },
+
   getLibraryStats: async () => {
     const response = await client.get("inventory/items/library_stats/");
     return response.data;
@@ -35,7 +40,9 @@ export const inventoryService = {
 
   getMyBooks: async (studentId?: number | null) => {
     const params = studentId ? { student_id: studentId } : {};
-    const response = await client.get(`inventory/book-issues/my_books/`, { params });
+    const response = await client.get(`inventory/book-issues/my_books/`, {
+      params,
+    });
     return response.data;
   },
 };

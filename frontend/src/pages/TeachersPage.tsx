@@ -23,6 +23,7 @@ import { Input } from "../components/ui/Input";
 import { Modal } from "../components/ui/Modal";
 import { TableSkeleton } from "../components/ui/Skeleton";
 import { ConfirmModal } from "../components/ui/ConfirmModal";
+import { Select } from "../components/ui/Select";
 import {
   Table,
   TableBody,
@@ -71,7 +72,7 @@ export const TeachersPage = () => {
   const createTeacherMutation = useMutation({
     mutationFn: (data: any) => teachersService.create(data),
     onSuccess: () => {
-      toast.success("Faculty induction successful");
+      toast.success("Teacher successfully registered");
       setIsModalOpen(false);
       resetForm();
       queryClient.invalidateQueries({ queryKey: ["teachers"] });
@@ -85,7 +86,7 @@ export const TeachersPage = () => {
     mutationFn: ({ id, data }: { id: number; data: any }) =>
       teachersService.update(id, data),
     onSuccess: () => {
-      toast.success("Identity records synchronized");
+      toast.success("Teacher details successfully updated");
       setIsModalOpen(false);
       setEditingTeacher(null);
       resetForm();
@@ -99,11 +100,11 @@ export const TeachersPage = () => {
   const deleteTeacherMutation = useMutation({
     mutationFn: (id: number) => teachersService.delete(id),
     onSuccess: () => {
-      toast.success("Faculty record purged");
+      toast.success("Teacher records deleted");
       queryClient.invalidateQueries({ queryKey: ["teachers"] });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.detail || "Purge protocol failed");
+      toast.error(error.response?.data?.detail || "Failed to delete teacher");
     },
   });
 
@@ -159,7 +160,7 @@ export const TeachersPage = () => {
 
   const handleBulkUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!csvFile) return toast.error("Select protocol file first.");
+    if (!csvFile) return toast.error("Select CSV file first.");
 
     const formDataObj = new FormData();
     formDataObj.append("file", csvFile);
@@ -172,7 +173,9 @@ export const TeachersPage = () => {
       setCsvFile(null);
       queryClient.invalidateQueries({ queryKey: ["teachers"] });
     } catch (error: any) {
-      toast.error(error.response?.data?.detail || "Mass induction failure");
+      toast.error(
+        error.response?.data?.detail || "Failed to upload teacher list",
+      );
     } finally {
       setIsUploading(false);
     }
@@ -187,11 +190,11 @@ export const TeachersPage = () => {
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
         <div className="space-y-2">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary tracking-tight leading-none">
-            Faculty <span className="text-gradient">Network</span>
+            Teacher <span className="text-gradient">Directory</span>
           </h1>
           <p className="text-muted text-xs sm:text-sm md:text-base font-medium max-w-xl">
-            Coordinate elite educators and manage multi-functional academic
-            assignments.
+            View and manage all registered teachers, their specialization, and
+            class streams.
           </p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
@@ -200,14 +203,14 @@ export const TeachersPage = () => {
             onClick={() => setIsBulkModalOpen(true)}
             className="gap-2 h-14 px-8 rounded-2xl"
           >
-            <UploadCloud className="w-5 h-5" /> Import Matrix
+            <UploadCloud className="w-5 h-5" /> Import Teachers (CSV)
           </Button>
           <Button
             onClick={handleAddTeacher}
             className="gap-2 h-14 px-8 rounded-2xl"
           >
             <UserPlus className="w-5 h-5" />
-            Induct Faculty
+            Register Teacher
           </Button>
         </div>
       </div>
@@ -218,7 +221,7 @@ export const TeachersPage = () => {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-200/20" />
             <Input
               type="text"
-              placeholder="Query name, ID, or specialization..."
+              placeholder="Search by name, ID, or subject..."
               className="pl-12 h-14 bg-white/5 border-white/5"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -229,10 +232,10 @@ export const TeachersPage = () => {
               variant="outline"
               className="gap-2 h-12 flex-1 md:flex-none px-6 text-[10px]"
             >
-              <Filter className="w-4 h-4" /> Filter Protocols
+              <Filter className="w-4 h-4" /> Filters
             </Button>
             <div className="hidden sm:flex h-12 items-center px-4 rounded-2xl bg-white/5 border border-white/5 text-[10px] font-black text-primary uppercase tracking-widest">
-              Active Nodes: {teachersData.length}
+              Total Teachers: {teachersData.length}
             </div>
           </div>
         </div>
@@ -242,19 +245,19 @@ export const TeachersPage = () => {
             <TableHeader className="bg-white/[0.02]">
               <TableRow className="border-0 hover:bg-transparent h-20">
                 <TableHead className="text-muted text-[10px] font-black uppercase tracking-widest pl-10 w-[350px]">
-                  Faculty Identity
+                  Teacher Name
                 </TableHead>
                 <TableHead className="text-muted text-[10px] font-black uppercase tracking-widest w-[300px]">
-                  Communication Channel
+                  Contact Info
                 </TableHead>
                 <TableHead className="text-muted text-[10px] font-black uppercase tracking-widest">
-                  Intelligence Domain
+                  Subject Area
                 </TableHead>
                 <TableHead className="text-muted text-[10px] font-black uppercase tracking-widest">
                   Status
                 </TableHead>
                 <TableHead className="text-right text-muted text-[10px] font-black uppercase tracking-widest pr-10">
-                  Operations
+                  Actions
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -272,7 +275,7 @@ export const TeachersPage = () => {
                       >
                         <UserPlus className="w-20 h-20 text-primary-200/5 mb-6" />
                         <p className="text-lg font-black uppercase tracking-[0.3em] text-primary-200/20">
-                          No Faculty Records Detected
+                          No Teacher Records Found
                         </p>
                       </motion.div>
                     </TableCell>
@@ -347,7 +350,7 @@ export const TeachersPage = () => {
                           ) : (
                             <ShieldAlert className="w-3 h-3" />
                           )}
-                          {teacher.is_active ? "Operational" : "Offline"}
+                          {teacher.is_active ? "Active" : "Inactive"}
                         </div>
                       </TableCell>
                       <TableCell className="text-right pr-10">
@@ -390,11 +393,7 @@ export const TeachersPage = () => {
           setIsModalOpen(false);
           setEditingTeacher(null);
         }}
-        title={
-          editingTeacher
-            ? "Identity Synchronization"
-            : "Faculty Protocol Induction"
-        }
+        title={editingTeacher ? "Edit Teacher Details" : "Register New Teacher"}
         className="max-w-4xl glass-morphic border-white/10 !rounded-[40px]"
       >
         <form
@@ -406,12 +405,12 @@ export const TeachersPage = () => {
               <div className="flex items-center gap-3 pb-3 border-b border-white/5">
                 <UserPlus className="w-5 h-5 text-primary-400" />
                 <h3 className="text-[10px] sm:text-xs font-black text-primary uppercase tracking-[0.3em]">
-                  Induction Parameters
+                  Teacher Details
                 </h3>
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">
-                  Faculty Identifier (ID)
+                  Teacher ID
                 </label>
                 <Input
                   required
@@ -457,12 +456,12 @@ export const TeachersPage = () => {
               <div className="flex items-center gap-3 pb-3 border-b border-white/5">
                 <Settings className="w-5 h-5 text-indigo-400" />
                 <h3 className="text-[10px] sm:text-xs font-black text-primary uppercase tracking-[0.3em]">
-                  Operational Matrix
+                  School & Class Details
                 </h3>
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">
-                  Domain Specialization
+                  Teaching Subject
                 </label>
                 <Input
                   required
@@ -476,7 +475,7 @@ export const TeachersPage = () => {
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">
-                  Protocol Activation Date
+                  Employment Date
                 </label>
                 <Input
                   required
@@ -494,12 +493,12 @@ export const TeachersPage = () => {
               <div className="flex items-center gap-3 pb-3 border-b border-white/5">
                 <Phone className="w-5 h-5 text-emerald-400" />
                 <h3 className="text-[10px] sm:text-xs font-black text-primary uppercase tracking-[0.3em]">
-                  Transmission Line
+                  Phone Number
                 </h3>
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">
-                  Secure Line (Phone)
+                  Phone Number
                 </label>
                 <Input
                   required
@@ -517,13 +516,13 @@ export const TeachersPage = () => {
               <div className="flex items-center gap-3 pb-3 border-b border-white/5">
                 <Mail className="w-5 h-5 text-amber-400" />
                 <h3 className="text-[10px] sm:text-xs font-black text-primary uppercase tracking-[0.3em]">
-                  Access Encryption
+                  Account Login Details
                 </h3>
               </div>
               <div className="space-y-4">
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">
-                    System Node (Email)
+                    Email Address
                   </label>
                   <Input
                     required
@@ -537,7 +536,7 @@ export const TeachersPage = () => {
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">
-                    Encryption Key (Password)
+                    Password
                   </label>
                   <Input
                     required={!editingTeacher}
@@ -561,7 +560,7 @@ export const TeachersPage = () => {
               className="flex-1 h-14 text-[10px]"
               onClick={() => setIsModalOpen(false)}
             >
-              Discard
+              Cancel
             </Button>
             <Button
               type="submit"
@@ -573,10 +572,10 @@ export const TeachersPage = () => {
             >
               {createTeacherMutation.isPending ||
               updateTeacherMutation.isPending
-                ? "Syncing Matrix..."
+                ? "Saving..."
                 : editingTeacher
-                  ? "Execute Update"
-                  : "Confirm Induction"}
+                  ? "Save Changes"
+                  : "Register Teacher"}
             </Button>
           </div>
         </form>
@@ -585,7 +584,7 @@ export const TeachersPage = () => {
       <Modal
         isOpen={isBulkModalOpen}
         onClose={() => setIsBulkModalOpen(false)}
-        title="Mass Data Ingestion"
+        title="Upload Teacher List"
         className="max-w-xl glass-morphic border-white/10 !rounded-[40px]"
       >
         <div className="mt-8 space-y-8">
@@ -615,13 +614,13 @@ export const TeachersPage = () => {
                   {csvFile.name}
                 </p>
                 <p className="text-[10px] font-black text-muted uppercase tracking-widest">
-                  {(csvFile.size / 1024).toFixed(1)} KB DATA STREAM
+                  {(csvFile.size / 1024).toFixed(1)} KB READY
                 </p>
               </div>
             ) : (
               <div>
                 <p className="text-primary font-black uppercase tracking-[0.2em] text-sm mb-2">
-                  Drop Induction Protocol
+                  Upload CSV File
                 </p>
                 <p className="text-[10px] font-black text-muted uppercase tracking-widest">
                   CSV RECORDS ONLY
@@ -637,14 +636,14 @@ export const TeachersPage = () => {
               className="flex-1 h-14 text-[10px]"
               onClick={() => setIsBulkModalOpen(false)}
             >
-              Abort
+              Cancel
             </Button>
             <Button
               onClick={handleBulkUpload}
               disabled={!csvFile || isUploading}
               className="flex-1 h-14 text-[10px]"
             >
-              {isUploading ? "Ingesting..." : "Execute Mass Induction"}
+              {isUploading ? "Uploading..." : "Upload Teacher List"}
             </Button>
           </div>
         </div>
@@ -657,8 +656,8 @@ export const TeachersPage = () => {
           if (teacherToDelete) deleteTeacherMutation.mutate(teacherToDelete);
           setTeacherToDelete(null);
         }}
-        title="Faculty Termination"
-        description="Permanently revoke all access and purge educator's operational records from the grid?"
+        title="Delete Teacher"
+        description="Are you sure you want to permanently delete this teacher's records and revoke their account access? This action cannot be undone."
       />
 
       <TeacherAssignmentsModal
@@ -709,19 +708,19 @@ const TeacherAssignmentsModal = ({
   const createAssignmentMutation = useMutation({
     mutationFn: (data: any) => classesService.createAssignment(data),
     onSuccess: () => {
-      toast.success("Assignment protocol synchronized");
+      toast.success("Subject successfully assigned");
       setSelectedSubject("");
       setSelectedStream("");
       queryClient.invalidateQueries({ queryKey: ["assignments", teacher?.id] });
     },
     onError: (err: any) =>
-      toast.error(err.response?.data?.detail || "Sync failure"),
+      toast.error(err.response?.data?.detail || "Failed to assign subject"),
   });
 
   const deleteAssignmentMutation = useMutation({
     mutationFn: (id: number) => classesService.deleteAssignment(id),
     onSuccess: () => {
-      toast.success("Assignment protocol revoked");
+      toast.success("Subject assignment removed");
       queryClient.invalidateQueries({ queryKey: ["assignments", teacher?.id] });
     },
   });
@@ -739,7 +738,7 @@ const TeacherAssignmentsModal = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Intelligence Scope Assignment"
+      title="Assign Subjects to Teacher"
       className="max-w-4xl glass-morphic border-white/10 !rounded-[40px]"
     >
       <div className="space-y-10 mt-8">
@@ -759,48 +758,39 @@ const TeacherAssignmentsModal = ({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-8 bg-white/[0.01] rounded-[32px] border border-white/5">
-          <div className="space-y-3">
-            <label className="text-[10px] font-black text-muted uppercase tracking-[0.2em] pl-1">
-              Target Intelligence Node
-            </label>
-            <select
-              value={selectedSubject}
-              onChange={(e) => setSelectedSubject(e.target.value)}
-              className="w-full h-14 bg-white/5 border border-white/5 rounded-xl px-4 text-primary text-sm outline-none focus:border-primary-500/50 transition-all"
-            >
-              <option value="" className="bg-bg-color">
-                Select Domain...
+          <Select
+            label="Select Subject"
+            value={selectedSubject}
+            onChange={(e) => setSelectedSubject(e.target.value)}
+          >
+            <option value="" className="bg-bg-color">
+              Select Subject...
+            </option>
+            {subjects.map((s: any) => (
+              <option key={s.id} value={s.id} className="bg-bg-color">
+                {s.name}
               </option>
-              {subjects.map((s: any) => (
-                <option key={s.id} value={s.id} className="bg-bg-color">
-                  {s.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="space-y-3">
-            <label className="text-[10px] font-black text-muted uppercase tracking-[0.2em] pl-1">
-              Operational Deployment Unit
-            </label>
-            <select
-              value={selectedStream}
-              onChange={(e) => setSelectedStream(e.target.value)}
-              className="w-full h-14 bg-white/5 border border-white/5 rounded-xl px-4 text-primary text-sm outline-none focus:border-primary-500/50 transition-all"
-            >
-              <option value="" className="bg-bg-color">
-                Select Stream...
-              </option>
-              {grades.map((g: any) => (
-                <optgroup key={g.id} label={g.name} className="bg-bg-color">
-                  {g.streams.map((s: any) => (
-                    <option key={s.id} value={s.id} className="bg-bg-color">
-                      {g.name} {s.name}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
-          </div>
+            ))}
+          </Select>
+
+          <Select
+            label="Select Class Stream"
+            value={selectedStream}
+            onChange={(e) => setSelectedStream(e.target.value)}
+          >
+            <option value="" className="bg-bg-color">
+              Select Stream...
+            </option>
+            {grades.map((g: any) => (
+              <optgroup key={g.id} label={g.name} className="bg-bg-color">
+                {g.streams.map((s: any) => (
+                  <option key={s.id} value={s.id} className="bg-bg-color">
+                    {g.name} {s.name}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </Select>
           <Button
             className="md:col-span-2 h-14 text-[10px]"
             onClick={handleAdd}
@@ -810,7 +800,7 @@ const TeacherAssignmentsModal = ({
               createAssignmentMutation.isPending
             }
           >
-            <Plus className="w-4 h-4" /> Initialize Assignment Protocol
+            <Plus className="w-4 h-4" /> Assign Subject
           </Button>
         </div>
 
@@ -818,7 +808,7 @@ const TeacherAssignmentsModal = ({
           <div className="flex items-center gap-3">
             <div className="w-1.5 h-1.5 rounded-full bg-primary-500 shadow-glow-sm" />
             <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">
-              Active Assignment Matrix
+              Active Subject Assignments
             </h4>
           </div>
 
@@ -834,7 +824,7 @@ const TeacherAssignmentsModal = ({
               ) : assignments.length === 0 ? (
                 <div className="col-span-full py-12 text-center rounded-[32px] border border-dashed border-white/5 opacity-30">
                   <p className="text-[10px] font-black uppercase tracking-widest">
-                    No Active Protocols
+                    No subjects assigned yet
                   </p>
                 </div>
               ) : (
@@ -875,7 +865,7 @@ const TeacherAssignmentsModal = ({
             className="h-12 px-10 text-[10px]"
             onClick={onClose}
           >
-            Close Matrix
+            Close
           </Button>
         </div>
       </div>

@@ -16,6 +16,7 @@ import { examsService } from "../api/services/examsService";
 import { classesService } from "../api/services/classesService";
 import { studentsService } from "../api/services/studentsService";
 import { TableSkeleton } from "../components/ui/Skeleton";
+import { Select } from "../components/ui/Select";
 
 interface StudentData {
   id: number;
@@ -30,7 +31,8 @@ export const ExamMarksEntryPage = () => {
   const [selectedExam, setSelectedExam] = useState<string>("");
   const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [selectedStream, setSelectedStream] = useState<string>("");
-  const [selectedAssignmentName, setSelectedAssignmentName] = useState<string>("");
+  const [selectedAssignmentName, setSelectedAssignmentName] =
+    useState<string>("");
   const [localMarks, setLocalMarks] = useState<Record<number, number>>({});
 
   const { data: examsData, isLoading: loadingExams } = useQuery({
@@ -43,16 +45,22 @@ export const ExamMarksEntryPage = () => {
     queryFn: () => classesService.getAssignments(),
   });
 
-  const exams = useMemo(() =>
-    Array.isArray(examsData) ? examsData : examsData?.results || []
-    , [examsData]);
+  const exams = useMemo(
+    () => (Array.isArray(examsData) ? examsData : examsData?.results || []),
+    [examsData],
+  );
 
-  const assignments = useMemo(() =>
-    Array.isArray(assignmentsData) ? assignmentsData : assignmentsData?.results || []
-    , [assignmentsData]);
+  const assignments = useMemo(
+    () =>
+      Array.isArray(assignmentsData)
+        ? assignmentsData
+        : assignmentsData?.results || [],
+    [assignmentsData],
+  );
 
   useEffect(() => {
-    if (exams.length > 0 && !selectedExam) setSelectedExam(exams[0].id.toString());
+    if (exams.length > 0 && !selectedExam)
+      setSelectedExam(exams[0].id.toString());
   }, [exams, selectedExam]);
 
   useEffect(() => {
@@ -78,14 +86,19 @@ export const ExamMarksEntryPage = () => {
   });
 
   const students: StudentData[] = useMemo(() => {
-    const sData = Array.isArray(studentsRaw) ? studentsRaw : studentsRaw?.results || [];
+    const sData = Array.isArray(studentsRaw)
+      ? studentsRaw
+      : studentsRaw?.results || [];
     const mData = Array.isArray(marksRaw) ? marksRaw : marksRaw?.results || [];
 
     return sData.map((s: any) => {
       const mark = mData.find((m: any) => m.student === s.id);
-      const score = localMarks[s.id] !== undefined
-        ? localMarks[s.id]
-        : (mark ? parseFloat(mark.score) : 0);
+      const score =
+        localMarks[s.id] !== undefined
+          ? localMarks[s.id]
+          : mark
+            ? parseFloat(mark.score)
+            : 0;
 
       return {
         id: s.id,
@@ -99,19 +112,21 @@ export const ExamMarksEntryPage = () => {
 
   const updateScore = (id: number, score: string) => {
     const val = parseFloat(score) || 0;
-    setLocalMarks(prev => ({ ...prev, [id]: val }));
+    setLocalMarks((prev) => ({ ...prev, [id]: val }));
   };
 
   const saveMarksMutation = useMutation({
     mutationFn: (data: any) => examsService.saveMarks(data),
     onSuccess: () => {
       toast.success("Marks saved successfully!");
-      queryClient.invalidateQueries({ queryKey: ["marks", selectedExam, selectedSubject] });
+      queryClient.invalidateQueries({
+        queryKey: ["marks", selectedExam, selectedSubject],
+      });
       setLocalMarks({});
     },
     onError: () => {
       toast.error("Failed to save marks");
-    }
+    },
   });
 
   const handleSave = () => {
@@ -188,87 +203,77 @@ export const ExamMarksEntryPage = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        <div className="glass p-5 md:p-6 rounded-3xl border border-white/5 space-y-3 md:space-y-4">
-          <label className="block text-xs md:text-sm font-medium text-muted font-bold uppercase tracking-widest">
-            Examination
-          </label>
-          <select
-            value={selectedExam}
-            onChange={(e) => setSelectedExam(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 md:py-3 text-primary text-sm outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            {loading ? (
+        <Select
+          label="Examination"
+          value={selectedExam}
+          onChange={(e) => setSelectedExam(e.target.value)}
+        >
+          {loading ? (
+            <option value="" className="bg-bg-color">
+              Loading examinations...
+            </option>
+          ) : exams.length === 0 ? (
+            <option value="" className="bg-bg-color">
+              No exams found
+            </option>
+          ) : (
+            <>
               <option value="" className="bg-bg-color">
-                Loading examinations...
+                Select an examination
               </option>
-            ) : exams.length === 0 ? (
-              <option value="" className="bg-bg-color">
-                No exams found
-              </option>
-            ) : (
-              <>
-                <option value="" className="bg-bg-color">
-                  Select an examination
+              {exams.map((e: any) => (
+                <option key={e.id} value={e.id} className="bg-bg-color">
+                  {e.name} ({e.academic_year})
                 </option>
-                {exams.map((e: any) => (
-                  <option key={e.id} value={e.id} className="bg-bg-color">
-                    {e.name} ({e.academic_year})
-                  </option>
-                ))}
-              </>
-            )}
-          </select>
-        </div>
+              ))}
+            </>
+          )}
+        </Select>
 
-        <div className="glass p-5 md:p-6 rounded-3xl border border-white/5 space-y-3 md:space-y-4">
-          <label className="block text-xs md:text-sm font-medium text-muted font-bold uppercase tracking-widest">
-            Subject &amp; Class
-          </label>
-          <select
-            value={`${selectedSubject}-${selectedStream}`}
-            onChange={(e) => {
-              const [subjectId, streamId] = e.target.value.split("-");
-              setSelectedSubject(subjectId);
-              setSelectedStream(streamId);
-              const selected = assignments.find(
-                (a: any) =>
-                  a.subject.toString() === subjectId &&
-                  a.stream.toString() === streamId,
+        <Select
+          label="Subject & Class"
+          value={`${selectedSubject}-${selectedStream}`}
+          onChange={(e) => {
+            const [subjectId, streamId] = e.target.value.split("-");
+            setSelectedSubject(subjectId);
+            setSelectedStream(streamId);
+            const selected = assignments.find(
+              (a: any) =>
+                a.subject.toString() === subjectId &&
+                a.stream.toString() === streamId,
+            );
+            if (selected) {
+              setSelectedAssignmentName(
+                `${selected.subject_name} - ${selected.grade_name} ${selected.stream_name}`,
               );
-              if (selected) {
-                setSelectedAssignmentName(
-                  `${selected.subject_name} - ${selected.grade_name} ${selected.stream_name}`,
-                );
-              }
-            }}
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 md:py-3 text-primary text-sm outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            {loading ? (
+            }
+          }}
+        >
+          {loading ? (
+            <option value="" className="bg-bg-color">
+              Loading subjects...
+            </option>
+          ) : assignments.length === 0 ? (
+            <option value="" className="bg-bg-color">
+              No subjects assigned
+            </option>
+          ) : (
+            <>
               <option value="" className="bg-bg-color">
-                Loading subjects...
+                Select subject &amp; class
               </option>
-            ) : assignments.length === 0 ? (
-              <option value="" className="bg-bg-color">
-                No subjects assigned
-              </option>
-            ) : (
-              <>
-                <option value="" className="bg-bg-color">
-                  Select subject &amp; class
+              {assignments.map((as: any) => (
+                <option
+                  key={as.id}
+                  value={`${as.subject}-${as.stream}`}
+                  className="bg-bg-color"
+                >
+                  {as.subject_name} - {as.grade_name} {as.stream_name}
                 </option>
-                {assignments.map((as: any) => (
-                  <option
-                    key={as.id}
-                    value={`${as.subject}-${as.stream}`}
-                    className="bg-bg-color"
-                  >
-                    {as.subject_name} - {as.grade_name} {as.stream_name}
-                  </option>
-                ))}
-              </>
-            )}
-          </select>
-        </div>
+              ))}
+            </>
+          )}
+        </Select>
 
         <div className="glass p-5 md:p-6 rounded-3xl border border-white/5 flex items-end sm:col-span-2 lg:col-span-2">
           <div className="flex gap-2 w-full">
@@ -289,7 +294,12 @@ export const ExamMarksEntryPage = () => {
             </button>
             <label className="px-4 py-2.5 md:py-3 bg-white/5 hover:bg-white/10 text-primary rounded-xl border border-white/10 flex items-center gap-2 text-sm cursor-pointer">
               <Upload className="w-4 h-4" /> Import
-              <input type="file" accept=".csv" onChange={importFromCSV} className="hidden" />
+              <input
+                type="file"
+                accept=".csv"
+                onChange={importFromCSV}
+                className="hidden"
+              />
             </label>
           </div>
         </div>
@@ -298,7 +308,9 @@ export const ExamMarksEntryPage = () => {
       {/* Grade Distribution Chart */}
       {students.length > 0 && (
         <div className="glass p-6 rounded-3xl border border-white/5">
-          <h3 className="text-sm font-bold text-muted mb-4">Grade Distribution</h3>
+          <h3 className="text-sm font-bold text-muted mb-4">
+            Grade Distribution
+          </h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
@@ -307,7 +319,7 @@ export const ExamMarksEntryPage = () => {
                     const g = s.grade || "N/A";
                     acc[g] = (acc[g] || 0) + 1;
                     return acc;
-                  }, {})
+                  }, {}),
                 ).map(([grade, count]) => ({ grade, count }))}
               >
                 <XAxis dataKey="grade" />
@@ -391,14 +403,15 @@ export const ExamMarksEntryPage = () => {
                     </td>
                     <td className="px-6 md:px-8 py-4">
                       <span
-                        className={`px-2 md:px-3 py-1 rounded-lg text-[10px] md:text-xs font-bold border ${student.grade === "A" || student.grade === "A-"
+                        className={`px-2 md:px-3 py-1 rounded-lg text-[10px] md:text-xs font-bold border ${
+                          student.grade === "A" || student.grade === "A-"
                             ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
                             : student.grade?.startsWith("B")
                               ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
                               : student.grade?.startsWith("C")
                                 ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
                                 : "bg-rose-500/10 text-rose-400 border-rose-500/20"
-                          }`}
+                        }`}
                       >
                         {student.grade || "-"}
                       </span>

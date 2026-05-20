@@ -15,7 +15,7 @@ class BackupManager:
 
     def __init__(self):
         self.s3_client = None
-        if settings.AWS_ACCESS_KEY_ID:
+        if getattr(settings, "AWS_ACCESS_KEY_ID", None):
             self.s3_client = boto3.client(
                 "s3",
                 aws_access_key_id=settings.AWS_ACCESS_KEY_ID,

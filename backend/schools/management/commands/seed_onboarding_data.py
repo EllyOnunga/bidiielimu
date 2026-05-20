@@ -1,5 +1,6 @@
-from classes.models import GradeLevel, Subject
 from django.core.management.base import BaseCommand
+
+from classes.models import GradeLevel, Subject
 from schools.models import SchoolSetting
 
 

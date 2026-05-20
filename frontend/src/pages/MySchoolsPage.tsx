@@ -21,12 +21,16 @@ export const MySchoolsPage = () => {
 
   const handleSchoolSwitch = (school: School) => {
     const { protocol, port, hostname } = window.location;
-    const isDev = hostname === "localhost" || port === "5173";
+    const isDev =
+      hostname === "localhost" ||
+      hostname.endsWith(".localhost") ||
+      port === "5173";
 
     if (isDev) {
-      // Construction for local multi-tenancy (e.g., http://tenant.localhost:5173)
+      // Construction for local multi-tenancy preserving the current port if present
       const domain = school.schema_name.replace(/_/g, "-");
-      window.location.href = `${protocol}//${domain}.localhost:5173`;
+      const portSuffix = port ? `:${port}` : "";
+      window.location.href = `${protocol}//${domain}.localhost${portSuffix}`;
     } else {
       // Production redirection using the domain provided by the backend
       window.location.href = `${protocol}//${school.domain}`;
@@ -42,13 +46,12 @@ export const MySchoolsPage = () => {
             <div className="flex items-center gap-3 mb-4">
               <ElimuHubLogo className="w-12 h-12" showText={false} />
               <h1 className="text-4xl font-black text-primary tracking-tighter uppercase font-serif">
-                Institutional <span className="text-primary-500">Registry</span>
+                My <span className="text-primary-500">Schools</span>
               </h1>
             </div>
             <p className="text-muted text-xs font-black uppercase tracking-widest leading-relaxed max-w-lg">
-              Select an established institution to initialize operational
-              command. Your credentials grant access to the following secure
-              environments.
+              Choose a school to open its dashboard. Your account has access to
+              the following schools.
             </p>
           </div>
         </div>
@@ -69,7 +72,7 @@ export const MySchoolsPage = () => {
               <div className="col-span-full py-20 text-center glass rounded-[40px] border-white/5">
                 <SchoolIcon className="w-16 h-16 text-muted/20 mx-auto mb-4" />
                 <p className="text-sm font-black text-muted uppercase tracking-widest">
-                  No institutional affiliations detected.
+                  No schools found on your account.
                 </p>
               </div>
             ) : (

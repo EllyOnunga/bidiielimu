@@ -20,6 +20,7 @@ import toast from "react-hot-toast";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { Modal } from "../components/ui/Modal";
+import { Select } from "../components/ui/Select";
 import {
   Table,
   TableBody,
@@ -83,11 +84,11 @@ export const SupportPage = () => {
     mutationFn: supportService.createTicket,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["support-tickets"] });
-      toast.success("Ticket Initialized. Strategic support is being deployed.");
+      toast.success("Support ticket created successfully.");
       setIsModalOpen(false);
     },
     onError: () => {
-      toast.error("Transmission Failed. Systems interference detected.");
+      toast.error("Failed to create ticket. Please check your connection.");
     },
   });
 
@@ -131,8 +132,8 @@ export const SupportPage = () => {
             </h1>
           </div>
           <p className="text-muted text-xs font-medium uppercase tracking-widest">
-            Direct interface for institutional maintenance & technical
-            briefings.
+            Submit support requests, ask questions, or contact technical
+            support.
           </p>
         </div>
 
@@ -141,11 +142,10 @@ export const SupportPage = () => {
           className="bg-primary-600 hover:bg-primary-500 text-white flex items-center gap-2 group"
         >
           <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform" />
-          Initialize Request
+          Create Ticket
         </Button>
       </div>
 
-      {/* ── STATS ── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="p-6 border-white/5 bg-white/[0.02]">
           <div className="flex items-center justify-between mb-4">
@@ -153,12 +153,12 @@ export const SupportPage = () => {
               <MessageCircle className="w-4 h-4" />
             </div>
             <span className="text-[10px] font-black text-blue-400/50 uppercase tracking-widest">
-              Active Channels
+              Total Tickets
             </span>
           </div>
           <p className="text-4xl font-black text-primary mb-1">{stats.total}</p>
           <p className="text-[9px] font-black text-muted uppercase tracking-widest">
-            Total Briefings
+            All support tickets
           </p>
         </Card>
 
@@ -168,12 +168,12 @@ export const SupportPage = () => {
               <Clock className="w-4 h-4" />
             </div>
             <span className="text-[10px] font-black text-amber-400/50 uppercase tracking-widest">
-              Pending Ops
+              Open Tickets
             </span>
           </div>
           <p className="text-4xl font-black text-primary mb-1">{stats.open}</p>
           <p className="text-[9px] font-black text-muted uppercase tracking-widest">
-            Awaiting Resolution
+            Tickets in progress
           </p>
         </Card>
 
@@ -183,14 +183,14 @@ export const SupportPage = () => {
               <CheckCircle2 className="w-4 h-4" />
             </div>
             <span className="text-[10px] font-black text-emerald-400/50 uppercase tracking-widest">
-              Success Rate
+              Resolved
             </span>
           </div>
           <p className="text-4xl font-black text-primary mb-1">
             {stats.resolved}
           </p>
           <p className="text-[9px] font-black text-muted uppercase tracking-widest">
-            Missions Accomplished
+            Resolved tickets
           </p>
         </Card>
       </div>
@@ -201,7 +201,7 @@ export const SupportPage = () => {
           <div className="relative w-full sm:w-96">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
             <Input
-              placeholder="Search communications..."
+              placeholder="Search tickets..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-12 bg-white/5 border-white/5"
@@ -229,7 +229,7 @@ export const SupportPage = () => {
                     ID
                   </TableHead>
                   <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted">
-                    Briefing Subject
+                    Subject
                   </TableHead>
                   <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted">
                     Priority
@@ -238,7 +238,7 @@ export const SupportPage = () => {
                     Status
                   </TableHead>
                   <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted">
-                    Transmission Date
+                    Date Created
                   </TableHead>
                   <TableHead className="text-[10px] font-black uppercase tracking-widest text-right">
                     Actions
@@ -252,7 +252,7 @@ export const SupportPage = () => {
                       <div className="flex flex-col items-center gap-2 opacity-20">
                         <ShieldAlert className="w-10 h-10" />
                         <p className="text-xs font-black uppercase tracking-widest">
-                          No communication history found
+                          No support tickets found
                         </p>
                       </div>
                     </TableCell>
@@ -308,46 +308,45 @@ export const SupportPage = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Initialize Maintenance Request"
+        title="Create Support Ticket"
       >
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">
-              Briefing Subject
+              Subject
             </label>
             <Input
               name="subject"
               required
-              placeholder="System downtime, data query, etc."
+              placeholder="e.g. Can't access report cards, payment issue"
             />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">
-              Priority Vector
-            </label>
-            <select
-              name="priority"
-              required
-              className="w-full bg-white/5 border border-white/5 p-4 rounded-2xl outline-none focus:border-primary-500 text-primary transition-all text-sm font-bold"
-            >
-              <option value="LOW">Low - General Inquiry</option>
-              <option value="MEDIUM">Medium - Operational Adjustment</option>
-              <option value="HIGH">High - Workflow Obstruction</option>
-              <option value="CRITICAL">Critical - System Failure</option>
-            </select>
-          </div>
+          <Select label="Priority Level" name="priority" required>
+            <option value="LOW" className="bg-bg-color">
+              Low - General Inquiry
+            </option>
+            <option value="MEDIUM" className="bg-bg-color">
+              Medium - Standard Support
+            </option>
+            <option value="HIGH" className="bg-bg-color">
+              High - Urgent Support
+            </option>
+            <option value="CRITICAL" className="bg-bg-color">
+              Critical - System Down
+            </option>
+          </Select>
 
           <div className="space-y-2">
             <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">
-              Mission Details (Description)
+              Description
             </label>
             <textarea
               name="description"
               required
               rows={4}
               className="w-full bg-white/5 border border-white/5 p-4 rounded-2xl outline-none focus:border-primary-500 text-primary transition-all text-sm font-bold resize-none"
-              placeholder="Provide tactical details about the encounter..."
+              placeholder="Describe your issue or request in detail..."
             />
           </div>
 
@@ -358,16 +357,14 @@ export const SupportPage = () => {
               onClick={() => setIsModalOpen(false)}
               className="flex-1 border-white/10"
             >
-              Abort
+              Cancel
             </Button>
             <Button
               type="submit"
               disabled={createMutation.isPending}
               className="flex-1 bg-primary-600 hover:bg-primary-500 text-white"
             >
-              {createMutation.isPending
-                ? "Transmitting..."
-                : "Initialize Briefing"}
+              {createMutation.isPending ? "Submitting..." : "Submit Ticket"}
             </Button>
           </div>
         </form>

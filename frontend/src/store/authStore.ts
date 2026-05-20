@@ -19,6 +19,8 @@ export interface User {
     name: string;
     logo?: string;
     curriculum?: string;
+    schema_name?: string;
+    domain?: string;
   };
 }
 

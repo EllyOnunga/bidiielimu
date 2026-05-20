@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { disciplineService, type DisciplineIncident } from "../../api/services/disciplineService";
+import {
+  disciplineService,
+  type DisciplineIncident,
+} from "../../api/services/disciplineService";
 import { toast } from "react-hot-toast";
 
 interface IncidentsListProps {
@@ -8,7 +11,10 @@ interface IncidentsListProps {
   onOpenForm: () => void;
 }
 
-export const IncidentsList = ({ onOpenProfile, onOpenForm }: IncidentsListProps) => {
+export const IncidentsList = ({
+  onOpenProfile,
+  onOpenForm,
+}: IncidentsListProps) => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data, isLoading, error } = useQuery({
@@ -16,7 +22,9 @@ export const IncidentsList = ({ onOpenProfile, onOpenForm }: IncidentsListProps)
     queryFn: () => disciplineService.getIncidents({ search: searchTerm }),
   });
 
-  const incidents: DisciplineIncident[] = Array.isArray(data) ? data : data?.results || [];
+  const incidents: DisciplineIncident[] = Array.isArray(data)
+    ? data
+    : data?.results || [];
 
   useEffect(() => {
     if (error) {
@@ -27,9 +35,12 @@ export const IncidentsList = ({ onOpenProfile, onOpenForm }: IncidentsListProps)
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'SEVERE': return 'text-red-400';
-      case 'MAJOR': return 'text-orange-400';
-      default: return 'text-primary-400';
+      case "SEVERE":
+        return "text-red-400";
+      case "MAJOR":
+        return "text-orange-400";
+      default:
+        return "text-primary-400";
     }
   };
 
@@ -68,16 +79,22 @@ export const IncidentsList = ({ onOpenProfile, onOpenForm }: IncidentsListProps)
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-bold text-white truncate">{it.student_name}</span>
+                  <span className="font-bold text-white truncate">
+                    {it.student_name}
+                  </span>
                   <span className="text-[10px] bg-white/5 px-2 py-0.5 rounded-full text-white/40 font-medium">
                     {new Date(it.date).toLocaleDateString()}
                   </span>
                 </div>
-                <div className="text-sm text-white/50 truncate max-w-md">{it.summary}</div>
+                <div className="text-sm text-white/50 truncate max-w-md">
+                  {it.summary}
+                </div>
               </div>
 
               <div className="flex items-center gap-4 ml-4">
-                <span className={`text-[10px] font-black uppercase tracking-widest ${getSeverityColor(it.category)}`}>
+                <span
+                  className={`text-[10px] font-black uppercase tracking-widest ${getSeverityColor(it.category)}`}
+                >
                   {it.category}
                 </span>
                 <div className="h-4 w-[1px] bg-white/10 hidden md:block" />

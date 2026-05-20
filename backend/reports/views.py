@@ -11,6 +11,28 @@ class StudentReportViewSet(viewsets.ModelViewSet):
     queryset = StudentReport.objects.all()
     serializer_class = StudentReportSerializer
 
+    def get_queryset(self):
+        queryset = StudentReport.objects.all()
+        student_id = self.request.query_params.get("student")
+        exam_id = self.request.query_params.get("exam")
+        if student_id and student_id.isdigit():
+            queryset = queryset.filter(student_id=student_id)
+        if exam_id and exam_id.isdigit():
+            queryset = queryset.filter(exam_id=exam_id)
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        student_id = request.data.get("student")
+        exam_id = request.data.get("exam")
+        if student_id and exam_id:
+            existing = StudentReport.objects.filter(
+                student_id=student_id, exam_id=exam_id
+            ).first()
+            if existing:
+                serializer = self.get_serializer(existing)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+        return super().create(request, *args, **kwargs)
+
     @action(detail=True, methods=["post"])
     def generate_ai_draft(self, request, pk=None):
         try:

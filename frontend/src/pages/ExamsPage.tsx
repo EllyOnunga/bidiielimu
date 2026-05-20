@@ -28,6 +28,7 @@ import { Input } from "../components/ui/Input";
 import { Modal } from "../components/ui/Modal";
 import { ConfirmModal } from "../components/ui/ConfirmModal";
 import { Skeleton } from "../components/ui/Skeleton";
+import { Select } from "../components/ui/Select";
 import { motion, AnimatePresence } from "framer-motion";
 
 const ExamCard = ({
@@ -72,7 +73,7 @@ const ExamCard = ({
                     : "bg-amber-500/10 text-amber-400 border-amber-500/20"
                 }`}
               >
-                {is_published ? "Active" : "Protocol Draft"}
+                {is_published ? "Active" : "Draft"}
               </span>
               <span className="text-[9px] font-black text-primary-200/20 uppercase tracking-widest">
                 • {term.replace("_", " ")}
@@ -86,7 +87,7 @@ const ExamCard = ({
                 onRank?.();
               }}
               className="p-2.5 bg-primary-500/10 hover:bg-primary-600 hover:text-white text-primary-400 rounded-xl transition-all shadow-sm"
-              title="Compute Intelligence Rankings"
+              title="Calculate Class Rankings"
             >
               <Award className="w-4 h-4" />
             </button>
@@ -162,7 +163,7 @@ export const ExamsPage = () => {
   const createExamMutation = useMutation({
     mutationFn: examsService.createExam,
     onSuccess: () => {
-      toast.success("Examination protocol initialized");
+      toast.success("Exam successfully created");
       setIsModalOpen(false);
       setFormData({
         name: "",
@@ -176,30 +177,30 @@ export const ExamsPage = () => {
       queryClient.invalidateQueries({ queryKey: ["exams_analytics"] });
     },
     onError: (error: any) => {
-      toast.error(
-        error.response?.data?.detail || "Protocol initialization failed",
-      );
+      toast.error(error.response?.data?.detail || "Failed to create exam");
     },
   });
 
   const deleteExamMutation = useMutation({
     mutationFn: examsService.deleteExam,
     onSuccess: () => {
-      toast.success("Examination record purged");
+      toast.success("Exam deleted");
       queryClient.invalidateQueries({ queryKey: ["exams"] });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.detail || "Purge protocol failed");
+      toast.error(error.response?.data?.detail || "Failed to delete exam");
     },
   });
 
   const computeRanksMutation = useMutation({
     mutationFn: (id: number) => examsService.computeRanks(id),
     onSuccess: (data) => {
-      toast.success(data.detail || "Intelligence rankings updated");
+      toast.success(data.detail || "Class rankings successfully updated");
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.detail || "Ranking computation failed");
+      toast.error(
+        error.response?.data?.detail || "Failed to calculate rankings",
+      );
     },
   });
 
@@ -212,24 +213,23 @@ export const ExamsPage = () => {
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
         <div className="space-y-2">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary tracking-tight leading-none">
-            Assessment <span className="text-gradient">Matrix</span>
+            Exams & <span className="text-gradient">Assessments</span>
           </h1>
           <p className="text-muted text-xs sm:text-sm md:text-base font-medium max-w-xl">
-            Strategic evaluation frameworks and high-fidelity performance
-            analytics across all institutional levels.
+            Create, organize, and view academic exams and class rankings.
           </p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
           <Link to="/grading" className="flex-1 sm:flex-none">
             <Button variant="outline" className="w-full gap-2 h-12 text-[10px]">
-              <Layers className="w-4 h-4" /> Systems
+              <Layers className="w-4 h-4" /> Grading Systems
             </Button>
           </Link>
           <Button
             onClick={() => setIsModalOpen(true)}
             className="flex-1 sm:flex-none gap-2 h-12 text-[10px]"
           >
-            <Calendar className="w-4 h-4" /> Initialize Protocol
+            <Calendar className="w-4 h-4" /> Create New Exam
           </Button>
         </div>
       </div>
@@ -238,12 +238,12 @@ export const ExamsPage = () => {
         <div className="lg:col-span-2 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <h2 className="text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">
-              Operational Queue
+              Exam List
             </h2>
             <div className="relative w-full sm:w-72">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-200/20" />
               <Input
-                placeholder="Query assessments..."
+                placeholder="Search exams..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-12 h-12 text-xs bg-white/5 border-white/5 focus:bg-white/10"
@@ -276,7 +276,7 @@ export const ExamsPage = () => {
                 <div className="premium-card text-center py-24 flex flex-col items-center gap-4">
                   <ClipboardList className="w-12 h-12 text-primary-200/10" />
                   <p className="text-[10px] font-black uppercase tracking-widest text-dim">
-                    No active assessment protocols found.
+                    No exams found.
                   </p>
                 </div>
               )}
@@ -286,7 +286,7 @@ export const ExamsPage = () => {
 
         <div className="space-y-6">
           <h2 className="text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">
-            Intelligence Matrix
+            Performance Analytics
           </h2>
           <div className="premium-card !p-6 space-y-8">
             <div className="h-64 w-full">
@@ -364,7 +364,7 @@ export const ExamsPage = () => {
                 <div className="h-full flex flex-col items-center justify-center text-primary-200/10 border-2 border-dashed border-white/5 rounded-[32px]">
                   <Layers className="w-10 h-10 mb-4 opacity-10" />
                   <p className="text-[9px] font-black uppercase tracking-widest">
-                    Awaiting Transmissions
+                    No Data Available
                   </p>
                 </div>
               )}
@@ -374,7 +374,7 @@ export const ExamsPage = () => {
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-black text-dim uppercase tracking-widest">
-                    Average Proficiency
+                    Class Average Score
                   </span>
                   <span className="text-2xl font-black text-primary">
                     {chartData.length > 0
@@ -406,13 +406,13 @@ export const ExamsPage = () => {
                   <p className="text-[8px] font-black text-dim uppercase tracking-widest mb-1">
                     Rankings
                   </p>
-                  <p className="text-lg font-black text-primary">Verified</p>
+                  <p className="text-lg font-black text-primary">Calculated</p>
                 </div>
                 <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
                   <p className="text-[8px] font-black text-dim uppercase tracking-widest mb-1">
                     Status
                   </p>
-                  <p className="text-lg font-black text-emerald-400">Stable</p>
+                  <p className="text-lg font-black text-emerald-400">Ready</p>
                 </div>
               </div>
             </div>
@@ -423,7 +423,7 @@ export const ExamsPage = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Protocol Initialization"
+        title="Create New Exam"
         className="max-w-xl glass-morphic border-white/10 !rounded-[32px]"
       >
         <form
@@ -436,7 +436,7 @@ export const ExamsPage = () => {
           <div className="space-y-6">
             <div className="space-y-2">
               <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest pl-1">
-                Protocol Name
+                Exam Name
               </label>
               <Input
                 required
@@ -444,65 +444,55 @@ export const ExamsPage = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                placeholder="e.g. End of Phase 01 Evaluation"
+                placeholder="e.g. Term 1 End Exam"
                 className="h-12 text-sm"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">
-                  Academic Cycle
-                </label>
-                <select
-                  value={formData.term}
-                  onChange={(e) =>
-                    setFormData({ ...formData, term: e.target.value })
-                  }
-                  className="flex h-12 w-full rounded-xl border border-white/5 bg-white/5 px-4 text-sm text-white outline-none focus:border-primary-500 transition-all"
-                >
-                  <option value="TERM_1" className="bg-bg-color">
-                    Term 01
-                  </option>
-                  <option value="TERM_2" className="bg-bg-color">
-                    Term 02
-                  </option>
-                  <option value="TERM_3" className="bg-bg-color">
-                    Term 03
-                  </option>
-                </select>
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">
-                  Protocol Class
-                </label>
-                <select
-                  value={formData.exam_type}
-                  onChange={(e) =>
-                    setFormData({ ...formData, exam_type: e.target.value })
-                  }
-                  className="flex h-12 w-full rounded-xl border border-white/5 bg-white/5 px-4 text-sm text-white outline-none focus:border-primary-500 transition-all"
-                >
-                  <option value="CAT" className="bg-bg-color">
-                    CAT
-                  </option>
-                  <option value="MID_TERM" className="bg-bg-color">
-                    Mid-Term
-                  </option>
-                  <option value="END_TERM" className="bg-bg-color">
-                    End-Term
-                  </option>
-                  <option value="MOCK" className="bg-bg-color">
-                    Mock
-                  </option>
-                </select>
-              </div>
+              <Select
+                label="Term"
+                value={formData.term}
+                onChange={(e) =>
+                  setFormData({ ...formData, term: e.target.value })
+                }
+              >
+                <option value="TERM_1" className="bg-bg-color">
+                  Term 1
+                </option>
+                <option value="TERM_2" className="bg-bg-color">
+                  Term 2
+                </option>
+                <option value="TERM_3" className="bg-bg-color">
+                  Term 3
+                </option>
+              </Select>
+              <Select
+                label="Exam Type"
+                value={formData.exam_type}
+                onChange={(e) =>
+                  setFormData({ ...formData, exam_type: e.target.value })
+                }
+              >
+                <option value="CAT" className="bg-bg-color">
+                  CAT
+                </option>
+                <option value="MID_TERM" className="bg-bg-color">
+                  Mid-Term
+                </option>
+                <option value="END_TERM" className="bg-bg-color">
+                  End-Term
+                </option>
+                <option value="MOCK" className="bg-bg-color">
+                  Mock
+                </option>
+              </Select>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">
-                  Start Phase
+                  Start Date
                 </label>
                 <Input
                   required
@@ -516,7 +506,7 @@ export const ExamsPage = () => {
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">
-                  End Phase
+                  End Date
                 </label>
                 <Input
                   required
@@ -530,28 +520,23 @@ export const ExamsPage = () => {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-muted uppercase tracking-widest pl-1">
-                Grading System
-              </label>
-              <select
-                required
-                value={formData.grading_system}
-                onChange={(e) =>
-                  setFormData({ ...formData, grading_system: e.target.value })
-                }
-                className="flex h-12 w-full rounded-xl border border-white/5 bg-white/5 px-4 text-sm text-white outline-none focus:border-primary-500 transition-all"
-              >
-                <option value="" className="bg-bg-color">
-                  Select Matrix System...
+            <Select
+              label="Grading System"
+              required
+              value={formData.grading_system}
+              onChange={(e) =>
+                setFormData({ ...formData, grading_system: e.target.value })
+              }
+            >
+              <option value="" className="bg-bg-color">
+                Select Grading System...
+              </option>
+              {gradingSystems.map((gs: any) => (
+                <option key={gs.id} value={gs.id} className="bg-bg-color">
+                  {gs.name}
                 </option>
-                {gradingSystems.map((gs: any) => (
-                  <option key={gs.id} value={gs.id} className="bg-bg-color">
-                    {gs.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+              ))}
+            </Select>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 pt-4 pb-2 border-t border-white/5">
@@ -561,16 +546,14 @@ export const ExamsPage = () => {
               className="flex-1 h-12 text-[10px]"
               onClick={() => setIsModalOpen(false)}
             >
-              Discard
+              Cancel
             </Button>
             <Button
               type="submit"
               className="flex-[2] h-12 text-[10px]"
               disabled={createExamMutation.isPending}
             >
-              {createExamMutation.isPending
-                ? "Initializing..."
-                : "Commit Protocol"}
+              {createExamMutation.isPending ? "Creating..." : "Create Exam"}
             </Button>
           </div>
         </form>
@@ -583,8 +566,8 @@ export const ExamsPage = () => {
           if (examToDelete) deleteExamMutation.mutate(examToDelete.id);
           setExamToDelete(null);
         }}
-        title="Protocol Termination"
-        description={`Execute terminal purge of assessment record "${examToDelete?.name}"? All associated intelligence will be lost.`}
+        title="Delete Exam"
+        description={`Are you sure you want to permanently delete the exam "${examToDelete?.name}"? All associated grading data and student marks will be lost.`}
       />
     </motion.div>
   );

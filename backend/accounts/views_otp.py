@@ -104,6 +104,28 @@ class OTPVerifyLoginView(views.APIView):
 
         user = get_object_or_404(User, id=user_id)
 
+        # Multi-tenant URL restriction
+        tenant = getattr(request, "tenant", None)
+        if tenant:
+            if tenant.schema_name == "public":
+                # Only SUPER_ADMIN allowed on main URL
+                if not (user.is_superuser or user.role_name == "SUPER_ADMIN"):
+                    return Response(
+                        {
+                            "error": "Only Platform Super Admins can access the main platform dashboard. Please login via your school's specific URL."
+                        },
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+            else:
+                # Restricted to their own school URL (Super Admins can access any)
+                if user.school != tenant and not user.is_superuser:
+                    return Response(
+                        {
+                            "error": "You do not have permission to access this school's dashboard. Please login via your own school's URL."
+                        },
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
         if OTPService.verify_otp(user, otp):
             # Generate JWT tokens
             refresh = RefreshToken.for_user(user)

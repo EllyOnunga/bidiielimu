@@ -1,25 +1,31 @@
+import logging
 from datetime import datetime, timedelta
+
+logger = logging.getLogger(__name__)
+
+from django.db.models import Avg, Count, Q, Sum
+from django.db.models.functions import TruncMonth
+from django.utils import timezone
+from rest_framework import permissions, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from accounts.models import User
 from attendance.models import DailyAttendance
 from classes.models import Stream
 from config.caching import cache_response
-from config.tenant_security import (StrictTenantPermission,
-                                    TenantAwareViewSetMixin)
-from django.db.models import Avg, Count, Q, Sum
-from django.db.models.functions import TruncMonth
-from django.utils import timezone
+from config.tenant_security import StrictTenantPermission, TenantAwareViewSetMixin
 from exams.models import Mark
 from fees.models import FeePayment
-from rest_framework import permissions, status, viewsets
-from rest_framework.decorators import action
-from rest_framework.response import Response
 from students.models import Student
 from teachers.models import Teacher
 
 from .models import School, SchoolSetting, Subscription
-from .serializers import (SchoolSerializer, SchoolSettingSerializer,
-                          SubscriptionSerializer)
+from .serializers import (
+    SchoolSerializer,
+    SchoolSettingSerializer,
+    SubscriptionSerializer,
+)
 
 
 class SchoolViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
@@ -132,6 +138,7 @@ class SchoolViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
 
         # Library Stats (from InventoryItem with LIBRARY category)
         from django.db.models import F as DbF
+
         from inventory.models import InventoryItem
 
         library_qs = InventoryItem.objects.filter(category="LIBRARY")
@@ -162,9 +169,10 @@ class SchoolViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
     def _get_global_analytics(self):
         from datetime import datetime, timedelta
 
-        from attendance.models import DailyAttendance
         from django.db.models import Avg, Count, Q
         from django_tenants.utils import tenant_context
+
+        from attendance.models import DailyAttendance
         from exams.models import Mark
         from schools.models import School
         from students.models import Student
@@ -317,10 +325,12 @@ class SchoolViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
     def super_admin_stats(self, request):
         from django.db import connection
 
-        print(f"DEBUG: super_admin_stats called by {
-                request.user.email} (Role: {
-                request.user.role_name}) on schema: {
-                connection.schema_name}")
+        logger.debug(
+            "super_admin_stats called by user_id=%s role=%s schema=%s",
+            request.user.id,
+            request.user.role_name,
+            connection.schema_name,
+        )
         if request.user.role_name != "SUPER_ADMIN":
             return Response({"detail": "Permission denied."}, status=403)
 
@@ -383,12 +393,54 @@ class SchoolViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
             return Response(data)
 
         elif request.method == "PATCH":
+            school = request.user.school
+            if school:
+                school_name = request.data.get("school_name")
+                school_address = request.data.get("school_address")
+                school_email = request.data.get("school_email")
+                school_phone = request.data.get("school_phone")
+                school_logo = request.data.get("school_logo")
+
+                if school_name:
+                    school.name = school_name
+                if school_address:
+                    school.address = school_address
+                if school_email:
+                    school.contact_email = school_email
+                if school_phone:
+                    school.contact_phone = school_phone
+                if school_logo:
+                    if isinstance(school_logo, str) and school_logo.startswith(
+                        "data:image"
+                    ):
+                        import base64
+
+                        from django.core.files.base import ContentFile
+
+                        format, imgstr = school_logo.split(";base64,")
+                        ext = format.split("/")[-1]
+                        school.logo = ContentFile(
+                            base64.b64decode(imgstr), name=f"logo.{ext}"
+                        )
+                school.save()
+
             serializer = SchoolSettingSerializer(
                 settings_obj, data=request.data, partial=True
             )
             if serializer.is_valid():
                 serializer.save()
-                return Response(serializer.data)
+                data = serializer.data
+                if school:
+                    data.update(
+                        {
+                            "school_name": school.name,
+                            "school_address": school.address,
+                            "school_email": school.contact_email,
+                            "school_phone": school.contact_phone,
+                            "school_logo": school.logo.url if school.logo else None,
+                        }
+                    )
+                return Response(data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

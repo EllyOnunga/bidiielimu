@@ -1,18 +1,29 @@
-from config.tenant_security import (StrictTenantPermission,
-                                    TenantAwareViewSetMixin)
 from django.db import models
 from django.utils import timezone
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
+
+from config.tenant_security import StrictTenantPermission, TenantAwareViewSetMixin
 from teachers.models import Teacher
 
-from .models import (Assignment, LessonNote, NoteConfirmation, Quiz,
-                     QuizAttempt, Resource, Submission)
-from .serializers import (AssignmentSerializer, LessonNoteSerializer,
-                          QuizSerializer, ResourceSerializer,
-                          SubmissionSerializer)
+from .models import (
+    Assignment,
+    LessonNote,
+    NoteConfirmation,
+    Quiz,
+    QuizAttempt,
+    Resource,
+    Submission,
+)
+from .serializers import (
+    AssignmentSerializer,
+    LessonNoteSerializer,
+    QuizSerializer,
+    ResourceSerializer,
+    SubmissionSerializer,
+)
 
 
 class AssignmentViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
@@ -100,6 +111,17 @@ class AssignmentViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
             return Response(
                 {"detail": "You cannot submit to an assignment for a different class."},
                 status=status.HTTP_403_FORBIDDEN,
+            )
+
+        existing_sub = Submission.objects.filter(
+            assignment=assignment, student=student
+        ).first()
+        if existing_sub and existing_sub.grade is not None:
+            return Response(
+                {
+                    "detail": "This assignment has already been graded and cannot be resubmitted or modified."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         submission, created = Submission.objects.update_or_create(

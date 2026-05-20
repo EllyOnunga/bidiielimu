@@ -9,6 +9,10 @@ https://docs.djangoproject.com/en/6.0/howto/deployment/wsgi/
 
 import os
 
+from config.sentry import init_sentry
+
+# Initialize Sentry before Django starts
+init_sentry()
 from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")

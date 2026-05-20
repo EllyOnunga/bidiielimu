@@ -21,6 +21,7 @@ import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { Modal } from "../components/ui/Modal";
 import { ConfirmModal } from "../components/ui/ConfirmModal";
+import { Select } from "../components/ui/Select";
 import {
   Table,
   TableBody,
@@ -31,7 +32,6 @@ import {
 } from "../components/ui/Table";
 import { TableSkeleton } from "../components/ui/Skeleton";
 import { Tabs } from "../components/ui/Tabs";
-
 
 const StudentCard = ({
   student,
@@ -90,7 +90,7 @@ const StudentCard = ({
     <div className="grid grid-cols-2 gap-2">
       <div className="bg-white/5 p-2 rounded-lg">
         <p className="text-[8px] font-black text-dim uppercase tracking-widest mb-1">
-          Allocation
+          Class Stream
         </p>
         <p className="text-[10px] font-bold text-primary truncate">
           {student.grade_name || "Unassigned"}
@@ -228,19 +228,60 @@ export const StudentsPage = () => {
     select: (data) => (Array.isArray(data) ? data : data.results || []),
   });
 
+  const [importTaskId, setImportTaskId] = useState<string | null>(null);
+  const [importProgress, setImportProgress] = useState(0);
+  const [importStatus, setImportStatus] = useState<string | null>(null);
+  const [importStats, setImportStats] = useState({ success: 0, total: 0, current: 0 });
+  const [importErrors, setImportErrors] = useState<string[]>([]);
+
   const importStudentsMutation = useMutation({
     mutationFn: (file: File) => studentsService.importStudents(file),
     onSuccess: (data) => {
-      toast.success(data.detail || "Upload successful");
-      setIsBulkModalOpen(false);
-      setCsvFile(null);
-      queryClient.invalidateQueries({ queryKey: ["students"] });
+      setImportTaskId(data.task_id);
+      setImportStatus(data.status || "PENDING");
+      setImportProgress(0);
+      setImportStats({ success: 0, total: 0, current: 0 });
+      setImportErrors([]);
     },
     onError: (error: any) => {
-      const errs = error.response?.data?.errors;
-      toast.error(errs?.[0] || error.response?.data?.detail || "Import failed");
+      toast.error(error.response?.data?.detail || "Import failed to start");
     },
   });
+
+  useEffect(() => {
+    if (!importTaskId) return;
+
+    const intervalId = setInterval(async () => {
+      try {
+        const data = await studentsService.importStatus(importTaskId);
+        setImportStatus(data.status);
+        setImportStats({
+          success: data.success_count || 0,
+          total: data.total || 0,
+          current: data.current || 0,
+        });
+        setImportErrors(data.errors || []);
+
+        if (data.total > 0) {
+          setImportProgress(Math.min(100, Math.round((data.current / data.total) * 100)));
+        }
+
+        if (data.status === "SUCCESS") {
+          clearInterval(intervalId);
+          toast.success("Student import completed successfully!");
+          queryClient.invalidateQueries({ queryKey: ["students"] });
+        } else if (data.status === "FAILURE") {
+          clearInterval(intervalId);
+          toast.error("Student import failed.");
+        }
+      } catch (err: any) {
+        // Silently retry or fail gracefully
+      }
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [importTaskId, queryClient]);
+
 
   const resetForm = () => {
     setFormData({
@@ -339,16 +380,19 @@ export const StudentsPage = () => {
     importStudentsMutation.mutate(csvFile);
   };
 
-  const downloadTemplate = () => {
-    const csvContent =
-      "data:text/csv;charset=utf-8,admission_number,first_name,last_name,gender,date_of_birth,enrollment_date,grade_name,stream_name,curriculum,guardian_name,guardian_phone,guardian_email,guardian_relationship\nADM001,John,Doe,M,2010-05-15,2020-09-01,Grade 4,West,CBC,Jane Doe,+254700000000,jane@example.com,MOTHER";
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "students_import_template.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const downloadTemplate = async () => {
+    try {
+      const blob = await studentsService.getTemplate();
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "students_import_template.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      toast.error("Failed to download template.");
+    }
   };
 
   const tabs = [
@@ -393,21 +437,20 @@ export const StudentsPage = () => {
                 className="h-12 text-sm"
               />
             </div>
-            <div className="space-y-1">
-              <label className="text-[9px] font-black text-primary-200/20 uppercase tracking-widest pl-1">
-                Gender
-              </label>
-              <select
-                value={formData.gender}
-                onChange={(e) =>
-                  setFormData({ ...formData, gender: e.target.value as any })
-                }
-                className="flex h-12 w-full rounded-xl border border-white/5 bg-white/5 px-4 text-sm text-white outline-none focus:border-primary-500/50 transition-all"
-              >
-                <option value="M">Male</option>
-                <option value="F">Female</option>
-              </select>
-            </div>
+            <Select
+              label="Gender"
+              value={formData.gender}
+              onChange={(e) =>
+                setFormData({ ...formData, gender: e.target.value as any })
+              }
+            >
+              <option value="M" className="bg-bg-color">
+                Male
+              </option>
+              <option value="F" className="bg-bg-color">
+                Female
+              </option>
+            </Select>
           </div>
         </div>
       ),
@@ -427,38 +470,35 @@ export const StudentsPage = () => {
             }
             className="h-12 text-sm"
           />
-          <div className="space-y-1">
-            <label className="text-[9px] font-black text-primary-200/20 uppercase tracking-widest pl-1">
-              Target Stream
-            </label>
-            <select
-              required
-              value={formData.stream}
-              onChange={(e) =>
-                setFormData({ ...formData, stream: e.target.value })
-              }
-              className="flex h-12 w-full rounded-xl border border-white/5 bg-white/5 px-4 text-sm text-white outline-none focus:border-primary-500/50 transition-all"
-            >
-              <option value="">Select Target Stream...</option>
-              {gradesData.map((grade: any) => (
-                <optgroup
-                  key={grade.id}
-                  label={grade.name}
-                  className="bg-bg-color"
-                >
-                  {grade.streams.map((stream: any) => (
-                    <option
-                      key={stream.id}
-                      value={stream.id}
-                      className="bg-bg-color"
-                    >
-                      {grade.name} {stream.name}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
-          </div>
+          <Select
+            label="Target Stream"
+            required
+            value={formData.stream}
+            onChange={(e) =>
+              setFormData({ ...formData, stream: e.target.value })
+            }
+          >
+            <option value="" className="bg-bg-color">
+              Select Target Stream...
+            </option>
+            {gradesData.map((grade: any) => (
+              <optgroup
+                key={grade.id}
+                label={grade.name}
+                className="bg-bg-color"
+              >
+                {grade.streams.map((stream: any) => (
+                  <option
+                    key={stream.id}
+                    value={stream.id.toString()}
+                    className="bg-bg-color"
+                  >
+                    {grade.name} {stream.name}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </Select>
           <div className="space-y-1">
             <label className="text-[9px] font-black text-primary-200/20 uppercase tracking-widest pl-1">
               Enrollment Date
@@ -492,7 +532,8 @@ export const StudentsPage = () => {
               }
               className="h-12 text-sm"
             />
-            <select
+            <Select
+              label="Relationship"
               value={formData.guardian_relationship}
               onChange={(e) =>
                 setFormData({
@@ -500,7 +541,6 @@ export const StudentsPage = () => {
                   guardian_relationship: e.target.value as any,
                 })
               }
-              className="flex h-12 w-full rounded-xl border border-white/5 bg-white/5 px-4 text-sm text-white outline-none focus:border-primary-500/50 transition-all"
             >
               <option value="FATHER" className="bg-bg-color">
                 Father
@@ -511,7 +551,7 @@ export const StudentsPage = () => {
               <option value="LEGAL_GUARDIAN" className="bg-bg-color">
                 Guardian
               </option>
-            </select>
+            </Select>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <Input
@@ -581,11 +621,11 @@ export const StudentsPage = () => {
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
         <div className="space-y-2">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary tracking-tight leading-none">
-            Student <span className="text-gradient">Registry</span>
+            Student <span className="text-gradient">Directory</span>
           </h1>
           <p className="text-muted text-xs sm:text-sm md:text-base font-medium max-w-xl">
-            Comprehensive lifecycle management and digital records for all
-            institution assets.
+            A complete list of all students registered in our school, with their
+            class and guardian details.
           </p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
@@ -611,7 +651,7 @@ export const StudentsPage = () => {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-200/20" />
             <Input
               type="text"
-              placeholder="Query admission, name, or parent..."
+              placeholder="Search by admission number, name, or parent..."
               className="pl-12 bg-white/5 border-white/5 focus:bg-white/10 h-12"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -654,7 +694,7 @@ export const StudentsPage = () => {
             ))
           ) : studentsData.length === 0 ? (
             <div className="premium-card text-center py-20 italic text-[10px] font-black text-dim uppercase tracking-widest">
-              No records detected in range.
+              No student records found.
             </div>
           ) : (
             studentsData.map((student: Student) => (
@@ -685,13 +725,13 @@ export const StudentsPage = () => {
                     className="w-4 h-4 rounded border-white/10 bg-white/5 text-primary-600 focus:ring-primary-500 cursor-pointer"
                   />
                 </TableHead>
-                <TableHead>Identifier</TableHead>
+                <TableHead>Admission No.</TableHead>
                 <TableHead>Full Name</TableHead>
-                <TableHead>Allocation</TableHead>
-                <TableHead>Demographics</TableHead>
-                <TableHead>Primary Contact</TableHead>
+                <TableHead>Class Stream</TableHead>
+                <TableHead>Gender</TableHead>
+                <TableHead>Parent / Guardian</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="text-right">Ops</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -776,7 +816,7 @@ export const StudentsPage = () => {
           setIsModalOpen(false);
           setEditingStudent(null);
         }}
-        title={editingStudent ? "Operational Modification" : "Record Admission"}
+        title={editingStudent ? "Edit Student Details" : "Register New Student"}
         className="max-w-2xl !rounded-[32px] glass-morphic"
       >
         <div className="mt-4">
@@ -789,7 +829,7 @@ export const StudentsPage = () => {
               className="flex-1 text-[10px] h-12"
               onClick={() => setIsModalOpen(false)}
             >
-              Discard
+              Cancel
             </Button>
             <Button
               type="button"
@@ -802,10 +842,10 @@ export const StudentsPage = () => {
             >
               {createStudentMutation.isPending ||
               updateStudentMutation.isPending
-                ? "Syncing..."
+                ? "Saving..."
                 : editingStudent
-                  ? "Commit Changes"
-                  : "Execute Admission"}
+                  ? "Save Changes"
+                  : "Register Student"}
             </Button>
           </div>
         </div>
@@ -813,87 +853,168 @@ export const StudentsPage = () => {
 
       <Modal
         isOpen={isBulkModalOpen}
-        onClose={() => setIsBulkModalOpen(false)}
-        title="Mass Ingestion Protocol"
+        onClose={() => {
+          if (importStatus !== "PENDING" && importStatus !== "PROGRESS") {
+            setIsBulkModalOpen(false);
+            setImportTaskId(null);
+            setCsvFile(null);
+          }
+        }}
+        title="Upload Student List"
         className="max-w-lg glass-morphic border-white/10 !rounded-[32px]"
       >
-        <div className="mt-6 space-y-6">
-          <div
-            className={`border-2 border-dashed rounded-3xl p-10 text-center transition-all cursor-pointer ${
-              csvFile
-                ? "border-primary-500 bg-primary-500/5"
-                : "border-white/10 bg-white/5 hover:border-white/20"
-            }`}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <input
-              type="file"
-              accept=".csv"
-              className="hidden"
-              ref={fileInputRef}
-              onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
-            />
-            <div className="flex flex-col items-center gap-4">
-              <UploadCloud
-                className={`w-12 h-12 ${csvFile ? "text-primary-500" : "text-primary-200/20"}`}
-              />
-              {csvFile ? (
-                <div>
-                  <p className="text-xs font-black text-white uppercase">
-                    {csvFile.name}
-                  </p>
-                  <p className="text-[9px] font-bold text-primary-200/40 uppercase tracking-widest mt-1">
-                    {(csvFile.size / 1024).toFixed(1)} KB Ready
-                  </p>
+        {importTaskId ? (
+          <div className="mt-6 space-y-6">
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-xs font-black uppercase tracking-widest text-primary-200">
+                <span>
+                  {importStatus === "SUCCESS"
+                    ? "Import Finished"
+                    : importStatus === "FAILURE"
+                      ? "Import Failed"
+                      : "Processing CSV..."}
+                </span>
+                <span className="font-mono text-primary-400">{importProgress}%</span>
+              </div>
+              <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden relative border border-white/5">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${importProgress}%` }}
+                  className="absolute top-0 left-0 h-full bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full"
+                  transition={{ duration: 0.3 }}
+                />
+              </div>
+              <div className="text-[9px] text-dim font-bold uppercase tracking-widest text-right mt-1.5">
+                Processed {importStats.current} of {importStats.total} rows
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-2xl text-center backdrop-blur-sm">
+                <span className="text-emerald-400 text-base font-black uppercase block">{importStats.success}</span>
+                <span className="text-[8px] text-primary-200/40 uppercase tracking-widest font-black mt-1.5 block">Imported</span>
+              </div>
+              <div className="bg-rose-500/5 border border-rose-500/10 p-4 rounded-2xl text-center backdrop-blur-sm">
+                <span className="text-rose-400 text-base font-black uppercase block">{importErrors.length}</span>
+                <span className="text-[8px] text-primary-200/40 uppercase tracking-widest font-black mt-1.5 block">Errors</span>
+              </div>
+            </div>
+
+            {importErrors.length > 0 && (
+              <div className="space-y-2">
+                <span className="text-[9px] font-black text-dim uppercase tracking-widest pl-1 block">Detailed Error Log</span>
+                <div className="max-h-40 overflow-y-auto bg-white/5 rounded-2xl p-4 border border-white/5 space-y-2 font-mono text-[9px] text-rose-300 backdrop-blur-sm">
+                  {importErrors.map((err, i) => (
+                    <div key={i} className="flex gap-2">
+                      <span className="text-rose-500 select-none font-bold">•</span>
+                      <span>{err}</span>
+                    </div>
+                  ))}
                 </div>
+              </div>
+            )}
+
+            <div className="flex gap-3 pt-2 pb-2">
+              {importStatus === "SUCCESS" || importStatus === "FAILURE" ? (
+                <Button
+                  onClick={() => {
+                    setIsBulkModalOpen(false);
+                    setImportTaskId(null);
+                    setCsvFile(null);
+                  }}
+                  className="w-full text-[10px] h-12"
+                >
+                  Close & Refresh
+                </Button>
               ) : (
-                <div>
-                  <p className="text-xs font-black text-white uppercase">
-                    Select Protocol File
-                  </p>
-                  <p className="text-[9px] font-bold text-primary-200/20 uppercase tracking-widest mt-1">
-                    CSV Format Required
-                  </p>
+                <div className="text-center w-full text-[10px] font-black uppercase text-dim tracking-widest py-3 animate-pulse">
+                  Celery background processor active...
                 </div>
               )}
             </div>
           </div>
+        ) : (
+          <div className="mt-6 space-y-6">
+            <div
+              className={`border-2 border-dashed rounded-3xl p-10 text-center transition-all cursor-pointer ${
+                csvFile
+                  ? "border-primary-500 bg-primary-500/5"
+                  : "border-white/10 bg-white/5 hover:border-white/20"
+              }`}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <input
+                type="file"
+                accept=".csv"
+                className="hidden"
+                ref={fileInputRef}
+                onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
+              />
+              <div className="flex flex-col items-center gap-4">
+                <UploadCloud
+                  className={`w-12 h-12 ${csvFile ? "text-primary-500" : "text-primary-200/20"}`}
+                />
+                {csvFile ? (
+                  <div>
+                    <p className="text-xs font-black text-white uppercase">
+                      {csvFile.name}
+                    </p>
+                    <p className="text-[9px] font-bold text-primary-200/40 uppercase tracking-widest mt-1">
+                      {(csvFile.size / 1024).toFixed(1)} KB Ready
+                    </p>
+                  </div>
+                ) : (
+                  <div>
+                    <p className="text-xs font-black text-white uppercase">
+                      Select CSV File
+                    </p>
+                    <p className="text-[9px] font-bold text-primary-200/20 uppercase tracking-widest mt-1">
+                      CSV Format Required
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
 
-          <div className="p-4 rounded-2xl bg-white/5 border border-white/5 flex items-start gap-4">
-            <div className="space-y-1.5 flex-1">
-              <p className="text-xs font-black text-white uppercase">
-                Template Missing?
-              </p>
-              <p className="text-[10px] font-medium text-primary-200/40 leading-relaxed">
-                Download the structured protocol template to ensure
-                high-fidelity ingestion.
-              </p>
-              <button
-                onClick={downloadTemplate}
-                className="text-[10px] font-black text-primary-400 hover:text-primary-300 mt-2 uppercase tracking-widest transition-all"
+            <div className="p-4 rounded-2xl bg-white/5 border border-white/5 flex items-start gap-4">
+              <div className="space-y-1.5 flex-1">
+                <p className="text-xs font-black text-white uppercase">
+                  Template Missing?
+                </p>
+                <p className="text-[10px] font-medium text-primary-200/40 leading-relaxed">
+                  Download the structured CSV template to ensure everything
+                  matches correctly.
+                </p>
+                <button
+                  type="button"
+                  onClick={downloadTemplate}
+                  className="text-[10px] font-black text-primary-400 hover:text-primary-300 mt-2 uppercase tracking-widest transition-all"
+                >
+                  Download Template →
+                </button>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 pt-2 pb-2">
+              <Button
+                variant="ghost"
+                className="flex-1 text-[10px] h-11"
+                onClick={() => setIsBulkModalOpen(false)}
               >
-                Download Protocol →
-              </button>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleBulkUpload}
+                disabled={!csvFile || importStudentsMutation.isPending}
+                className="flex-[2] text-[10px] h-11"
+              >
+                {importStudentsMutation.isPending
+                  ? "Uploading..."
+                  : "Upload List"}
+              </Button>
             </div>
           </div>
-
-          <div className="flex flex-col sm:flex-row gap-3 pt-2 pb-2">
-            <Button
-              variant="ghost"
-              className="flex-1 text-[10px] h-11"
-              onClick={() => setIsBulkModalOpen(false)}
-            >
-              Abort
-            </Button>
-            <Button
-              onClick={handleBulkUpload}
-              disabled={!csvFile || importStudentsMutation.isPending}
-              className="flex-[2] text-[10px] h-11"
-            >
-              {importStudentsMutation.isPending ? "Ingesting..." : "Execute Protocol"}
-            </Button>
-          </div>
-        </div>
+        )}
       </Modal>
 
       <ConfirmModal
@@ -902,8 +1023,8 @@ export const StudentsPage = () => {
         onConfirm={() => {
           if (studentToDelete) deleteStudentMutation.mutate(studentToDelete);
         }}
-        title="Data Purge"
-        description="Permanently terminate this student's records from the operational intelligence database."
+        title="Delete Student"
+        description="Are you sure you want to permanently delete this student's records? This action cannot be undone."
       />
 
       <ConfirmModal
@@ -914,9 +1035,9 @@ export const StudentsPage = () => {
             .promise(
               Promise.all(selectedIds.map((id) => studentsService.delete(id))),
               {
-                loading: "Mass purge executing...",
-                success: "Records terminated",
-                error: "Purge protocol failed",
+                loading: "Deleting selected students...",
+                success: "Students deleted",
+                error: "Failed to delete students",
               },
             )
             .then(() => {
@@ -924,8 +1045,8 @@ export const StudentsPage = () => {
               queryClient.invalidateQueries({ queryKey: ["students"] });
             });
         }}
-        title="Mass Termination"
-        description={`Execute permanent purge of ${selectedIds.length} student records? This protocol is irreversible.`}
+        title="Delete Multiple Students"
+        description={`Are you sure you want to permanently delete these ${selectedIds.length} students? This action cannot be undone.`}
       />
     </motion.div>
   );

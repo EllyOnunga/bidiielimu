@@ -77,4 +77,18 @@ export const studentsService = {
     });
     return response.data;
   },
+
+  importStatus: async (taskId: string) => {
+    const response = await client.get(`students/import/status/${taskId}/`);
+    return response.data;
+  },
+
+  getTemplate: async () => {
+    const response = await client.get("students/import/template/", {
+      responseType: "blob",
+    });
+    return response.data;
+  },
 };
+
+

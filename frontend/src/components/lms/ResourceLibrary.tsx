@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { useAuthStore } from "../../store/authStore";
 import { Button } from "../ui/Button";
 import { Modal } from "../ui/Modal";
+import { Select } from "../ui/Select";
 import { Plus, Loader2 } from "lucide-react";
 import { classesService } from "../../api/services/classesService";
 import { useQuery } from "@tanstack/react-query";
@@ -254,8 +255,8 @@ export const ResourceLibrary = () => {
       <Modal
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
-        title="Intelligence Depository Integration"
-        description="Ingest new knowledge resources into the school's digital library."
+        title="Add Study Resource"
+        description="Upload new study materials, books, or video lectures for students."
         className="max-w-md glass border-white/10"
       >
         <form onSubmit={handleUpload} className="space-y-6 mt-6">
@@ -271,57 +272,49 @@ export const ResourceLibrary = () => {
                 setUploadData({ ...uploadData, title: e.target.value })
               }
               className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-primary text-sm outline-none focus:border-primary-500"
-              placeholder="e.g. Q3 Physics Seminar Notes"
+              placeholder="e.g. Physics Revision Notes"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">
-                Category
-              </label>
-              <select
-                value={uploadData.category}
-                onChange={(e) =>
-                  setUploadData({
-                    ...uploadData,
-                    category: e.target.value as any,
-                  })
-                }
-                className="w-full h-12 bg-slate-900 border border-white/10 rounded-xl px-3 text-white text-sm outline-none focus:border-primary-500"
-              >
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">
-                Domain (Subject)
-              </label>
-              <select
-                required
-                value={uploadData.subject}
-                onChange={(e) =>
-                  setUploadData({ ...uploadData, subject: e.target.value })
-                }
-                className="w-full h-12 bg-slate-900 border border-white/10 rounded-xl px-3 text-white text-sm outline-none focus:border-primary-500"
-              >
-                <option value="">Select Domain...</option>
-                {subjects.map((s: any) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <Select
+              label="Category"
+              value={uploadData.category}
+              onChange={(e) =>
+                setUploadData({
+                  ...uploadData,
+                  category: e.target.value as any,
+                })
+              }
+            >
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id} className="bg-bg-color">
+                  {cat.label}
+                </option>
+              ))}
+            </Select>
+            <Select
+              label="Subject"
+              required
+              value={uploadData.subject}
+              onChange={(e) =>
+                setUploadData({ ...uploadData, subject: e.target.value })
+              }
+            >
+              <option value="" className="bg-bg-color">
+                Select Subject...
+              </option>
+              {subjects.map((s: any) => (
+                <option key={s.id} value={s.id} className="bg-bg-color">
+                  {s.name}
+                </option>
+              ))}
+            </Select>
           </div>
 
           <div className="space-y-2">
             <label className="text-[10px] font-black text-muted uppercase tracking-widest">
-              Payload File
+              Resource File
             </label>
             <input
               required
@@ -343,7 +336,7 @@ export const ResourceLibrary = () => {
               className="flex-1 h-12 bg-white/5 border-white/5 text-primary-200/50 rounded-2xl font-black uppercase tracking-widest text-xs"
               onClick={() => setIsUploadModalOpen(false)}
             >
-              Abort
+              Cancel
             </Button>
             <Button
               type="submit"
@@ -353,7 +346,7 @@ export const ResourceLibrary = () => {
               {isUploading ? (
                 <Loader2 className="w-5 h-5 animate-spin mx-auto" />
               ) : (
-                "Execute Ingestion"
+                "Upload Material"
               )}
             </Button>
           </div>

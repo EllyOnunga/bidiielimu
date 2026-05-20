@@ -1,9 +1,17 @@
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
+
 from teachers.models import Teacher
 
-from .models import (Assignment, LessonNote, Question, Quiz, QuizAttempt,
-                     Resource, Submission)
+from .models import (
+    Assignment,
+    LessonNote,
+    Question,
+    Quiz,
+    QuizAttempt,
+    Resource,
+    Submission,
+)
 
 
 class ResourceSerializer(serializers.ModelSerializer):
@@ -56,6 +64,8 @@ class AssignmentSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
     student_grade = serializers.SerializerMethodField()
     student_feedback = serializers.SerializerMethodField()
+    student_text_content = serializers.SerializerMethodField()
+    student_file_url = serializers.SerializerMethodField()
     teacher = serializers.PrimaryKeyRelatedField(
         queryset=Teacher.objects.all(), required=False, allow_null=True
     )
@@ -79,9 +89,43 @@ class AssignmentSerializer(serializers.ModelSerializer):
             "status",
             "student_grade",
             "student_feedback",
+            "student_text_content",
+            "student_file_url",
             "created_at",
         ]
         read_only_fields = ["created_at"]
+
+    def get_student_text_content(self, obj):
+        try:
+            request = self.context.get("request")
+            if (
+                request
+                and request.user.is_authenticated
+                and request.user.role_name == "STUDENT"
+            ):
+                student = getattr(request.user, "student_profile", None)
+                if student:
+                    submission = obj.submissions.filter(student=student).first()
+                    return submission.text_content if submission else ""
+        except BaseException:
+            return ""
+        return ""
+
+    def get_student_file_url(self, obj):
+        try:
+            request = self.context.get("request")
+            if (
+                request
+                and request.user.is_authenticated
+                and request.user.role_name == "STUDENT"
+            ):
+                student = getattr(request.user, "student_profile", None)
+                if student:
+                    submission = obj.submissions.filter(student=student).first()
+                    return submission.file.url if submission and submission.file else ""
+        except BaseException:
+            return ""
+        return ""
 
     def get_student_grade(self, obj):
         try:
@@ -98,25 +142,6 @@ class AssignmentSerializer(serializers.ModelSerializer):
         except BaseException:
             return None
         return None
-
-
-# New serializers for scalable LMS features
-class StudentProgressSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = "lms.StudentProgress"
-        fields = "__all__"
-
-
-class VideoWatchTimeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = "lms.VideoWatchTime"
-        fields = "__all__"
-
-
-class DiscussionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = "lms.Discussion"
-        fields = "__all__"
 
     def get_student_feedback(self, obj):
         try:
@@ -181,6 +206,25 @@ class DiscussionSerializer(serializers.ModelSerializer):
             # Fallback to pending if anything goes wrong during status check
             return "pending"
         return "pending"
+
+
+# New serializers for scalable LMS features
+class StudentProgressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = "lms.StudentProgress"
+        fields = "__all__"
+
+
+class VideoWatchTimeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = "lms.VideoWatchTime"
+        fields = "__all__"
+
+
+class DiscussionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = "lms.Discussion"
+        fields = "__all__"
 
 
 class LessonNoteSerializer(serializers.ModelSerializer):

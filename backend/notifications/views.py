@@ -3,8 +3,12 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from .models import Notice, Notification, PTMMeeting, SchoolEvent
-from .serializers import (NoticeSerializer, NotificationSerializer,
-                          PTMMeetingSerializer, SchoolEventSerializer)
+from .serializers import (
+    NoticeSerializer,
+    NotificationSerializer,
+    PTMMeetingSerializer,
+    SchoolEventSerializer,
+)
 from .services_sms import SMSService
 
 
@@ -26,6 +30,11 @@ class NotificationViewSet(viewsets.ModelViewSet):
     def mark_all_as_read(self, request):
         self.get_queryset().filter(is_read=False).update(is_read=True)
         return Response({"status": "all notifications marked as read"})
+
+    @action(detail=False, methods=["post"])
+    def clear_all(self, request):
+        self.get_queryset().delete()
+        return Response({"status": "all notifications cleared"})
 
     @action(detail=False, methods=["post"])
     def bulk_email(self, request):

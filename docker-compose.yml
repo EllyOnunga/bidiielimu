@@ -74,6 +74,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      disable: true
 
   celery-beat:
     build: ./backend
@@ -97,6 +99,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      disable: true
 
   frontend:
     build:

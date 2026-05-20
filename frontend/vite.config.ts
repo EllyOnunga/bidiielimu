@@ -23,6 +23,44 @@ export default defineConfig({
         chunkFileNames: "assets/[name]-[hash].js",
         entryFileNames: "assets/[name]-[hash].js",
         assetFileNames: "assets/[name]-[hash].[ext]",
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            if (id.includes("recharts") || id.includes("d3")) {
+              return "vendor-charts";
+            }
+            if (id.includes("lucide-react")) {
+              return "vendor-icons";
+            }
+            if (id.includes("html2canvas")) {
+              return "vendor-html2canvas";
+            }
+            if (id.includes("jspdf")) {
+              return "vendor-jspdf";
+            }
+            if (id.includes("@dnd-kit")) {
+              return "vendor-dnd";
+            }
+            if (id.includes("framer-motion")) {
+              return "vendor-motion";
+            }
+            if (id.includes("@capacitor") || id.includes("@capgo")) {
+              return "vendor-capacitor";
+            }
+            if (id.includes("@tanstack")) {
+              return "vendor-query";
+            }
+            if (
+              id.includes("react-router-dom") ||
+              id.includes("react-router")
+            ) {
+              return "vendor-router";
+            }
+            if (id.includes("react") || id.includes("react-dom")) {
+              return "vendor-react-core";
+            }
+            return "vendor-misc";
+          }
+        },
       },
     },
     // Performance optimizations

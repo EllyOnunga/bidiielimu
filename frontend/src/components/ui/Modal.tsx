@@ -22,10 +22,10 @@ export function Modal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-md p-0 sm:p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
       <div
         className={cn(
-          "glass w-full max-w-lg rounded-t-[28px] rounded-b-none sm:rounded-[32px] p-5 sm:p-6 md:p-8 relative animate-in fade-in slide-in-from-bottom-4 sm:zoom-in-95 duration-300 max-h-[92vh] sm:max-h-[90vh] overflow-y-auto custom-scrollbar",
+          "glass w-full max-w-lg rounded-[28px] sm:rounded-[32px] p-5 sm:p-6 md:p-8 relative animate-in fade-in zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto custom-scrollbar",
           className,
         )}
       >

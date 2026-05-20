@@ -1,5 +1,6 @@
-from attendance.models import DailyAttendance
 from django.db.models import Avg
+
+from attendance.models import DailyAttendance
 from exams.models import Mark
 
 from .models import PredictiveRisk

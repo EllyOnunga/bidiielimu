@@ -2,6 +2,7 @@ import logging
 
 from celery import shared_task
 from django_tenants.utils import tenant_context
+
 from schools.models import School
 from students.models import Student
 

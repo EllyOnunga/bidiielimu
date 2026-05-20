@@ -54,6 +54,17 @@ class ReportCardService:
         ranking = ExamRanking.objects.filter(
             student_id=student_id, exam_id=exam_id
         ).first()
+        if not ranking:
+            try:
+                from exams.services_ranking import RankingService
+
+                RankingService.compute_exam_ranks(exam_id)
+                ranking = ExamRanking.objects.filter(
+                    student_id=student_id, exam_id=exam_id
+                ).first()
+            except Exception:
+                pass
+
         ranking_data = {
             "total_marks": float(ranking.total_marks) if ranking else 0,
             "mean_score": float(ranking.mean_score) if ranking else 0,

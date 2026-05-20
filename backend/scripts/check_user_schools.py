@@ -1,8 +1,9 @@
 import os
 
 import django
-from accounts.models import User
 from django.db import connection
+
+from accounts.models import User
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()

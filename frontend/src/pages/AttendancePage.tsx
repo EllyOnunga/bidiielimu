@@ -14,6 +14,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { Button } from "../components/ui/Button";
+import { Select } from "../components/ui/Select";
 import { Input } from "../components/ui/Input";
 import {
   Table,
@@ -43,14 +44,19 @@ export const AttendancePage = () => {
     new Date().toISOString().split("T")[0],
   );
   const [selectedStream, setSelectedStream] = useState("");
-  const [localAttendance, setLocalAttendance] = useState<Record<number, AttendanceStatus>>({});
+  const [localAttendance, setLocalAttendance] = useState<
+    Record<number, AttendanceStatus>
+  >({});
   const [search, setSearch] = useState("");
 
   const { data: gradesData = [] } = useQuery({
     queryKey: ["grades"],
     queryFn: () => classesService.getGrades(),
   });
-  const grades = useMemo(() => Array.isArray(gradesData) ? gradesData : gradesData.results || [], [gradesData]);
+  const grades = useMemo(
+    () => (Array.isArray(gradesData) ? gradesData : gradesData.results || []),
+    [gradesData],
+  );
 
   const { data: attendanceRaw = [], isLoading: loadingAttendance } = useQuery({
     queryKey: ["attendance", selectedDate, selectedStream],
@@ -65,12 +71,17 @@ export const AttendancePage = () => {
   });
 
   const students = useMemo(() => {
-    const sList = Array.isArray(studentsRaw) ? studentsRaw : studentsRaw.results || [];
-    const aList = Array.isArray(attendanceRaw) ? attendanceRaw : attendanceRaw.results || [];
+    const sList = Array.isArray(studentsRaw)
+      ? studentsRaw
+      : studentsRaw.results || [];
+    const aList = Array.isArray(attendanceRaw)
+      ? attendanceRaw
+      : attendanceRaw.results || [];
 
     return sList.map((s: any) => {
       const record = aList.find((a: any) => a.student === s.id);
-      const status = localAttendance[s.id] || (record ? record.status : "PRESENT");
+      const status =
+        localAttendance[s.id] || (record ? record.status : "PRESENT");
       return {
         id: s.id,
         name: `${s.first_name} ${s.last_name}`,
@@ -95,13 +106,15 @@ export const AttendancePage = () => {
   const bulkMarkMutation = useMutation({
     mutationFn: (data: any) => attendanceService.bulkMark(data),
     onSuccess: () => {
-      toast.success("Attendance matrix synchronized");
-      queryClient.invalidateQueries({ queryKey: ["attendance", selectedDate, selectedStream] });
+      toast.success("Attendance successfully saved");
+      queryClient.invalidateQueries({
+        queryKey: ["attendance", selectedDate, selectedStream],
+      });
       setLocalAttendance({});
     },
     onError: () => {
-      toast.error("Telemetry synchronization failed");
-    }
+      toast.error("Failed to save attendance");
+    },
   });
 
   const handleSave = () => {
@@ -131,11 +144,10 @@ export const AttendancePage = () => {
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
         <div className="space-y-2">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary tracking-tight leading-none">
-            Attendance <span className="text-gradient">Protocol</span>
+            Student <span className="text-gradient">Attendance</span>
           </h1>
           <p className="text-muted text-xs sm:text-sm md:text-base font-medium max-w-xl">
-            Real-time institutional grid tracking and daily student presence
-            synchronization.
+            Mark and track daily attendance for your school classes.
           </p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
@@ -144,7 +156,7 @@ export const AttendancePage = () => {
             className="flex-1 lg:flex-none h-14 px-8 rounded-2xl text-emerald-400 hover:bg-emerald-500/10"
             onClick={() => markAll("PRESENT")}
           >
-            Mark All Optimal
+            Mark All Present
           </Button>
           <Button
             onClick={handleSave}
@@ -152,7 +164,7 @@ export const AttendancePage = () => {
             className="flex-1 lg:flex-none h-14 px-8 rounded-2xl gap-2"
           >
             <ShieldCheck className="w-5 h-5" />
-            {saving ? "Synchronizing..." : "Commit Matrix"}
+            {saving ? "Saving..." : "Save Attendance"}
           </Button>
         </div>
       </div>
@@ -160,7 +172,7 @@ export const AttendancePage = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="premium-card p-6 space-y-4">
           <label className="text-[10px] font-black text-muted uppercase tracking-[0.3em] pl-1">
-            Operational Cycle (Date)
+            Date
           </label>
           <div className="relative">
             <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-400" />
@@ -174,16 +186,13 @@ export const AttendancePage = () => {
         </div>
 
         <div className="premium-card p-6 space-y-4">
-          <label className="text-[10px] font-black text-muted uppercase tracking-[0.3em] pl-1">
-            Deployment Unit (Stream)
-          </label>
-          <select
+          <Select
+            label="Select Class Stream"
             value={selectedStream}
             onChange={(e) => setSelectedStream(e.target.value)}
-            className="w-full h-14 bg-white/5 border border-white/5 rounded-xl px-4 text-primary text-sm font-black outline-none focus:border-primary-500 transition-all appearance-none"
           >
             <option value="" className="bg-bg-color">
-              Select Unit Identity...
+              Select Stream...
             </option>
             {grades.map((g: any) => (
               <optgroup
@@ -198,17 +207,17 @@ export const AttendancePage = () => {
                 ))}
               </optgroup>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div className="premium-card p-6 space-y-4 sm:col-span-2 lg:col-span-1">
           <label className="text-[10px] font-black text-muted uppercase tracking-[0.3em] pl-1">
-            Node Query (Search)
+            Search Students
           </label>
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-400" />
             <Input
-              placeholder="Query name or admission..."
+              placeholder="Search by name or admission number..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-12 h-14 bg-white/5 border-white/5"
@@ -221,19 +230,20 @@ export const AttendancePage = () => {
         <div className="p-8 border-b border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white/[0.01]">
           <div>
             <h2 className="text-lg font-black text-primary uppercase tracking-[0.2em]">
-              Operational Roster
+              Attendance Overview
             </h2>
             <p className="text-[10px] font-black text-muted uppercase tracking-widest mt-1">
-              Real-time presence tracking matrix
+              Provides daily attendance trends and real-time status updates for
+              the selected stream.
             </p>
           </div>
           <div className="hidden sm:flex items-center gap-6">
             <div className="flex flex-col items-end">
               <p className="text-[10px] font-black text-muted uppercase tracking-widest">
-                Active Capacity
+                Active Students
               </p>
               <p className="text-xl font-black text-primary">
-                {filteredStudents.length} Nodes
+                {filteredStudents.length} Students
               </p>
             </div>
             <div className="w-12 h-12 rounded-2xl bg-primary-600/10 flex items-center justify-center border border-primary-500/10">
@@ -247,13 +257,13 @@ export const AttendancePage = () => {
             <TableHeader className="bg-white/[0.02]">
               <TableRow className="border-0 hover:bg-transparent h-20">
                 <TableHead className="text-muted text-[10px] font-black uppercase tracking-widest pl-10 w-[400px]">
-                  Student Identity
+                  Student Details
                 </TableHead>
                 <TableHead className="text-muted text-[10px] font-black uppercase tracking-widest text-center">
-                  Operational Status
+                  Status
                 </TableHead>
                 <TableHead className="text-right text-muted text-[10px] font-black uppercase tracking-widest pr-10">
-                  Temporal Stamp
+                  Recorded Time
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -268,8 +278,8 @@ export const AttendancePage = () => {
                         <Zap className="w-20 h-20 mb-6" />
                         <p className="text-lg font-black uppercase tracking-[0.3em]">
                           {selectedStream
-                            ? "No signals detected for this unit."
-                            : "Initialize unit selection to scan roster."}
+                            ? "No students found for this class."
+                            : "Please select a stream above to see the student list."}
                         </p>
                       </div>
                     </TableCell>
@@ -307,35 +317,35 @@ export const AttendancePage = () => {
                             active={s.status === "PRESENT"}
                             type="PRESENT"
                             icon={CheckCircle2}
-                            label="Optimal"
+                            label="Present"
                             onClick={() => updateStatus(s.id, "PRESENT")}
                           />
                           <StatusButton
                             active={s.status === "ABSENT"}
                             type="ABSENT"
                             icon={XCircle}
-                            label="Offline"
+                            label="Absent"
                             onClick={() => updateStatus(s.id, "ABSENT")}
                           />
                           <StatusButton
                             active={s.status === "LATE"}
                             type="LATE"
                             icon={Clock}
-                            label="Delayed"
+                            label="Late"
                             onClick={() => updateStatus(s.id, "LATE")}
                           />
                           <StatusButton
                             active={s.status === "EXCUSED"}
                             type="EXCUSED"
                             icon={AlertCircle}
-                            label="Authorized"
+                            label="Excused"
                             onClick={() => updateStatus(s.id, "EXCUSED")}
                           />
                         </div>
                       </TableCell>
                       <TableCell className="text-right text-[10px] font-black text-dim uppercase tracking-widest pr-10">
                         {selectedDate === new Date().toISOString().split("T")[0]
-                          ? "Current Cycle"
+                          ? "Today"
                           : selectedDate}
                       </TableCell>
                     </motion.tr>

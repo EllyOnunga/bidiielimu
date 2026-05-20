@@ -1,6 +1,7 @@
 import os
 
 import django
+
 from accounts.models import Role
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")

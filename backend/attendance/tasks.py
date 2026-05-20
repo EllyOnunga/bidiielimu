@@ -1,10 +1,11 @@
 from celery import shared_task
 from django.utils import timezone
+
 from notifications.models import Notification
 
 
 @shared_task
-def process_absence_alert(student_id, date_str):
+def process_absence_alert(student_id, _date_str):
     from students.models import Student
 
     student = Student.objects.get(id=student_id)

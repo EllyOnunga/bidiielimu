@@ -1,12 +1,13 @@
 import csv
 import io
 
-from accounts.permissions import IsSchoolAdmin
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
+from accounts.permissions import IsSchoolAdmin
 
 from .models import Teacher
 from .serializers import TeacherSerializer
@@ -16,7 +17,11 @@ User = get_user_model()
 
 class TeacherViewSet(viewsets.ModelViewSet):
     serializer_class = TeacherSerializer
-    permission_classes = [permissions.IsAuthenticated, IsSchoolAdmin]
+
+    def get_permissions(self):
+        if self.request.method in permissions.SAFE_METHODS:
+            return [permissions.IsAuthenticated()]
+        return [permissions.IsAuthenticated(), IsSchoolAdmin()]
 
     def get_queryset(self):
         return Teacher.objects.all().select_related("user")
@@ -120,8 +125,11 @@ class TeacherViewSet(viewsets.ModelViewSet):
 
                         # Assign subjects if subject_ids provided
                         if subject_ids_str and class_id:
-                            from classes.models import (Stream, Subject,
-                                                        SubjectAssignment)
+                            from classes.models import (
+                                Stream,
+                                Subject,
+                                SubjectAssignment,
+                            )
 
                             stream = Stream.objects.get(id=class_id)
                             subject_ids = [

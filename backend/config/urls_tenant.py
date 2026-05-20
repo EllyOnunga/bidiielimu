@@ -2,23 +2,38 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.http import JsonResponse
+
 # Triggering reload to resolve 502 Bad Gateway
 from django.urls import include, path
-from drf_spectacular.views import (SpectacularAPIView, SpectacularRedocView,
-                                   SpectacularSwaggerView)
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularRedocView,
+    SpectacularSwaggerView,
+)
+
 from schools.views_theme import TenantThemeView
+from config.views_tasks import SystemTaskStatusView
 
 
 def health_check(request):
-    return JsonResponse({"status": "ok", "version": "1.0.0", "schema": "tenant"})
+    return JsonResponse({"status": "ok", "version": settings.VERSION, "schema": "tenant"})
 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("health/", health_check, name="health_check"),
     path(
+        "api/v1/system/tasks/<str:task_id>/",
+        SystemTaskStatusView.as_view(),
+        name="system-task-status"
+    ),
+    path(
         "api/v1/ping/",
-        lambda r: JsonResponse({"status": "ping-tenant"}),
+        lambda r: JsonResponse({
+            "status": "ping-tenant",
+            "version": settings.VERSION,
+            "environment": "development" if settings.DEBUG else "production"
+        }),
         name="ping-tenant",
     ),
     path("api/v1/accounts/", include("accounts.urls")),
@@ -36,6 +51,7 @@ urlpatterns = [
     path("api/v1/reports/", include("reports.urls")),
     path("api/v1/hr/", include("hr.urls")),
     path("api/v1/schools/", include("schools.urls")),
+    path("api/v1/blog/", include("blog.urls")),
     path("api/v1/discipline/", include("discipline.urls")),
     # Auth endpoints
     path("api/v1/auth/registration/", include("dj_rest_auth.registration.urls")),

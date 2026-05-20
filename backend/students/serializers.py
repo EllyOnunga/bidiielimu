@@ -48,11 +48,15 @@ class StudentTransferSerializer(serializers.ModelSerializer):
 
 
 class StudentSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(write_only=True, required=True)
+    email = serializers.EmailField(
+        write_only=True, required=False, allow_null=True, allow_blank=True
+    )
     password = serializers.CharField(
         write_only=True,
         min_length=8,
-        required=True,
+        required=False,
+        allow_null=True,
+        allow_blank=True,
         help_text="Password must be at least 8 characters long, cannot be entirely numeric, and cannot be a commonly used password.",
     )
 
@@ -104,13 +108,27 @@ class StudentSerializer(serializers.ModelSerializer):
                 )
         return value
 
+    def validate(self, attrs):
+        email = attrs.get("email")
+        password = attrs.get("password")
+
+        if email and not password:
+            raise serializers.ValidationError(
+                {"password": ["Password is required when email is provided."]}
+            )
+        if password and not email:
+            raise serializers.ValidationError(
+                {"email": ["Email is required when password is provided."]}
+            )
+        return attrs
+
     def create(self, validated_data):
         email = validated_data.pop("email", None)
         password = validated_data.pop("password", None)
         guardians_data = validated_data.pop("guardians", [])
         medical_data = validated_data.pop("medical_record", None)
 
-        if email and password:
+        if email and password and str(email).strip() and str(password).strip():
             # Ensure the user is created with the current school context
             request = self.context.get("request")
             school = request.user.school if request else None
@@ -129,6 +147,7 @@ class StudentSerializer(serializers.ModelSerializer):
                     first_name=validated_data.get("first_name"),
                     last_name=validated_data.get("last_name"),
                     school=school,
+                    is_email_verified=True,
                 )
                 validated_data["user"] = user
             except IntegrityError:

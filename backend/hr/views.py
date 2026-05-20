@@ -5,8 +5,11 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from .models import LeaveRequest, PayrollRecord, StaffProfile
-from .serializers import (LeaveRequestSerializer, PayrollRecordSerializer,
-                          StaffProfileSerializer)
+from .serializers import (
+    LeaveRequestSerializer,
+    PayrollRecordSerializer,
+    StaffProfileSerializer,
+)
 
 
 class StaffProfileViewSet(viewsets.ModelViewSet):
@@ -67,6 +70,47 @@ class PayrollRecordViewSet(viewsets.ModelViewSet):
                 "total_tax": float(total_tax * 0.15),
                 "employee_count": employee_count,
                 "trend": list(reversed(trend_data)),
+            }
+        )
+
+    @action(detail=False, methods=["post"])
+    def run_payroll(self, request):
+        from decimal import Decimal
+
+        from django.utils import timezone
+
+        from .models import PayrollRecord, StaffProfile
+
+        now = timezone.now()
+        active_staff = StaffProfile.objects.filter(status="ACTIVE")
+        created_count = 0
+
+        for staff in active_staff:
+            if not PayrollRecord.objects.filter(
+                staff=staff, month=now.month, year=now.year
+            ).exists():
+                gross = staff.basic_salary
+                shif = gross * Decimal("0.0275")
+                housing_levy = gross * Decimal("0.015")
+                nssf = Decimal("400.00")
+                deductions = shif + housing_levy + nssf
+                net_salary = gross - deductions
+
+                PayrollRecord.objects.create(
+                    staff=staff,
+                    month=now.month,
+                    year=now.year,
+                    gross_salary=gross,
+                    deductions=deductions,
+                    net_salary=net_salary,
+                    is_paid=True,
+                    paid_at=now,
+                )
+                created_count += 1
+
+        return Response(
+            {
+                "detail": f"Successfully processed payroll for {created_count} staff members."
             }
         )
 
