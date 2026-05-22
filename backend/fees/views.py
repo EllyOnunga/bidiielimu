@@ -332,13 +332,14 @@ class FeePaymentViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
         If large (> 5), spawns background Celery compilation.
         """
         from django.http import HttpResponse
+
         from .tasks import generate_bulk_receipts_pdf, generate_bulk_receipts_pdf_task
 
         payment_ids = request.data.get("payment_ids", [])
         if not payment_ids:
             return Response(
                 {"detail": "No payment_ids provided."},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         try:
@@ -346,7 +347,7 @@ class FeePaymentViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
         except (ValueError, TypeError):
             return Response(
                 {"detail": "payment_ids must be a list of integers."},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         # Strict Authorization Check: Only fetch payments authorized for the active user session.
@@ -357,7 +358,7 @@ class FeePaymentViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
         if not authorized_ids:
             return Response(
                 {"detail": "No authorized payments found for the provided IDs."},
-                status=status.HTTP_403_FORBIDDEN
+                status=status.HTTP_403_FORBIDDEN,
             )
 
         schema_name = request.tenant.schema_name
@@ -367,12 +368,14 @@ class FeePaymentViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
             try:
                 pdf_bytes = generate_bulk_receipts_pdf(authorized_ids)
                 response = HttpResponse(pdf_bytes, content_type="application/pdf")
-                response["Content-Disposition"] = 'attachment; filename="bulk_receipts.pdf"'
+                response["Content-Disposition"] = (
+                    'attachment; filename="bulk_receipts.pdf"'
+                )
                 return response
             except Exception as e:
                 return Response(
                     {"detail": f"Failed to generate receipts: {str(e)}"},
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
         else:
             # Asynchronous generation for larger print batches
@@ -381,8 +384,7 @@ class FeePaymentViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
                 {
                     "task_id": task.id,
                     "detail": "Bulk receipt PDF generation started in the background.",
-                    "status": "PENDING"
+                    "status": "PENDING",
                 },
-                status=status.HTTP_202_ACCEPTED
+                status=status.HTTP_202_ACCEPTED,
             )
-

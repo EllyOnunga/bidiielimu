@@ -34,6 +34,7 @@ export const QuizBuilder = ({
     title: initialData?.title || "",
     description: initialData?.description || "",
     subject: initialData?.subject || "",
+    stream: initialData?.stream || "",
     duration_minutes: initialData?.duration_minutes || 30,
     questions: (initialData?.questions || [
       {
@@ -54,6 +55,15 @@ export const QuizBuilder = ({
     },
     enabled: isOpen,
   });
+
+  const { data: streamsData } = useQuery({
+    queryKey: ["streams"],
+    queryFn: classesService.getStreams,
+    enabled: isOpen,
+  });
+  const streams = Array.isArray(streamsData)
+    ? streamsData
+    : (streamsData as any)?.results || [];
 
   const addQuestion = () => {
     setFormData({
@@ -111,11 +121,15 @@ export const QuizBuilder = ({
 
     setIsSubmitting(true);
     try {
+      const payload = {
+        ...formData,
+        stream: formData.stream ? parseInt(formData.stream) : null,
+      };
       if (initialData?.id) {
-        await lmsService.updateQuiz(initialData.id, formData);
+        await lmsService.updateQuiz(initialData.id, payload);
         toast.success("Quiz updated successfully");
       } else {
-        await lmsService.createQuiz(formData);
+        await lmsService.createQuiz(payload);
         toast.success("New quiz created successfully");
       }
       onSuccess();
@@ -187,6 +201,23 @@ export const QuizBuilder = ({
               {subjects.map((s: any) => (
                 <option key={s.id} value={s.id} className="bg-bg-color">
                   {s.name}
+                </option>
+              ))}
+            </Select>
+
+            <Select
+              label="Assign to Stream"
+              value={formData.stream}
+              onChange={(e) =>
+                setFormData({ ...formData, stream: e.target.value })
+              }
+            >
+              <option value="" className="bg-bg-color">
+                All Classes (no stream)
+              </option>
+              {streams.map((s: any) => (
+                <option key={s.id} value={s.id} className="bg-bg-color">
+                  {s.grade_level_name ? `${s.grade_level_name} - ${s.name}` : s.name}
                 </option>
               ))}
             </Select>

@@ -3,6 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from .views import (
     AssignmentViewSet,
+    DiscussionViewSet,
     LessonNoteViewSet,
     QuizViewSet,
     ResourceViewSet,
@@ -15,6 +16,7 @@ router.register(r"student-submissions", SubmissionViewSet, basename="submission"
 router.register(r"notes", LessonNoteViewSet, basename="lessonnote")
 router.register(r"quizzes", QuizViewSet, basename="quiz")
 router.register(r"resources", ResourceViewSet, basename="resource")
+router.register(r"discussions", DiscussionViewSet, basename="discussion")
 
 urlpatterns = [
     path("", include(router.urls)),

@@ -58,7 +58,7 @@ export const feesService = {
     const response = await client.post(
       "fees/payments/bulk-print/",
       { payment_ids: paymentIds },
-      { responseType: "blob" }
+      { responseType: "blob" },
     );
     return response;
   },
@@ -69,9 +69,12 @@ export const feesService = {
   },
 
   downloadReceipt: async (paymentId: number) => {
-    const response = await client.get(`fees/payments/${paymentId}/download_receipt/`, {
-      responseType: "blob",
-    });
+    const response = await client.get(
+      `fees/payments/${paymentId}/download_receipt/`,
+      {
+        responseType: "blob",
+      },
+    );
     return response.data;
   },
 };

@@ -74,6 +74,9 @@ class School(TenantMixin):
 
     auto_create_schema = True
 
+    # Citus Distributed Sharding Configuration
+    citus_partition_key = "schema_name"
+
     def __str__(self):
         return self.name
 
@@ -111,6 +114,9 @@ class Subscription(models.Model):
     mpesa_transaction_reference = models.CharField(
         max_length=100, null=True, blank=True
     )
+
+    # Citus Distributed Sharding Configuration
+    citus_partition_key = "school_id"
 
     def is_locked(self):
         """Returns True if subscription is expired AND past the grace period."""

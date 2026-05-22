@@ -1,4 +1,5 @@
 import client from "../client";
+import { offlineStore } from "../offlineStore";
 
 export interface Exam {
   id: number;
@@ -65,7 +66,20 @@ export const examsService = {
   },
 
   saveMarks: async (data: { exam: string; subject: string; marks: any[] }) => {
-    const response = await client.post("exams/marks/bulk_save/", data);
-    return response.data;
+    if (!navigator.onLine) {
+      await offlineStore.addToQueue("exams/marks/bulk_save/", "post", data);
+      return { status: "queued", message: "Marks queued for offline sync" };
+    }
+
+    try {
+      const response = await client.post("exams/marks/bulk_save/", data);
+      return response.data;
+    } catch (error: any) {
+      if (error.message === "Network Error" || !error.response) {
+        await offlineStore.addToQueue("exams/marks/bulk_save/", "post", data);
+        return { status: "queued", message: "Marks queued for offline sync" };
+      }
+      throw error;
+    }
   },
 };

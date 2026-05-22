@@ -718,13 +718,15 @@ export const SuperAdminPage = () => {
       content: (
         <div className="space-y-8">
           {/* Diagnostic Summary Header Card */}
-          <div className={`p-6 sm:p-8 rounded-[32px] sm:rounded-[40px] border border-white/5 relative overflow-hidden transition-all duration-700 bg-gradient-to-br ${
-            isLoadingHealth
-              ? "from-slate-900/50 to-slate-950/50"
-              : systemHealth?.status === "healthy"
-                ? "from-emerald-950/20 to-slate-950/50 border-emerald-500/10 shadow-[0_0_50px_rgba(16,185,129,0.05)]"
-                : "from-rose-950/20 to-slate-950/50 border-rose-500/10 shadow-[0_0_50px_rgba(244,63,94,0.05)]"
-          }`}>
+          <div
+            className={`p-6 sm:p-8 rounded-[32px] sm:rounded-[40px] border border-white/5 relative overflow-hidden transition-all duration-700 bg-gradient-to-br ${
+              isLoadingHealth
+                ? "from-slate-900/50 to-slate-950/50"
+                : systemHealth?.status === "healthy"
+                  ? "from-emerald-950/20 to-slate-950/50 border-emerald-500/10 shadow-[0_0_50px_rgba(16,185,129,0.05)]"
+                  : "from-rose-950/20 to-slate-950/50 border-rose-500/10 shadow-[0_0_50px_rgba(244,63,94,0.05)]"
+            }`}
+          >
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.02),transparent)] pointer-events-none" />
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
               <div className="space-y-2">
@@ -732,27 +734,43 @@ export const SuperAdminPage = () => {
                   <span className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">
                     Overall Liveness Index
                   </span>
-                  <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                    isLoadingHealth
-                      ? "bg-white/5 text-muted border border-white/10"
+                  <span
+                    className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                      isLoadingHealth
+                        ? "bg-white/5 text-muted border border-white/10"
+                        : systemHealth?.status === "healthy"
+                          ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                          : "bg-rose-500/10 text-rose-400 border border-rose-500/20"
+                    }`}
+                  >
+                    {isLoadingHealth
+                      ? "Diagnosing..."
                       : systemHealth?.status === "healthy"
-                        ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                        : "bg-rose-500/10 text-rose-400 border border-rose-500/20"
-                  }`}>
-                    {isLoadingHealth ? "Diagnosing..." : systemHealth?.status === "healthy" ? "All Systems Healthy" : "Alert Active"}
+                        ? "All Systems Healthy"
+                        : "Alert Active"}
                   </span>
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-black text-primary tracking-tight">
                   {isLoadingHealth ? (
                     "Analyzing Service Architecture..."
                   ) : systemHealth?.status === "healthy" ? (
-                    <span>Ecosystem operating <span className="text-gradient">normally</span></span>
+                    <span>
+                      Ecosystem operating{" "}
+                      <span className="text-gradient">normally</span>
+                    </span>
                   ) : (
-                    <span>Ecosystem report: <span className="text-rose-400">service interruption</span></span>
+                    <span>
+                      Ecosystem report:{" "}
+                      <span className="text-rose-400">
+                        service interruption
+                      </span>
+                    </span>
                   )}
                 </h2>
                 <p className="text-xs text-muted max-w-2xl leading-relaxed">
-                  Real-time database pooling, cache eviction registers, and background messaging brokers are analyzed continuously to prevent transactional drift.
+                  Real-time database pooling, cache eviction registers, and
+                  background messaging brokers are analyzed continuously to
+                  prevent transactional drift.
                 </p>
               </div>
 
@@ -784,14 +802,18 @@ export const SuperAdminPage = () => {
                 <span className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">
                   Relational DB Pool
                 </span>
-                <span className={`px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-wider border ${
-                  isLoadingHealth
-                    ? "bg-white/5 text-muted border-white/10"
-                    : systemHealth?.services?.database?.status === "healthy"
-                      ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                      : "bg-rose-500/10 text-rose-400 border-rose-500/20"
-                }`}>
-                  {isLoadingHealth ? "Checking..." : systemHealth?.services?.database?.status || "offline"}
+                <span
+                  className={`px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-wider border ${
+                    isLoadingHealth
+                      ? "bg-white/5 text-muted border-white/10"
+                      : systemHealth?.services?.database?.status === "healthy"
+                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                        : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                  }`}
+                >
+                  {isLoadingHealth
+                    ? "Checking..."
+                    : systemHealth?.services?.database?.status || "offline"}
                 </span>
               </div>
               <div className="space-y-2 mt-6">
@@ -801,7 +823,8 @@ export const SuperAdminPage = () => {
                 <p className="text-xs text-muted leading-relaxed font-mono">
                   {isLoadingHealth
                     ? "Establishing connection..."
-                    : systemHealth?.services?.database?.details || "Connection down."}
+                    : systemHealth?.services?.database?.details ||
+                      "Connection down."}
                 </p>
               </div>
             </div>
@@ -812,14 +835,18 @@ export const SuperAdminPage = () => {
                 <span className="text-[10px] font-black text-primary-200/30 uppercase tracking-widest">
                   Memory Store
                 </span>
-                <span className={`px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-wider border ${
-                  isLoadingHealth
-                    ? "bg-white/5 text-muted border-white/10"
-                    : systemHealth?.services?.redis?.status === "healthy"
-                      ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                      : "bg-rose-500/10 text-rose-400 border-rose-500/20"
-                }`}>
-                  {isLoadingHealth ? "Checking..." : systemHealth?.services?.redis?.status || "offline"}
+                <span
+                  className={`px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-wider border ${
+                    isLoadingHealth
+                      ? "bg-white/5 text-muted border-white/10"
+                      : systemHealth?.services?.redis?.status === "healthy"
+                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                        : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                  }`}
+                >
+                  {isLoadingHealth
+                    ? "Checking..."
+                    : systemHealth?.services?.redis?.status || "offline"}
                 </span>
               </div>
               <div className="space-y-2 mt-6">
@@ -829,7 +856,8 @@ export const SuperAdminPage = () => {
                 <p className="text-xs text-muted leading-relaxed font-mono">
                   {isLoadingHealth
                     ? "Pinging cache layer..."
-                    : systemHealth?.services?.redis?.details || "Cache inaccessible."}
+                    : systemHealth?.services?.redis?.details ||
+                      "Cache inaccessible."}
                 </p>
               </div>
             </div>
@@ -851,7 +879,8 @@ export const SuperAdminPage = () => {
                 <p className="text-xs text-muted leading-relaxed font-mono">
                   {isLoadingHealth
                     ? "Testing mail route..."
-                    : systemHealth?.services?.email?.details || "Email service configured"}
+                    : systemHealth?.services?.email?.details ||
+                      "Email service configured"}
                 </p>
               </div>
             </div>
@@ -865,27 +894,45 @@ export const SuperAdminPage = () => {
               </h3>
               <div className="space-y-3 font-mono text-xs">
                 <div className="flex justify-between py-2 border-b border-white/5">
-                  <span className="text-muted uppercase">Platform Core Stack</span>
-                  <span className="text-white font-bold">Django REST / React Vite</span>
+                  <span className="text-muted uppercase">
+                    Platform Core Stack
+                  </span>
+                  <span className="text-white font-bold">
+                    Django REST / React Vite
+                  </span>
                 </div>
                 <div className="flex justify-between py-2 border-b border-white/5">
                   <span className="text-muted uppercase">Core Version</span>
-                  <span className="text-white font-bold bg-white/5 px-2 py-0.5 rounded border border-white/10">v1.0.0</span>
+                  <span className="text-white font-bold bg-white/5 px-2 py-0.5 rounded border border-white/10">
+                    v1.0.0
+                  </span>
                 </div>
                 <div className="flex justify-between py-2 border-b border-white/5">
-                  <span className="text-muted uppercase">API Server Version</span>
+                  <span className="text-muted uppercase">
+                    API Server Version
+                  </span>
                   <span className="text-primary-400 font-bold bg-primary-500/10 px-2 py-0.5 rounded border border-primary-500/20">
-                    {isLoadingHealth ? "Diagnosing..." : systemHealth?.version ? `v${systemHealth.version}` : "v1.0.0"}
+                    {isLoadingHealth
+                      ? "Diagnosing..."
+                      : systemHealth?.version
+                        ? `v${systemHealth.version}`
+                        : "v1.0.0"}
                   </span>
                 </div>
                 <div className="flex justify-between py-2 border-b border-white/5">
                   <span className="text-muted uppercase">Diagnostics Host</span>
-                  <span className="text-white truncate max-w-xs">{import.meta.env.VITE_API_URL || window.location.origin}</span>
+                  <span className="text-white truncate max-w-xs">
+                    {import.meta.env.VITE_API_URL || window.location.origin}
+                  </span>
                 </div>
                 <div className="flex justify-between py-2">
                   <span className="text-muted uppercase">Server Timestamp</span>
                   <span className="text-white font-bold">
-                    {isLoadingHealth ? "Fetching timestamp..." : systemHealth?.timestamp ? new Date(systemHealth.timestamp).toLocaleString() : new Date().toLocaleString()}
+                    {isLoadingHealth
+                      ? "Fetching timestamp..."
+                      : systemHealth?.timestamp
+                        ? new Date(systemHealth.timestamp).toLocaleString()
+                        : new Date().toLocaleString()}
                   </span>
                 </div>
               </div>
@@ -897,7 +944,10 @@ export const SuperAdminPage = () => {
                   Tenant Mesh Control
                 </h3>
                 <p className="text-xs text-muted leading-relaxed">
-                  ElimuHub multi-tenant context isolates individual school databases at the middleware level. PostgreSQL connection pooling maintains a maximum pool size per tenant. Cache evictions occur dynamically when settings change.
+                  ElimuHub multi-tenant context isolates individual school
+                  databases at the middleware level. PostgreSQL connection
+                  pooling maintains a maximum pool size per tenant. Cache
+                  evictions occur dynamically when settings change.
                 </p>
               </div>
               <div className="pt-4 border-t border-white/5 mt-4">

@@ -30,4 +30,20 @@ export const hrService = {
     const response = await client.post("hr/payroll/run_payroll/");
     return response.data;
   },
+
+  getAllLeaveRequests: async (params?: any) => {
+    const response = await client.get("hr/leave/", { params });
+    return response.data;
+  },
+
+  createLeaveRequest: async (data: any) => {
+    const response = await client.post("hr/leave/", data);
+    return response.data;
+  },
+
+  updateLeaveStatus: async (id: number, status: "APPROVED" | "REJECTED") => {
+    const endpoint = status === "APPROVED" ? "approve" : "reject";
+    const response = await client.post(`hr/leave/${id}/${endpoint}/`);
+    return response.data;
+  },
 };

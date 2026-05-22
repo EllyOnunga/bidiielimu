@@ -1,7 +1,16 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Search, FileText, Video, Book, Download, Tag } from "lucide-react";
+import {
+  Search,
+  FileText,
+  Video,
+  Book,
+  Download,
+  Tag,
+  MessageSquare,
+} from "lucide-react";
 import { lmsService } from "../../api/services/lmsService";
+import { DiscussionPanel } from "./DiscussionPanel";
 import toast from "react-hot-toast";
 import { useAuthStore } from "../../store/authStore";
 import { Button } from "../ui/Button";
@@ -18,6 +27,7 @@ interface Resource {
   file: string;
   version: number;
   subject_name: string;
+  stream_name?: string;
   uploaded_at: string;
 }
 
@@ -30,15 +40,29 @@ export const ResourceLibrary = () => {
 
   const [resources, setResources] = useState<Resource[]>([]);
   const [search, setSearch] = useState("");
+  const [isDiscussionOpen, setIsDiscussionOpen] = useState(false);
+  const [selectedResource, setSelectedResource] = useState<Resource | null>(
+    null,
+  );
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [selectedStreamId, setSelectedStreamId] = useState<string>("");
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadData, setUploadData] = useState({
     title: "",
     category: "NOTE",
     subject: "",
+    stream: "",
     file: null as File | null,
   });
+
+  const { data: streamsData } = useQuery({
+    queryKey: ["streams"],
+    queryFn: classesService.getStreams,
+  });
+  const streams = Array.isArray(streamsData)
+    ? streamsData
+    : (streamsData as any)?.results || [];
 
   const categories = [
     {
@@ -58,7 +82,7 @@ export const ResourceLibrary = () => {
 
   useEffect(() => {
     fetchResources();
-  }, []);
+  }, [selectedStreamId]);
 
   const { data: subjects = [] } = useQuery({
     queryKey: ["subjects"],
@@ -71,7 +95,8 @@ export const ResourceLibrary = () => {
 
   const fetchResources = async () => {
     try {
-      const res = await lmsService.getResources();
+      const params = selectedStreamId ? { stream: selectedStreamId } : {};
+      const res = await lmsService.getResources(params);
       setResources(Array.isArray(res) ? res : res.results || []);
     } catch (err) {
       toast.error("Failed to load resources");
@@ -88,13 +113,16 @@ export const ResourceLibrary = () => {
     formData.append("title", uploadData.title);
     formData.append("category", uploadData.category);
     formData.append("subject", uploadData.subject);
+    if (uploadData.stream) {
+      formData.append("stream", uploadData.stream);
+    }
     formData.append("file", uploadData.file);
 
     try {
       await lmsService.createResource(formData);
       toast.success("Resource uploaded successfully");
       setIsUploadModalOpen(false);
-      setUploadData({ title: "", category: "NOTE", subject: "", file: null });
+      setUploadData({ title: "", category: "NOTE", subject: "", stream: "", file: null });
       fetchResources();
     } catch (err: any) {
       const errorMsg =
@@ -204,6 +232,37 @@ export const ResourceLibrary = () => {
         </div>
       </div>
 
+      {/* Stream Selector Bar */}
+      <div className="flex flex-wrap items-center gap-2 p-1.5 bg-white/5 rounded-[24px] border border-white/5 backdrop-blur-md w-fit">
+        <button
+          onClick={() => setSelectedStreamId("")}
+          className={`relative flex items-center gap-2 px-5 py-2.5 rounded-[18px] transition-all duration-300 ${
+            selectedStreamId === ""
+              ? "bg-emerald-500 text-white shadow-glow-sm shadow-emerald-500/20"
+              : "text-muted hover:text-primary hover:bg-white/5"
+          }`}
+        >
+          <span className="text-[10px] font-black uppercase tracking-widest">
+            All Classes
+          </span>
+        </button>
+        {streams.map((stream: any) => (
+          <button
+            key={stream.id}
+            onClick={() => setSelectedStreamId(stream.id.toString())}
+            className={`relative flex items-center gap-2 px-5 py-2.5 rounded-[18px] transition-all duration-300 ${
+              selectedStreamId === stream.id.toString()
+                ? "bg-emerald-500 text-white shadow-glow-sm shadow-emerald-500/20"
+                : "text-muted hover:text-primary hover:bg-white/5"
+            }`}
+          >
+            <span className="text-[10px] font-black uppercase tracking-widest font-sans">
+              {stream.grade_level_name ? `${stream.grade_level_name} - ${stream.name}` : stream.name}
+            </span>
+          </button>
+        ))}
+      </div>
+
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filteredResources.map((resource) => {
@@ -230,9 +289,14 @@ export const ResourceLibrary = () => {
                 <h3 className="text-lg font-bold text-primary group-hover:text-primary-400 transition-colors line-clamp-2">
                   {resource.title}
                 </h3>
-                <div className="flex items-center gap-2 mt-4 text-xs text-muted">
-                  <Tag className="w-3 h-3" />
-                  <span>{resource.subject_name}</span>
+                <div className="flex flex-wrap gap-2 mt-4">
+                  <div className="flex items-center gap-2 text-xs text-muted">
+                    <Tag className="w-3 h-3 text-emerald-400" />
+                    <span>{resource.subject_name}</span>
+                  </div>
+                  <span className="px-2.5 py-1 text-[8px] font-black text-emerald-400 bg-emerald-500/10 rounded-lg border border-emerald-500/15 uppercase tracking-widest font-sans">
+                    {resource.stream_name || "All Classes"}
+                  </span>
                 </div>
               </div>
 
@@ -240,12 +304,25 @@ export const ResourceLibrary = () => {
                 <span className="text-[10px] font-black text-dim uppercase tracking-widest">
                   {new Date(resource.uploaded_at).toLocaleDateString()}
                 </span>
-                <button
-                  onClick={() => downloadFile(resource.file, resource.title)}
-                  className="p-3 bg-primary-500 text-white rounded-xl hover:bg-primary-400 transition-all shadow-lg"
-                >
-                  <Download className="w-4 h-4" />
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setSelectedResource(resource);
+                      setIsDiscussionOpen(true);
+                    }}
+                    className="p-3 bg-white/5 text-primary-200 hover:bg-white/10 rounded-xl transition-all border border-white/10"
+                    title="Discuss resource"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => downloadFile(resource.file, resource.title)}
+                    className="p-3 bg-primary-500 text-white rounded-xl hover:bg-primary-400 transition-all shadow-lg"
+                    title="Download file"
+                  >
+                    <Download className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
           );
@@ -312,6 +389,23 @@ export const ResourceLibrary = () => {
             </Select>
           </div>
 
+          <Select
+            label="Assign to Stream"
+            value={uploadData.stream}
+            onChange={(e) =>
+              setUploadData({ ...uploadData, stream: e.target.value })
+            }
+          >
+            <option value="" className="bg-bg-color">
+              All Classes (no stream)
+            </option>
+            {streams.map((s: any) => (
+              <option key={s.id} value={s.id} className="bg-bg-color">
+                {s.grade_level_name ? `${s.grade_level_name} - ${s.name}` : s.name}
+              </option>
+            ))}
+          </Select>
+
           <div className="space-y-2">
             <label className="text-[10px] font-black text-muted uppercase tracking-widest">
               Resource File
@@ -352,6 +446,16 @@ export const ResourceLibrary = () => {
           </div>
         </form>
       </Modal>
+
+      <DiscussionPanel
+        isOpen={isDiscussionOpen}
+        onClose={() => {
+          setIsDiscussionOpen(false);
+          setSelectedResource(null);
+        }}
+        resourceId={selectedResource?.id}
+        title={selectedResource?.title || ""}
+      />
     </div>
   );
 };

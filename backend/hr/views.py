@@ -119,14 +119,92 @@ class LeaveRequestViewSet(viewsets.ModelViewSet):
     serializer_class = LeaveRequestSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def ensure_teacher_staff_profile(self, user):
+        try:
+            return user.hr_staff_profile
+        except StaffProfile.DoesNotExist:
+            try:
+                teacher = user.teacher_profile
+                return StaffProfile.objects.create(
+                    user=user,
+                    employee_id=teacher.employee_id,
+                    department="Academics",
+                    job_title=teacher.designation or "Teacher",
+                    joining_date=teacher.joining_date,
+                    basic_salary=teacher.basic_salary,
+                    status="ACTIVE",
+                )
+            except Exception:
+                return StaffProfile.objects.create(
+                    user=user,
+                    employee_id=f"TCH-{user.id}",
+                    department="Academics",
+                    job_title="Teacher",
+                    joining_date=user.date_joined.date(),
+                    basic_salary=0.00,
+                    status="ACTIVE",
+                )
+
     def get_queryset(self):
         user = self.request.user
+        if user.role_name == "TEACHER":
+            self.ensure_teacher_staff_profile(user)
+
         if user.role_name and user.role_name in ["ADMIN", "SUPER_ADMIN", "PRINCIPAL"]:
             return LeaveRequest.objects.all().select_related("staff__user")
         return LeaveRequest.objects.filter(staff__user=user)
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        if user.role_name == "TEACHER":
+            staff_profile = self.ensure_teacher_staff_profile(user)
+        else:
+            try:
+                staff_profile = user.hr_staff_profile
+            except StaffProfile.DoesNotExist:
+                staff_profile = StaffProfile.objects.create(
+                    user=user,
+                    employee_id=f"STF-{user.id}",
+                    department="Administration",
+                    job_title=user.role_name or "Staff",
+                    joining_date=user.date_joined.date(),
+                    basic_salary=0.00,
+                    status="ACTIVE",
+                )
+        serializer.save(staff=staff_profile)
 
     @action(detail=False, methods=["get"])
     def recent(self, request):
         qs = self.get_queryset().order_by("-start_date")[:5]
         serializer = self.get_serializer(qs, many=True)
         return Response(serializer.data)
+
+    @action(detail=True, methods=["post"])
+    def approve(self, request, pk=None):
+        user = request.user
+        if not (
+            user.role_name and user.role_name in ["ADMIN", "SUPER_ADMIN", "PRINCIPAL"]
+        ):
+            return Response({"detail": "Permission denied."}, status=403)
+
+        leave_request = self.get_object()
+        leave_request.status = "APPROVED"
+        leave_request.save()
+        return Response(
+            {"detail": "Leave request approved successfully.", "status": "APPROVED"}
+        )
+
+    @action(detail=True, methods=["post"])
+    def reject(self, request, pk=None):
+        user = request.user
+        if not (
+            user.role_name and user.role_name in ["ADMIN", "SUPER_ADMIN", "PRINCIPAL"]
+        ):
+            return Response({"detail": "Permission denied."}, status=403)
+
+        leave_request = self.get_object()
+        leave_request.status = "REJECTED"
+        leave_request.save()
+        return Response(
+            {"detail": "Leave request rejected successfully.", "status": "REJECTED"}
+        )

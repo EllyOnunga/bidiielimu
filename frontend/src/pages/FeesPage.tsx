@@ -57,18 +57,25 @@ export const FeesPage = () => {
   const [bulkPrintStatus, setBulkPrintStatus] = useState<string | null>(null);
   const [bulkPrintTotal, setBulkPrintTotal] = useState(0);
   const [bulkPrintCurrent, setBulkPrintCurrent] = useState(0);
-  const [isSingleDownloading, setIsSingleDownloading] = useState<number | null>(null);
+  const [isSingleDownloading, setIsSingleDownloading] = useState<number | null>(
+    null,
+  );
 
   // Clear selections when search query changes
   useEffect(() => {
     setSelectedPaymentIds([]);
   }, [debouncedSearch]);
 
-  const handleDownloadSingleReceipt = async (paymentId: number, transactionRef: string) => {
+  const handleDownloadSingleReceipt = async (
+    paymentId: number,
+    transactionRef: string,
+  ) => {
     setIsSingleDownloading(paymentId);
     try {
       const blob = await feesService.downloadReceipt(paymentId);
-      const url = window.URL.createObjectURL(new Blob([blob], { type: "application/pdf" }));
+      const url = window.URL.createObjectURL(
+        new Blob([blob], { type: "application/pdf" }),
+      );
       const link = document.createElement("a");
       link.href = url;
       link.setAttribute("download", `receipt_${transactionRef}.pdf`);
@@ -102,13 +109,17 @@ export const FeesPage = () => {
         if (data.task_id) {
           setBulkPrintTaskId(data.task_id);
           setBulkPrintStatus(data.status || "PENDING");
-          toast.loading("Bulk printing task started in background...", { id: "bulk-print-toast" });
+          toast.loading("Bulk printing task started in background...", {
+            id: "bulk-print-toast",
+          });
         } else {
           throw new Error("No task ID returned");
         }
       } else {
         // Direct synchronous PDF returned!
-        const url = window.URL.createObjectURL(new Blob([blob], { type: "application/pdf" }));
+        const url = window.URL.createObjectURL(
+          new Blob([blob], { type: "application/pdf" }),
+        );
         const link = document.createElement("a");
         link.href = url;
         link.setAttribute("download", "bulk_receipts.pdf");
@@ -147,7 +158,8 @@ export const FeesPage = () => {
         setBulkPrintCurrent(data.current || 0);
         setBulkPrintTotal(data.total || selectedPaymentIds.length || 1);
 
-        const percent = data.total > 0 ? Math.round((data.current / data.total) * 100) : 0;
+        const percent =
+          data.total > 0 ? Math.round((data.current / data.total) * 100) : 0;
         setBulkPrintProgress(percent);
 
         if (data.status === "SUCCESS") {
@@ -483,7 +495,12 @@ export const FeesPage = () => {
                           variant="ghost"
                           size="sm"
                           disabled={isSingleDownloading === p.id}
-                          onClick={() => handleDownloadSingleReceipt(p.id, p.transaction_id || "VERIFIED")}
+                          onClick={() =>
+                            handleDownloadSingleReceipt(
+                              p.id,
+                              p.transaction_id || "VERIFIED",
+                            )
+                          }
                           className="h-9 px-3 rounded-lg text-[10px] font-black uppercase tracking-widest border border-white/5 bg-white/5 text-primary hover:bg-primary-600 hover:text-white flex items-center justify-center gap-1.5 ml-auto"
                         >
                           {isSingleDownloading === p.id ? (
@@ -721,7 +738,10 @@ export const FeesPage = () => {
                     className="w-4 h-4 rounded border-white/10 bg-white/5 text-primary-600 focus:ring-primary-500 focus:ring-offset-bg-color cursor-pointer transition-all"
                     checked={
                       paymentsData.length > 0 &&
-                      selectedPaymentIds.length === paymentsData.filter((p: any) => p.status === "COMPLETED").length
+                      selectedPaymentIds.length ===
+                        paymentsData.filter(
+                          (p: any) => p.status === "COMPLETED",
+                        ).length
                     }
                     onChange={(e) => {
                       if (e.target.checked) {
@@ -778,7 +798,9 @@ export const FeesPage = () => {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: idx * 0.02 }}
                       className={`group transition-all h-24 border-white/5 hover:bg-white/[0.03] ${
-                        selectedPaymentIds.includes(payment.id) ? "bg-primary-600/[0.02]" : ""
+                        selectedPaymentIds.includes(payment.id)
+                          ? "bg-primary-600/[0.02]"
+                          : ""
                       }`}
                     >
                       <TableCell className="pl-10">
@@ -789,9 +811,14 @@ export const FeesPage = () => {
                             checked={selectedPaymentIds.includes(payment.id)}
                             onChange={(e) => {
                               if (e.target.checked) {
-                                setSelectedPaymentIds((prev) => [...prev, payment.id]);
+                                setSelectedPaymentIds((prev) => [
+                                  ...prev,
+                                  payment.id,
+                                ]);
                               } else {
-                                setSelectedPaymentIds((prev) => prev.filter((id) => id !== payment.id));
+                                setSelectedPaymentIds((prev) =>
+                                  prev.filter((id) => id !== payment.id),
+                                );
                               }
                             }}
                           />
@@ -841,7 +868,12 @@ export const FeesPage = () => {
                             variant="ghost"
                             size="sm"
                             disabled={isSingleDownloading === payment.id}
-                            onClick={() => handleDownloadSingleReceipt(payment.id, payment.transaction_reference || "VERIFIED")}
+                            onClick={() =>
+                              handleDownloadSingleReceipt(
+                                payment.id,
+                                payment.transaction_reference || "VERIFIED",
+                              )
+                            }
                             className="h-9 w-9 p-0 rounded-lg border border-white/5 bg-white/5 text-primary hover:bg-primary-600 hover:text-white flex items-center justify-center ml-auto"
                             title="Download Receipt"
                           >
@@ -1054,22 +1086,24 @@ export const FeesPage = () => {
               {bulkPrintStatus === "SUCCESS"
                 ? "Compilation Complete"
                 : bulkPrintStatus === "FAILURE"
-                ? "Compilation Failed"
-                : "Compiling Receipts"}
+                  ? "Compilation Failed"
+                  : "Compiling Receipts"}
             </h3>
             <p className="text-[10px] font-black text-muted uppercase tracking-widest">
               {bulkPrintStatus === "SUCCESS"
                 ? "Your document is ready for printing"
                 : bulkPrintStatus === "FAILURE"
-                ? "Something went wrong in the background"
-                : `Processing ${bulkPrintCurrent} of ${bulkPrintTotal} receipts`}
+                  ? "Something went wrong in the background"
+                  : `Processing ${bulkPrintCurrent} of ${bulkPrintTotal} receipts`}
             </p>
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs font-black text-dim uppercase">
               <span>Progress</span>
-              <span className="font-mono text-primary-400">{bulkPrintProgress}%</span>
+              <span className="font-mono text-primary-400">
+                {bulkPrintProgress}%
+              </span>
             </div>
             <div className="h-2.5 bg-white/5 rounded-full overflow-hidden border border-white/5 p-0.5">
               <motion.div
@@ -1081,7 +1115,8 @@ export const FeesPage = () => {
           </div>
 
           <div className="text-[10px] text-muted font-bold uppercase tracking-widest bg-white/[0.02] p-4 rounded-xl border border-white/5">
-            Do not close this page. The system is securely compiling tenant-locked PDFs in a dedicated, background context.
+            Do not close this page. The system is securely compiling
+            tenant-locked PDFs in a dedicated, background context.
           </div>
 
           {(bulkPrintStatus === "SUCCESS" || bulkPrintStatus === "FAILURE") && (

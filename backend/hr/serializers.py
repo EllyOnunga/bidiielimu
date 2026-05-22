@@ -8,6 +8,16 @@ class StaffProfileSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(write_only=True)
     last_name = serializers.CharField(write_only=True)
     role_name = serializers.CharField(write_only=True)
+    designation = serializers.CharField(
+        write_only=True, required=False, allow_blank=True
+    )
+    department = serializers.CharField(
+        required=False, allow_blank=True, default="General"
+    )
+    job_title = serializers.CharField(required=False, allow_blank=True, default="Staff")
+    basic_salary = serializers.DecimalField(
+        max_digits=12, decimal_places=2, required=False, default=0.00
+    )
     full_name = serializers.CharField(source="user.get_full_name", read_only=True)
     user_email = serializers.EmailField(source="user.email", read_only=True)
 
@@ -19,6 +29,7 @@ class StaffProfileSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "role_name",
+            "designation",
             "employee_id",
             "department",
             "job_title",
@@ -53,8 +64,19 @@ class StaffProfileSerializer(serializers.ModelSerializer):
         last_name = validated_data.pop("last_name")
         role_name = validated_data.pop("role_name")
 
+        designation = validated_data.pop("designation", None)
+        if designation and validated_data.get("job_title", "Staff") == "Staff":
+            validated_data["job_title"] = designation
+
         with transaction.atomic():
-            role = Role.objects.get(name=role_name)
+            try:
+                role = Role.objects.get(name=role_name)
+            except Role.DoesNotExist:
+                if role_name == "BURSAR":
+                    role = Role.objects.get(name="FINANCE")
+                else:
+                    role = Role.objects.get(name="ADMIN")  # fallback
+
             # Create user with a default password (employee_id)
             user = User.objects.create_user(
                 email=email,
@@ -76,6 +98,8 @@ class PayrollRecordSerializer(serializers.ModelSerializer):
 
 
 class LeaveRequestSerializer(serializers.ModelSerializer):
+    staff = serializers.PrimaryKeyRelatedField(read_only=True)
+
     class Meta:
         model = LeaveRequest
         fields = "__all__"

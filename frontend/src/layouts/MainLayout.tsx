@@ -51,10 +51,9 @@ const NavItem = ({ to, icon: Icon, label, onClick }: NavItemProps) => (
     to={to}
     onClick={onClick}
     className={({ isActive }) =>
-      `flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2.5 md:py-3 min-h-[44px] rounded-2xl transition-all duration-300 group relative touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 ${
-        isActive
-          ? "text-primary-400"
-          : "text-muted hover:bg-white/5 hover:text-primary"
+      `flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2.5 md:py-3 min-h-[44px] rounded-2xl transition-all duration-300 group relative touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 ${isActive
+        ? "text-primary-400"
+        : "text-muted hover:bg-white/5 hover:text-primary"
       }`
     }
   >
@@ -101,303 +100,310 @@ const SidebarContent = ({
 
   return (
     <div className="flex flex-col h-full">
-    <div className="flex items-center justify-between mb-6 md:mb-10 px-2">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 md:w-12 md:h-12 bg-primary-600 rounded-2xl shadow-premium flex items-center justify-center overflow-hidden shrink-0 border border-white/10">
-          {schoolLogo ? (
-            <img
-              src={schoolLogo}
-              alt="Logo"
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <ElimuHubLogo className="w-8 h-8" showText={false} />
-          )}
+      <div className="flex items-center justify-between mb-6 md:mb-10 px-2">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 md:w-12 md:h-12 bg-primary-600 rounded-2xl shadow-premium flex items-center justify-center overflow-hidden shrink-0 border border-white/10">
+            {schoolLogo ? (
+              <img
+                src={schoolLogo}
+                alt="Logo"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <ElimuHubLogo className="w-8 h-8" showText={false} />
+            )}
+          </div>
+          <div className="min-w-0">
+            <h1
+              className="text-sm md:text-lg font-black text-primary tracking-tight truncate w-24 md:w-32 font-serif"
+              title={schoolName}
+            >
+              {schoolName || "ElimuHub"}
+            </h1>
+            <p className="text-[9px] md:text-[10px] font-bold text-muted uppercase tracking-widest">
+              {user?.role} PORTAL
+            </p>
+          </div>
         </div>
-        <div className="min-w-0">
-          <h1
-            className="text-sm md:text-lg font-black text-primary tracking-tight truncate w-24 md:w-32 font-serif"
-            title={schoolName}
-          >
-            {schoolName || "ElimuHub"}
-          </h1>
-          <p className="text-[9px] md:text-[10px] font-bold text-muted uppercase tracking-widest">
-            {user?.role} PORTAL
-          </p>
-        </div>
+        <button
+          onClick={() => setIsSidebarOpen(false)}
+          className="lg:hidden p-2 text-primary-200/50 hover:text-white"
+          aria-label="Close navigation menu"
+        >
+          <CloseIcon className="w-6 h-6" />
+        </button>
       </div>
-      <button
-        onClick={() => setIsSidebarOpen(false)}
-        className="lg:hidden p-2 text-primary-200/50 hover:text-white"
-        aria-label="Close navigation menu"
-      >
-        <CloseIcon className="w-6 h-6" />
-      </button>
-    </div>
 
-    <nav className="space-y-1.5 flex-1 overflow-y-auto pr-2 custom-scrollbar">
-      {/* Dashboard - Accessible by all staff roles */}
-      {(user?.role === ROLES.ADMIN ||
-        user?.role === ROLES.PRINCIPAL ||
-        user?.role === ROLES.TEACHER ||
-        user?.role === ROLES.HOD ||
-        user?.role === ROLES.SUPER_ADMIN ||
-        user?.role === ROLES.LIBRARIAN ||
-        user?.role === ROLES.FINANCE) && (
+      <nav className="space-y-1.5 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+        {/* Dashboard - Accessible by all staff roles */}
+        {(user?.role === ROLES.ADMIN ||
+          user?.role === ROLES.PRINCIPAL ||
+          user?.role === ROLES.TEACHER ||
+          user?.role === ROLES.HOD ||
+          user?.role === ROLES.SUPER_ADMIN ||
+          user?.role === ROLES.LIBRARIAN ||
+          user?.role === ROLES.FINANCE) && (
+            <NavItem
+              to="/dashboard"
+              icon={LayoutDashboard}
+              label="Dashboard"
+              onClick={() => setIsSidebarOpen(false)}
+            />
+          )}
+
+        {/* Academic Section */}
+        {(user?.role === ROLES.ADMIN ||
+          user?.role === ROLES.PRINCIPAL ||
+          user?.role === ROLES.TEACHER ||
+          user?.role === ROLES.HOD) && (
+            <>
+              <div className="pt-3 md:pt-4 pb-2 px-3 md:px-4 text-[9px] md:text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">
+                Academic
+              </div>
+              <NavItem
+                to="/students"
+                icon={Users}
+                label="Students"
+                onClick={() => setIsSidebarOpen(false)}
+              />
+              <NavItem
+                to="/lms"
+                icon={GraduationCap}
+                label="Learning Portal"
+                onClick={() => setIsSidebarOpen(false)}
+              />
+              <NavItem
+                to="/classes"
+                icon={BookOpen}
+                label="Classes"
+                onClick={() => setIsSidebarOpen(false)}
+              />
+              <NavItem
+                to="/exams"
+                icon={ClipboardList}
+                label="Exams & Grading"
+                onClick={() => setIsSidebarOpen(false)}
+              />
+              <NavItem
+                to="/grading"
+                icon={Layers}
+                label="Grading Systems"
+                onClick={() => setIsSidebarOpen(false)}
+              />
+              <NavItem
+                to="/attendance"
+                icon={CheckSquare}
+                label="Attendance"
+                onClick={() => setIsSidebarOpen(false)}
+              />
+              <NavItem
+                to="/timetable"
+                icon={Calendar}
+                label="Timetable"
+                onClick={() => setIsSidebarOpen(false)}
+              />
+            </>
+          )}
+
+        {/* Operations Section - Dynamic based on role */}
+        {(user?.role === ROLES.ADMIN ||
+          user?.role === ROLES.PRINCIPAL ||
+          user?.role === ROLES.FINANCE ||
+          user?.role === ROLES.LIBRARIAN ||
+          user?.role === ROLES.TEACHER ||
+          user?.role === ROLES.HOD) && (
+            <>
+              <div className="pt-3 md:pt-4 pb-2 px-3 md:px-4 text-[9px] md:text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">
+                Operations
+              </div>
+
+              {(user?.role === ROLES.ADMIN ||
+                user?.role === ROLES.PRINCIPAL ||
+                user?.role === ROLES.FINANCE) && (
+                  <NavItem
+                    to="/fees"
+                    icon={Wallet}
+                    label="Finance"
+                    onClick={() => setIsSidebarOpen(false)}
+                  />
+                )}
+
+              {(user?.role === ROLES.ADMIN || user?.role === ROLES.PRINCIPAL) && (
+                <NavItem
+                  to="/hr/directory"
+                  icon={UserSquare2}
+                  label="Staff"
+                  onClick={() => setIsSidebarOpen(false)}
+                />
+              )}
+
+              {(user?.role === ROLES.ADMIN ||
+                user?.role === ROLES.PRINCIPAL ||
+                user?.role === ROLES.FINANCE) && (
+                  <NavItem
+                    to="/hr/payroll"
+                    icon={ClipboardList}
+                    label="Payroll"
+                    onClick={() => setIsSidebarOpen(false)}
+                  />
+                )}
+
+              {(user?.role === ROLES.ADMIN ||
+                user?.role === ROLES.PRINCIPAL ||
+                user?.role === ROLES.LIBRARIAN) && (
+                  <NavItem
+                    to="/inventory"
+                    icon={Box}
+                    label="Inventory"
+                    onClick={() => setIsSidebarOpen(false)}
+                  />
+                )}
+
+              {(user?.role === ROLES.ADMIN ||
+                user?.role === ROLES.PRINCIPAL ||
+                user?.role === ROLES.HOD ||
+                user?.role === ROLES.TEACHER) && (
+                  <NavItem
+                    to="/discipline"
+                    icon={Scale}
+                    label="Discipline"
+                    onClick={() => setIsSidebarOpen(false)}
+                  />
+                )}
+
+              <NavItem
+                to="/hr/leave"
+                icon={Calendar}
+                label="Leave Requests"
+                onClick={() => setIsSidebarOpen(false)}
+              />
+            </>
+          )}
+
+        {/* Intelligence & System Sections */}
+        {(user?.role === ROLES.ADMIN || user?.role === ROLES.PRINCIPAL) && (
+          <>
+            <div className="pt-3 md:pt-4 pb-2 px-3 md:px-4 text-[9px] md:text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">
+              Intelligence
+            </div>
+            <NavItem
+              to="/analytics"
+              icon={BrainCircuit}
+              label="Analytics"
+              onClick={() => setIsSidebarOpen(false)}
+            />
+
+            <div className="pt-3 md:pt-4 pb-2 px-3 md:px-4 text-[9px] md:text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">
+              System
+            </div>
+            <NavItem
+              to="/communication"
+              icon={MessageSquare}
+              label="Communication"
+              onClick={() => setIsSidebarOpen(false)}
+            />
+            <NavItem
+              to="/audit-logs"
+              icon={ShieldAlert}
+              label="Audit Logs"
+              onClick={() => setIsSidebarOpen(false)}
+            />
+          </>
+        )}
+
+        {/* Platform Level Section */}
+        {user?.role === ROLES.SUPER_ADMIN && (
+          <>
+            <div className="pt-3 md:pt-4 pb-2 px-3 md:px-4 text-[9px] md:text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">
+              Platform Control
+            </div>
+            <NavItem
+              to="/super-admin"
+              icon={Shield}
+              label="Super-Admin"
+              onClick={() => setIsSidebarOpen(false)}
+            />
+            <NavItem
+              to="/audit-logs"
+              icon={ShieldAlert}
+              label="System Audit"
+              onClick={() => setIsSidebarOpen(false)}
+            />
+          </>
+        )}
+
+        {/* Portal View for Students/Parents */}
+        {(user?.role === ROLES.STUDENT || user?.role === ROLES.PARENT) && (
+          <>
+            <NavItem
+              to="/portal"
+              icon={LayoutDashboard}
+              label="Portal"
+              onClick={() => setIsSidebarOpen(false)}
+            />
+            <NavItem
+              to="/lms"
+              icon={GraduationCap}
+              label="Learning Portal"
+              onClick={() => setIsSidebarOpen(false)}
+            />
+            <NavItem
+              to="/timetable"
+              icon={Calendar}
+              label="Timetable"
+              onClick={() => setIsSidebarOpen(false)}
+            />
+          </>
+        )}
+      </nav>
+
+      <div className="mt-auto border-t border-white/5 pt-6 space-y-1">
         <NavItem
-          to="/dashboard"
-          icon={LayoutDashboard}
-          label="Dashboard"
+          to="/my-schools"
+          icon={School}
+          label="My Schools"
           onClick={() => setIsSidebarOpen(false)}
         />
-      )}
+        <NavItem
+          to="/support"
+          icon={LifeBuoy}
+          label="Support"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+        <NavItem
+          to="/settings"
+          icon={Settings}
+          label="Settings"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2.5 md:py-3 min-h-[44px] w-full text-primary-200/50 hover:text-rose-400 hover:bg-rose-500/10 rounded-2xl transition-all font-bold text-xs md:text-sm mb-4 touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
+        >
+          <LogOut className="w-4 h-4 md:w-5 md:h-5" />
+          Logout
+        </button>
 
-      {/* Academic Section */}
-      {(user?.role === ROLES.ADMIN ||
-        user?.role === ROLES.PRINCIPAL ||
-        user?.role === ROLES.TEACHER ||
-        user?.role === ROLES.HOD) && (
-        <>
-          <div className="pt-3 md:pt-4 pb-2 px-3 md:px-4 text-[9px] md:text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">
-            Academic
+        {/* Powered By Branding */}
+        <div className="flex flex-col items-center justify-center pt-4 pb-2 border-t border-white/5 opacity-50 hover:opacity-100 transition-opacity">
+          <ElimuHubLogo className="w-8 h-8" showText={false} />
+          <p className="text-[9px] font-bold text-white mt-2 uppercase tracking-[0.2em]">
+            Powered by
+          </p>
+          <p className="text-xs font-black text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-[#22c55e] mb-2">
+            ElimuHub
+          </p>
+          {/* Elegant Platform Version Badge */}
+          <div className="px-3 py-1 rounded-full text-[9px] font-mono font-bold tracking-wider bg-primary-500/10 border border-primary-500/20 text-primary-300 hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shadow-sm">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary-500"></span>
+            </span>
+            {systemStatus?.version ? `v${systemStatus.version}` : "v1.0.0"}
           </div>
-          <NavItem
-            to="/students"
-            icon={Users}
-            label="Students"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-          <NavItem
-            to="/lms"
-            icon={GraduationCap}
-            label="Learning Portal (LMS)"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-          <NavItem
-            to="/classes"
-            icon={BookOpen}
-            label="Classes"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-          <NavItem
-            to="/exams"
-            icon={ClipboardList}
-            label="Exams & Grading"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-          <NavItem
-            to="/grading"
-            icon={Layers}
-            label="Grading Systems"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-          <NavItem
-            to="/attendance"
-            icon={CheckSquare}
-            label="Attendance"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-          <NavItem
-            to="/timetable"
-            icon={Calendar}
-            label="Timetable"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-        </>
-      )}
-
-      {/* Operations Section - Dynamic based on role */}
-      {(user?.role === ROLES.ADMIN ||
-        user?.role === ROLES.PRINCIPAL ||
-        user?.role === ROLES.FINANCE ||
-        user?.role === ROLES.LIBRARIAN ||
-        user?.role === ROLES.TEACHER ||
-        user?.role === ROLES.HOD) && (
-        <>
-          <div className="pt-3 md:pt-4 pb-2 px-3 md:px-4 text-[9px] md:text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">
-            Operations
-          </div>
-
-          {(user?.role === ROLES.ADMIN ||
-            user?.role === ROLES.PRINCIPAL ||
-            user?.role === ROLES.FINANCE) && (
-            <NavItem
-              to="/fees"
-              icon={Wallet}
-              label="Finance & Fees"
-              onClick={() => setIsSidebarOpen(false)}
-            />
-          )}
-
-          {(user?.role === ROLES.ADMIN || user?.role === ROLES.PRINCIPAL) && (
-            <NavItem
-              to="/hr/directory"
-              icon={UserSquare2}
-              label="Staff"
-              onClick={() => setIsSidebarOpen(false)}
-            />
-          )}
-
-          {(user?.role === ROLES.ADMIN ||
-            user?.role === ROLES.PRINCIPAL ||
-            user?.role === ROLES.FINANCE) && (
-            <NavItem
-              to="/hr/payroll"
-              icon={ClipboardList}
-              label="Payroll"
-              onClick={() => setIsSidebarOpen(false)}
-            />
-          )}
-
-          {(user?.role === ROLES.ADMIN ||
-            user?.role === ROLES.PRINCIPAL ||
-            user?.role === ROLES.LIBRARIAN) && (
-            <NavItem
-              to="/inventory"
-              icon={Box}
-              label="Inventory"
-              onClick={() => setIsSidebarOpen(false)}
-            />
-          )}
-
-          {(user?.role === ROLES.ADMIN ||
-            user?.role === ROLES.PRINCIPAL ||
-            user?.role === ROLES.HOD ||
-            user?.role === ROLES.TEACHER) && (
-            <NavItem
-              to="/discipline"
-              icon={Scale}
-              label="Discipline"
-              onClick={() => setIsSidebarOpen(false)}
-            />
-          )}
-        </>
-      )}
-
-      {/* Intelligence & System Sections */}
-      {(user?.role === ROLES.ADMIN || user?.role === ROLES.PRINCIPAL) && (
-        <>
-          <div className="pt-3 md:pt-4 pb-2 px-3 md:px-4 text-[9px] md:text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">
-            Intelligence
-          </div>
-          <NavItem
-            to="/analytics"
-            icon={BrainCircuit}
-            label="Analytics"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-
-          <div className="pt-3 md:pt-4 pb-2 px-3 md:px-4 text-[9px] md:text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">
-            System
-          </div>
-          <NavItem
-            to="/communication"
-            icon={MessageSquare}
-            label="Communication"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-          <NavItem
-            to="/audit-logs"
-            icon={ShieldAlert}
-            label="Audit Logs"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-        </>
-      )}
-
-      {/* Platform Level Section */}
-      {user?.role === ROLES.SUPER_ADMIN && (
-        <>
-          <div className="pt-3 md:pt-4 pb-2 px-3 md:px-4 text-[9px] md:text-[10px] font-black text-primary-200/30 uppercase tracking-[0.2em]">
-            Platform Control
-          </div>
-          <NavItem
-            to="/super-admin"
-            icon={Shield}
-            label="Super-Admin"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-          <NavItem
-            to="/audit-logs"
-            icon={ShieldAlert}
-            label="System Audit"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-        </>
-      )}
-
-      {/* Portal View for Students/Parents */}
-      {(user?.role === ROLES.STUDENT || user?.role === ROLES.PARENT) && (
-        <>
-          <NavItem
-            to="/portal"
-            icon={LayoutDashboard}
-            label="Portal"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-          <NavItem
-            to="/lms"
-            icon={GraduationCap}
-            label="Learning Portal"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-          <NavItem
-            to="/timetable"
-            icon={Calendar}
-            label="Timetable"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-        </>
-      )}
-    </nav>
-
-    <div className="mt-auto border-t border-white/5 pt-6 space-y-1">
-      <NavItem
-        to="/my-schools"
-        icon={School}
-        label="My Schools"
-        onClick={() => setIsSidebarOpen(false)}
-      />
-      <NavItem
-        to="/support"
-        icon={LifeBuoy}
-        label="Support"
-        onClick={() => setIsSidebarOpen(false)}
-      />
-      <NavItem
-        to="/settings"
-        icon={Settings}
-        label="Settings"
-        onClick={() => setIsSidebarOpen(false)}
-      />
-      <button
-        onClick={handleLogout}
-        className="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2.5 md:py-3 min-h-[44px] w-full text-primary-200/50 hover:text-rose-400 hover:bg-rose-500/10 rounded-2xl transition-all font-bold text-xs md:text-sm mb-4 touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
-      >
-        <LogOut className="w-4 h-4 md:w-5 md:h-5" />
-        Logout
-      </button>
-
-      {/* Powered By Branding */}
-      <div className="flex flex-col items-center justify-center pt-4 pb-2 border-t border-white/5 opacity-50 hover:opacity-100 transition-opacity">
-        <ElimuHubLogo className="w-8 h-8" showText={false} />
-        <p className="text-[9px] font-bold text-white mt-2 uppercase tracking-[0.2em]">
-          Powered by
-        </p>
-        <p className="text-xs font-black text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-[#22c55e] mb-2">
-          ElimuHub
-        </p>
-        {/* Elegant Platform Version Badge */}
-        <div className="px-3 py-1 rounded-full text-[9px] font-mono font-bold tracking-wider bg-primary-500/10 border border-primary-500/20 text-primary-300 hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shadow-sm">
-          <span className="relative flex h-1.5 w-1.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary-500"></span>
-          </span>
-          {systemStatus?.version ? `v${systemStatus.version}` : "v1.0.0"}
         </div>
       </div>
     </div>
-  </div>
   );
 };
 
@@ -547,11 +553,10 @@ export const MainLayout = () => {
               <div className="relative">
                 <button
                   onClick={() => setShowNotifications(!showNotifications)}
-                  className={`p-2.5 min-h-[44px] min-w-[44px] rounded-xl border transition-all relative active:scale-95 touch-manipulation ${
-                    showNotifications
-                      ? "bg-primary-600 border-primary-500 text-white shadow-premium"
-                      : "bg-white/5 border-white/5 text-primary-200/50 hover:text-white"
-                  }`}
+                  className={`p-2.5 min-h-[44px] min-w-[44px] rounded-xl border transition-all relative active:scale-95 touch-manipulation ${showNotifications
+                    ? "bg-primary-600 border-primary-500 text-white shadow-premium"
+                    : "bg-white/5 border-white/5 text-primary-200/50 hover:text-white"
+                    }`}
                   aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}
                   aria-expanded={showNotifications}
                 >
@@ -595,7 +600,7 @@ export const MainLayout = () => {
                         </div>
                         <div className="max-h-[60vh] sm:max-h-[400px] overflow-y-auto pr-1 space-y-1 custom-scrollbar">
                           {!Array.isArray(notifications) ||
-                          notifications.length === 0 ? (
+                            notifications.length === 0 ? (
                             <div className="p-10 text-center text-primary-200/30 text-xs font-medium italic">
                               No new notifications
                             </div>
@@ -609,13 +614,12 @@ export const MainLayout = () => {
                               >
                                 <div className="flex items-start gap-3">
                                   <div
-                                    className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${
-                                      n.notification_type === "success"
-                                        ? "bg-emerald-500"
-                                        : n.notification_type === "warning"
-                                          ? "bg-amber-500"
-                                          : "bg-primary-500"
-                                    } ${n.is_read ? "opacity-20" : "shadow-glow"}`}
+                                    className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${n.notification_type === "success"
+                                      ? "bg-emerald-500"
+                                      : n.notification_type === "warning"
+                                        ? "bg-amber-500"
+                                        : "bg-primary-500"
+                                      } ${n.is_read ? "opacity-20" : "shadow-glow"}`}
                                   />
                                   <div className="flex-1 min-w-0">
                                     <p

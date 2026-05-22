@@ -172,6 +172,9 @@ const StaffDirectoryPage = lazy(() =>
 const PayrollPage = lazy(() =>
   import("./pages/PayrollPage").then((m) => ({ default: m.PayrollPage })),
 );
+const LeavePage = lazy(() =>
+  import("./pages/LeavePage").then((m) => ({ default: m.LeavePage })),
+);
 const InventoryPage = lazy(() =>
   import("./pages/InventoryPage").then((m) => ({ default: m.InventoryPage })),
 );
@@ -625,6 +628,24 @@ function App() {
                     ]}
                   >
                     <PayrollPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/hr/leave"
+                element={
+                  <ProtectedRoute
+                    allowedRoles={[
+                      ROLES.SUPER_ADMIN,
+                      ROLES.ADMIN,
+                      ROLES.PRINCIPAL,
+                      ROLES.HOD,
+                      ROLES.TEACHER,
+                      ROLES.FINANCE,
+                      ROLES.LIBRARIAN,
+                    ]}
+                  >
+                    <LeavePage />
                   </ProtectedRoute>
                 }
               />

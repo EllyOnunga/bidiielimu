@@ -107,19 +107,23 @@ def import_students_csv_task(self, schema_name, file_path, user_id):
     """
     Background task to process student import from CSV under schema context.
     """
-    import os
     import csv
+    import os
     from datetime import datetime
+
     from django.conf import settings
     from django_tenants.utils import schema_context
-    from students.models import Student, Guardian
+
     from classes.models import GradeLevel, Stream
+    from students.models import Guardian, Student
 
     # Verify boundary of the file_path strictly to prevent traversal/security issues
     # The file should reside inside media/<schema_name>/temp_imports/
-    expected_dir = os.path.abspath(os.path.join(settings.MEDIA_ROOT, schema_name, "temp_imports"))
+    expected_dir = os.path.abspath(
+        os.path.join(settings.MEDIA_ROOT, schema_name, "temp_imports")
+    )
     real_path = os.path.abspath(file_path)
-    
+
     if not real_path.startswith(expected_dir + os.path.sep):
         error_msg = "Security exception: Invalid directory path boundary checked."
         self.update_state(
@@ -130,7 +134,7 @@ def import_students_csv_task(self, schema_name, file_path, user_id):
                 "success_count": 0,
                 "errors": [error_msg],
                 "schema_name": schema_name,
-            }
+            },
         )
         return {"success_count": 0, "errors": [error_msg]}
 
@@ -140,7 +144,9 @@ def import_students_csv_task(self, schema_name, file_path, user_id):
 
         try:
             if not os.path.exists(file_path):
-                raise FileNotFoundError(f"CSV file not found: {os.path.basename(file_path)}")
+                raise FileNotFoundError(
+                    f"CSV file not found: {os.path.basename(file_path)}"
+                )
 
             with open(file_path, "r", encoding="utf-8-sig") as f:
                 reader = csv.reader(f)
@@ -156,7 +162,7 @@ def import_students_csv_task(self, schema_name, file_path, user_id):
                     "success_count": 0,
                     "errors": [f"Failed to load CSV: {str(e)}"],
                     "schema_name": schema_name,
-                }
+                },
             )
             if os.path.exists(file_path):
                 try:
@@ -173,7 +179,7 @@ def import_students_csv_task(self, schema_name, file_path, user_id):
                 "success_count": 0,
                 "errors": [],
                 "schema_name": schema_name,
-            }
+            },
         )
 
         with open(file_path, "r", encoding="utf-8-sig") as f:
@@ -186,7 +192,9 @@ def import_students_csv_task(self, schema_name, file_path, user_id):
 
                     stream = None
                     if grade_name and stream_name:
-                        grade, _ = GradeLevel.objects.get_or_create(name=grade_name.strip())
+                        grade, _ = GradeLevel.objects.get_or_create(
+                            name=grade_name.strip()
+                        )
                         stream, _ = Stream.objects.get_or_create(
                             grade_level=grade, name=stream_name.strip()
                         )
@@ -202,7 +210,9 @@ def import_students_csv_task(self, schema_name, file_path, user_id):
                     enroll_str = row.get("enrollment_date")
                     enroll = None
                     if enroll_str:
-                        enroll = datetime.strptime(enroll_str.strip(), "%Y-%m-%d").date()
+                        enroll = datetime.strptime(
+                            enroll_str.strip(), "%Y-%m-%d"
+                        ).date()
                     else:
                         enroll = datetime.today().date()
 
@@ -226,7 +236,11 @@ def import_students_csv_task(self, schema_name, file_path, user_id):
                         admission_number=adm,
                         first_name=first_name,
                         last_name=last_name,
-                        gender=row.get("gender", "O")[0].upper() if row.get("gender") else "O",
+                        gender=(
+                            row.get("gender", "O")[0].upper()
+                            if row.get("gender")
+                            else "O"
+                        ),
                         date_of_birth=dob,
                         enrollment_date=enroll,
                         stream=stream,
@@ -236,13 +250,23 @@ def import_students_csv_task(self, schema_name, file_path, user_id):
 
                     # Create basic guardian if provided
                     if row.get("guardian_name") or row.get("parent_name"):
-                        g_name = row.get("guardian_name") or row.get("parent_name") or "Guardian"
+                        g_name = (
+                            row.get("guardian_name")
+                            or row.get("parent_name")
+                            or "Guardian"
+                        )
                         g_name = g_name.strip()
-                        g_phone = row.get("guardian_phone") or row.get("parent_phone") or ""
+                        g_phone = (
+                            row.get("guardian_phone") or row.get("parent_phone") or ""
+                        )
                         g_phone = g_phone.strip()
-                        g_email = row.get("guardian_email") or row.get("parent_email") or ""
+                        g_email = (
+                            row.get("guardian_email") or row.get("parent_email") or ""
+                        )
                         g_email = g_email.strip()
-                        g_relationship = row.get("guardian_relationship") or "LEGAL_GUARDIAN"
+                        g_relationship = (
+                            row.get("guardian_relationship") or "LEGAL_GUARDIAN"
+                        )
                         g_relationship = g_relationship.strip()
 
                         Guardian.objects.create(
@@ -270,17 +294,20 @@ def import_students_csv_task(self, schema_name, file_path, user_id):
                         "success_count": results["success_count"],
                         "errors": results["errors"],
                         "schema_name": schema_name,
-                    }
+                    },
                 )
 
         # Create a notification for completion
         try:
             from notifications.models import Notification
+
             Notification.objects.create(
                 user_id=user_id,
                 title="Student Bulk Import Complete",
                 message=f"Successfully imported {results['success_count']} students. {len(results['errors'])} errors encountered.",
-                notification_type="success" if results["success_count"] > 0 else "error",
+                notification_type=(
+                    "success" if results["success_count"] > 0 else "error"
+                ),
             )
         except Exception as e:
             print(f"Failed to create notification: {e}")
@@ -293,4 +320,3 @@ def import_students_csv_task(self, schema_name, file_path, user_id):
                 pass
 
         return results
-

@@ -39,7 +39,6 @@ export const StaffDirectory = () => {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<"All" | "Teachers" | "Other">(
     "All",
   );
@@ -94,6 +93,26 @@ export const StaffDirectory = () => {
     },
   });
 
+  const formatApiError = (error: any, fallbackMessage: string) => {
+    const data = error.response?.data;
+    if (data && typeof data === "object") {
+      const messages = Object.entries(data)
+        .map(([key, val]) => {
+          if (key === "detail") return String(val);
+          const formattedKey = key
+            .replace(/_/g, " ")
+            .replace(/\b\w/g, (c) => c.toUpperCase());
+          const valMessage = Array.isArray(val) ? val.join(", ") : String(val);
+          return `${formattedKey}: ${valMessage}`;
+        })
+        .filter(Boolean);
+      if (messages.length > 0) {
+        return messages.join("\n");
+      }
+    }
+    return data?.detail || fallbackMessage;
+  };
+
   const createMutation = useMutation({
     mutationFn: (data: any) => {
       return data.role === "TEACHER"
@@ -107,7 +126,7 @@ export const StaffDirectory = () => {
       queryClient.invalidateQueries({ queryKey: ["staff"] });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.detail || "Failed to onboard staff");
+      toast.error(formatApiError(error, "Failed to onboard staff"));
     },
   });
 
@@ -125,7 +144,7 @@ export const StaffDirectory = () => {
       queryClient.invalidateQueries({ queryKey: ["staff"] });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.detail || "Update failed");
+      toast.error(formatApiError(error, "Update failed"));
     },
   });
 
@@ -147,7 +166,6 @@ export const StaffDirectory = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
     const payload = editingStaff
       ? { ...formData, id: editingStaff.id }
       : formData;
@@ -156,7 +174,6 @@ export const StaffDirectory = () => {
     } else {
       createMutation.mutate(payload);
     }
-    setIsSubmitting(false);
   };
 
   const handleEdit = (member: StaffMember) => {
@@ -466,15 +483,17 @@ export const StaffDirectory = () => {
 
           <div className="col-span-full pt-6">
             <button
-              disabled={isSubmitting}
+              disabled={createMutation.isPending || updateMutation.isPending}
               className="w-full py-4 bg-primary-500 hover:bg-primary-400 text-white rounded-[20px] font-black text-base shadow-premium transition-all flex items-center justify-center gap-3 disabled:opacity-50"
             >
-              {isSubmitting ? (
+              {createMutation.isPending || updateMutation.isPending ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 <Plus className="w-5 h-5" />
               )}
-              {isSubmitting ? "PROVISIONING..." : "FINALIZE ONBOARDING"}
+              {createMutation.isPending || updateMutation.isPending
+                ? "PROVISIONING..."
+                : "FINALIZE ONBOARDING"}
             </button>
           </div>
         </form>

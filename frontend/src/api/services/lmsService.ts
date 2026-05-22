@@ -1,8 +1,8 @@
 import client from "../client";
 
 export const lmsService = {
-  getQuizzes: async () => {
-    const response = await client.get("lms/quizzes/");
+  getQuizzes: async (params?: { stream?: string | number }) => {
+    const response = await client.get("lms/quizzes/", { params });
     return response.data;
   },
 
@@ -21,8 +21,8 @@ export const lmsService = {
     return response.data;
   },
 
-  getResources: async () => {
-    const response = await client.get("lms/resources/");
+  getResources: async (params?: { stream?: string | number }) => {
+    const response = await client.get("lms/resources/", { params });
     return response.data;
   },
 
@@ -72,6 +72,21 @@ export const lmsService = {
         headers: { "Content-Type": "multipart/form-data" },
       },
     );
+    return response.data;
+  },
+
+  getDiscussions: async (params?: any) => {
+    const response = await client.get("lms/discussions/", { params });
+    return response.data;
+  },
+
+  createDiscussion: async (data: any) => {
+    const response = await client.post("lms/discussions/", data);
+    return response.data;
+  },
+
+  deleteDiscussion: async (id: string | number) => {
+    const response = await client.delete(`lms/discussions/${id}/`);
     return response.data;
   },
 };
