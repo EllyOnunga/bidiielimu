@@ -45,7 +45,7 @@ whitenoise>=6.4.0
 gunicorn>=26.0.0
 
 # Security
-django-otp>=1.5.0
+django-otp>=1.7.0
 django-allauth-2fa>=0.9.0
 argon2-cffi>=23.1.0
 
