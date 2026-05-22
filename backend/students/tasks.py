@@ -1,5 +1,7 @@
 import csv
 import io
+import secrets
+import string
 
 from celery import shared_task
 from django.contrib.auth import get_user_model
@@ -29,7 +31,17 @@ def process_bulk_upload(csv_content, school_id, user_id):
     for row_idx, row in enumerate(reader, start=2):
         try:
             email = row.get("email")
-            password = row.get("password", "Student123!")
+            # Generate a cryptographically secure temporary password;
+            # never rely on a hardcoded default.
+            _alphabet = string.ascii_letters + string.digits + string.punctuation
+            # Ensure at least one of each required category for common password policies
+            password = (
+                secrets.choice(string.ascii_uppercase)
+                + secrets.choice(string.ascii_lowercase)
+                + secrets.choice(string.digits)
+                + secrets.choice(string.punctuation)
+                + "".join(secrets.choice(_alphabet) for _ in range(12))
+            )
             first_name = row.get("first_name")
             last_name = row.get("last_name")
             admission_number = row.get("admission_number")
@@ -80,6 +92,20 @@ def process_bulk_upload(csv_content, school_id, user_id):
                     parent_name=parent_name,
                     parent_phone=parent_phone,
                 )
+                # Send welcome email with generated credentials
+                try:
+                    from accounts.services import EmailService
+
+                    base_url = EmailService._get_frontend_url(user)
+                    login_url = f"{base_url}/login"
+                    EmailService.send_welcome_email(
+                        user, login_url=login_url, plain_password=password
+                    )
+                except Exception as email_err:
+                    errors.append(
+                        f"Row {row_idx}: Created but welcome email failed: {email_err}"
+                    )
+
                 created_count += 1
 
         except Exception as e:

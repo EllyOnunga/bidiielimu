@@ -1,5 +1,7 @@
 import csv
 import io
+import secrets
+import string
 
 from django.contrib.auth import get_user_model
 from django.db import transaction
@@ -76,9 +78,19 @@ class TeacherViewSet(viewsets.ModelViewSet):
                         from accounts.models import Role
 
                         teacher_role = Role.objects.get(name="TEACHER")
+                        # Generate a cryptographically secure temporary password.
+                        # Never derive credentials from predictable values like employee IDs.
+                        _alpha = string.ascii_letters + string.digits + string.punctuation
+                        temp_password = (
+                            secrets.choice(string.ascii_uppercase)
+                            + secrets.choice(string.ascii_lowercase)
+                            + secrets.choice(string.digits)
+                            + secrets.choice(string.punctuation)
+                            + "".join(secrets.choice(_alpha) for _ in range(12))
+                        )
                         user = User.objects.create_user(
                             email=email,
-                            password=f"teacher@{emp_id}",
+                            password=temp_password,
                             role=teacher_role,
                             first_name=first_name,
                             last_name=last_name,
@@ -105,7 +117,7 @@ class TeacherViewSet(viewsets.ModelViewSet):
                         EmailService.send_welcome_email(
                             user,
                             login_url=login_url,
-                            plain_password=f"teacher@{emp_id}",
+                            plain_password=temp_password,
                         )
 
                         # Assign as class teacher if class_id provided
