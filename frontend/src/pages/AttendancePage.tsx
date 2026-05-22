@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   CheckCircle2,
@@ -10,6 +10,8 @@ import {
   Users,
   ShieldCheck,
   Zap,
+  Wifi,
+  WifiOff,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
@@ -48,6 +50,48 @@ export const AttendancePage = () => {
     Record<number, AttendanceStatus>
   >({});
   const [search, setSearch] = useState("");
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  useEffect(() => {
+    const handleOnline = async () => {
+      setIsOnline(true);
+      setIsSyncing(true);
+      try {
+        const { synced, failed } =
+          await attendanceService.syncOfflineAttendance();
+        if (synced > 0) {
+          toast.success(`Successfully synced ${synced} offline records!`);
+          queryClient.invalidateQueries({
+            queryKey: ["attendance", selectedDate, selectedStream],
+          });
+        }
+        if (failed > 0) {
+          toast.error(
+            `Failed to sync ${failed} records. Will try again later.`,
+          );
+        }
+      } catch (e) {
+        console.error("Sync failed", e);
+      } finally {
+        setIsSyncing(false);
+      }
+    };
+
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    if (navigator.onLine) {
+      handleOnline();
+    }
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, [queryClient, selectedDate, selectedStream]);
 
   const { data: gradesData = [] } = useQuery({
     queryKey: ["grades"],
@@ -105,8 +149,12 @@ export const AttendancePage = () => {
 
   const bulkMarkMutation = useMutation({
     mutationFn: (data: any) => attendanceService.bulkMark(data),
-    onSuccess: () => {
-      toast.success("Attendance successfully saved");
+    onSuccess: (data) => {
+      if (data?.offline) {
+        toast.success(data.message || "Saved offline.", { icon: "🔄" });
+      } else {
+        toast.success("Attendance successfully saved");
+      }
       queryClient.invalidateQueries({
         queryKey: ["attendance", selectedDate, selectedStream],
       });
@@ -143,8 +191,18 @@ export const AttendancePage = () => {
     >
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
         <div className="space-y-2">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary tracking-tight leading-none">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-primary tracking-tight leading-none flex items-center gap-4 flex-wrap">
             Student <span className="text-gradient">Attendance</span>
+            {!isOnline && (
+              <span className="text-sm bg-rose-500/20 text-rose-500 px-3 py-1 rounded-full flex items-center gap-2">
+                <WifiOff className="w-4 h-4" /> Offline Mode
+              </span>
+            )}
+            {isOnline && isSyncing && (
+              <span className="text-sm bg-blue-500/20 text-blue-500 px-3 py-1 rounded-full flex items-center gap-2">
+                <Wifi className="w-4 h-4 animate-pulse" /> Syncing...
+              </span>
+            )}
           </h1>
           <p className="text-muted text-xs sm:text-sm md:text-base font-medium max-w-xl">
             Mark and track daily attendance for your school classes.

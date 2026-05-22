@@ -70,9 +70,13 @@ export const PublicFooter = () => {
 
         <div className="pt-10 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-[9px] font-black text-muted uppercase tracking-[0.4em] text-center sm:text-left flex flex-wrap items-center justify-center sm:justify-start gap-2">
-            <span>&copy; {new Date().getFullYear()} ElimuHub. All rights reserved.</span>
+            <span>
+              &copy; {new Date().getFullYear()} ElimuHub. All rights reserved.
+            </span>
             <span className="hidden sm:inline text-white/10">•</span>
-            <span className="font-mono text-white/30 font-bold hover:text-primary-400 transition-colors">v1.0.0</span>
+            <span className="font-mono text-white/30 font-bold hover:text-primary-400 transition-colors">
+              v1.0.0
+            </span>
           </div>
           <div className="flex items-center gap-8">
             <div className="flex gap-4">

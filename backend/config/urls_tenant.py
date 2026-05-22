@@ -11,12 +11,14 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 
-from schools.views_theme import TenantThemeView
 from config.views_tasks import SystemTaskStatusView
+from schools.views_theme import TenantThemeView
 
 
 def health_check(request):
-    return JsonResponse({"status": "ok", "version": settings.VERSION, "schema": "tenant"})
+    return JsonResponse(
+        {"status": "ok", "version": settings.VERSION, "schema": "tenant"}
+    )
 
 
 urlpatterns = [
@@ -25,15 +27,17 @@ urlpatterns = [
     path(
         "api/v1/system/tasks/<str:task_id>/",
         SystemTaskStatusView.as_view(),
-        name="system-task-status"
+        name="system-task-status",
     ),
     path(
         "api/v1/ping/",
-        lambda r: JsonResponse({
-            "status": "ping-tenant",
-            "version": settings.VERSION,
-            "environment": "development" if settings.DEBUG else "production"
-        }),
+        lambda r: JsonResponse(
+            {
+                "status": "ping-tenant",
+                "version": settings.VERSION,
+                "environment": "development" if settings.DEBUG else "production",
+            }
+        ),
         name="ping-tenant",
     ),
     path("api/v1/accounts/", include("accounts.urls")),

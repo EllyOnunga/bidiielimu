@@ -833,3 +833,42 @@ if not IS_RENDER and is_writable(BASE_DIR / "logs"):
 # File Upload Settings (100MB limit for videos)
 DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600
 FILE_UPLOAD_MAX_MEMORY_SIZE = 104857600
+
+# OpenTelemetry Configuration
+import os
+
+OTEL_ENABLED = os.environ.get("OTEL_ENABLED", "True") == "True"
+if OTEL_ENABLED:
+    try:
+        import logging
+
+        from opentelemetry import trace
+        from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import (
+            OTLPSpanExporter,
+        )
+        from opentelemetry.instrumentation.celery import CeleryInstrumentor
+        from opentelemetry.instrumentation.django import DjangoInstrumentor
+        from opentelemetry.instrumentation.psycopg2 import Psycopg2Instrumentor
+        from opentelemetry.sdk.resources import Resource
+        from opentelemetry.sdk.trace import TracerProvider
+        from opentelemetry.sdk.trace.export import BatchSpanProcessor
+
+        if not hasattr(trace, "_ELIMUHUB_OTEL_INITIALIZED"):
+            resource = Resource.create({"service.name": "elimuhub-backend"})
+            provider = TracerProvider(resource=resource)
+            # Send to local otel-collector sidecar on port 4317
+            processor = BatchSpanProcessor(
+                OTLPSpanExporter(endpoint="http://otel-collector:4317", insecure=True)
+            )
+            provider.add_span_processor(processor)
+            trace.set_tracer_provider(provider)
+
+            DjangoInstrumentor().instrument()
+            Psycopg2Instrumentor().instrument()
+            CeleryInstrumentor().instrument()
+            trace._ELIMUHUB_OTEL_INITIALIZED = True
+            logging.info(
+                "OpenTelemetry initialized and connected to otel-collector:4317"
+            )
+    except ImportError:
+        pass

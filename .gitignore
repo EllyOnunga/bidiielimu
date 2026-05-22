@@ -27,8 +27,6 @@ share/python-wheels/
 MANIFEST
 
 # PyInstaller
-#  Usually these files are written by a python script, and contain several settings for
-#  a binary executable.
 *.manifest
 *.spec
 
@@ -59,8 +57,8 @@ cover/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-staticfiles/
-media/
+backend/staticfiles/
+backend/media/
 logs/
 
 # Flask stuff:
@@ -85,28 +83,18 @@ profile_default/
 ipython_config.py
 
 # pyenv
-#   For a library or package, you might want to ignore these files since the code is
-#   intended to run in multiple environments; otherwise, check them in:
 # .python-version
 
 # pipenv
-#   According to pypa/pipenv#1255, pipenv should generally have its out-of-code-folders
-#   (.venv) ignored, or check them in:
-# .venv
-#  In some cases, you may want to ignore Pipfile.lock too:
 # Pipfile.lock
 
 # poetry
-#   Similar to pipenv, poetry should generally have its virtualenv ignored:
 # .venv
 
 # pdm
-#   Similar to pipenv, pdm should generally have its .pdm-python ignored:
 # .pdm-python
-#   pdm-lock.dev.txt is a developer-only file:
-# pdm-lock.dev.txt
 
-# PEP 582; used by e.g. github.com/pdm-project/pdm
+# PEP 582
 __pypackages__/
 
 # Celery stuff
@@ -116,8 +104,18 @@ celerybeat.pid
 # SageMath parsed files
 *.sage.py
 
-# Environments
+# ========================
+# SECRETS & CREDENTIALS
+# ========================
 .env
+.env.local
+.env.*.local
+!.env.example
+nginx/userlist.txt
+
+# ========================
+# PYTHON VIRTUAL ENVS
+# ========================
 .venv
 env/
 venv/
@@ -125,44 +123,83 @@ ENV/
 env.bak/
 venv.bak/
 
-# Spyder project settings
-.spyderproject
-.spyproject
+# ========================
+# DOCKER VOLUMES / DATA
+# ========================
+postgres_data/
+redis_data/
+prometheus_data/
+grafana_data/
 
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre type checker
-.pyre/
-
-# pytype static type analyzer
-.pytype/
-
-# Cython debug symbols
-cython_debug/
-
-# Node stuff
+# ========================
+# COMPILED FRONTEND ASSETS
+# ========================
+frontend/dist/
+frontend/.vite/
+frontend/build/
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# OS stuff
+# ========================
+# ML MODEL ARTIFACTS
+# ========================
+*.pkl
+*.joblib
+*.h5
+*.onnx
+models/
+backend/ml_models/
+
+# ========================
+# LOGS
+# ========================
+*.log
+backend/logs/
+
+# ========================
+# SSL / TLS CERTIFICATES
+# ========================
+nginx/certs/
+*.pem
+*.key
+*.crt
+*.csr
+
+# ========================
+# STATIC TYPE CHECKERS
+# ========================
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+cython_debug/
+
+# ========================
+# Spyder / Rope
+# ========================
+.spyderproject
+.spyproject
+.ropeproject
+
+# mkdocs
+/site
+
+# ========================
+# OS / IDE
+# ========================
 .DS_Store
 Thumbs.db
-
-# IDE stuff
 .vscode/
 .idea/
 *.swp
-*.swo
-
 .automate
+
+# ========================
+# DATABASE BACKUPS
+# ========================
+backend/backups/
+*.sql
+*.sql.gz

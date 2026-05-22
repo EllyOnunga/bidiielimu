@@ -1,5 +1,14 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Check, X, Clock, Save, ChevronLeft, Search } from "lucide-react";
+import {
+  Check,
+  X,
+  Clock,
+  Save,
+  ChevronLeft,
+  Search,
+  Wifi,
+  WifiOff,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
@@ -24,6 +33,48 @@ export const AttendanceMarkingPage = () => {
     Record<number, string>
   >({});
   const [search, setSearch] = useState("");
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  useEffect(() => {
+    const handleOnline = async () => {
+      setIsOnline(true);
+      setIsSyncing(true);
+      try {
+        const { synced, failed } =
+          await attendanceService.syncOfflineAttendance();
+        if (synced > 0) {
+          toast.success(`Successfully synced ${synced} offline records!`);
+          queryClient.invalidateQueries({
+            queryKey: ["attendance-stats"],
+          });
+        }
+        if (failed > 0) {
+          toast.error(
+            `Failed to sync ${failed} records. Will try again later.`,
+          );
+        }
+      } catch (e) {
+        console.error("Sync failed", e);
+      } finally {
+        setIsSyncing(false);
+      }
+    };
+
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    if (navigator.onLine) {
+      handleOnline();
+    }
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, [queryClient]);
 
   const { data: streamsRaw = [] } = useQuery({
     queryKey: ["streams"],
@@ -71,8 +122,12 @@ export const AttendanceMarkingPage = () => {
 
   const saveAttendanceMutation = useMutation({
     mutationFn: (data: any) => attendanceService.saveAttendance(data),
-    onSuccess: () => {
-      toast.success("Attendance saved successfully!");
+    onSuccess: (data) => {
+      if (data?.offline) {
+        toast.success(data.message || "Saved offline.", { icon: "🔄" });
+      } else {
+        toast.success("Attendance saved successfully!");
+      }
       queryClient.invalidateQueries({ queryKey: ["attendance-stats"] });
     },
     onError: (error: any) => {
@@ -105,8 +160,18 @@ export const AttendanceMarkingPage = () => {
           <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-muted" />
         </Link>
         <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-primary tracking-tight">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-primary tracking-tight flex items-center gap-3 flex-wrap">
             Mark Attendance
+            {!isOnline && (
+              <span className="text-xs bg-rose-500/20 text-rose-500 px-2 py-1 rounded-full flex items-center gap-1.5">
+                <WifiOff className="w-3 h-3" /> Offline Mode
+              </span>
+            )}
+            {isOnline && isSyncing && (
+              <span className="text-xs bg-blue-500/20 text-blue-500 px-2 py-1 rounded-full flex items-center gap-1.5">
+                <Wifi className="w-3 h-3 animate-pulse" /> Syncing...
+              </span>
+            )}
           </h1>
           <p className="text-muted text-sm md:text-base">
             Recording attendance for {selectedClassLabel}

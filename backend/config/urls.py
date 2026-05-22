@@ -50,11 +50,13 @@ urlpatterns = [
     path("graphql/", GraphQLView.as_view(graphiql=True)),
     path(
         "api/v1/ping/",
-        lambda r: JsonResponse({
-            "status": "ping-main",
-            "version": settings.VERSION,
-            "environment": "development" if settings.DEBUG else "production",
-        }),
+        lambda r: JsonResponse(
+            {
+                "status": "ping-main",
+                "version": settings.VERSION,
+                "environment": "development" if settings.DEBUG else "production",
+            }
+        ),
         name="ping-main",
     ),
     path("api/v1/theme/", TenantThemeView.as_view(), name="theme"),

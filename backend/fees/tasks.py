@@ -1,12 +1,13 @@
 import io
 import os
 import uuid
+
 from celery import shared_task
-from django_tenants.utils import schema_context
 from django.conf import settings
-from django.db import connection
-from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
+from django.db import connection
+from django_tenants.utils import schema_context
 
 from fees.models import FeePayment
 from schools.models import SchoolSetting
@@ -27,7 +28,9 @@ def generate_bulk_receipts_pdf(payment_ids):
     buffer = io.BytesIO()
     c = canvas.Canvas(buffer, pagesize=letter)
 
-    payments = FeePayment.objects.select_related("student", "invoice").filter(id__in=payment_ids)
+    payments = FeePayment.objects.select_related("student", "invoice").filter(
+        id__in=payment_ids
+    )
 
     settings_obj = SchoolSetting.objects.first()
     primary_color = (
@@ -109,7 +112,9 @@ def save_tenant_pdf(schema_name, filename, pdf_data):
         return default_storage.url(saved_name)
     else:
         # Local File System Storage fallback
-        temp_dir = os.path.abspath(os.path.join(settings.MEDIA_ROOT, schema_name, "temp_prints"))
+        temp_dir = os.path.abspath(
+            os.path.join(settings.MEDIA_ROOT, schema_name, "temp_prints")
+        )
         os.makedirs(temp_dir, exist_ok=True)
         file_path = os.path.abspath(os.path.join(temp_dir, filename))
 
@@ -134,8 +139,8 @@ def generate_bulk_receipts_pdf_task(self, schema_name, payment_ids):
             "current": 0,
             "total": len(payment_ids),
             "schema_name": schema_name,
-            "detail": "Beginning PDF compilation..."
-        }
+            "detail": "Beginning PDF compilation...",
+        },
     )
 
     with schema_context(schema_name):
@@ -153,16 +158,12 @@ def generate_bulk_receipts_pdf_task(self, schema_name, payment_ids):
                 "current": len(payment_ids),
                 "total": len(payment_ids),
                 "schema_name": schema_name,
-                "status": "SUCCESS"
+                "status": "SUCCESS",
             }
             return result
 
         except Exception as e:
             self.update_state(
-                state="FAILURE",
-                meta={
-                    "errors": [str(e)],
-                    "schema_name": schema_name
-                }
+                state="FAILURE", meta={"errors": [str(e)], "schema_name": schema_name}
             )
             raise e

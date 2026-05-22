@@ -6,6 +6,7 @@ from django_tenants.utils import tenant_context
 from schools.models import School
 from students.models import Student
 
+from .analytics_tasks import train_predictive_retention_model
 from .ml_engine import EarlyWarningEngine
 
 logger = logging.getLogger(__name__)

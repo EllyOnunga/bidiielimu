@@ -16,8 +16,19 @@ class Resource(models.Model):
     category = models.CharField(max_length=10, choices=CATEGORY_CHOICES, default="NOTE")
     version = models.IntegerField(default=1)
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    stream = models.ForeignKey(
+        "classes.Stream",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="resources",
+    )
     uploaded_by = models.ForeignKey(
-        "teachers.Teacher", on_delete=models.SET_NULL, null=True
+        "teachers.Teacher",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="uploaded_resources",
     )
 
     def __str__(self):
@@ -100,6 +111,21 @@ class Quiz(models.Model):
     subject = models.ForeignKey(
         "classes.Subject", on_delete=models.CASCADE, related_name="quizzes"
     )
+    stream = models.ForeignKey(
+        "classes.Stream",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="quizzes",
+    )
+    teacher = models.ForeignKey(
+        "teachers.Teacher",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="quizzes",
+    )
+
     title = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
     duration_minutes = models.IntegerField(default=30)

@@ -231,7 +231,11 @@ export const StudentsPage = () => {
   const [importTaskId, setImportTaskId] = useState<string | null>(null);
   const [importProgress, setImportProgress] = useState(0);
   const [importStatus, setImportStatus] = useState<string | null>(null);
-  const [importStats, setImportStats] = useState({ success: 0, total: 0, current: 0 });
+  const [importStats, setImportStats] = useState({
+    success: 0,
+    total: 0,
+    current: 0,
+  });
   const [importErrors, setImportErrors] = useState<string[]>([]);
 
   const importStudentsMutation = useMutation({
@@ -263,7 +267,9 @@ export const StudentsPage = () => {
         setImportErrors(data.errors || []);
 
         if (data.total > 0) {
-          setImportProgress(Math.min(100, Math.round((data.current / data.total) * 100)));
+          setImportProgress(
+            Math.min(100, Math.round((data.current / data.total) * 100)),
+          );
         }
 
         if (data.status === "SUCCESS") {
@@ -281,7 +287,6 @@ export const StudentsPage = () => {
 
     return () => clearInterval(intervalId);
   }, [importTaskId, queryClient]);
-
 
   const resetForm = () => {
     setFormData({
@@ -874,7 +879,9 @@ export const StudentsPage = () => {
                       ? "Import Failed"
                       : "Processing CSV..."}
                 </span>
-                <span className="font-mono text-primary-400">{importProgress}%</span>
+                <span className="font-mono text-primary-400">
+                  {importProgress}%
+                </span>
               </div>
               <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden relative border border-white/5">
                 <motion.div
@@ -891,22 +898,34 @@ export const StudentsPage = () => {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-2xl text-center backdrop-blur-sm">
-                <span className="text-emerald-400 text-base font-black uppercase block">{importStats.success}</span>
-                <span className="text-[8px] text-primary-200/40 uppercase tracking-widest font-black mt-1.5 block">Imported</span>
+                <span className="text-emerald-400 text-base font-black uppercase block">
+                  {importStats.success}
+                </span>
+                <span className="text-[8px] text-primary-200/40 uppercase tracking-widest font-black mt-1.5 block">
+                  Imported
+                </span>
               </div>
               <div className="bg-rose-500/5 border border-rose-500/10 p-4 rounded-2xl text-center backdrop-blur-sm">
-                <span className="text-rose-400 text-base font-black uppercase block">{importErrors.length}</span>
-                <span className="text-[8px] text-primary-200/40 uppercase tracking-widest font-black mt-1.5 block">Errors</span>
+                <span className="text-rose-400 text-base font-black uppercase block">
+                  {importErrors.length}
+                </span>
+                <span className="text-[8px] text-primary-200/40 uppercase tracking-widest font-black mt-1.5 block">
+                  Errors
+                </span>
               </div>
             </div>
 
             {importErrors.length > 0 && (
               <div className="space-y-2">
-                <span className="text-[9px] font-black text-dim uppercase tracking-widest pl-1 block">Detailed Error Log</span>
+                <span className="text-[9px] font-black text-dim uppercase tracking-widest pl-1 block">
+                  Detailed Error Log
+                </span>
                 <div className="max-h-40 overflow-y-auto bg-white/5 rounded-2xl p-4 border border-white/5 space-y-2 font-mono text-[9px] text-rose-300 backdrop-blur-sm">
                   {importErrors.map((err, i) => (
                     <div key={i} className="flex gap-2">
-                      <span className="text-rose-500 select-none font-bold">•</span>
+                      <span className="text-rose-500 select-none font-bold">
+                        •
+                      </span>
                       <span>{err}</span>
                     </div>
                   ))}

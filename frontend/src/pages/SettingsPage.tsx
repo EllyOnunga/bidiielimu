@@ -1407,7 +1407,8 @@ export const SettingsPage = () => {
                       System & Version
                     </h2>
                     <p className="text-primary-200/30 text-[10px] font-black uppercase tracking-[0.2em]">
-                      Monitor client-gateway synchronizations and underlying core environments.
+                      Monitor client-gateway synchronizations and underlying
+                      core environments.
                     </p>
                   </div>
 
@@ -1433,7 +1434,9 @@ export const SettingsPage = () => {
                           System Active
                         </h3>
                         <p className="text-xs text-muted-400 leading-relaxed">
-                          All client requests and gateway channels are operating within optimal latency. All background processing systems and database linkages are synchronized.
+                          All client requests and gateway channels are operating
+                          within optimal latency. All background processing
+                          systems and database linkages are synchronized.
                         </p>
                       </div>
                     </div>
@@ -1441,25 +1444,44 @@ export const SettingsPage = () => {
                     {/* Specs Card */}
                     <div className="bg-white/5 border border-white/5 rounded-3xl p-6 md:p-8 space-y-4 shadow-premium hover:border-white/10 transition-all font-mono text-xs">
                       <div className="flex justify-between items-center py-2.5 border-b border-white/5">
-                        <span className="text-[10px] font-black font-sans text-primary-200/30 uppercase tracking-widest">Platform Core</span>
-                        <span className="text-white font-bold bg-white/5 px-2 py-0.5 rounded border border-white/10">v1.0.0</span>
-                      </div>
-                      <div className="flex justify-between items-center py-2.5 border-b border-white/5">
-                        <span className="text-[10px] font-black font-sans text-primary-200/30 uppercase tracking-widest">API Gateway</span>
-                        <span className="text-primary-400 font-bold bg-primary-500/10 px-2 py-0.5 rounded border border-primary-500/20">
-                          {isSystemStatusLoading ? "Querying..." : systemStatus?.version ? `v${systemStatus.version}` : "v1.0.0"}
+                        <span className="text-[10px] font-black font-sans text-primary-200/30 uppercase tracking-widest">
+                          Platform Core
+                        </span>
+                        <span className="text-white font-bold bg-white/5 px-2 py-0.5 rounded border border-white/10">
+                          v1.0.0
                         </span>
                       </div>
                       <div className="flex justify-between items-center py-2.5 border-b border-white/5">
-                        <span className="text-[10px] font-black font-sans text-primary-200/30 uppercase tracking-widest">Build Environment</span>
+                        <span className="text-[10px] font-black font-sans text-primary-200/30 uppercase tracking-widest">
+                          API Gateway
+                        </span>
+                        <span className="text-primary-400 font-bold bg-primary-500/10 px-2 py-0.5 rounded border border-primary-500/20">
+                          {isSystemStatusLoading
+                            ? "Querying..."
+                            : systemStatus?.version
+                              ? `v${systemStatus.version}`
+                              : "v1.0.0"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center py-2.5 border-b border-white/5">
+                        <span className="text-[10px] font-black font-sans text-primary-200/30 uppercase tracking-widest">
+                          Build Environment
+                        </span>
                         <span className="text-emerald-400 font-bold capitalize bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
                           {import.meta.env.MODE || "production"}
                         </span>
                       </div>
                       <div className="flex justify-between items-center py-2.5">
-                        <span className="text-[10px] font-black font-sans text-primary-200/30 uppercase tracking-widest">Gateway context</span>
-                        <span className="text-muted-400 text-[10px] max-w-[200px] truncate" title={systemStatus?.status || "ping-main"}>
-                          {isSystemStatusLoading ? "Querying..." : systemStatus?.status || "ping-main"}
+                        <span className="text-[10px] font-black font-sans text-primary-200/30 uppercase tracking-widest">
+                          Gateway context
+                        </span>
+                        <span
+                          className="text-muted-400 text-[10px] max-w-[200px] truncate"
+                          title={systemStatus?.status || "ping-main"}
+                        >
+                          {isSystemStatusLoading
+                            ? "Querying..."
+                            : systemStatus?.status || "ping-main"}
                         </span>
                       </div>
                     </div>
@@ -1470,11 +1492,17 @@ export const SettingsPage = () => {
                       Deployment Gateway Architecture
                     </h3>
                     <p className="text-xs text-muted-400 leading-relaxed uppercase tracking-wider font-mono">
-                      Endpoint URI: {import.meta.env.VITE_API_URL || window.location.origin}/api/v1/
+                      Endpoint URI:{" "}
+                      {import.meta.env.VITE_API_URL || window.location.origin}
+                      /api/v1/
                     </p>
                     <div className="h-px bg-white/5 w-full my-4" />
                     <p className="text-[10px] text-primary-200/30 uppercase tracking-widest leading-relaxed">
-                      ElimuHub relies on a dynamic, multi-tenant cloud mesh network. Under high loads, traffic is dynamically distributed across load-balanced zones to guarantee 99.99% uptime. High performance caching layers automatically store frequently requested analytics metrics.
+                      ElimuHub relies on a dynamic, multi-tenant cloud mesh
+                      network. Under high loads, traffic is dynamically
+                      distributed across load-balanced zones to guarantee 99.99%
+                      uptime. High performance caching layers automatically
+                      store frequently requested analytics metrics.
                     </p>
                   </div>
                 </div>

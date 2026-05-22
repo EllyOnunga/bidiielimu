@@ -19,6 +19,7 @@ import { QuizBuilder } from "../components/lms/QuizBuilder";
 import { useAuthStore } from "../store/authStore";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { lmsService } from "../api/services/lmsService";
+import { classesService } from "../api/services/classesService";
 
 type TabType = "assignments" | "resources" | "quizzes";
 
@@ -34,11 +35,21 @@ export const LMSPage = () => {
   const [activeQuizId, setActiveQuizId] = useState<string | null>(null);
   const [isBuilderOpen, setIsBuilderOpen] = useState(false);
   const [editingQuiz, setEditingQuiz] = useState<any>(null);
+  const [selectedStreamId, setSelectedStreamId] = useState<string>("");
+
+  const { data: streamsData } = useQuery({
+    queryKey: ["streams"],
+    queryFn: classesService.getStreams,
+  });
+  const streams = Array.isArray(streamsData)
+    ? streamsData
+    : (streamsData as any)?.results || [];
 
   const { data: quizzes = [], isLoading: loadingQuizzes } = useQuery({
-    queryKey: ["quizzes"],
+    queryKey: ["quizzes", selectedStreamId],
     queryFn: async () => {
-      const res = await lmsService.getQuizzes();
+      const params = selectedStreamId ? { stream: selectedStreamId } : {};
+      const res = await lmsService.getQuizzes(params);
       return Array.isArray(res) ? res : (res as any).results || [];
     },
     enabled: activeTab === "quizzes",
@@ -157,6 +168,37 @@ export const LMSPage = () => {
                 )}
               </div>
 
+              {/* Stream Selector Bar */}
+              <div className="flex flex-wrap items-center gap-2 p-1.5 bg-white/5 rounded-[24px] border border-white/5 backdrop-blur-md w-fit">
+                <button
+                  onClick={() => setSelectedStreamId("")}
+                  className={`relative flex items-center gap-2 px-5 py-2.5 rounded-[18px] transition-all duration-300 ${
+                    selectedStreamId === ""
+                      ? "bg-amber-500 text-white shadow-glow-sm shadow-amber-500/20"
+                      : "text-muted hover:text-primary hover:bg-white/5"
+                  }`}
+                >
+                  <span className="text-[10px] font-black uppercase tracking-widest">
+                    All Classes
+                  </span>
+                </button>
+                {streams.map((stream: any) => (
+                  <button
+                    key={stream.id}
+                    onClick={() => setSelectedStreamId(stream.id.toString())}
+                    className={`relative flex items-center gap-2 px-5 py-2.5 rounded-[18px] transition-all duration-300 ${
+                      selectedStreamId === stream.id.toString()
+                        ? "bg-amber-500 text-white shadow-glow-sm shadow-amber-500/20"
+                        : "text-muted hover:text-primary hover:bg-white/5"
+                    }`}
+                  >
+                    <span className="text-[10px] font-black uppercase tracking-widest font-sans">
+                      {stream.grade_level_name ? `${stream.grade_level_name} - ${stream.name}` : stream.name}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
               {loadingQuizzes ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {Array.from({ length: 3 }).map((_, i) => (
@@ -195,6 +237,18 @@ export const LMSPage = () => {
                           >
                             <Settings className="w-4 h-4" />
                           </button>
+                        )}
+                      </div>
+
+                      {/* Stream & Subject Badges */}
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        <span className="px-2.5 py-1 text-[8px] font-black text-amber-400 bg-amber-500/10 rounded-lg border border-amber-500/15 uppercase tracking-widest font-sans">
+                          {q.stream_name || "All Classes"}
+                        </span>
+                        {q.subject_name && (
+                          <span className="px-2.5 py-1 text-[8px] font-black text-primary-400 bg-primary-500/10 rounded-lg border border-primary-500/15 uppercase tracking-widest font-sans">
+                            {q.subject_name}
+                          </span>
                         )}
                       </div>
 

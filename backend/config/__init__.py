@@ -6,4 +6,3 @@ __all__ = (
     "celery_app",
     "__version__",
 )
-

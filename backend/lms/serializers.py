@@ -1,26 +1,40 @@
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 
+from classes.models import Stream
 from teachers.models import Teacher
 
 from .models import (
     Assignment,
+    Discussion,
     LessonNote,
     Question,
     Quiz,
     QuizAttempt,
     Resource,
+    StudentProgress,
     Submission,
+    VideoWatchTime,
 )
 
 
 class ResourceSerializer(serializers.ModelSerializer):
+    stream = serializers.PrimaryKeyRelatedField(
+        queryset=Stream.objects.all(), allow_null=True, required=False
+    )
     subject_name = serializers.CharField(source="subject.name", read_only=True)
+    stream_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Resource
         fields = "__all__"
         read_only_fields = ["uploaded_by"]
+
+    def get_stream_name(self, obj):
+        try:
+            return obj.stream.name if obj.stream else "All Classes"
+        except BaseException:
+            return "All Classes"
 
 
 class SubmissionSerializer(serializers.ModelSerializer):
@@ -211,20 +225,37 @@ class AssignmentSerializer(serializers.ModelSerializer):
 # New serializers for scalable LMS features
 class StudentProgressSerializer(serializers.ModelSerializer):
     class Meta:
-        model = "lms.StudentProgress"
+        model = StudentProgress
         fields = "__all__"
 
 
 class VideoWatchTimeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = "lms.VideoWatchTime"
+        model = VideoWatchTime
         fields = "__all__"
 
 
 class DiscussionSerializer(serializers.ModelSerializer):
+    author_name = serializers.SerializerMethodField()
+    author_role = serializers.CharField(source="author.role_name", read_only=True)
+
     class Meta:
-        model = "lms.Discussion"
-        fields = "__all__"
+        model = Discussion
+        fields = [
+            "id",
+            "resource",
+            "assignment",
+            "author",
+            "author_name",
+            "author_role",
+            "content",
+            "created_at",
+        ]
+        read_only_fields = ["author", "created_at"]
+
+    def get_author_name(self, obj):
+        name = f"{obj.author.first_name} {obj.author.last_name}".strip()
+        return name if name else obj.author.email
 
 
 class LessonNoteSerializer(serializers.ModelSerializer):
@@ -252,12 +283,23 @@ class QuestionSerializer(serializers.ModelSerializer):
 class QuizSerializer(serializers.ModelSerializer):
     questions = QuestionSerializer(many=True, required=False)
     question_count = serializers.SerializerMethodField()
+    stream_name = serializers.SerializerMethodField()
+    teacher_name = serializers.SerializerMethodField()
+    subject_name = serializers.CharField(source="subject.name", read_only=True)
+    teacher = serializers.PrimaryKeyRelatedField(
+        queryset=Teacher.objects.all(), required=False, allow_null=True
+    )
 
     class Meta:
         model = Quiz
         fields = [
             "id",
+            "stream",
+            "stream_name",
             "subject",
+            "subject_name",
+            "teacher",
+            "teacher_name",
             "title",
             "description",
             "duration_minutes",
@@ -265,9 +307,22 @@ class QuizSerializer(serializers.ModelSerializer):
             "questions",
             "question_count",
         ]
+        read_only_fields = ["teacher"]
 
     def get_question_count(self, obj):
         return obj.questions.count()
+
+    def get_teacher_name(self, obj):
+        try:
+            return obj.teacher.full_name if obj.teacher else ""
+        except BaseException:
+            return "Unknown Teacher"
+
+    def get_stream_name(self, obj):
+        try:
+            return obj.stream.name if obj.stream else "All Classes"
+        except BaseException:
+            return "All Classes"
 
     def create(self, validated_data):
         questions_data = validated_data.pop("questions", [])

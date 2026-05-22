@@ -90,5 +90,3 @@ export const studentsService = {
     return response.data;
   },
 };
-
-

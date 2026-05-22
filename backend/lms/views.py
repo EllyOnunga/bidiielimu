@@ -5,11 +5,13 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
+from classes.models import Stream
 from config.tenant_security import StrictTenantPermission, TenantAwareViewSetMixin
 from teachers.models import Teacher
 
 from .models import (
     Assignment,
+    Discussion,
     LessonNote,
     NoteConfirmation,
     Quiz,
@@ -19,6 +21,7 @@ from .models import (
 )
 from .serializers import (
     AssignmentSerializer,
+    DiscussionSerializer,
     LessonNoteSerializer,
     QuizSerializer,
     ResourceSerializer,
@@ -220,17 +223,30 @@ class QuizViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        qs = Quiz.objects.filter(is_active=True).select_related("subject")
+        qs = Quiz.objects.filter(is_active=True).select_related("subject", "teacher")
 
         if user.role_name == "STUDENT":
             student = getattr(user, "student_profile", None)
             if student and student.stream:
                 from classes.models import SubjectAssignment
 
-                assigned_subjects = SubjectAssignment.objects.filter(
-                    stream=student.stream
-                ).values_list("subject_id", flat=True)
-                qs = qs.filter(subject_id__in=assigned_subjects)
+                assignments = SubjectAssignment.objects.filter(stream=student.stream)
+                assigned_subject_ids = assignments.values_list("subject_id", flat=True)
+
+                q_filter = models.Q()
+                for assignment in assignments:
+                    q_filter |= models.Q(
+                        subject_id=assignment.subject_id,
+                        teacher_id=assignment.teacher_id,
+                    )
+                q_filter |= models.Q(
+                    subject_id__in=assigned_subject_ids,
+                    teacher__isnull=True,
+                )
+                qs = qs.filter(
+                    models.Q(stream=student.stream) | models.Q(stream__isnull=True),
+                    q_filter,
+                )
             else:
                 qs = qs.none()
         elif user.role_name in ["TEACHER", "PRINCIPAL", "HOD"]:
@@ -238,14 +254,98 @@ class QuizViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
             if teacher:
                 from classes.models import SubjectAssignment
 
-                assigned_subjects = SubjectAssignment.objects.filter(
-                    teacher=teacher
-                ).values_list("subject_id", flat=True)
-                qs = qs.filter(subject_id__in=assigned_subjects)
+                assignments = SubjectAssignment.objects.filter(teacher=teacher)
+                q_filter = models.Q(teacher=teacher)
+                for assignment in assignments:
+                    q_filter |= models.Q(
+                        subject_id=assignment.subject_id,
+                        stream_id__in=[assignment.stream_id, None],
+                    )
+                qs = qs.filter(q_filter)
             else:
                 qs = qs.none()
 
+        stream_id = self.request.query_params.get("stream")
+        if stream_id:
+            qs = qs.filter(stream_id=stream_id)
+
         return qs
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        teacher = getattr(user, "teacher_profile", None)
+        if user.role_name in ["ADMIN", "SUPER_ADMIN"]:
+            teacher_id = self.request.data.get("teacher")
+            if teacher_id:
+                teacher = Teacher.objects.filter(id=teacher_id).first()
+        serializer.save(teacher=teacher)
+
+    @action(detail=False, methods=["post"])
+    def bulk_import(self, request):
+        """Bulk import multiple quizzes. Only teachers and admins allowed."""
+        user = request.user
+        if user.role_name not in [
+            "TEACHER",
+            "PRINCIPAL",
+            "HOD",
+            "ADMIN",
+            "SUPER_ADMIN",
+        ]:
+            return Response(
+                {"detail": "Permission denied for bulk import."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        quizzes_data = request.data.get("quizzes")
+        if not isinstance(quizzes_data, list):
+            return Response(
+                {"detail": "'quizzes' must be a list of quiz objects."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        serializer = QuizSerializer(data=quizzes_data, many=True)
+        serializer.is_valid(raise_exception=True)
+        from django.db import transaction
+
+        with transaction.atomic():
+            serializer.save()
+        return Response(
+            {"created": len(serializer.validated_data)}, status=status.HTTP_201_CREATED
+        )
+
+    @action(detail=False, methods=["post"])
+    def bulk_reassign(self, request):
+        """Bulk reassign quizzes to a specific stream (or null for all classes).
+        Expected payload: {"quiz_ids": [1,2,3], "stream_id": <id or null>}
+        """
+        user = request.user
+        if user.role_name not in [
+            "TEACHER",
+            "PRINCIPAL",
+            "HOD",
+            "ADMIN",
+            "SUPER_ADMIN",
+        ]:
+            return Response(
+                {"detail": "Permission denied for bulk reassignment."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        quiz_ids = request.data.get("quiz_ids")
+        if not isinstance(quiz_ids, list) or not quiz_ids:
+            return Response(
+                {"detail": "'quiz_ids' must be a non‑empty list."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        stream_id = request.data.get("stream_id")
+        stream = None
+        if stream_id is not None:
+            try:
+                stream = Stream.objects.get(id=stream_id)
+            except Stream.DoesNotExist:
+                return Response(
+                    {"detail": "Specified stream does not exist."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        updated = Quiz.objects.filter(id__in=quiz_ids).update(stream=stream)
+        return Response({"updated": updated}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["post"])
     def attempt(self, request, pk=None):
@@ -306,10 +406,23 @@ class ResourceViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
             if student and student.stream:
                 from classes.models import SubjectAssignment
 
-                assigned_subjects = SubjectAssignment.objects.filter(
-                    stream=student.stream
-                ).values_list("subject_id", flat=True)
-                qs = qs.filter(subject_id__in=assigned_subjects)
+                assignments = SubjectAssignment.objects.filter(stream=student.stream)
+                assigned_subject_ids = assignments.values_list("subject_id", flat=True)
+
+                q_filter = models.Q()
+                for assignment in assignments:
+                    q_filter |= models.Q(
+                        subject_id=assignment.subject_id,
+                        uploaded_by_id=assignment.teacher_id,
+                    )
+                q_filter |= models.Q(
+                    subject_id__in=assigned_subject_ids,
+                    uploaded_by__isnull=True,
+                )
+                qs = qs.filter(
+                    models.Q(stream=student.stream) | models.Q(stream__isnull=True),
+                    q_filter,
+                )
             else:
                 qs = qs.none()
         elif user.role_name in ["TEACHER", "PRINCIPAL", "HOD"]:
@@ -317,22 +430,30 @@ class ResourceViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
             if teacher:
                 from classes.models import SubjectAssignment
 
-                assigned_subjects = SubjectAssignment.objects.filter(
-                    teacher=teacher
-                ).values_list("subject_id", flat=True)
-                qs = qs.filter(
-                    models.Q(uploaded_by=teacher)
-                    | models.Q(subject_id__in=assigned_subjects)
-                )
+                assignments = SubjectAssignment.objects.filter(teacher=teacher)
+                q_filter = models.Q(uploaded_by=teacher)
+                for assignment in assignments:
+                    q_filter |= models.Q(
+                        subject_id=assignment.subject_id,
+                        stream_id__in=[assignment.stream_id, None],
+                    )
+                qs = qs.filter(q_filter)
             else:
                 qs = qs.none()
+
+        stream_id = self.request.query_params.get("stream")
+        if stream_id:
+            qs = qs.filter(stream_id=stream_id)
 
         return qs
 
     def perform_create(self, serializer):
         user = self.request.user
         teacher = getattr(user, "teacher_profile", None)
-        # Even if teacher is None, we save (admin might not have teacher profile)
+        if user.role_name in ["ADMIN", "SUPER_ADMIN"]:
+            teacher_id = self.request.data.get("uploaded_by")
+            if teacher_id:
+                teacher = Teacher.objects.filter(id=teacher_id).first()
         serializer.save(uploaded_by=teacher)
 
     @action(detail=True, methods=["post"])
@@ -435,3 +556,68 @@ class SubmissionViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
             return Response(
                 {"detail": "Invalid score value."}, status=status.HTTP_400_BAD_REQUEST
             )
+
+
+class DiscussionViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
+    serializer_class = DiscussionSerializer
+    permission_classes = [permissions.IsAuthenticated, StrictTenantPermission]
+
+    def get_queryset(self):
+        user = self.request.user
+        qs = Discussion.objects.all().select_related("resource", "assignment", "author")
+
+        if user.role_name == "STUDENT":
+            student = getattr(user, "student_profile", None)
+            if student and student.stream:
+                from classes.models import SubjectAssignment
+
+                assigned_subjects = SubjectAssignment.objects.filter(
+                    stream=student.stream
+                ).values_list("subject_id", flat=True)
+
+                qs = qs.filter(
+                    models.Q(
+                        resource__isnull=False,
+                        resource__subject_id__in=assigned_subjects,
+                        resource__stream_id__in=[student.stream.id, None],
+                    )
+                    | models.Q(
+                        assignment__isnull=False, assignment__stream=student.stream
+                    )
+                )
+            else:
+                qs = qs.none()
+        elif user.role_name in ["TEACHER", "PRINCIPAL", "HOD"]:
+            teacher = getattr(user, "teacher_profile", None)
+            if teacher:
+                from classes.models import SubjectAssignment
+
+                assignments = SubjectAssignment.objects.filter(teacher=teacher)
+
+                q_filter = models.Q(author=user)
+                for assignment in assignments:
+                    q_filter |= models.Q(
+                        resource__isnull=False,
+                        resource__subject_id=assignment.subject_id,
+                        resource__stream_id__in=[assignment.stream_id, None],
+                    ) | models.Q(
+                        assignment__isnull=False,
+                        assignment__subject_id=assignment.subject_id,
+                        assignment__stream_id__in=[assignment.stream_id, None],
+                    )
+                qs = qs.filter(q_filter)
+            else:
+                qs = qs.none()
+
+        resource_id = self.request.query_params.get("resource")
+        if resource_id:
+            qs = qs.filter(resource_id=resource_id)
+
+        assignment_id = self.request.query_params.get("assignment")
+        if assignment_id:
+            qs = qs.filter(assignment_id=assignment_id)
+
+        return qs
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)

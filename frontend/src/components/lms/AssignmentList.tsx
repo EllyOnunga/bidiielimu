@@ -9,6 +9,7 @@ import {
   Plus,
   Users,
   Download,
+  MessageSquare,
 } from "lucide-react";
 import { lmsService } from "../../api/services/lmsService";
 import { teachersService } from "../../api/services/teachersService";
@@ -19,6 +20,7 @@ import { Button } from "../ui/Button";
 import { Select } from "../ui/Select";
 import { useQuery } from "@tanstack/react-query";
 import { classesService } from "../../api/services/classesService";
+import { DiscussionPanel } from "./DiscussionPanel";
 
 const getFileUrl = (path: string) => {
   if (!path) return "";
@@ -81,6 +83,7 @@ export const AssignmentList = () => {
     useState<Submission | null>(null);
   const [isGradingModalOpen, setIsGradingModalOpen] = useState(false);
   const [gradingData, setGradingData] = useState({ score: "", feedback: "" });
+  const [isDiscussionOpen, setIsDiscussionOpen] = useState(false);
 
   const [formData, setFormData] = useState<{
     subject: string;
@@ -367,17 +370,26 @@ export const AssignmentList = () => {
                   {selectedAssignment.description}
                 </p>
 
-                {selectedAssignment.file && (
-                  <a
-                    href={getFileUrl(selectedAssignment.file)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-4 flex items-center gap-2 text-xs font-bold text-primary-400 hover:text-primary-300 transition-all bg-primary-400/10 w-fit px-3 py-1.5 rounded-lg"
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {selectedAssignment.file && (
+                    <a
+                      href={getFileUrl(selectedAssignment.file)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-xs font-bold text-primary-400 hover:text-primary-300 transition-all bg-primary-400/10 w-fit px-3 py-1.5 rounded-lg border border-primary-500/20"
+                    >
+                      <Download className="w-4 h-4" />
+                      Instructions
+                    </a>
+                  )}
+                  <button
+                    onClick={() => setIsDiscussionOpen(true)}
+                    className="flex items-center gap-2 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-all bg-indigo-400/10 w-fit px-3 py-1.5 rounded-lg border border-indigo-500/20"
                   >
-                    <Download className="w-4 h-4" />
-                    Download Instructions Attachment
-                  </a>
-                )}
+                    <MessageSquare className="w-4 h-4" />
+                    Discuss Assignment
+                  </button>
+                </div>
               </div>
 
               <div className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/5">
@@ -882,6 +894,13 @@ export const AssignmentList = () => {
           </div>
         </div>
       </Modal>
+
+      <DiscussionPanel
+        isOpen={isDiscussionOpen}
+        onClose={() => setIsDiscussionOpen(false)}
+        assignmentId={selectedAssignment?.id}
+        title={selectedAssignment?.title || ""}
+      />
     </div>
   );
 };
