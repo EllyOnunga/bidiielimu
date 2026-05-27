@@ -14,7 +14,7 @@ dj-database-url>=3.1.2
 # File handling
 Pillow>=12.2.0
 django-storages[s3]>=1.13.0
-boto3>=1.26.0
+boto3>=1.43.15
 
 # Email
 django-allauth>=0.57.2
