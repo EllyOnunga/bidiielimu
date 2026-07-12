@@ -41,7 +41,7 @@
     "react-is": "^19.0.0",
     "react-router-dom": "^7.14.2",
     "react-virtualized-auto-sizer": "^1.0.24",
-    "react-window": "^1.8.10",
+    "react-window": "^2.2.7",
     "recharts": "^3.8.1",
     "tailwind-merge": "^3.5.0",
     "zustand": "^5.0.12"
@@ -52,7 +52,7 @@
     "@types/node": "^24.12.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@types/react-window": "^1.8.8",
+    "@types/react-window": "^2.0.0",
     "@vitejs/plugin-react": "^6.0.1",
     "autoprefixer": "^10.5.0",
     "esbuild": "^0.28.0",
