@@ -26,7 +26,9 @@ class APIKeyViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        api_key = serializer.save(user=self.request.user, school=self.request.user.school)
+        api_key = serializer.save(
+            user=self.request.user, school=self.request.user.school
+        )
         # Rotate to generate the secret and persist hashed key
         new_secret = api_key.rotate_key()
         api_key.is_legacy = False
@@ -60,7 +62,9 @@ class APIKeyViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
         api_key.save()
         return Response(
             {
-                "message": "API key activated" if api_key.is_active else "API key deactivated",
+                "message": (
+                    "API key activated" if api_key.is_active else "API key deactivated"
+                ),
                 "is_active": api_key.is_active,
             }
         )

@@ -105,16 +105,24 @@ class MyTokenRefreshView(TokenRefreshView):
 
     def post(self, request, *args, **kwargs):
         # We need to support reading the refresh token from request data OR from cookie
-        refresh_token = request.data.get("refresh") or request.COOKIES.get("jwt-refresh-token")
+        refresh_token = request.data.get("refresh") or request.COOKIES.get(
+            "jwt-refresh-token"
+        )
         if not refresh_token:
-            return Response({"detail": "Refresh token is required"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "Refresh token is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         # Process the token refresh by running the serializer
         serializer = self.get_serializer(data={"refresh": refresh_token})
         try:
             serializer.is_valid(raise_exception=True)
         except Exception as e:
-            return Response(getattr(e, "detail", {"detail": str(e)}), status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                getattr(e, "detail", {"detail": str(e)}),
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
 
         res_data = serializer.validated_data
         response = Response(res_data, status=status.HTTP_200_OK)

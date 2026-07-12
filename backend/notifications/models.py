@@ -4,10 +4,10 @@ from django.utils import timezone
 
 # Per-plan monthly limits for SMS and email communications
 PLAN_LIMITS = {
-    "FREE":         {"sms": 500,    "email": 1_000},
-    "STARTER":      {"sms": 5_000,  "email": 10_000},
+    "FREE": {"sms": 500, "email": 1_000},
+    "STARTER": {"sms": 5_000, "email": 10_000},
     "PROFESSIONAL": {"sms": 20_000, "email": 50_000},
-    "ENTERPRISE":   {"sms": 100_000, "email": 200_000},
+    "ENTERPRISE": {"sms": 100_000, "email": 200_000},
 }
 
 
@@ -104,4 +104,3 @@ class CommunicationUsage(models.Model):
             billing_month=cls.current_month_key(),
         )
         return obj, created
-

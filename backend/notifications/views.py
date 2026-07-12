@@ -150,7 +150,12 @@ class NotificationViewSet(BaseTenantViewSet):
         bom_count = UserSchoolMembership.objects.filter(
             school=request.tenant,
             status="ACTIVE",
-            role__name__in=["BOM", "BOARD_OF_MANAGEMENT", "BOM_MEMBER", "Board of Management"]
+            role__name__in=[
+                "BOM",
+                "BOARD_OF_MANAGEMENT",
+                "BOM_MEMBER",
+                "Board of Management",
+            ],
         ).count()
 
         return Response(
@@ -214,16 +219,26 @@ class NotificationViewSet(BaseTenantViewSet):
                 )
         elif pk == "bom":
             from accounts.models import UserSchoolMembership
+
             memberships = UserSchoolMembership.objects.filter(
                 school=request.tenant,
                 status="ACTIVE",
-                role__name__in=["BOM", "BOARD_OF_MANAGEMENT", "BOM_MEMBER", "Board of Management"]
+                role__name__in=[
+                    "BOM",
+                    "BOARD_OF_MANAGEMENT",
+                    "BOM_MEMBER",
+                    "Board of Management",
+                ],
             ).select_related("user")
 
             if group_type == "email":
-                recipients = memberships.values_list("user__email", flat=True).distinct()
+                recipients = memberships.values_list(
+                    "user__email", flat=True
+                ).distinct()
             else:
-                recipients = memberships.values_list("user__phone_number", flat=True).distinct()
+                recipients = memberships.values_list(
+                    "user__phone_number", flat=True
+                ).distinct()
         else:
             recipients = []
 

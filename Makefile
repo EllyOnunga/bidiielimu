@@ -42,10 +42,10 @@ test:
 
 test-backend-docker:
 	docker compose exec -T db sh -lc 'dropdb --if-exists --force -U "$${DB_USER:-gilanios_admin}" "test_$${DB_NAME:-gilanios}"'
-	docker compose exec -T backend sh -lc 'export DATABASE_URL="postgres://$${DB_USER:-gilanios_admin}:$${DB_PASSWORD:-***REDACTED***}@db:5432/$${DB_NAME:-gilanios}"; export DATABASE_READ_URL="$$DATABASE_URL"; python manage.py test --noinput'
+	docker compose exec -T backend sh -lc 'export DATABASE_URL="postgres://$${DB_USER:-gilanios_admin}:$${DB_PASSWORD}@db:5432/$${DB_NAME:-gilanios}"; export DATABASE_READ_URL="$$DATABASE_URL"; python manage.py test --noinput'
 
 test-backend-local:
-	cd backend && DATABASE_URL="$${DATABASE_URL:-postgres://gilanios_admin:***REDACTED***@localhost:5432/gilanios}" DATABASE_READ_URL="$${DATABASE_READ_URL:-postgres://gilanios_admin:***REDACTED***@localhost:5432/gilanios}" python manage.py test --noinput
+	cd backend && DATABASE_URL="$${DATABASE_URL}" DATABASE_READ_URL="$${DATABASE_READ_URL}" python manage.py test --noinput
 
 # Linting and formatting
 lint:

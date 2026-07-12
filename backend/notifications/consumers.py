@@ -207,13 +207,9 @@ class ClassUpdateConsumer(TenantAwareMixin, AsyncJsonWebsocketConsumer):
 
     async def disconnect(self, close_code):
         if hasattr(self, "school_group"):
-            await self.channel_layer.group_discard(
-                self.school_group, self.channel_name
-            )
+            await self.channel_layer.group_discard(self.school_group, self.channel_name)
         if hasattr(self, "class_group"):
-            await self.channel_layer.group_discard(
-                self.class_group, self.channel_name
-            )
+            await self.channel_layer.group_discard(self.class_group, self.channel_name)
 
     async def timetable_update(self, event):
         """Send timetable changes."""

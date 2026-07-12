@@ -16,6 +16,7 @@ class Command(BaseCommand):
 
             # Add localhost and common domains
             import os
+
             domain_list = os.environ.get("PUBLIC_TENANT_DOMAINS", "localhost,127.0.0.1")
             domains = [d.strip() for d in domain_list.split(",") if d.strip()]
             for domain_name in domains:
@@ -47,7 +48,9 @@ class Command(BaseCommand):
                     "SUPERUSER_EMAIL and SUPERUSER_PASSWORD environment variables are required in production."
                 )
 
-            User.objects.create_superuser(email=superuser_email, password=superuser_password)
+            User.objects.create_superuser(
+                email=superuser_email, password=superuser_password
+            )
             self.stdout.write(self.style.SUCCESS("Superuser created successfully!"))
         else:
             self.stdout.write("Superuser already exists.")

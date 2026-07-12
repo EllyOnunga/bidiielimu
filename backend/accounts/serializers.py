@@ -119,13 +119,16 @@ class UserSerializer(serializers.ModelSerializer):
     def get_school_details(self, obj):
         school = obj.school
         if not school:
-            active_membership = obj.school_memberships.select_related("school").filter(status="ACTIVE").first()
+            active_membership = (
+                obj.school_memberships.select_related("school")
+                .filter(status="ACTIVE")
+                .first()
+            )
             if active_membership:
                 school = active_membership.school
         if school:
             return SchoolSerializer(school).data
         return None
-
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -271,7 +274,9 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
             # Proceed directly to token generation
             pass
         else:
-            sms_device = SMSDevice.objects.filter(user=self.user, confirmed=True).first()
+            sms_device = SMSDevice.objects.filter(
+                user=self.user, confirmed=True
+            ).first()
             if sms_device or self.user.email:
                 # Prepare available methods
                 methods = ["EMAIL"]

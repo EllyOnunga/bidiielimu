@@ -20,7 +20,9 @@ def on_tenant_creation(sender, instance, created, **kwargs):
                 try:
                     # Seed the onboarding data
                     call_command("seed_onboarding_data")
-                    logger.info("Successfully seeded onboarding data for %s", instance.name)
+                    logger.info(
+                        "Successfully seeded onboarding data for %s", instance.name
+                    )
                 except Exception:
                     logger.exception("Error seeding data for %s", instance.name)
 

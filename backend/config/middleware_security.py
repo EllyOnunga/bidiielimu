@@ -51,7 +51,9 @@ class APIKeyAuthenticationMiddleware(MiddlewareMixin):
                 # Rotate the key immediately to invalidate it and trigger rotation lifecycle
                 key_obj.rotate_key()
                 key_obj.is_legacy = True
-                key_obj.save(update_fields=["key", "key_hash", "key_prefix", "is_legacy"])
+                key_obj.save(
+                    update_fields=["key", "key_hash", "key_prefix", "is_legacy"]
+                )
                 return JsonResponse(
                     {
                         "error": "Legacy API key detected. Your key has been automatically rotated for security. Please retrieve your new API key from your school dashboard."

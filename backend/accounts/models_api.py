@@ -32,7 +32,9 @@ class APIKey(models.Model):
         blank=True,
     )
     is_active = models.BooleanField(default=True)
-    is_legacy = models.BooleanField(default=False, help_text="Flag to mark legacy plaintext keys that need rotation")
+    is_legacy = models.BooleanField(
+        default=False, help_text="Flag to mark legacy plaintext keys that need rotation"
+    )
     expires_at = models.DateTimeField(null=True, blank=True)
     last_used_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

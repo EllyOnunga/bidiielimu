@@ -102,7 +102,9 @@ class OTPVerifyLoginView(views.APIView):
         otp = request.data.get("otp")
 
         if settings.DEBUG:
-            logger.info(f"[DEBUG] OTP verify-login request: user_id={user_id}, otp={otp}")
+            logger.info(
+                f"[DEBUG] OTP verify-login request: user_id={user_id}, otp={otp}"
+            )
 
         if not user_id or not otp:
             if settings.DEBUG:

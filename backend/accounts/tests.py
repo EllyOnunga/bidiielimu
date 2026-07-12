@@ -161,9 +161,7 @@ class UserAPITest(APITestCase):
                     verify_response.cookies["jwt-refresh-token"]["httponly"],
                 )
             else:
-                self.fail(
-                    f"Unexpected login failure payload: {login_response.json()}"
-                )
+                self.fail(f"Unexpected login failure payload: {login_response.json()}")
         else:
             self.fail(
                 f"Unexpected login status code: {login_response.status_code} {login_response.content}"
@@ -186,10 +184,12 @@ class APIKeyTest(APITestCase):
     def setUp(self):
         # Reset schema to public for test isolation
         from django.db import connection
+
         connection.set_schema_to_public()
 
         # Create the public tenant if it doesn't exist
         from schools.models import Domain, School
+
         self.school, _ = School.objects.get_or_create(
             schema_name="public", name="Public Tenant", curriculum="CBC"
         )
@@ -211,13 +211,12 @@ class APIKeyTest(APITestCase):
             key="legacy-plaintext-key-123",
             user=self.user,
             school=self.school,
-            is_legacy=True
+            is_legacy=True,
         )
 
         # Authenticate using the legacy plaintext key
         response = self.client.get(
-            "/api/v1/ping/",
-            HTTP_X_API_KEY="legacy-plaintext-key-123"
+            "/api/v1/ping/", HTTP_X_API_KEY="legacy-plaintext-key-123"
         )
 
         # It should return a 401 response and state that the key was rotated
@@ -232,8 +231,7 @@ class APIKeyTest(APITestCase):
 
         # A second attempt with the old legacy key should return "Invalid API key" (also 401)
         response_second = self.client.get(
-            "/api/v1/ping/",
-            HTTP_X_API_KEY="legacy-plaintext-key-123"
+            "/api/v1/ping/", HTTP_X_API_KEY="legacy-plaintext-key-123"
         )
         self.assertEqual(response_second.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(response_second.json()["error"], "Invalid API key")
@@ -244,19 +242,14 @@ class APIKeyTest(APITestCase):
 
         # Create a modern API key (save() will automatically generate and hash it)
         api_key = APIKey.objects.create(
-            name="Modern Key",
-            user=self.user,
-            school=self.school
+            name="Modern Key", user=self.user, school=self.school
         )
 
         # Get the one-time raw secret that was generated
         raw_key = api_key._plain_key
 
         # Authenticate using the raw key
-        response = self.client.get(
-            "/api/v1/ping/",
-            HTTP_X_API_KEY=raw_key
-        )
+        response = self.client.get("/api/v1/ping/", HTTP_X_API_KEY=raw_key)
 
         # It should succeed
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -267,10 +260,7 @@ class APIKeyTest(APITestCase):
 
         # Create a key and mark it as legacy
         api_key = APIKey.objects.create(
-            name="Key to Regenerate",
-            user=self.user,
-            school=self.school,
-            is_legacy=True
+            name="Key to Regenerate", user=self.user, school=self.school, is_legacy=True
         )
         self.assertTrue(api_key.is_legacy)
 
