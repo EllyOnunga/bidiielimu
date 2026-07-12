@@ -1,7 +1,10 @@
+import logging
 import secrets
 import string
 
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -47,7 +50,7 @@ class EmailService:
             verification_token.save()
 
         # Send email
-        subject = "Verify Your Email - ElimuHub"
+        subject = "Verify Your Email - GilaniOS"
         base_url = EmailService._get_frontend_url(user)
         verification_url = f"{base_url}/verify-email/{token}"
 
@@ -71,13 +74,13 @@ class EmailService:
             )
             return True
         except Exception as e:
-            print(f"Failed to send verification email: {e}")
+            logger.exception("Failed to send verification email: %s", str(e))
             return False
 
     @staticmethod
     def send_welcome_email(user, login_url, plain_password=None):
         """Send a welcome email with credentials/links"""
-        subject = "Welcome to ElimuHub!"
+        subject = "Welcome to GilaniOS!"
 
         html_message = render_to_string(
             "emails/welcome_email.html",
@@ -100,5 +103,5 @@ class EmailService:
             )
             return True
         except Exception as e:
-            print(f"Failed to send welcome email: {e}")
+            logger.exception("Failed to send welcome email: %s", str(e))
             return False

@@ -1,4 +1,4 @@
-package com.bidiielimu.app;
+package com.gilanios.app;
 
 import com.getcapacitor.BridgeActivity;
 

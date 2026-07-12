@@ -25,7 +25,7 @@ class ReceiptService:
         school_name = (
             connection.tenant.name.upper()
             if hasattr(connection, "tenant") and connection.tenant
-            else "ELIMUHUB ACADEMY"
+            else "GILANIOS ACADEMY"
         )
 
         receipt = [
@@ -60,7 +60,7 @@ class ReceiptService:
         school_name = (
             connection.tenant.name.upper()
             if hasattr(connection, "tenant") and connection.tenant
-            else "ELIMUHUB ACADEMY"
+            else "GILANIOS ACADEMY"
         )
 
         settings_obj = SchoolSetting.objects.first()

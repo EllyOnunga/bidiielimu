@@ -8,6 +8,59 @@ class GradeLevel(models.Model):
         return self.name
 
 
+class AcademicYear(models.Model):
+    name = models.CharField(max_length=20)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    is_current = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-start_date"]
+        constraints = [
+            models.UniqueConstraint(fields=["name"], name="unique_academic_year_name")
+        ]
+        indexes = [
+            models.Index(fields=["is_current"]),
+            models.Index(fields=["start_date", "end_date"]),
+        ]
+
+    def __str__(self):
+        return self.name
+
+
+class AcademicTerm(models.Model):
+    TERM_CHOICES = (
+        ("TERM_1", "Term 1"),
+        ("TERM_2", "Term 2"),
+        ("TERM_3", "Term 3"),
+        ("OTHER", "Other"),
+    )
+
+    academic_year = models.ForeignKey(
+        AcademicYear, on_delete=models.CASCADE, related_name="terms"
+    )
+    name = models.CharField(max_length=20, choices=TERM_CHOICES)
+    display_name = models.CharField(max_length=50, blank=True, default="")
+    start_date = models.DateField()
+    end_date = models.DateField()
+    is_current = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["start_date"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["academic_year", "name"], name="unique_academic_year_term"
+            )
+        ]
+        indexes = [
+            models.Index(fields=["academic_year", "is_current"]),
+            models.Index(fields=["start_date", "end_date"]),
+        ]
+
+    def __str__(self):
+        return self.display_name or self.get_name_display()
+
+
 class Stream(models.Model):
     grade_level = models.ForeignKey(
         GradeLevel, on_delete=models.CASCADE, related_name="streams"

@@ -1,5 +1,5 @@
-# ElimuHub Platform — PowerShell Management Script
-# Usage: .\elimuhub.ps1 <command>
+# GilaniOS Platform — PowerShell Management Script
+# Usage: .\gilanios.ps1 <command>
 
 param (
     [Parameter(Mandatory=$true)]

@@ -1,6 +1,8 @@
 from django.db.models import Count
 from rest_framework import permissions, viewsets
 
+from config.tenant_security import BaseTenantViewSet
+
 from .models import (
     Classroom,
     GradeLevel,
@@ -19,9 +21,8 @@ from .serializers import (
 )
 
 
-class SubjectAssignmentViewSet(viewsets.ModelViewSet):
+class SubjectAssignmentViewSet(BaseTenantViewSet):
     serializer_class = SubjectAssignmentSerializer
-    permission_classes = [permissions.IsAuthenticated]
     search_fields = [
         "teacher__user__first_name",
         "teacher__user__last_name",
@@ -51,9 +52,8 @@ class SubjectAssignmentViewSet(viewsets.ModelViewSet):
         serializer.save()
 
 
-class GradeLevelViewSet(viewsets.ModelViewSet):
+class GradeLevelViewSet(BaseTenantViewSet):
     serializer_class = GradeLevelSerializer
-    permission_classes = [permissions.IsAuthenticated]
     search_fields = ["name"]
 
     def get_queryset(self):
@@ -68,9 +68,8 @@ class GradeLevelViewSet(viewsets.ModelViewSet):
         serializer.save()
 
 
-class StreamViewSet(viewsets.ModelViewSet):
+class StreamViewSet(BaseTenantViewSet):
     serializer_class = StreamSerializer
-    permission_classes = [permissions.IsAuthenticated]
     search_fields = [
         "name",
         "grade_level__name",
@@ -92,9 +91,8 @@ class StreamViewSet(viewsets.ModelViewSet):
         return qs
 
 
-class SubjectViewSet(viewsets.ModelViewSet):
+class SubjectViewSet(BaseTenantViewSet):
     serializer_class = SubjectSerializer
-    permission_classes = [permissions.IsAuthenticated]
     search_fields = ["name", "code"]
 
     def get_queryset(self):
@@ -104,9 +102,8 @@ class SubjectViewSet(viewsets.ModelViewSet):
         serializer.save()
 
 
-class ClassroomViewSet(viewsets.ModelViewSet):
+class ClassroomViewSet(BaseTenantViewSet):
     serializer_class = ClassroomSerializer
-    permission_classes = [permissions.IsAuthenticated]
     search_fields = ["name"]
 
     def get_queryset(self):
@@ -116,9 +113,8 @@ class ClassroomViewSet(viewsets.ModelViewSet):
         serializer.save()
 
 
-class ScheduleSlotViewSet(viewsets.ModelViewSet):
+class ScheduleSlotViewSet(BaseTenantViewSet):
     serializer_class = ScheduleSlotSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user

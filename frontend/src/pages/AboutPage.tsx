@@ -39,13 +39,13 @@ export const AboutPage = () => (
             for Educators
           </h1>
           <p className="text-slate-400 text-lg leading-relaxed mb-4">
-            ElimuHub was born in 2022 out of frustration. Our founders — former
+            GilaniOS was born in 2022 out of frustration. Our founders — former
             teachers and school administrators — spent years watching schools
             struggle with paper registers, Excel fee sheets, and WhatsApp grade
             reports.
           </p>
           <p className="text-slate-400 text-lg leading-relaxed">
-            We built ElimuHub SYSTEM to fix that. A single, beautiful, reliable
+            We built GilaniOS SYSTEM to fix that. A single, beautiful, reliable
             platform that every school in Africa can afford and use from day
             one.
           </p>

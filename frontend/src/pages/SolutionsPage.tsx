@@ -96,7 +96,7 @@ export const SolutionsPage = () => (
         </h1>
         <p className="text-slate-400 max-w-2xl mx-auto text-lg">
           Whether you run a single primary school or a chain of campuses,
-          ElimuHub SYSTEM scales with you.
+          GilaniOS SYSTEM scales with you.
         </p>
       </motion.div>
 

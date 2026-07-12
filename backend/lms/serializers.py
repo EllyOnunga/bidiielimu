@@ -1,8 +1,11 @@
+import logging
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 
 from classes.models import Stream
 from teachers.models import Teacher
+
+logger = logging.getLogger(__name__)
 
 from .models import (
     Assignment,
@@ -213,10 +216,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
                             return "graded"
                         return "submitted"
         except Exception as e:
-            print(f"[ERROR] AssignmentSerializer get_status: {str(e)}")
-            import traceback
-
-            traceback.print_exc()
+            logger.exception("AssignmentSerializer get_status error")
             # Fallback to pending if anything goes wrong during status check
             return "pending"
         return "pending"

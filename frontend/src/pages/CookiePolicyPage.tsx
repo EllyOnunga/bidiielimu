@@ -42,7 +42,7 @@ export const CookiePolicyPage = () => (
           </p>
         </Section>
         <Section title="2. How We Use Cookies">
-          <p>ElimuHub SYSTEM uses the following types of cookies:</p>
+          <p>GilaniOS SYSTEM uses the following types of cookies:</p>
           <ul className="list-disc list-inside space-y-2">
             <li>
               <strong className="text-white">Essential Cookies:</strong>{" "}
@@ -86,10 +86,10 @@ export const CookiePolicyPage = () => (
           <p>
             For questions about cookies, contact{" "}
             <a
-              href="mailto:support@elimuhub.app"
+              href="mailto:support@gilanios.app"
               className="text-primary-400 hover:underline"
             >
-              support@elimuhub.app
+              support@gilanios.app
             </a>
             .
           </p>

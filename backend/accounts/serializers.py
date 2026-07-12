@@ -16,19 +16,27 @@ from .services import EmailService
 
 
 class APIKeySerializer(serializers.ModelSerializer):
+    secret = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = APIKey
         fields = [
             "id",
             "name",
-            "key",
+            "key_prefix",
+            "secret",
             "key_type",
             "is_active",
             "expires_at",
             "last_used_at",
             "created_at",
+            "rate_limit_requests",
+            "rate_limit_burst",
         ]
-        read_only_fields = ["key", "last_used_at", "created_at"]
+        read_only_fields = ["key_prefix", "secret", "last_used_at", "created_at"]
+
+    def get_secret(self, obj):
+        return getattr(obj, "_plain_key", None)
 
 
 class RoleSerializer(serializers.ModelSerializer):
@@ -75,7 +83,8 @@ class SchoolSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    school_details = SchoolSerializer(source="school", read_only=True)
+    school = serializers.SerializerMethodField()
+    school_details = serializers.SerializerMethodField()
     role_details = RoleSerializer(source="role", read_only=True)
     role = serializers.SlugRelatedField(slug_field="name", queryset=Role.objects.all())
 
@@ -98,6 +107,25 @@ class UserSerializer(serializers.ModelSerializer):
             "job_title",
         ]
         read_only_fields = ["id", "is_email_verified"]
+
+    def get_school(self, obj):
+        if obj.school_id:
+            return obj.school_id
+        active_membership = obj.school_memberships.filter(status="ACTIVE").first()
+        if active_membership:
+            return active_membership.school_id
+        return None
+
+    def get_school_details(self, obj):
+        school = obj.school
+        if not school:
+            active_membership = obj.school_memberships.select_related("school").filter(status="ACTIVE").first()
+            if active_membership:
+                school = active_membership.school
+        if school:
+            return SchoolSerializer(school).data
+        return None
+
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -238,29 +266,34 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         from .models import SMSDevice
         from .services_otp import OTPService
 
-        sms_device = SMSDevice.objects.filter(user=self.user, confirmed=True).first()
-        if sms_device or self.user.email:
-            # Prepare available methods
-            methods = ["EMAIL"]
-            if sms_device:
-                methods.append("SMS")
+        # Skip 2FA for superadmins
+        if self.user.is_superuser:
+            # Proceed directly to token generation
+            pass
+        else:
+            sms_device = SMSDevice.objects.filter(user=self.user, confirmed=True).first()
+            if sms_device or self.user.email:
+                # Prepare available methods
+                methods = ["EMAIL"]
+                if sms_device:
+                    methods.append("SMS")
 
-            # Default to SMS if available, otherwise EMAIL
-            default_method = "SMS" if sms_device else "EMAIL"
+                # Default to SMS if available, otherwise EMAIL
+                default_method = "SMS" if sms_device else "EMAIL"
 
-            # Trigger OTP send via default method
-            OTPService.send_otp(self.user, method=default_method)
+                # Trigger OTP send via default method
+                OTPService.send_otp(self.user, method=default_method)
 
-            # Raise special error that frontend can catch to show OTP input
-            raise serializers.ValidationError(
-                {
-                    "2fa_required": True,
-                    "methods": methods,
-                    "default_method": default_method,
-                    "user_id": self.user.id,
-                    "detail": "Two-factor authentication required.",
-                }
-            )
+                # Raise special error that frontend can catch to show OTP input
+                raise serializers.ValidationError(
+                    {
+                        "2fa_required": True,
+                        "methods": methods,
+                        "default_method": default_method,
+                        "user_id": self.user.id,
+                        "detail": "Two-factor authentication required.",
+                    }
+                )
 
         # Add custom claims to token
         refresh = self.get_token(self.user)

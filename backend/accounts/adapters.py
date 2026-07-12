@@ -7,7 +7,7 @@ User = get_user_model()
 
 class SocialAccountAdapter(DefaultSocialAccountAdapter):
     """
-    Custom social account adapter for ElimuHub
+    Custom social account adapter for GilaniOS
     """
 
     def pre_social_login(self, request, sociallogin):
@@ -103,7 +103,7 @@ from django.conf import settings
 
 class CustomAccountAdapter(DefaultAccountAdapter):
     """
-    Custom account adapter for ElimuHub to standardize frontend URLs.
+    Custom account adapter for GilaniOS to standardize frontend URLs.
     """
 
     def get_email_confirmation_url(self, request, emailconfirmation):

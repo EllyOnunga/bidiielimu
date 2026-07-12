@@ -1,6 +1,6 @@
 import re
 
-from rest_framework import exceptions, permissions
+from rest_framework import exceptions, permissions, viewsets
 
 
 def sanitize_input(value):
@@ -61,3 +61,11 @@ class TenantAwareViewSetMixin:
             queryset = queryset.filter(school=tenant)
 
         return queryset
+
+
+class BaseTenantViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
+    """
+    Base viewset for tenant-aware models.
+    """
+
+    permission_classes = [permissions.IsAuthenticated, StrictTenantPermission]

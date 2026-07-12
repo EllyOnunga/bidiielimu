@@ -7,7 +7,7 @@ variable "aws_region" {
 variable "project_name" {
   description = "Project Name"
   type        = string
-  default     = "elimuhub"
+  default     = "gilanios"
 }
 
 variable "environment" {
@@ -23,6 +23,12 @@ variable "db_password" {
 }
 
 variable "domain_name" {
-  description = "Main domain name (e.g. elimuhub.com)"
+  description = "Main domain name (e.g. gilanios.com)"
   type        = string
+}
+
+variable "allowed_origins" {
+  description = "Allowed CORS origins for the media bucket"
+  type        = list(string)
+  default     = ["https://example.com"]
 }

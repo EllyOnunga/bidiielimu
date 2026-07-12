@@ -137,7 +137,7 @@ export const TenantSettings = () => {
                     SSL Certificate
                   </p>
                   <p className="text-primary-200/40 text-[10px] font-black uppercase">
-                    Auto-Renewed by ElimuHub
+                    Auto-Renewed by GilaniOS
                   </p>
                 </div>
               </div>

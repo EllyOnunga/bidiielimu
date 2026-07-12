@@ -42,7 +42,7 @@ def generate_bulk_receipts_pdf(payment_ids):
     school_name = (
         connection.tenant.name.upper()
         if hasattr(connection, "tenant") and connection.tenant
-        else "ELIMUHUB ACADEMY"
+        else "GILANIOS ACADEMY"
     )
 
     for idx, payment in enumerate(payments):

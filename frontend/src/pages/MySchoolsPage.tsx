@@ -4,7 +4,7 @@ import { Card } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
 import { accountsService } from "../api/services/accountsService";
 import { ArrowRight, School as SchoolIcon, Globe } from "lucide-react";
-import { ElimuHubLogo } from "../components/ui/Logo";
+import { GilaniOSLogo } from "../components/ui/Logo";
 
 interface School {
   id: number;
@@ -44,7 +44,7 @@ export const MySchoolsPage = () => {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <ElimuHubLogo className="w-12 h-12" showText={false} />
+              <GilaniOSLogo className="w-12 h-12" showText={false} />
               <h1 className="text-4xl font-black text-primary tracking-tighter uppercase font-serif">
                 My <span className="text-primary-500">Schools</span>
               </h1>

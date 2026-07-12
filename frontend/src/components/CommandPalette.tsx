@@ -133,7 +133,7 @@ export const CommandPalette = () => {
                   Close
                 </span>
               </div>
-              <span>ElimuHub Search</span>
+              <span>GilaniOS Search</span>
             </div>
           </motion.div>
         </div>

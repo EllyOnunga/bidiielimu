@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "com.bidiielimu.app",
-  appName: "ElimuHub",
+  appId: "com.gilanios.app",
+  appName: "GilaniOS",
   webDir: "dist",
 };
 

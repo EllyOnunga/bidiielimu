@@ -14,17 +14,18 @@ from accounts.models import User
 from attendance.models import DailyAttendance
 from classes.models import Stream
 from config.caching import cache_response
-from config.tenant_security import StrictTenantPermission, TenantAwareViewSetMixin
+from config.tenant_security import StrictTenantPermission, TenantAwareViewSetMixin, BaseTenantViewSet
 from exams.models import Mark
 from fees.models import FeePayment
 from students.models import Student
 from teachers.models import Teacher
 
-from .models import School, SchoolSetting, Subscription
+from .models import School, SchoolSetting, Subscription, MediaAsset
 from .serializers import (
     SchoolSerializer,
     SchoolSettingSerializer,
     SubscriptionSerializer,
+    MediaAssetSerializer,
 )
 
 
@@ -44,7 +45,7 @@ class SchoolViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
 
         tenant = serializer.save()
         domain_name = self.request.data.get(
-            "domain_url", f"{tenant.schema_name}.elimuhub.com"
+            "domain_url", f"{tenant.schema_name}.gilanios.com"
         )
         Domain.objects.create(domain=domain_name, tenant=tenant, is_primary=True)
 
@@ -454,3 +455,23 @@ class SubscriptionViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
         if self.request.user.role_name == "SUPER_ADMIN":
             return Subscription.objects.all()
         return Subscription.objects.filter(school__schema_name=connection.schema_name)
+
+
+class MediaAssetViewSet(BaseTenantViewSet):
+    queryset = MediaAsset.objects.all()
+    serializer_class = MediaAssetSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = super().get_queryset()
+        
+        # Platform super admins can access all media assets
+        if user.is_superuser or getattr(user, "role_name", "") == "SUPER_ADMIN":
+            return queryset
+
+        # Standard users see files that are public, scoped to their school, or uploaded by themselves
+        return queryset.filter(
+            Q(visibility="PUBLIC") |
+            Q(visibility="TENANT", school=self.request.tenant) |
+            Q(uploaded_by=user)
+        )

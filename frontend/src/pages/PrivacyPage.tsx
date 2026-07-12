@@ -48,7 +48,7 @@ export const PrivacyPage = () => (
         <Section title="2. How We Use Your Data">
           <p>Your data is used exclusively to:</p>
           <ul className="list-disc list-inside space-y-1">
-            <li>Provide and improve the ElimuHub SYSTEM service</li>
+            <li>Provide and improve the GilaniOS SYSTEM service</li>
             <li>
               Send service-related notifications (billing, downtime alerts)
             </li>
@@ -92,10 +92,10 @@ export const PrivacyPage = () => (
             You have the right to access, correct, or delete your data at any
             time. Contact us at{" "}
             <a
-              href="mailto:support@elimuhub.app"
+              href="mailto:support@gilanios.app"
               className="text-primary-400 hover:underline"
             >
-              support@elimuhub.app
+              support@gilanios.app
             </a>{" "}
             for any requests.
           </p>
@@ -104,10 +104,10 @@ export const PrivacyPage = () => (
           <p>
             For privacy-related enquiries, email{" "}
             <a
-              href="mailto:support@elimuhub.app"
+              href="mailto:support@gilanios.app"
               className="text-primary-400 hover:underline"
             >
-              support@elimuhub.app
+              support@gilanios.app
             </a>
             .
           </p>

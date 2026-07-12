@@ -1,11 +1,12 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, viewsets
+from rest_framework import filters
 
+from config.tenant_security import BaseTenantViewSet
 from .models import DisciplineIncident
 from .serializers import DisciplineIncidentSerializer
 
 
-class DisciplineIncidentViewSet(viewsets.ModelViewSet):
+class DisciplineIncidentViewSet(BaseTenantViewSet):
     queryset = DisciplineIncident.objects.all()
     serializer_class = DisciplineIncidentSerializer
     filter_backends = [

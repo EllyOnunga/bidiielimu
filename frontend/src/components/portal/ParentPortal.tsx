@@ -10,8 +10,8 @@ import {
   AlertCircle,
   Wallet,
 } from "lucide-react";
-import axios from "axios";
 import toast from "react-hot-toast";
+import client from "../../api/client";
 
 export const ParentPortal = () => {
   const [children, setChildren] = useState<any[]>([]);
@@ -23,7 +23,7 @@ export const ParentPortal = () => {
 
   const fetchData = async () => {
     try {
-      const res = await axios.get("/api/v1/students/portal-dashboard/");
+      const res = await client.get("students/portal-dashboard/");
       setChildren(res.data);
     } catch (err) {
       toast.error("Failed to load portal data");

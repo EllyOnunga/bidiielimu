@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "../store/authStore";
 import { ROLES } from "../constants/roles";
@@ -114,11 +114,11 @@ export const SettingsPage = () => {
   });
 
   // Sync data to local state when loaded
-  useMemo(() => {
+  useEffect(() => {
     if (settingsData) setSettings(settingsData);
   }, [settingsData]);
 
-  useMemo(() => {
+  useEffect(() => {
     if (schoolProfileData) {
       setSchoolProfile({
         name: schoolProfileData.name,
@@ -1498,7 +1498,7 @@ export const SettingsPage = () => {
                     </p>
                     <div className="h-px bg-white/5 w-full my-4" />
                     <p className="text-[10px] text-primary-200/30 uppercase tracking-widest leading-relaxed">
-                      ElimuHub relies on a dynamic, multi-tenant cloud mesh
+                      GilaniOS relies on a dynamic, multi-tenant cloud mesh
                       network. Under high loads, traffic is dynamically
                       distributed across load-balanced zones to guarantee 99.99%
                       uptime. High performance caching layers automatically

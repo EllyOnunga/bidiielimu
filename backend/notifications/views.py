@@ -1,8 +1,18 @@
-from rest_framework import status, viewsets
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from .models import Notice, Notification, PTMMeeting, SchoolEvent
+from config.tenant_security import BaseTenantViewSet
+from django.db.models import F
+
+from .models import (
+    CommunicationUsage,
+    Notice,
+    Notification,
+    PLAN_LIMITS,
+    PTMMeeting,
+    SchoolEvent,
+)
 from .serializers import (
     NoticeSerializer,
     NotificationSerializer,
@@ -12,7 +22,7 @@ from .serializers import (
 from .services_sms import SMSService
 
 
-class NotificationViewSet(viewsets.ModelViewSet):
+class NotificationViewSet(BaseTenantViewSet):
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
 
@@ -59,6 +69,11 @@ class NotificationViewSet(viewsets.ModelViewSet):
                 recipients,
                 fail_silently=False,
             )
+            # Track email usage
+            usage, _ = CommunicationUsage.get_or_create_for_school(request.tenant)
+            CommunicationUsage.objects.filter(pk=usage.pk).update(
+                email_sent=F("email_sent") + len(recipients)
+            )
             return Response({"status": "Success", "sent_to": len(recipients)})
         except Exception as e:
             return Response(
@@ -80,18 +95,41 @@ class NotificationViewSet(viewsets.ModelViewSet):
         service = SMSService()
         res = service.send_bulk_sms(phones, message)
 
+        # Track SMS usage
+        usage, _ = CommunicationUsage.get_or_create_for_school(request.tenant)
+        CommunicationUsage.objects.filter(pk=usage.pk).update(
+            sms_sent=F("sms_sent") + len(phones)
+        )
+
         return Response({"status": "Success", "response": res})
 
     @action(detail=False, methods=["get"])
     def communication_stats(self, request):
-        # Mocking usage stats for now
+        from schools.models import Subscription
+
+        school = request.tenant
+
+        # Resolve plan limits from the school's subscription
+        try:
+            subscription = Subscription.objects.get(school=school, status="ACTIVE")
+            plan = subscription.plan
+        except Subscription.DoesNotExist:
+            plan = "FREE"
+
+        limits = PLAN_LIMITS.get(plan, PLAN_LIMITS["FREE"])
+        is_premium = plan in ("PROFESSIONAL", "ENTERPRISE")
+
+        # Get current month's usage (creates a zero-count row if none exists)
+        usage, _ = CommunicationUsage.get_or_create_for_school(school)
+
         return Response(
             {
-                "sms_limit": 5000,
-                "sms_used": 1240,
-                "email_limit": 10000,
-                "email_used": 2500,
-                "is_premium": False,
+                "sms_limit": limits["sms"],
+                "sms_used": usage.sms_sent,
+                "email_limit": limits["email"],
+                "email_used": usage.email_sent,
+                "is_premium": is_premium,
+                "plan": plan,
             }
         )
 
@@ -99,6 +137,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
     def recipient_groups(self, request):
         from students.models import Student
         from teachers.models import Teacher
+        from accounts.models import UserSchoolMembership
 
         parent_count = (
             Student.objects.filter(is_active=True)
@@ -107,6 +146,12 @@ class NotificationViewSet(viewsets.ModelViewSet):
             .count()
         )
         teacher_count = Teacher.objects.filter(is_active=True).count()
+
+        bom_count = UserSchoolMembership.objects.filter(
+            school=request.tenant,
+            status="ACTIVE",
+            role__name__in=["BOM", "BOARD_OF_MANAGEMENT", "BOM_MEMBER", "Board of Management"]
+        ).count()
 
         return Response(
             [
@@ -125,7 +170,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
                 {
                     "id": "bom",
                     "name": "Board of Management",
-                    "count": 8,
+                    "count": bom_count,
                     "type": "BOTH",
                 },
             ]
@@ -167,13 +212,25 @@ class NotificationViewSet(viewsets.ModelViewSet):
                     .values_list("phone_number", flat=True)
                     .distinct()
                 )
+        elif pk == "bom":
+            from accounts.models import UserSchoolMembership
+            memberships = UserSchoolMembership.objects.filter(
+                school=request.tenant,
+                status="ACTIVE",
+                role__name__in=["BOM", "BOARD_OF_MANAGEMENT", "BOM_MEMBER", "Board of Management"]
+            ).select_related("user")
+
+            if group_type == "email":
+                recipients = memberships.values_list("user__email", flat=True).distinct()
+            else:
+                recipients = memberships.values_list("user__phone_number", flat=True).distinct()
         else:
             recipients = []
 
         return Response({"recipients": list(filter(None, recipients))})
 
 
-class NoticeViewSet(viewsets.ModelViewSet):
+class NoticeViewSet(BaseTenantViewSet):
     queryset = Notice.objects.all().order_by("-published_at")
     serializer_class = NoticeSerializer
 
@@ -189,11 +246,11 @@ class NoticeViewSet(viewsets.ModelViewSet):
         return Response({"status": "Sent", "response": res})
 
 
-class SchoolEventViewSet(viewsets.ModelViewSet):
+class SchoolEventViewSet(BaseTenantViewSet):
     queryset = SchoolEvent.objects.all().order_by("start_date")
     serializer_class = SchoolEventSerializer
 
 
-class PTMMeetingViewSet(viewsets.ModelViewSet):
+class PTMMeetingViewSet(BaseTenantViewSet):
     queryset = PTMMeeting.objects.all().order_by("scheduled_time")
     serializer_class = PTMMeetingSerializer

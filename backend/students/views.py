@@ -1,8 +1,11 @@
+import logging
 from django.contrib.auth import get_user_model
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+logger = logging.getLogger(__name__)
 
 from config.tenant_security import StrictTenantPermission, TenantAwareViewSetMixin
 
@@ -51,10 +54,7 @@ class StudentViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
         try:
             return super().create(request, *args, **kwargs)
         except Exception as e:
-            import traceback
-
-            print(f"[CRITICAL ERROR] StudentViewSet create: {str(e)}")
-            traceback.print_exc()
+            logger.exception("StudentViewSet create error")
             raise e
 
     @action(detail=False, methods=["get"])

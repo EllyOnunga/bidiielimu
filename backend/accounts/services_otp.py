@@ -2,7 +2,8 @@ import logging
 import random
 import string
 
-from django.core.cache import cache
+from django.conf import settings
+from django.core.cache import caches
 from django.utils import timezone
 
 from notifications.services_sms import SMSService
@@ -10,6 +11,9 @@ from notifications.services_sms import SMSService
 from .models import SMSDevice
 
 logger = logging.getLogger(__name__)
+
+# Use dedicated OTP cache that bypasses tenant-aware key prefixing
+otp_cache = caches["otp_cache"]
 
 
 class OTPService:
@@ -20,7 +24,19 @@ class OTPService:
         """
         otp = "".join(random.choices(string.digits, k=length))
         cache_key = f"sms_otp_{user.id}"
-        cache.set(cache_key, otp, timeout=300)  # 5 minutes
+        otp_cache.set(cache_key, otp, timeout=300)  # 5 minutes
+
+        # Verify it was stored
+        cached_value = otp_cache.get(cache_key)
+
+        # Log OTP in DEBUG mode for development/testing
+        if settings.DEBUG:
+            logger.info(
+                f"[DEBUG] OTP generated for user {user.id} ({user.email}): {otp}, "
+                f"cache_key={cache_key}, stored_successfully={cached_value == otp}, "
+                f"cached_value={cached_value}"
+            )
+
         return otp
 
     @staticmethod
@@ -45,7 +61,7 @@ class OTPService:
                 return False
             phone_number = device.phone_number
 
-        message = f"Your ElimuHub verification code is: {otp}. It expires in 5 minutes."
+        message = f"Your GilaniOS verification code is: {otp}. It expires in 5 minutes."
         sms_service = SMSService()
         response = sms_service.send_bulk_sms([phone_number], message)
 
@@ -62,7 +78,7 @@ class OTPService:
         from django.core.mail import send_mail
         from django.template.loader import render_to_string
 
-        subject = f"{otp} is your ElimuHub verification code"
+        subject = f"{otp} is your GilaniOS verification code"
         html_message = render_to_string(
             "emails/otp_email.html", {"user": user, "otp": otp}
         )
@@ -87,9 +103,24 @@ class OTPService:
         Verifies the provided OTP against the cached one.
         """
         cache_key = f"sms_otp_{user.id}"
-        cached_otp = cache.get(cache_key)
+        cached_otp = otp_cache.get(cache_key)
+
+        if settings.DEBUG:
+            logger.info(
+                f"[DEBUG] OTP verification for user {user.id} ({user.email}): "
+                f"provided={otp}, cached={cached_otp}, match={cached_otp == otp}, "
+                f"cache_key={cache_key}"
+            )
 
         if cached_otp and cached_otp == otp:
-            cache.delete(cache_key)
+            otp_cache.delete(cache_key)
+            if settings.DEBUG:
+                logger.info(f"[DEBUG] OTP verified successfully for user {user.id}")
             return True
+
+        if settings.DEBUG:
+            logger.warning(
+                f"[DEBUG] OTP verification failed for user {user.id}: "
+                f"cached_otp exists={bool(cached_otp)}, match={cached_otp == otp if cached_otp else False}"
+            )
         return False

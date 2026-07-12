@@ -4,9 +4,12 @@ Service interfaces and contracts for microservices architecture
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+import logging
 from typing import Any, Dict, List, Optional
 
 from django.utils import timezone
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -182,7 +185,7 @@ class EventPublisher:
     def publish_event(event: DomainEvent):
         """Publish event to message broker"""
         # In a real implementation, this would publish to Kafka, RabbitMQ, etc.
-        print(
+        logger.info(
             f"Publishing event: {event.event_type} for aggregate {event.aggregate_id}"
         )
 

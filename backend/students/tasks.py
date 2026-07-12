@@ -1,7 +1,10 @@
 import csv
 import io
+import logging
 import secrets
 import string
+
+logger = logging.getLogger(__name__)
 
 from celery import shared_task
 from django.contrib.auth import get_user_model
@@ -123,7 +126,7 @@ def process_bulk_upload(csv_content, school_id, user_id):
             notification_type="success" if created_count > 0 else "error",
         )
     except Exception as e:
-        print(f"Failed to create notification: {e}")
+        logger.exception("Failed to create notification: %s", str(e))
 
     return {"created": created_count, "errors": errors}
 
@@ -336,7 +339,7 @@ def import_students_csv_task(self, schema_name, file_path, user_id):
                 ),
             )
         except Exception as e:
-            print(f"Failed to create notification: {e}")
+            logger.exception("Failed to create notification: %s", str(e))
 
         # Clean up temp file
         if os.path.exists(file_path):

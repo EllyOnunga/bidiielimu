@@ -10,7 +10,7 @@ django.setup()
 
 try:
     user = User.objects.get(email="onungae5@gmail.com")
-    user.set_password("ElimuHub2026!")
+    user.set_password("GilaniOS2026!")
     user.save()
     print("Password reset successful for onungae5@gmail.com")
 except User.DoesNotExist:

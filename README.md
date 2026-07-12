@@ -1,4 +1,4 @@
-# ElimuHub — Enterprise School Management SaaS
+# GilaniOS — Enterprise School Management SaaS
 
 > A world-class, AI-powered, multi-tenant School Information System built for East & West Africa.
 
@@ -43,8 +43,8 @@ Client (React PWA / React Native)
 
 ### 1. Clone & Configure
 ```bash
-git clone https://github.com/your-org/ElimuHub.git
-cd ElimuHub
+git clone https://github.com/EllyOnunga/gilanios.git
+cd GilaniOS
 cp .env.example .env
 # Edit .env with your credentials
 ```
@@ -95,9 +95,9 @@ make clean          # Full teardown
 Each school gets its own PostgreSQL schema:
 
 ```
-public (shared)        → ElimuHub.app
-pg_school_greenwood    → greenwood.ElimuHub.app
-pg_school_stmarys      → stmarys.ElimuHub.app
+public (shared)        → GilaniOS.app
+pg_school_greenwood    → greenwood.GilaniOS.app
+pg_school_stmarys      → stmarys.GilaniOS.app
 ```
 
 To onboard a new school:
@@ -105,7 +105,7 @@ To onboard a new school:
 docker compose exec backend python manage.py create_tenant \
   --schema_name=greenwood \
   --name="Greenwood Academy" \
-  --domain=greenwood.ElimuHub.app
+  --domain=greenwood.GilaniOS.app
 ```
 
 ---
@@ -128,4 +128,4 @@ docker compose exec backend python manage.py create_tenant \
 
 ## 📄 License
 
-Proprietary — All Rights Reserved © ElimuHub 2024
+Proprietary — All Rights Reserved © GilaniOS 2024

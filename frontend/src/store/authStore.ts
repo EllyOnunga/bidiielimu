@@ -28,8 +28,8 @@ interface AuthState {
   user: User | null;
   token: string | null;
   refreshToken: string | null;
-  setAuth: (user: User, token: string, refreshToken?: string) => void;
-  setTokens: (token: string, refreshToken: string) => void;
+  setAuth: (user: User, token: string | null, refreshToken?: string | null) => void;
+  setTokens: (token: string | null, refreshToken: string | null) => void;
   logout: () => void;
 }
 
@@ -44,24 +44,19 @@ const getStoredUser = () => {
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: getStoredUser(),
-  token: localStorage.getItem("token"),
-  refreshToken: localStorage.getItem("refreshToken"),
+  token: null,
+  refreshToken: null,
   setAuth: (user, token, refreshToken) => {
-    localStorage.setItem("token", token);
+    // Persist only non-sensitive user object; tokens are kept in-memory or as HttpOnly cookies
     localStorage.setItem("user", JSON.stringify(user));
-    if (refreshToken) {
-      localStorage.setItem("refreshToken", refreshToken);
-    }
-    set({ user, token, refreshToken: refreshToken || null });
+    set({ user, token: token || null, refreshToken: refreshToken || null });
   },
   setTokens: (token, refreshToken) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("refreshToken", refreshToken);
+    // Keep tokens in-memory; cookie-based refresh will be used for long-lived refresh tokens
     set({ token, refreshToken });
   },
   logout: () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("refreshToken");
+    // Clear local user data and in-memory tokens; backend should clear cookies on logout
     localStorage.removeItem("user");
     set({ user: null, token: null, refreshToken: null });
   },

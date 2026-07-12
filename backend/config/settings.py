@@ -46,25 +46,24 @@ except KeyError:
 # Force Debug and Allowed Hosts for Local Dev
 DEBUG = os.getenv("DEBUG", "False") == "True"
 ALLOWED_HOSTS = os.getenv(
-    "ALLOWED_HOSTS", "localhost,127.0.0.1,.elimuhub.com,testserver,test_tenant"
+    "ALLOWED_HOSTS", "localhost,127.0.0.1,.gilanios.com,testserver,test_tenant"
 ).split(",")
 
 # CORS Settings
 CORS_ALLOW_ALL_ORIGINS = False
-CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^https?://[a-zA-Z0-9_-]+\.localhost$",
-    r"^https?://localhost$",
-]
 CORS_ALLOW_CREDENTIALS = True
+
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 TENANT_SUBFOLDER_PREFIX = os.getenv("TENANT_SUBFOLDER_PREFIX", "school")
 TENANT_DOMAIN_SUFFIX = os.getenv("TENANT_DOMAIN_SUFFIX", "localhost")
 
+# Keep a single source of truth for allowed origins.
 CORS_ALLOWED_ORIGINS = [
     FRONTEND_URL,
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
+
 
 # HTTPS/SSL Security Settings
 SECURE_SSL_REDIRECT = not DEBUG and "test" not in sys.argv
@@ -256,7 +255,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 # Database Configuration with Read/Write Splitting
 db_config = dj_database_url.config(
-    default="postgres://localhost/elimuhubdb",
+    default="postgres://localhost/gilaniosdb",
     conn_max_age=600,
     conn_health_checks=True,
 )
@@ -388,7 +387,8 @@ REST_AUTH = {
     "USE_JWT": True,
     "JWT_AUTH_COOKIE": "jwt-auth",
     "JWT_AUTH_REFRESH_COOKIE": "jwt-refresh-token",
-    "JWT_AUTH_HTTPONLY": False,
+    "JWT_AUTH_HTTPONLY": True,
+    "JWT_AUTH_SECURE": not DEBUG,
     "USER_DETAILS_SERIALIZER": "accounts.serializers.UserSerializer",
     "REGISTER_SERIALIZER": "accounts.serializers.RegisterSerializer",
     "PASSWORD_RESET_SERIALIZER": "accounts.serializers.CustomPasswordResetSerializer",
@@ -515,7 +515,7 @@ CACHES = {
             if not DEBUG
             else {}
         ),
-        "KEY_PREFIX": "elimuhub",
+        "KEY_PREFIX": "gilanios",
         "TIMEOUT": 3600,  # 1 hour default
         "KEY_FUNCTION": "config.cache_utils.make_tenant_aware_key",
     },
@@ -562,6 +562,17 @@ CACHES = {
         "KEY_PREFIX": "api",
         "TIMEOUT": 1800,  # 30 minutes
     },
+    "otp_cache": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": os.getenv("REDIS_URL", "redis://127.0.0.1:6379/4"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+        "KEY_PREFIX": "otp",
+        "TIMEOUT": 300,  # 5 minutes
+        # NOTE: No KEY_FUNCTION - OTP cache bypasses tenant-aware key prefixing
+        # NOTE: Always use Redis even in DEBUG to avoid LocMemCache worker isolation
+    },
 }
 
 # Session Caching
@@ -581,8 +592,8 @@ CELERY_RESULT_BACKEND = os.getenv(
 
 # API Documentation Settings
 SPECTACULAR_SETTINGS = {
-    "TITLE": "ElimuHub API",
-    "DESCRIPTION": "Official API for ElimuHub School Management Platform",
+    "TITLE": "GilaniOS API",
+    "DESCRIPTION": "Official API for GilaniOS School Management Platform",
     "VERSION": VERSION,
     "SERVE_INCLUDE_SCHEMA": False,
 }
@@ -596,7 +607,7 @@ if USE_S3:
     AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
     AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
     AWS_STORAGE_BUCKET_NAME = os.getenv(
-        "AWS_STORAGE_BUCKET_NAME", "elimuhub-media-storage"
+        "AWS_STORAGE_BUCKET_NAME", "gilanios-media-storage"
     )
     AWS_S3_REGION_NAME = os.getenv("AWS_REGION", "us-east-1")
 
@@ -645,7 +656,7 @@ else:
     EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
     EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@elimuhub.com")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@gilanios.com")
 
 # Africa's Talking Settings
 AT_USERNAME = os.getenv("AT_USERNAME", "sandbox")
@@ -853,8 +864,8 @@ if OTEL_ENABLED:
         from opentelemetry.sdk.trace import TracerProvider
         from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
-        if not hasattr(trace, "_ELIMUHUB_OTEL_INITIALIZED"):
-            resource = Resource.create({"service.name": "elimuhub-backend"})
+        if not hasattr(trace, "_GILANIOS_OTEL_INITIALIZED"):
+            resource = Resource.create({"service.name": "gilanios-backend"})
             provider = TracerProvider(resource=resource)
             # Send to local otel-collector sidecar on port 4317
             processor = BatchSpanProcessor(
@@ -866,7 +877,7 @@ if OTEL_ENABLED:
             DjangoInstrumentor().instrument()
             Psycopg2Instrumentor().instrument()
             CeleryInstrumentor().instrument()
-            trace._ELIMUHUB_OTEL_INITIALIZED = True
+            trace._GILANIOS_OTEL_INITIALIZED = True
             logging.info(
                 "OpenTelemetry initialized and connected to otel-collector:4317"
             )

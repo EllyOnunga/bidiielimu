@@ -1,9 +1,12 @@
+import logging
+
 from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
 from notifications.services import NotificationService
 
+logger = logging.getLogger(__name__)
 User = get_user_model()
 
 
@@ -23,9 +26,9 @@ def assignment_created_notification(sender, instance, created, **kwargs):
                             message=f"A new assignment '{instance.title}' has been released for {instance.subject.name}. Due date: {instance.due_date.strftime('%Y-%m-%d %H:%M')}.",
                             level="INFO",
                         )
-        except Exception as e:
+        except Exception:
             # Prevent failures from crashing the main transaction
-            print(f"Error in assignment notification signal: {e}")
+            logger.exception("Error in assignment notification signal")
 
 
 @receiver(post_save, sender="lms.LessonNote")
@@ -48,8 +51,8 @@ def lesson_note_created_notification(sender, instance, created, **kwargs):
                         message=f"New lesson note '{instance.title}' has been uploaded for {instance.subject.name}.",
                         level="INFO",
                     )
-        except Exception as e:
-            print(f"Error in lesson note notification signal: {e}")
+        except Exception:
+            logger.exception("Error in lesson note notification signal")
 
 
 @receiver(post_save, sender="lms.Resource")
@@ -75,8 +78,8 @@ def resource_created_notification(sender, instance, created, **kwargs):
                         message=f"A new {category_display.lower()} '{instance.title}' has been uploaded for {instance.subject.name}.",
                         level="INFO",
                     )
-        except Exception as e:
-            print(f"Error in resource notification signal: {e}")
+        except Exception:
+            logger.exception("Error in resource notification signal")
 
 
 @receiver(post_save, sender="lms.Submission")
@@ -91,8 +94,8 @@ def submission_graded_notification(sender, instance, created, **kwargs):
                     message=f"Your submission for '{instance.assignment.title}' has been graded. Score: {instance.grade}/{instance.assignment.max_score}.",
                     level="SUCCESS",
                 )
-        except Exception as e:
-            print(f"Error in submission graded notification signal: {e}")
+        except Exception:
+            logger.exception("Error in submission graded notification signal")
 
 
 @receiver(pre_save, sender=User)
@@ -118,8 +121,8 @@ def user_password_changed_notification(sender, instance, created, **kwargs):
                     message="Your account password was successfully updated. If you did not request this, please contact your school administrator immediately.",
                     level="WARNING",
                 )
-            except Exception as e:
-                print(f"Error in password changed notification signal: {e}")
+            except Exception:
+                logger.exception("Error in password changed notification signal")
 
 
 @receiver(post_save, sender="notifications.Notice")
@@ -140,8 +143,8 @@ def notice_published_notification(sender, instance, created, **kwargs):
                     + ("..." if len(instance.content) > 200 else ""),
                     level="INFO",
                 )
-        except Exception as e:
-            print(f"Error in notice notification signal: {e}")
+        except Exception:
+            logger.exception("Error in notice notification signal")
 
 
 @receiver(post_save, sender="notifications.SchoolEvent")
@@ -156,5 +159,5 @@ def school_event_created_notification(sender, instance, created, **kwargs):
                     message=f"Event scheduled from {instance.start_date.strftime('%Y-%m-%d %H:%M')} to {instance.end_date.strftime('%Y-%m-%d %H:%M')}.",
                     level="INFO",
                 )
-        except Exception as e:
-            print(f"Error in school event notification signal: {e}")
+        except Exception:
+            logger.exception("Error in school event notification signal")

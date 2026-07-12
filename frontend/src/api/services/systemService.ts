@@ -1,5 +1,4 @@
 import client from "../client";
-import axios from "axios";
 
 export interface SystemStatus {
   status: string;
@@ -30,15 +29,10 @@ export const systemService = {
   },
 
   getSystemHealth: async (): Promise<SystemHealth> => {
-    // The health-check view is located at /health/ (not prefix by /api/v1/)
+    // The health-check view is located at /health/ (not prefixed by /api/v1/)
     const apiBase = client.defaults.baseURL || "";
     const rootUrl = apiBase.replace("/api/v1/", "/health/");
-    const token = localStorage.getItem("token");
-    const response = await axios.get<SystemHealth>(rootUrl, {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-      },
-    });
+    const response = await client.get<SystemHealth>(rootUrl);
     return response.data;
   },
 };

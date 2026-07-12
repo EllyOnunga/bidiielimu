@@ -33,13 +33,14 @@ const baseURL = getBaseURL();
 
 const client = axios.create({
   baseURL,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
 client.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+  const token = useAuthStore.getState().token;
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -84,28 +85,20 @@ client.interceptors.response.use(
     // 2. Handle Token Expiration (401)
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      const refreshToken = localStorage.getItem("refreshToken");
 
-      if (refreshToken) {
-        try {
-          const res = await axios.post(`${baseURL}accounts/token/refresh/`, {
-            refresh: refreshToken,
-          });
-          const newAccess = res.data.access;
-          const newRefresh = res.data.refresh || refreshToken;
+      try {
+        // Attempt a cookie-based refresh; backend should read HttpOnly refresh cookie
+        const res = await client.post(`${baseURL}accounts/token/refresh/`, {});
+        const newAccess = res.data.access;
 
-          useAuthStore.getState().setTokens(newAccess, newRefresh);
-          originalRequest.headers.Authorization = `Bearer ${newAccess}`;
+        useAuthStore.getState().setTokens(newAccess, null);
+        originalRequest.headers.Authorization = `Bearer ${newAccess}`;
 
-          return client(originalRequest);
-        } catch (refreshError) {
-          useAuthStore.getState().logout();
-          window.location.href = "/login";
-          return Promise.reject(refreshError);
-        }
-      } else {
+        return client(originalRequest);
+      } catch (refreshError) {
         useAuthStore.getState().logout();
         window.location.href = "/login";
+        return Promise.reject(refreshError);
       }
     }
 

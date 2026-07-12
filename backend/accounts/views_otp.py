@@ -1,3 +1,6 @@
+import logging
+
+from django.conf import settings
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions, status, views
 from rest_framework.response import Response
@@ -6,6 +9,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import SMSDevice, User
 from .serializers import UserSerializer
 from .services_otp import OTPService
+
+logger = logging.getLogger(__name__)
 
 
 class SMSOTPSetupView(views.APIView):
@@ -96,7 +101,14 @@ class OTPVerifyLoginView(views.APIView):
         user_id = request.data.get("user_id")
         otp = request.data.get("otp")
 
+        if settings.DEBUG:
+            logger.info(f"[DEBUG] OTP verify-login request: user_id={user_id}, otp={otp}")
+
         if not user_id or not otp:
+            if settings.DEBUG:
+                logger.warning(
+                    f"[DEBUG] OTP verify-login failed: missing params - user_id={bool(user_id)}, otp={bool(otp)}"
+                )
             return Response(
                 {"error": "User ID and OTP are required"},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -110,6 +122,10 @@ class OTPVerifyLoginView(views.APIView):
             if tenant.schema_name == "public":
                 # Only SUPER_ADMIN allowed on main URL
                 if not (user.is_superuser or user.role_name == "SUPER_ADMIN"):
+                    if settings.DEBUG:
+                        logger.warning(
+                            f"[DEBUG] OTP verify-login failed: public schema but user is not SUPER_ADMIN - user_id={user.id}, is_superuser={user.is_superuser}, role={user.role_name}"
+                        )
                     return Response(
                         {
                             "error": "Only Platform Super Admins can access the main platform dashboard. Please login via your school's specific URL."
@@ -119,6 +135,10 @@ class OTPVerifyLoginView(views.APIView):
             else:
                 # Restricted to their own school URL (Super Admins can access any)
                 if user.school != tenant and not user.is_superuser:
+                    if settings.DEBUG:
+                        logger.warning(
+                            f"[DEBUG] OTP verify-login failed: school mismatch - user_id={user.id}, user_school={user.school}, tenant={tenant}"
+                        )
                     return Response(
                         {
                             "error": "You do not have permission to access this school's dashboard. Please login via your own school's URL."
@@ -133,7 +153,7 @@ class OTPVerifyLoginView(views.APIView):
             refresh["school_id"] = user.school_id if user.school else None
             refresh["role"] = user.role.name if user.role else "ADMIN"
 
-            return Response(
+            response = Response(
                 {
                     "refresh": str(refresh),
                     "access": str(refresh.access_token),
@@ -141,6 +161,20 @@ class OTPVerifyLoginView(views.APIView):
                 }
             )
 
+            # Issue HttpOnly JWT cookies for cookie-based refresh support
+            from .views import set_jwt_cookies
+
+            set_jwt_cookies(
+                response,
+                str(refresh.access_token),
+                str(refresh),
+            )
+            return response
+
+        if settings.DEBUG:
+            logger.warning(
+                f"[DEBUG] OTP verify-login failed: invalid or expired OTP - user_id={user.id}"
+            )
         return Response(
             {"error": "Invalid or expired OTP"}, status=status.HTTP_400_BAD_REQUEST
         )

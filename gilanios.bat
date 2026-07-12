@@ -27,5 +27,5 @@ if "%CMD%"=="build" (
 ) else if "%CMD%"=="ps" (
     docker compose ps
 ) else (
-    echo Usage: elimuhub.bat [build^|up^|down^|restart^|logs^|migrate^|superuser^|test^|clean^|ps]
+    echo Usage: gilanios.bat [build^|up^|down^|restart^|logs^|migrate^|superuser^|test^|clean^|ps]
 )

@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 
 from .models import LeaveRequest, StaffProfile, Teacher
 
@@ -17,6 +18,16 @@ class TeacherSerializer(serializers.ModelSerializer):
     )
 
     role = serializers.CharField(write_only=True, required=False)
+
+    employee_id = serializers.CharField(
+        validators=[
+            UniqueValidator(
+                queryset=Teacher.objects.all(),
+                message="This employee ID is already in use. Please enter a unique ID.",
+            )
+        ],
+        required=False,
+    )
 
     class Meta:
         model = Teacher
@@ -52,6 +63,11 @@ class TeacherSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     "A user with this email already exists."
                 )
+        return value
+
+    def validate_employee_id(self, value):
+        if value:
+            value = value.strip().upper()
         return value
 
     def get_name(self, obj):

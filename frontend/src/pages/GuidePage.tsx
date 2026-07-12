@@ -72,7 +72,7 @@ export const GuidePage = () => {
               <GraduationCap className="w-5 h-5 text-white" />
             </div>
             <span className="text-xl font-black tracking-tighter uppercase">
-              ElimuHub
+              GilaniOS
               <span className="ml-2 text-xs font-bold text-slate-500 tracking-widest">
                 GUIDE
               </span>
@@ -146,7 +146,7 @@ export const GuidePage = () => {
                 Getting Started
               </h1>
               <p className="text-slate-400 text-lg leading-relaxed mb-8">
-                Welcome to ElimuHub, the premier SaaS School Management System.
+                Welcome to GilaniOS, the premier SaaS School Management System.
                 This guide will walk you through the core features designed to
                 streamline your institution's daily operations.
               </p>
@@ -259,7 +259,7 @@ export const GuidePage = () => {
                 Exams & Grading
               </h2>
               <p className="text-slate-400 mb-6">
-                ElimuHub offers an elite grading system capable of handling
+                GilaniOS offers an elite grading system capable of handling
                 standard and custom grading curves.
               </p>
               <ul className="list-disc list-inside space-y-4 text-sm text-slate-300">

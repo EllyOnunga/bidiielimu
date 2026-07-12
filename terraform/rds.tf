@@ -34,8 +34,8 @@ resource "aws_db_instance" "main" {
   engine               = "postgres"
   engine_version       = "17.1"
   instance_class       = "db.t3.medium" # Minimum for production performance
-  db_name              = "elimuhub"
-  username             = "elimuhub_admin"
+  db_name              = "gilanios"
+  username             = "gilanios_admin"
   password             = var.db_password
   parameter_group_name = "default.postgres17"
   skip_final_snapshot  = true

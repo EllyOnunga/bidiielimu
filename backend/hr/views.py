@@ -4,6 +4,8 @@ from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from config.tenant_security import BaseTenantViewSet
+
 from .models import LeaveRequest, PayrollRecord, StaffProfile
 from .serializers import (
     LeaveRequestSerializer,
@@ -12,9 +14,8 @@ from .serializers import (
 )
 
 
-class StaffProfileViewSet(viewsets.ModelViewSet):
+class StaffProfileViewSet(BaseTenantViewSet):
     serializer_class = StaffProfileSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
@@ -23,9 +24,8 @@ class StaffProfileViewSet(viewsets.ModelViewSet):
         return StaffProfile.objects.filter(user=user)
 
 
-class PayrollRecordViewSet(viewsets.ModelViewSet):
+class PayrollRecordViewSet(BaseTenantViewSet):
     serializer_class = PayrollRecordSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
@@ -115,9 +115,8 @@ class PayrollRecordViewSet(viewsets.ModelViewSet):
         )
 
 
-class LeaveRequestViewSet(viewsets.ModelViewSet):
+class LeaveRequestViewSet(BaseTenantViewSet):
     serializer_class = LeaveRequestSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
     def ensure_teacher_staff_profile(self, user):
         try:
@@ -125,9 +124,15 @@ class LeaveRequestViewSet(viewsets.ModelViewSet):
         except StaffProfile.DoesNotExist:
             try:
                 teacher = user.teacher_profile
+                emp_id = (getattr(teacher, "employee_id", None) or "").strip().upper()
+                if (
+                    not emp_id
+                    or StaffProfile.objects.filter(employee_id=emp_id).exists()
+                ):
+                    emp_id = f"TCH-{user.id}"
                 return StaffProfile.objects.create(
                     user=user,
-                    employee_id=teacher.employee_id,
+                    employee_id=emp_id,
                     department="Academics",
                     job_title=teacher.designation or "Teacher",
                     joining_date=teacher.joining_date,

@@ -57,6 +57,26 @@ class Invoice(models.Model):
         return f"Invoice {self.id} - {self.student} ({self.balance})"
 
 
+class InvoiceLineItem(models.Model):
+    invoice = models.ForeignKey(
+        Invoice, on_delete=models.CASCADE, related_name="line_items"
+    )
+    description = models.CharField(max_length=255)
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    quantity = models.PositiveIntegerField(default=1)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [models.Index(fields=["invoice", "created_at"])]
+
+    @property
+    def total(self):
+        return self.amount * self.quantity
+
+    def __str__(self):
+        return f"{self.description} ({self.total})"
+
+
 class FeePayment(models.Model):
     PAYMENT_METHODS = (
         ("MPESA", "M-Pesa STK"),
@@ -126,3 +146,104 @@ class FinancialAid(models.Model):
 
     def __str__(self):
         return f"{self.aid_type} - {self.student} ({self.amount})"
+
+
+class LedgerAccount(models.Model):
+    ACCOUNT_TYPES = (
+        ("ASSET", "Asset"),
+        ("LIABILITY", "Liability"),
+        ("EQUITY", "Equity"),
+        ("REVENUE", "Revenue"),
+        ("EXPENSE", "Expense"),
+    )
+
+    code = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=120)
+    account_type = models.CharField(max_length=20, choices=ACCOUNT_TYPES)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["code"]
+        indexes = [models.Index(fields=["account_type", "is_active"])]
+
+    def __str__(self):
+        return f"{self.code} - {self.name}"
+
+
+class LedgerEntry(models.Model):
+    ENTRY_TYPES = (
+        ("DEBIT", "Debit"),
+        ("CREDIT", "Credit"),
+    )
+
+    account = models.ForeignKey(
+        LedgerAccount, on_delete=models.PROTECT, related_name="entries"
+    )
+    student = models.ForeignKey(
+        "students.Student",
+        on_delete=models.SET_NULL,
+        related_name="ledger_entries",
+        null=True,
+        blank=True,
+    )
+    invoice = models.ForeignKey(
+        Invoice,
+        on_delete=models.SET_NULL,
+        related_name="ledger_entries",
+        null=True,
+        blank=True,
+    )
+    payment = models.ForeignKey(
+        FeePayment,
+        on_delete=models.SET_NULL,
+        related_name="ledger_entries",
+        null=True,
+        blank=True,
+    )
+    entry_type = models.CharField(max_length=10, choices=ENTRY_TYPES)
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    currency = models.CharField(max_length=3, default="KES")
+    reference = models.CharField(max_length=120, db_index=True)
+    description = models.TextField(blank=True, default="")
+    posted_at = models.DateTimeField(auto_now_add=True)
+    is_reversal = models.BooleanField(default=False)
+    reverses = models.ForeignKey(
+        "self", on_delete=models.SET_NULL, null=True, blank=True
+    )
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["account", "posted_at"]),
+            models.Index(fields=["student", "posted_at"]),
+            models.Index(fields=["invoice", "posted_at"]),
+            models.Index(fields=["payment", "posted_at"]),
+        ]
+
+    def __str__(self):
+        return f"{self.entry_type} {self.amount} {self.account}"
+
+
+class PaymentAllocation(models.Model):
+    payment = models.ForeignKey(
+        FeePayment, on_delete=models.CASCADE, related_name="allocations"
+    )
+    invoice = models.ForeignKey(
+        Invoice, on_delete=models.CASCADE, related_name="payment_allocations"
+    )
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    allocated_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["payment", "invoice"], name="unique_payment_invoice_allocation"
+            )
+        ]
+        indexes = [
+            models.Index(fields=["payment", "allocated_at"]),
+            models.Index(fields=["invoice", "allocated_at"]),
+        ]
+
+    def __str__(self):
+        return f"{self.payment} -> {self.invoice} ({self.amount})"

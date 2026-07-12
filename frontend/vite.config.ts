@@ -76,8 +76,8 @@ export default defineConfig({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "apple-touch-icon.png", "mask-icon.svg"],
       manifest: {
-        name: "ElimuHub - AI School Management",
-        short_name: "ElimuHub",
+        name: "GilaniOS - AI School Management",
+        short_name: "GilaniOS",
         description: "Advanced AI-Powered School Management System",
         theme_color: "#020617",
         icons: [

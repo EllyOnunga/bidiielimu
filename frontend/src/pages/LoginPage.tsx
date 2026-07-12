@@ -17,7 +17,7 @@ import { authService } from "../api/services/authService";
 import { useAuthStore } from "../store/authStore";
 import { mobileService } from "../services/mobileService";
 import { useTheme } from "../contexts/ThemeContext";
-import { ElimuHubLogo } from "../components/ui/Logo";
+import { GilaniOSLogo } from "../components/ui/Logo";
 
 declare global {
   interface Window {
@@ -289,7 +289,7 @@ export const LoginPage = () => {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <ElimuHubLogo
+                <GilaniOSLogo
                   className="w-12 h-12 sm:w-16 sm:h-16"
                   showText={false}
                 />

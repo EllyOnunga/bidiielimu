@@ -47,7 +47,7 @@ export const BlogPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="inline-flex items-center gap-2 bg-primary-500/10 border border-primary-500/30 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest text-primary-400"
           >
-            <Sparkles className="w-3.5 h-3.5" /> ElimuHub Blog
+            <Sparkles className="w-3.5 h-3.5" /> GilaniOS Blog
           </motion.div>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}

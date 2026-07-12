@@ -1,11 +1,14 @@
 import gzip
 import json
+import logging
 import os
 from pathlib import Path
 
 import boto3
 from django.conf import settings
 from django.utils import timezone
+
+logger = logging.getLogger(__name__)
 
 
 class BackupManager:
@@ -51,7 +54,7 @@ class BackupManager:
                 "--username",
                 os.getenv("DB_USER", "postgres"),
                 "--dbname",
-                os.getenv("DB_NAME", "elimuhubdb"),
+                os.getenv("DB_NAME", "gilaniosdb"),
                 "--compress",
                 "9",
                 "--format",
@@ -75,7 +78,10 @@ class BackupManager:
                 raise Exception(f"Database backup failed: {result.stderr}")
 
         except Exception as e:
-            print(f"Database backup error: {e}")
+            import logging
+
+            logger = logging.getLogger(__name__)
+            logger.exception("Database backup error: %s", str(e))
             raise
 
     def create_media_backup(self):
@@ -108,7 +114,10 @@ class BackupManager:
                 raise Exception(f"Media backup failed: {result.stderr}")
 
         except Exception as e:
-            print(f"Media backup error: {e}")
+            import logging
+
+            logger = logging.getLogger(__name__)
+            logger.exception("Media backup error: %s", str(e))
             raise
 
     def verify_backup(self, filepath):
@@ -150,7 +159,10 @@ class BackupManager:
             return filepath
 
         except Exception as e:
-            print(f"Config backup error: {e}")
+            import logging
+
+            logger = logging.getLogger(__name__)
+            logger.exception("Config backup error: %s", str(e))
             raise
 
     def restore_database_backup(self, backup_file, tenant_schema=None):
@@ -169,7 +181,7 @@ class BackupManager:
                 "--username",
                 os.getenv("DB_USER", "postgres"),
                 "--dbname",
-                os.getenv("DB_NAME", "elimuhubdb"),
+                os.getenv("DB_NAME", "gilaniosdb"),
                 "--clean",
                 "--if-exists",
                 str(backup_file),
@@ -187,7 +199,10 @@ class BackupManager:
                 raise Exception(f"Database restore failed: {result.stderr}")
 
         except Exception as e:
-            print(f"Database restore error: {e}")
+            import logging
+
+            logger = logging.getLogger(__name__)
+            logger.exception("Database restore error: %s", str(e))
             raise
 
     def cleanup_old_backups(self, days_to_keep=30):
@@ -215,7 +230,10 @@ class BackupManager:
                                 Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=obj["Key"]
                             )
             except Exception as e:
-                print(f"S3 cleanup error: {e}")
+                import logging
+
+                logger = logging.getLogger(__name__)
+                logger.exception("S3 cleanup error: %s", str(e))
 
     def _upload_to_s3(self, filepath, s3_key):
         """
@@ -227,5 +245,5 @@ class BackupManager:
                     str(filepath), settings.AWS_STORAGE_BUCKET_NAME, f"backups/{s3_key}"
                 )
             except Exception as e:
-                print(f"S3 upload error: {e}")
+                logger.exception("S3 upload error: %s", str(e))
                 raise

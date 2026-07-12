@@ -11,8 +11,8 @@ import {
   Edit3,
   Loader2,
 } from "lucide-react";
-import axios from "axios";
 import toast from "react-hot-toast";
+import client from "../../api/client";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 
@@ -39,7 +39,7 @@ export const ReportCardManager = () => {
 
   const fetchReports = async () => {
     try {
-      const res = await axios.get("/api/v1/reports/student-reports/");
+      const res = await client.get("reports/student-reports/");
       setReports(res.data);
     } catch (err) {
       toast.error("Failed to load reports");
@@ -49,9 +49,7 @@ export const ReportCardManager = () => {
   const handleGenerateAI = async (id: string) => {
     setIsGenerating(true);
     try {
-      const res = await axios.post(
-        `/api/v1/reports/student-reports/${id}/generate_ai_draft/`,
-      );
+      const res = await client.post(`reports/student-reports/${id}/generate_ai_draft/`);
       setComment(res.data.draft);
       toast.success("AI Draft Generated!");
     } catch (err) {
@@ -63,7 +61,7 @@ export const ReportCardManager = () => {
 
   const handleApprove = async (id: string) => {
     try {
-      await axios.post(`/api/v1/reports/student-reports/${id}/approve/`, {
+      await client.post(`reports/student-reports/${id}/approve/`, {
         teacher_comment: comment,
       });
       toast.success("Report Approved!");

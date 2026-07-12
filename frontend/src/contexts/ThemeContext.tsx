@@ -9,7 +9,7 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType>({
-  schoolName: "ElimuHub",
+  schoolName: "GilaniOS",
   logoUrl: null,
   primaryColor: "#2DD4BF",
   isLoading: true,
@@ -21,7 +21,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [theme, setTheme] = useState<Omit<ThemeContextType, "isLoading">>({
-    schoolName: "ElimuHub",
+    schoolName: "GilaniOS",
     logoUrl: null,
     primaryColor: "#2DD4BF",
   });
@@ -35,7 +35,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
         const { school_name, logo_url, primary_color } = data;
 
         setTheme({
-          schoolName: school_name || "ElimuHub",
+          schoolName: school_name || "GilaniOS",
           logoUrl: logo_url || null,
           primaryColor: primary_color || "#2DD4BF",
         });

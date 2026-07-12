@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import { blogService } from "../api/services/blogService";
 import { ThemeToggle } from "../components/ThemeToggle";
-import { ElimuHubLogo } from "../components/ui/Logo";
+import { GilaniOSLogo } from "../components/ui/Logo";
 
 import {
   GraduationCap,
@@ -147,7 +147,7 @@ export const LandingPage = () => {
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group relative z-10">
-            <ElimuHubLogo className="w-10 h-10 sm:w-12 h-12" showText={true} />
+            <GilaniOSLogo className="w-10 h-10 sm:w-12 h-12" showText={true} />
           </Link>
 
           <nav className="hidden lg:flex items-center gap-8 xl:gap-12 glass px-8 py-3 rounded-2xl border-white/5">
@@ -272,7 +272,7 @@ export const LandingPage = () => {
             </h1>
 
             <p className="text-base sm:text-xl text-muted mb-12 font-medium leading-relaxed max-w-xl">
-              ElimuHub is a simple, modern app designed to power school
+              GilaniOS is a simple, modern app designed to power school
               operations. Manage students, track fees, simplify classes, and
               support your teachers.
             </p>
@@ -811,7 +811,7 @@ export const LandingPage = () => {
                   {
                     icon: Mail,
                     label: "Email Us",
-                    value: "comms@elimuhub.app",
+                    value: "comms@gilanios.app",
                   },
                   { icon: Phone, label: "Call Us", value: "+254 700 888 999" },
                   {

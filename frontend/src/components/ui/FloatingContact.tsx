@@ -42,7 +42,7 @@ export const FloatingContact = () => {
 
             <div className="space-y-3">
               <a
-                href="mailto:comms@elimuhub.app"
+                href="mailto:comms@gilanios.app"
                 className="flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 rounded-2xl transition-colors group"
               >
                 <div className="p-2 bg-primary-600/20 text-primary-400 rounded-xl group-hover:bg-primary-600 group-hover:text-white transition-all">
@@ -53,7 +53,7 @@ export const FloatingContact = () => {
                     Email
                   </p>
                   <p className="text-xs font-bold text-white">
-                    comms@elimuhub.app
+                    comms@gilanios.app
                   </p>
                 </div>
               </a>
