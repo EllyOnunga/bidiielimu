@@ -6,8 +6,8 @@ import {
   BrainCircuit,
   User,
 } from "lucide-react";
-import axios from "axios";
 import toast from "react-hot-toast";
+import client from "../../api/client";
 
 interface RiskProfile {
   id: string;
@@ -29,7 +29,7 @@ export const RiskAlertList = () => {
 
   const fetchAlerts = async () => {
     try {
-      const res = await axios.get("/api/v1/analytics/dashboard/");
+      const res = await client.get("analytics/dashboard/");
       setAlerts(res.data.at_risk);
     } catch (err) {
       toast.error("Failed to load risk alerts");

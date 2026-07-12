@@ -76,7 +76,7 @@ class GuardianSignalTest(TestCase):
 
         # Verify a welcome email was sent
         self.assertEqual(len(mail.outbox), 1)
-        self.assertIn("Welcome to ElimuHub", mail.outbox[0].subject)
+        self.assertIn("Welcome to GilaniOS", mail.outbox[0].subject)
         self.assertIn("jane.doe@example.com", mail.outbox[0].to)
 
     def test_guardian_creation_with_existing_user(self):

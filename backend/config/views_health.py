@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import connection
+from rest_framework import permissions
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -131,8 +132,8 @@ class MetricsView(APIView):
     Prometheus-style metrics endpoint
     """
 
-    permission_classes = []
-    authentication_classes = []
+    # Enforce admin authentication strictly
+    permission_classes = [permissions.IsAdminUser]
 
     def get(self, request):
         metrics = []

@@ -10,7 +10,7 @@ class StaticStorage(S3Boto3Storage):
 
 class MediaStorage(S3Boto3Storage):
     file_overwrite = False
-    default_acl = "public-read"
+    default_acl = "private"
     custom_domain = getattr(settings, "MEDIA_CDN_DOMAIN", None)
 
     @property

@@ -150,7 +150,7 @@ export const FeesPage = () => {
   useEffect(() => {
     if (!bulkPrintTaskId) return;
 
-    let intervalId: any;
+    let intervalId: ReturnType<typeof setInterval> | undefined;
     const pollStatus = async () => {
       try {
         const data = await feesService.getTaskStatus(bulkPrintTaskId);

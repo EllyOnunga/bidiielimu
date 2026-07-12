@@ -35,7 +35,7 @@ export const mobileService = {
       await NativeBiometric.verifyIdentity({
         reason,
         title: "Biometric Login",
-        subtitle: "ElimuHub Secure Access",
+        subtitle: "GilaniOS Secure Access",
         description: "Use your fingerprint or face to log in",
       });
       return true;

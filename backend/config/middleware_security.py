@@ -1,6 +1,7 @@
 import logging
 
 from django.core.cache import cache
+from django.db.models import Q
 from django.http import JsonResponse
 from django.utils import timezone
 from django.utils.deprecation import MiddlewareMixin
@@ -39,9 +40,24 @@ class APIKeyAuthenticationMiddleware(MiddlewareMixin):
         try:
             from accounts.models_api import APIKey
 
+            key_hash = APIKey.hash_key(api_key)
             key_obj = APIKey.objects.select_related("user", "school").get(
-                key=api_key, is_active=True
+                Q(key_hash=key_hash) | Q(key=api_key),
+                is_active=True,
             )
+
+            # Check if this is a legacy plaintext key
+            if key_obj.key == api_key or key_obj.is_legacy:
+                # Rotate the key immediately to invalidate it and trigger rotation lifecycle
+                key_obj.rotate_key()
+                key_obj.is_legacy = True
+                key_obj.save(update_fields=["key", "key_hash", "key_prefix", "is_legacy"])
+                return JsonResponse(
+                    {
+                        "error": "Legacy API key detected. Your key has been automatically rotated for security. Please retrieve your new API key from your school dashboard."
+                    },
+                    status=401,
+                )
 
             if key_obj.is_expired:
                 return JsonResponse({"error": "API key has expired"}, status=401)
@@ -76,7 +92,9 @@ class SecurityMiddleware(MiddlewareMixin):
     def process_request(self, request):
         # Input validation
         if request.method in ["POST", "PUT", "PATCH"]:
-            self._validate_json_content(request)
+            invalid_json_response = self._validate_json_content(request)
+            if invalid_json_response:
+                return invalid_json_response
 
         # Log sensitive requests
         if any(endpoint in request.path for endpoint in self.SENSITIVE_ENDPOINTS):
@@ -99,12 +117,12 @@ class SecurityMiddleware(MiddlewareMixin):
         # Content Security Policy
         csp = (
             "default-src 'self' blob:; "
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.google.com https://*.googletagmanager.com; "
+            "script-src 'self' https://*.google.com https://*.googletagmanager.com; "
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://api.fontshare.com; "
             "font-src 'self' https://fonts.gstatic.com https://api.fontshare.com https://cdn.fontshare.com data:; "
             "img-src 'self' data: https: blob:; "
             "connect-src 'self' http: https: ws: wss: https://*.google.com https://*.microsoft.com; "
-            "object-src 'self' blob:;"
+            "object-src 'none';"
         )
         response["Content-Security-Policy"] = csp
 
@@ -126,14 +144,15 @@ class SecurityMiddleware(MiddlewareMixin):
     def _validate_json_content(self, request):
         """Validate JSON content for API requests"""
         if request.content_type == "application/json":
+            if not request.body:
+                return JsonResponse({"error": "Empty JSON body"}, status=400)
             try:
                 import json
 
                 json.loads(request.body.decode("utf-8"))
             except (json.JSONDecodeError, UnicodeDecodeError):
-                from django.http import JsonResponse
-
                 return JsonResponse({"error": "Invalid JSON content"}, status=400)
+        return None
 
     def _get_client_ip(self, request):
         x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")

@@ -30,8 +30,9 @@ export const authService = {
     return response.data;
   },
 
-  refreshToken: async (refresh: string) => {
-    const response = await client.post("accounts/token/refresh/", { refresh });
+  refreshToken: async (refresh?: string) => {
+    const payload = refresh ? { refresh } : {};
+    const response = await client.post("accounts/token/refresh/", payload);
     return response.data;
   },
 

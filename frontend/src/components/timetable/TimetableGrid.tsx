@@ -7,8 +7,8 @@ import {
 } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { Clock, User, MapPin, AlertCircle, Sparkles, Save } from "lucide-react";
-import axios from "axios";
 import toast from "react-hot-toast";
+import client from "../../api/client";
 
 interface Slot {
   id: string;
@@ -105,9 +105,7 @@ export const TimetableGrid = ({ streamId }: { streamId: string }) => {
   }, [streamId]);
 
   const fetchSlots = async () => {
-    const res = await axios.get(
-      `/api/v1/classes/schedule-slots/?stream=${streamId}`,
-    );
+    const res = await client.get(`classes/schedule-slots/?stream=${streamId}`);
     setSlots(res.data);
   };
 
@@ -122,15 +120,12 @@ export const TimetableGrid = ({ streamId }: { streamId: string }) => {
 
     try {
       // Validate with backend before moving
-      const checkRes = await axios.post(
-        "/api/v1/classes/timetable/check-conflict/",
-        {
-          id: slotId,
-          day_of_week: days.indexOf(newDay),
-          start_time: newTime,
-          // ... other required fields for validation
-        },
-      );
+      const checkRes = await client.post("classes/timetable/check-conflict/", {
+        id: slotId,
+        day_of_week: days.indexOf(newDay),
+        start_time: newTime,
+        // ... other required fields for validation
+      });
 
       if (checkRes.data.status === "conflict") {
         toast.error(
@@ -149,7 +144,7 @@ export const TimetableGrid = ({ streamId }: { streamId: string }) => {
       );
 
       // Save to backend
-      await axios.patch(`/api/v1/classes/schedule-slots/${slotId}/`, {
+      await client.patch(`classes/schedule-slots/${slotId}/`, {
         day_of_week: days.indexOf(newDay),
         start_time: newTime,
       });
@@ -165,7 +160,7 @@ export const TimetableGrid = ({ streamId }: { streamId: string }) => {
     setIsGenerating(true);
     const toastId = toast.loading("Generating optimal timetable...");
     try {
-      const res = await axios.post("/api/v1/classes/timetable/generate/", {
+      const res = await client.post("classes/timetable/generate/", {
         stream_id: streamId,
       });
       toast.success(`Generated ${res.data.success} slots!`, { id: toastId });

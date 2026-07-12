@@ -944,7 +944,7 @@ export const SuperAdminPage = () => {
                   Tenant Mesh Control
                 </h3>
                 <p className="text-xs text-muted leading-relaxed">
-                  ElimuHub multi-tenant context isolates individual school
+                  GilaniOS multi-tenant context isolates individual school
                   databases at the middleware level. PostgreSQL connection
                   pooling maintains a maximum pool size per tenant. Cache
                   evictions occur dynamically when settings change.
@@ -952,7 +952,7 @@ export const SuperAdminPage = () => {
               </div>
               <div className="pt-4 border-t border-white/5 mt-4">
                 <span className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">
-                  ElimuHub HyperScale Network
+                  GilaniOS HyperScale Network
                 </span>
               </div>
             </div>

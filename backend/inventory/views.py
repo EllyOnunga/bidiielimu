@@ -3,15 +3,16 @@ from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from config.tenant_security import BaseTenantViewSet
+
 from .models import InventoryItem, ProcurementLog
 from .serializers import InventoryItemSerializer, ProcurementLogSerializer
 
 INVENTORY_ALLOWED_ROLES = ["ADMIN", "SUPER_ADMIN", "PRINCIPAL", "LIBRARIAN"]
 
 
-class InventoryItemViewSet(viewsets.ModelViewSet):
+class InventoryItemViewSet(BaseTenantViewSet):
     serializer_class = InventoryItemSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
@@ -89,11 +90,10 @@ class InventoryItemViewSet(viewsets.ModelViewSet):
         )
 
 
-class BookIssueViewSet(viewsets.ModelViewSet):
+class BookIssueViewSet(BaseTenantViewSet):
     from .serializers import BookIssueSerializer
 
     serializer_class = BookIssueSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         from .models import BookIssue
@@ -175,13 +175,32 @@ class BookIssueViewSet(viewsets.ModelViewSet):
             else:
                 qs = qs.none()
 
+        today = timezone.now().date()
+
+        # Bulk update overdue statuses to avoid per-object writes.
+        BookIssue.objects.filter(status="ISSUED", due_date__lt=today).update(
+            status="OVERDUE"
+        )
+
+        # Re-fetch after bulk update.
+        qs = BookIssue.objects.filter(status__in=["ISSUED", "OVERDUE"]).select_related(
+            "item"
+        )
+
+        if user.role_name == "STUDENT":
+            qs = qs.filter(student__user=user)
+        elif user.role_name == "PARENT":
+            qs = qs.filter(student__guardians__email=user.email)
+        else:
+            student_id = request.query_params.get("student_id")
+            if student_id:
+                qs = qs.filter(student_id=student_id)
+            else:
+                qs = qs.none()
+
         results = []
         for issue in qs:
-            is_overdue = issue.due_date < timezone.now().date()
-            if is_overdue and issue.status == "ISSUED":
-                issue.status = "OVERDUE"
-                issue.save()
-
+            is_overdue = issue.status == "OVERDUE" or (issue.due_date < today)
             results.append(
                 {
                     "id": issue.id,
@@ -238,9 +257,8 @@ class BookIssueViewSet(viewsets.ModelViewSet):
         return Response(results)
 
 
-class ProcurementLogViewSet(viewsets.ModelViewSet):
+class ProcurementLogViewSet(BaseTenantViewSet):
     serializer_class = ProcurementLogSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user

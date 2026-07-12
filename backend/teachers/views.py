@@ -10,6 +10,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from accounts.permissions import IsSchoolAdmin
+from config.tenant_security import BaseTenantViewSet, StrictTenantPermission
 
 from .models import Teacher
 from .serializers import TeacherSerializer
@@ -17,13 +18,17 @@ from .serializers import TeacherSerializer
 User = get_user_model()
 
 
-class TeacherViewSet(viewsets.ModelViewSet):
+class TeacherViewSet(BaseTenantViewSet):
     serializer_class = TeacherSerializer
 
     def get_permissions(self):
         if self.request.method in permissions.SAFE_METHODS:
-            return [permissions.IsAuthenticated()]
-        return [permissions.IsAuthenticated(), IsSchoolAdmin()]
+            return [permissions.IsAuthenticated(), StrictTenantPermission()]
+        return [
+            permissions.IsAuthenticated(),
+            StrictTenantPermission(),
+            IsSchoolAdmin(),
+        ]
 
     def get_queryset(self):
         return Teacher.objects.all().select_related("user")
@@ -62,7 +67,7 @@ class TeacherViewSet(viewsets.ModelViewSet):
                         email = row.get("email", "").strip()
                         first_name = row.get("first_name", "").strip()
                         last_name = row.get("last_name", "").strip()
-                        emp_id = row.get("employee_id", "").strip()
+                        emp_id = row.get("employee_id", "").strip().upper()
                         specialization = row.get("specialization", "").strip()
                         phone = row.get("phone_number", "").strip()
                         joining_date = row.get("joining_date", "").strip()
@@ -80,7 +85,9 @@ class TeacherViewSet(viewsets.ModelViewSet):
                         teacher_role = Role.objects.get(name="TEACHER")
                         # Generate a cryptographically secure temporary password.
                         # Never derive credentials from predictable values like employee IDs.
-                        _alpha = string.ascii_letters + string.digits + string.punctuation
+                        _alpha = (
+                            string.ascii_letters + string.digits + string.punctuation
+                        )
                         temp_password = (
                             secrets.choice(string.ascii_uppercase)
                             + secrets.choice(string.ascii_lowercase)

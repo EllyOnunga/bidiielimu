@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">BidiiElimu</string>
-    <string name="title_activity_main">BidiiElimu</string>
-    <string name="package_name">com.bidiielimu.app</string>
-    <string name="custom_url_scheme">com.bidiielimu.app</string>
+    <string name="app_name">GilaniOS</string>
+    <string name="title_activity_main">GilaniOS</string>
+    <string name="package_name">com.gilanios.app</string>
+    <string name="custom_url_scheme">com.gilanios.app</string>
 </resources>

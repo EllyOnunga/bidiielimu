@@ -1,4 +1,4 @@
-# ElimuHub Backend Shortcut Makefile
+# GilaniOS Backend Shortcut Makefile
 # Redirects common commands to the root Makefile or runs them directly
 
 .PHONY: help docker-build docker-up docker-down migrate test shell

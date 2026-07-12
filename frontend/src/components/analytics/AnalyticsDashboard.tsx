@@ -19,7 +19,7 @@ import {
   Calendar,
   Download,
 } from "lucide-react";
-import axios from "axios";
+import client from "../../api/client";
 
 export const AnalyticsDashboard = () => {
   const [data, setData] = useState<any>(null);
@@ -31,7 +31,7 @@ export const AnalyticsDashboard = () => {
 
   const fetchAnalytics = async () => {
     try {
-      const res = await axios.get("/api/v1/analytics/dashboard/");
+      const res = await client.get("analytics/dashboard/");
       setData(res.data);
     } catch (err) {
       console.error("Failed to load analytics");

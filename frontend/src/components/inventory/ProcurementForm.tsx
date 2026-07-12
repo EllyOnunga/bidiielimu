@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ShoppingBag, Send, X, AlertCircle } from "lucide-react";
-import axios from "axios";
 import toast from "react-hot-toast";
+import client from "../../api/client";
 
 export const ProcurementForm = ({ onClose }: { onClose: () => void }) => {
   const [formData, setFormData] = useState({
@@ -16,7 +16,7 @@ export const ProcurementForm = ({ onClose }: { onClose: () => void }) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await axios.post("/api/v1/inventory/procurement/", formData);
+      await client.post("inventory/procurement/", formData);
       toast.success("Procurement request submitted!");
       onClose();
     } catch (err) {

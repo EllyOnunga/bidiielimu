@@ -7,7 +7,7 @@ export interface OfflineRequest {
 }
 
 class OfflineStore {
-  private dbName = "elimuhub_offline_db";
+  private dbName = "gilanios_offline_db";
   private dbVersion = 1;
   private storeName = "sync_queue";
 

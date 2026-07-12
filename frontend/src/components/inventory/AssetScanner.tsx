@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { QrCode, X, CheckCircle, ArrowRight } from "lucide-react";
-import axios from "axios";
 import toast from "react-hot-toast";
+import client from "../../api/client";
 
 export const AssetScanner = ({ onClose }: { onClose: () => void }) => {
   const [step, setStep] = useState<"SCAN" | "PROCESS" | "SUCCESS">("SCAN");
@@ -11,8 +11,8 @@ export const AssetScanner = ({ onClose }: { onClose: () => void }) => {
     setStep("PROCESS");
     try {
       // Logic to fetch asset details based on token/barcode
-      const res = await axios.get(
-        `/api/v1/inventory/assets/?barcode_id=${scannedToken}`,
+      const res = await client.get(
+        `inventory/assets/?barcode_id=${scannedToken}`,
       );
       if (res.data.length > 0) {
         setAssetDetails(res.data[0]);
@@ -29,8 +29,8 @@ export const AssetScanner = ({ onClose }: { onClose: () => void }) => {
   const handleAction = async (action: "checkout" | "checkin") => {
     try {
       if (action === "checkout") {
-        await axios.post(
-          `/api/v1/inventory/assets/${assetDetails.id}/checkout/`,
+        await client.post(
+          `inventory/assets/${assetDetails.id}/checkout/`,
           {
             user_id: "current_user_id", // Would come from auth context
             expected_return_date: new Date(
@@ -39,8 +39,8 @@ export const AssetScanner = ({ onClose }: { onClose: () => void }) => {
           },
         );
       } else {
-        await axios.post(
-          `/api/v1/inventory/assets/${assetDetails.id}/checkin/`,
+        await client.post(
+          `inventory/assets/${assetDetails.id}/checkin/`,
           {
             condition: "Good",
           },

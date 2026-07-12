@@ -53,6 +53,16 @@ urlpatterns = [
         ),
         name="api_key_detail",
     ),
+    path(
+        "api-keys/<int:pk>/regenerate/",
+        APIKeyViewSet.as_view({"post": "regenerate"}),
+        name="api_key_regenerate",
+    ),
+    path(
+        "api-keys/<int:pk>/toggle-active/",
+        APIKeyViewSet.as_view({"post": "toggle_active"}),
+        name="api_key_toggle_active",
+    ),
     # GDPR Endpoints
     path("gdpr/export/", GDPRExportView.as_view(), name="gdpr_export"),
     path("gdpr/delete/", GDPRDeleteView.as_view(), name="gdpr_delete"),

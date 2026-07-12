@@ -237,7 +237,7 @@ class StripeService:
         # Placeholder for Stripe logic
         # import stripe
         # stripe.api_key = settings.STRIPE_SECRET_KEY
-        print(f"Creating Stripe intent for {amount} {currency}")
+        logger.info(f"Creating Stripe intent for {amount} {currency}")
         return {"client_secret": "mock_stripe_secret"}
 
 

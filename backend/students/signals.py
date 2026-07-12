@@ -1,3 +1,4 @@
+import logging
 import secrets
 import string
 
@@ -9,6 +10,7 @@ from django.dispatch import receiver
 from accounts.models import Role
 from students.models import Guardian
 
+logger = logging.getLogger(__name__)
 User = get_user_model()
 
 
@@ -60,7 +62,7 @@ def create_guardian_user(sender, instance, created, **kwargs):
                     user, login_url=login_url, plain_password=temp_password
                 )
             except Exception as e:
-                print(f"[ERROR] Failed to send parent welcome email: {e}")
+                logger.error("Failed to send parent welcome email", exc_info=True)
 
         # Link the user to the guardian if not already linked
         if instance.user != user:

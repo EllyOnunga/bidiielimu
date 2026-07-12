@@ -17,7 +17,7 @@ class TenantThemeView(generics.GenericAPIView):
         if connection.schema_name == "public":
             return Response(
                 {
-                    "school_name": "ElimuHub Platform",
+                    "school_name": "GilaniOS Platform",
                     "primary_color": "#2DD4BF",
                     "logo_url": None,
                     "schema_name": "public",
@@ -45,7 +45,7 @@ class TenantThemeView(generics.GenericAPIView):
         except Exception:
             return Response(
                 {
-                    "school_name": "ElimuHub",
+                    "school_name": "GilaniOS",
                     "primary_color": "#6366f1",
                     "schema_name": "public",
                 }

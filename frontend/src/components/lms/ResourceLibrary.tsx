@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useState, useEffect, useCallback } from "react";
+import client from "../../api/client";
 import {
   Search,
   FileText,
@@ -80,9 +80,19 @@ export const ResourceLibrary = () => {
     { id: "BOOK", label: "E-Books", icon: Book, color: "text-emerald-400" },
   ];
 
+  const fetchResources = useCallback(async () => {
+    try {
+      const params = selectedStreamId ? { stream: selectedStreamId } : {};
+      const res = await lmsService.getResources(params);
+      setResources(Array.isArray(res) ? res : res.results || []);
+    } catch (err) {
+      toast.error("Failed to load resources");
+    }
+  }, [selectedStreamId]);
+
   useEffect(() => {
     fetchResources();
-  }, [selectedStreamId]);
+  }, [fetchResources]);
 
   const { data: subjects = [] } = useQuery({
     queryKey: ["subjects"],
@@ -93,15 +103,6 @@ export const ResourceLibrary = () => {
     enabled: isTeacher && isUploadModalOpen,
   });
 
-  const fetchResources = async () => {
-    try {
-      const params = selectedStreamId ? { stream: selectedStreamId } : {};
-      const res = await lmsService.getResources(params);
-      setResources(Array.isArray(res) ? res : res.results || []);
-    } catch (err) {
-      toast.error("Failed to load resources");
-    }
-  };
 
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,14 +146,10 @@ export const ResourceLibrary = () => {
 
   const downloadFile = async (url: string, title: string) => {
     try {
-      const relativeUrl = url.replace(/^(?:https?:\/\/[^\/]+)?/, "");
-      const token = localStorage.getItem("token");
+      const relativeUrl = url.replace(/^(?:https?:\/\/[^/]+)?/, "");
 
-      const response = await axios.get(relativeUrl, {
+      const response = await client.get(relativeUrl, {
         responseType: "blob",
-        headers: {
-          Authorization: token ? `Bearer ${token}` : "",
-        },
       });
 
       // Extract extension from the original URL (e.g., .mp4, .pdf)

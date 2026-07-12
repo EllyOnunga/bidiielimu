@@ -36,14 +36,14 @@ export const TermsPage = () => (
       <div className="glass-dark rounded-[32px] border border-white/5 p-8 md:p-12">
         <Section title="1. Acceptance of Terms">
           <p>
-            By accessing or using ElimuHub SYSTEM ("the Service"), you agree to
+            By accessing or using GilaniOS SYSTEM ("the Service"), you agree to
             be bound by these Terms of Service. If you do not agree, please
             discontinue use immediately.
           </p>
         </Section>
         <Section title="2. Use of the Service">
           <p>
-            ElimuHub SYSTEM is licensed to educational institutions for academic
+            GilaniOS SYSTEM is licensed to educational institutions for academic
             management purposes. You may not use the Service for any unlawful
             purpose or in violation of any regulations.
           </p>
@@ -62,7 +62,7 @@ export const TermsPage = () => (
         <Section title="4. Data Ownership">
           <p>
             All data entered into the system by your institution remains your
-            property. ElimuHub does not claim ownership of school or student
+            property. GilaniOS does not claim ownership of school or student
             data. You grant us a limited license to process that data solely to
             deliver the Service.
           </p>
@@ -83,7 +83,7 @@ export const TermsPage = () => (
         </Section>
         <Section title="7. Limitation of Liability">
           <p>
-            ElimuHub shall not be liable for indirect, incidental, or
+            GilaniOS shall not be liable for indirect, incidental, or
             consequential damages arising from your use of or inability to use
             the Service.
           </p>
@@ -98,10 +98,10 @@ export const TermsPage = () => (
           <p>
             For questions about these terms, contact us at{" "}
             <a
-              href="mailto:support@elimuhub.app"
+              href="mailto:support@gilanios.app"
               className="text-primary-400 hover:underline"
             >
-              support@elimuhub.app
+              support@gilanios.app
             </a>
             .
           </p>

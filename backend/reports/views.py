@@ -1,13 +1,15 @@
-from rest_framework import status, viewsets
+from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
+from config.tenant_security import BaseTenantViewSet
 
 from .models import StudentReport
 from .serializers import StudentReportSerializer
 from .services_ai import AIReportService
 
 
-class StudentReportViewSet(viewsets.ModelViewSet):
+class StudentReportViewSet(BaseTenantViewSet):
     queryset = StudentReport.objects.all()
     serializer_class = StudentReportSerializer
 

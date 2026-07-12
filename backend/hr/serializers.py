@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 
 from .models import LeaveRequest, PayrollRecord, StaffProfile
 
@@ -18,6 +19,21 @@ class StaffProfileSerializer(serializers.ModelSerializer):
     basic_salary = serializers.DecimalField(
         max_digits=12, decimal_places=2, required=False, default=0.00
     )
+    employee_id = serializers.CharField(
+        validators=[
+            UniqueValidator(
+                queryset=StaffProfile.objects.all(),
+                message="This employee ID is already in use. Please enter a unique ID.",
+            )
+        ],
+        required=False,
+    )
+
+    def validate_employee_id(self, value):
+        if value:
+            value = value.strip().upper()
+        return value
+
     full_name = serializers.CharField(source="user.get_full_name", read_only=True)
     user_email = serializers.EmailField(source="user.email", read_only=True)
 

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ElimuHubLogo } from "../ui/Logo";
+import { GilaniOSLogo } from "../ui/Logo";
 import { FaTwitter, FaLinkedin, FaFacebook, FaInstagram } from "react-icons/fa";
 
 export const PublicFooter = () => {
@@ -9,7 +9,7 @@ export const PublicFooter = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 sm:gap-16 mb-20 text-center sm:text-left">
           <div className="lg:col-span-1 space-y-6 flex flex-col items-center sm:items-start">
             <Link to="/" className="flex items-center gap-3 group">
-              <ElimuHubLogo
+              <GilaniOSLogo
                 className="w-9 h-9 sm:w-11 sm:h-11"
                 showText={true}
               />
@@ -71,7 +71,7 @@ export const PublicFooter = () => {
         <div className="pt-10 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-[9px] font-black text-muted uppercase tracking-[0.4em] text-center sm:text-left flex flex-wrap items-center justify-center sm:justify-start gap-2">
             <span>
-              &copy; {new Date().getFullYear()} ElimuHub. All rights reserved.
+              &copy; {new Date().getFullYear()} GilaniOS. All rights reserved.
             </span>
             <span className="hidden sm:inline text-white/10">•</span>
             <span className="font-mono text-white/30 font-bold hover:text-primary-400 transition-colors">

@@ -105,7 +105,10 @@ class SMSService:
             response = self.circuit_breaker.call(_send)
             return response
         except Exception as e:
-            print(f"SMS Broadcast failed: {str(e)}")
+            import logging
+
+            logger = logging.getLogger(__name__)
+            logger.exception("SMS Broadcast failed: %s", str(e))
             return None
 
     @staticmethod

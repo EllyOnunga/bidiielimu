@@ -6,31 +6,49 @@ from .models_api import APIKey
 from .serializers import APIKeySerializer
 
 
-class APIKeyViewSet(viewsets.ModelViewSet):
+from config.tenant_security import StrictTenantPermission, TenantAwareViewSetMixin
+
+
+class APIKeyViewSet(TenantAwareViewSetMixin, viewsets.ModelViewSet):
     """
     ViewSet for managing API keys
     """
 
     serializer_class = APIKeySerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, StrictTenantPermission]
 
     def get_queryset(self):
-        return APIKey.objects.filter(user=self.request.user)
+        qs = APIKey.objects.filter(user=self.request.user)
+        if not self.request.user.is_superuser:
+            qs = qs.filter(school=self.request.user.school)
+        return qs
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user, school=self.request.user.school)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        api_key = serializer.save(user=self.request.user, school=self.request.user.school)
+        # Rotate to generate the secret and persist hashed key
+        new_secret = api_key.rotate_key()
+        api_key.is_legacy = False
+        api_key.save(update_fields=["key", "key_hash", "key_prefix", "is_legacy"])
+        data = APIKeySerializer(api_key, context={"request": request}).data
+        # Include the one-time secret in the response
+        data["secret"] = new_secret
+        headers = self.get_success_headers(data)
+        return Response(data, status=201, headers=headers)
 
     @action(detail=True, methods=["post"])
     def regenerate(self, request, pk=None):
-        """Regenerate an API key"""
+        """Regenerate an API key and return the secret once"""
         api_key = self.get_object()
-        old_key = api_key.key
-        api_key.save()  # This will generate a new key
+        new_key = api_key.rotate_key()
+        api_key.is_legacy = False
+        api_key.save(update_fields=["key", "key_hash", "key_prefix", "is_legacy"])
         return Response(
             {
                 "message": "API key regenerated successfully",
-                "new_key": api_key.key,
-                "old_key": old_key,
+                "secret": new_key,
+                "key_prefix": api_key.key_prefix,
             }
         )
 
@@ -42,8 +60,7 @@ class APIKeyViewSet(viewsets.ModelViewSet):
         api_key.save()
         return Response(
             {
-                "message": f'API key {
-                    "activated" if api_key.is_active else "deactivated"}',
+                "message": "API key activated" if api_key.is_active else "API key deactivated",
                 "is_active": api_key.is_active,
             }
         )

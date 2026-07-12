@@ -36,7 +36,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { notificationsService } from "../api/services/notificationsService";
 import { useState } from "react";
 import { useTheme } from "../contexts/ThemeContext";
-import { ElimuHubLogo } from "../components/ui/Logo";
+import { GilaniOSLogo } from "../components/ui/Logo";
 import { systemService } from "../api/services/systemService";
 
 interface NavItemProps {
@@ -110,7 +110,7 @@ const SidebarContent = ({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <ElimuHubLogo className="w-8 h-8" showText={false} />
+              <GilaniOSLogo className="w-8 h-8" showText={false} />
             )}
           </div>
           <div className="min-w-0">
@@ -118,7 +118,7 @@ const SidebarContent = ({
               className="text-sm md:text-lg font-black text-primary tracking-tight truncate w-24 md:w-32 font-serif"
               title={schoolName}
             >
-              {schoolName || "ElimuHub"}
+              {schoolName || "GilaniOS"}
             </h1>
             <p className="text-[9px] md:text-[10px] font-bold text-muted uppercase tracking-widest">
               {user?.role} PORTAL
@@ -386,12 +386,12 @@ const SidebarContent = ({
 
         {/* Powered By Branding */}
         <div className="flex flex-col items-center justify-center pt-4 pb-2 border-t border-white/5 opacity-50 hover:opacity-100 transition-opacity">
-          <ElimuHubLogo className="w-8 h-8" showText={false} />
+          <GilaniOSLogo className="w-8 h-8" showText={false} />
           <p className="text-[9px] font-bold text-white mt-2 uppercase tracking-[0.2em]">
             Powered by
           </p>
           <p className="text-xs font-black text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-[#22c55e] mb-2">
-            ElimuHub
+            GilaniOS
           </p>
           {/* Elegant Platform Version Badge */}
           <div className="px-3 py-1 rounded-full text-[9px] font-mono font-bold tracking-wider bg-primary-500/10 border border-primary-500/20 text-primary-300 hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shadow-sm">
@@ -525,7 +525,7 @@ export const MainLayout = () => {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <ElimuHubLogo
+                  <GilaniOSLogo
                     className="w-5 h-5 sm:w-6 sm:h-6"
                     showText={false}
                   />

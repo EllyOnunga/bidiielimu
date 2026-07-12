@@ -42,12 +42,29 @@ export default defineConfig([
       // ── General JS ────────────────────────────────────────────────────────
       "no-useless-escape": "warn",
       "no-use-before-define": "off",
+      "no-restricted-imports": [
+        "error",
+        {
+          "paths": [
+            {
+              "name": "axios",
+              "message": "Do not import axios directly. Use the preconfigured api client (e.g. from 'src/services/api') to ensure JWT cookies, csrf tokens, and tenant headers are correctly handled."
+            }
+          ]
+        }
+      ],
 
       // ── React Refresh ─────────────────────────────────────────────────────
       "react-refresh/only-export-components": [
         "warn",
         { allowConstantExport: true },
       ],
+    },
+  },
+  {
+    files: ["src/api/client.ts"],
+    rules: {
+      "no-restricted-imports": "off",
     },
   },
 ]);

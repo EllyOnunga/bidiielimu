@@ -154,4 +154,56 @@ class SchoolSetting(models.Model):
         return "School Settings"
 
 
+class MediaAsset(models.Model):
+    VISIBILITY_CHOICES = (
+        ("PRIVATE", "Private"),
+        ("TENANT", "Tenant"),
+        ("PUBLIC", "Public"),
+    )
+    SCAN_STATUS_CHOICES = (
+        ("PENDING", "Pending"),
+        ("CLEAN", "Clean"),
+        ("INFECTED", "Infected"),
+        ("FAILED", "Failed"),
+        ("SKIPPED", "Skipped"),
+    )
+
+    school = models.ForeignKey(
+        School,
+        on_delete=models.CASCADE,
+        related_name="media_assets",
+        null=True,
+        blank=True,
+    )
+    uploaded_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        related_name="media_assets",
+        null=True,
+        blank=True,
+    )
+    storage_key = models.CharField(max_length=500, unique=True)
+    original_filename = models.CharField(max_length=255)
+    content_type = models.CharField(max_length=120)
+    size_bytes = models.BigIntegerField()
+    checksum_sha256 = models.CharField(max_length=64, blank=True, default="")
+    visibility = models.CharField(
+        max_length=20, choices=VISIBILITY_CHOICES, default="PRIVATE"
+    )
+    scan_status = models.CharField(
+        max_length=20, choices=SCAN_STATUS_CHOICES, default="PENDING"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["school", "visibility"]),
+            models.Index(fields=["scan_status", "created_at"]),
+            models.Index(fields=["content_type"]),
+        ]
+
+    def __str__(self):
+        return self.original_filename
+
+
 # Blog models moved to dedicated blog app

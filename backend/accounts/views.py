@@ -31,6 +31,38 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
         return self.request.user
 
 
+def set_jwt_cookies(response, access_token, refresh_token):
+    from django.conf import settings
+
+    rest_auth_settings = getattr(settings, "REST_AUTH", {})
+    cookie_secure = rest_auth_settings.get("JWT_AUTH_SECURE")
+    if cookie_secure is None:
+        cookie_secure = getattr(settings, "SESSION_COOKIE_SECURE", False)
+
+    cookie_httponly = rest_auth_settings.get("JWT_AUTH_HTTPONLY", True)
+
+    if access_token:
+        response.set_cookie(
+            "jwt-auth",
+            access_token,
+            max_age=3600,  # 1 hour
+            httponly=cookie_httponly,
+            secure=cookie_secure,
+            path="/",
+            samesite="Lax",
+        )
+    if refresh_token:
+        response.set_cookie(
+            "jwt-refresh-token",
+            refresh_token,
+            max_age=86400,  # 24 hours
+            httponly=cookie_httponly,
+            secure=cookie_secure,
+            path="/",
+            samesite="Lax",
+        )
+
+
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
     permission_classes = [permissions.AllowAny]
@@ -38,7 +70,12 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
     def post(self, request, *args, **kwargs):
         try:
-            return super().post(request, *args, **kwargs)
+            response = super().post(request, *args, **kwargs)
+            if response.status_code == 200:
+                access_token = response.data.get("access")
+                refresh_token = response.data.get("refresh")
+                set_jwt_cookies(response, access_token, refresh_token)
+            return response
         except Exception as e:
             # If it's a ValidationError with our special 2FA payload, flatten it
             # DRF's exception_handler wraps dictionary values in lists
@@ -65,6 +102,28 @@ class MyTokenRefreshView(TokenRefreshView):
     serializer_class = MyTokenRefreshSerializer
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
+
+    def post(self, request, *args, **kwargs):
+        # We need to support reading the refresh token from request data OR from cookie
+        refresh_token = request.data.get("refresh") or request.COOKIES.get("jwt-refresh-token")
+        if not refresh_token:
+            return Response({"detail": "Refresh token is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Process the token refresh by running the serializer
+        serializer = self.get_serializer(data={"refresh": refresh_token})
+        try:
+            serializer.is_valid(raise_exception=True)
+        except Exception as e:
+            return Response(getattr(e, "detail", {"detail": str(e)}), status=status.HTTP_401_UNAUTHORIZED)
+
+        res_data = serializer.validated_data
+        response = Response(res_data, status=status.HTTP_200_OK)
+
+        new_access = res_data.get("access")
+        new_refresh = res_data.get("refresh")
+
+        set_jwt_cookies(response, new_access, new_refresh)
+        return response
 
 
 class VerifyEmailView(generics.GenericAPIView):

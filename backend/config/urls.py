@@ -46,8 +46,8 @@ urlpatterns = [
     path("ready/", ReadinessCheckView.as_view(), name="readiness_check"),
     path("live/", LivenessCheckView.as_view(), name="liveness_check"),
     path("metrics/", MetricsView.as_view(), name="metrics"),
-    # GraphQL API
-    path("graphql/", GraphQLView.as_view(graphiql=True)),
+    # GraphQL API (playground disabled in production)
+    path("graphql/", GraphQLView.as_view(graphiql=settings.DEBUG)),
     path(
         "api/v1/ping/",
         lambda r: JsonResponse(
@@ -78,17 +78,23 @@ urlpatterns = [
     path("api/v1/auth/registration/", include("dj_rest_auth.registration.urls")),
     path("api/v1/auth/social/", include("allauth.socialaccount.urls")),
     path("api/v1/auth/", include("dj_rest_auth.urls")),
-    # API Documentation
-    path("api/v1/schema/", SpectacularAPIView.as_view(), name="schema"),
-    path(
-        "api/v1/docs/",
-        SpectacularSwaggerView.as_view(url_name="schema"),
-        name="swagger-ui",
-    ),
-    path(
-        "api/v1/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"
-    ),
 ]
+
+if settings.DEBUG:
+    urlpatterns += [
+        # API Documentation
+        path("api/v1/schema/", SpectacularAPIView.as_view(), name="schema"),
+        path(
+            "api/v1/docs/",
+            SpectacularSwaggerView.as_view(url_name="schema"),
+            name="swagger-ui",
+        ),
+        path(
+            "api/v1/redoc/",
+            SpectacularRedocView.as_view(url_name="schema"),
+            name="redoc",
+        ),
+    ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

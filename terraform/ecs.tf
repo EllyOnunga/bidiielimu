@@ -77,8 +77,8 @@ resource "aws_ecs_task_definition" "backend" {
       environment = [
         { name = "DB_HOST", value = aws_db_instance.main.address },
         { name = "DB_PORT", value = "5432" },
-        { name = "DB_NAME", value = "elimuhub" },
-        { name = "DB_USER", value = "elimuhub_admin" },
+        { name = "DB_NAME", value = "gilanios" },
+        { name = "DB_USER", value = "gilanios_admin" },
         { name = "REDIS_URL", value = "redis://localhost:6379/0" } # Update if using ElastiCache
       ]
     }

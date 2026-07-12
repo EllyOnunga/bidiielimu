@@ -66,6 +66,44 @@ class Role(models.Model):
         return self.name
 
 
+class Permission(models.Model):
+    """
+    Structured permission catalog used alongside Role.permissions JSON for
+    gradual migration to auditable, scoped access control.
+    """
+
+    code = models.CharField(max_length=120, unique=True)
+    name = models.CharField(max_length=120)
+    description = models.TextField(blank=True, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["code"]
+
+    def __str__(self):
+        return self.code
+
+
+class RolePermission(models.Model):
+    role = models.ForeignKey(
+        Role, on_delete=models.CASCADE, related_name="permission_links"
+    )
+    permission = models.ForeignKey(
+        Permission, on_delete=models.CASCADE, related_name="role_links"
+    )
+    is_enabled = models.BooleanField(default=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["role", "permission"], name="unique_role_permission"
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.role} -> {self.permission}"
+
+
 class User(AbstractUser):
     ROLES = (
         ("SUPER_ADMIN", "Platform Super Admin"),
@@ -145,6 +183,44 @@ class User(AbstractUser):
     @property
     def role_name(self):
         return self.role.name if self.role else self.role_old
+
+
+class UserSchoolMembership(models.Model):
+    STATUS_CHOICES = (
+        ("ACTIVE", "Active"),
+        ("INVITED", "Invited"),
+        ("SUSPENDED", "Suspended"),
+        ("ENDED", "Ended"),
+    )
+
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="school_memberships"
+    )
+    school = models.ForeignKey(
+        "schools.School", on_delete=models.CASCADE, related_name="user_memberships"
+    )
+    role = models.ForeignKey(
+        Role, on_delete=models.PROTECT, related_name="school_memberships"
+    )
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="ACTIVE")
+    is_primary = models.BooleanField(default=False)
+    scope = models.JSONField(default=dict, blank=True)
+    joined_at = models.DateTimeField(auto_now_add=True)
+    ended_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["user", "status"]),
+            models.Index(fields=["school", "role", "status"]),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "school", "role"], name="unique_user_school_role"
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.user.email} - {self.school} ({self.role})"
 
 
 class EmailVerificationToken(models.Model):

@@ -16,7 +16,7 @@ export const PageLoader = () => {
         </div>
         <div className="text-center">
           <h3 className="text-white font-black text-lg uppercase tracking-tight">
-            ElimuHub
+            GilaniOS
           </h3>
           <p className="text-primary-200/50 text-[10px] font-black uppercase tracking-[0.2em] mt-1">
             Loading Assets...

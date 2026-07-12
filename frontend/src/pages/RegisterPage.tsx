@@ -8,7 +8,7 @@ import {
   Loader2,
   ChevronLeft,
 } from "lucide-react";
-import { ElimuHubLogo } from "../components/ui/Logo";
+import { GilaniOSLogo } from "../components/ui/Logo";
 import { PasswordInput } from "../components/ui/PasswordInput";
 import { PasswordHint } from "../components/ui/PasswordHint";
 import { motion } from "framer-motion";
@@ -115,7 +115,7 @@ export const RegisterPage = () => {
 
         <div className="glass p-8 md:p-12 rounded-[40px]">
           <div className="flex justify-center mb-6">
-            <ElimuHubLogo className="w-12 h-12" showText={true} />
+            <GilaniOSLogo className="w-12 h-12" showText={true} />
           </div>
 
           <div className="text-center mb-10">

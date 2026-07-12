@@ -1,4 +1,4 @@
-const CACHE_NAME = "elimuhub-cache-v1";
+const CACHE_NAME = "gilanios-cache-v1";
 const urlsToCache = ["/", "/index.html", "/manifest.json", "/favicon.svg"];
 
 self.addEventListener("install", (event) => {
@@ -10,6 +10,15 @@ self.addEventListener("install", (event) => {
 self.addEventListener("fetch", (event) => {
   // Only handle GET requests
   if (event.request.method !== "GET") return;
+  const url = new URL(event.request.url);
+  if (
+    url.pathname.startsWith("/api/") ||
+    url.pathname.startsWith("/admin/") ||
+    url.pathname.startsWith("/graphql/") ||
+    url.pathname.startsWith("/media/")
+  ) {
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request).then((response) => {

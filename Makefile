@@ -1,6 +1,6 @@
-# ElimuHub Development Makefile
+# GilaniOS Development Makefile
 
-.PHONY: help install clean test lint format docker-build docker-up docker-down migrate collectstatic
+.PHONY: help install clean test test-backend-docker test-backend-local lint format docker-build docker-up docker-down migrate collectstatic
 
 # Default target
 help:
@@ -33,8 +33,19 @@ clean:
 
 # Testing
 test:
-	docker compose exec -T backend python manage.py test || (cd backend && python manage.py test)
+	@if docker compose ps --services --filter status=running 2>/dev/null | grep -qx backend; then \
+		$(MAKE) test-backend-docker; \
+	else \
+		$(MAKE) test-backend-local; \
+	fi
 	cd frontend && npm run type-check
+
+test-backend-docker:
+	docker compose exec -T db sh -lc 'dropdb --if-exists --force -U "$${DB_USER:-gilanios_admin}" "test_$${DB_NAME:-gilanios}"'
+	docker compose exec -T backend sh -lc 'export DATABASE_URL="postgres://$${DB_USER:-gilanios_admin}:$${DB_PASSWORD:-gilanios_pass}@db:5432/$${DB_NAME:-gilanios}"; export DATABASE_READ_URL="$$DATABASE_URL"; python manage.py test --noinput'
+
+test-backend-local:
+	cd backend && DATABASE_URL="$${DATABASE_URL:-postgres://gilanios_admin:gilanios_pass@localhost:5432/gilanios}" DATABASE_READ_URL="$${DATABASE_READ_URL:-postgres://gilanios_admin:gilanios_pass@localhost:5432/gilanios}" python manage.py test --noinput
 
 # Linting and formatting
 lint:
