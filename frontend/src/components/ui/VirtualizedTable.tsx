@@ -155,6 +155,7 @@ export function VirtualizedTable<T extends Record<string, any>>({
 }
 
 // Hook for lazy loading data with virtualization
+// eslint-disable-next-line react-refresh/only-export-components
 export function useVirtualizedData<T>(
   fetchData: (
     offset: number,

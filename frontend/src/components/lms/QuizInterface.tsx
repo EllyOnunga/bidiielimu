@@ -79,7 +79,7 @@ export const QuizInterface = ({
     } finally {
       setIsSubmitting(false);
     }
-  }, [quizId, answers, isSubmitting, onComplete]);
+  }, [quizId, answers, isSubmitting]);
 
   useEffect(() => {
     if (timeLeft <= 0 && quiz) {

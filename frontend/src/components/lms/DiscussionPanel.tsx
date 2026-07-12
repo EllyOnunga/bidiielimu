@@ -57,6 +57,7 @@ export const DiscussionPanel = ({
     if (isOpen && (resourceId || assignmentId)) {
       fetchDiscussions();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, resourceId, assignmentId]);
 
   useEffect(() => {

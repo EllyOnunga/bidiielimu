@@ -150,6 +150,7 @@ export const FeesPage = () => {
   useEffect(() => {
     if (!bulkPrintTaskId) return;
 
+    // eslint-disable-next-line prefer-const
     let intervalId: ReturnType<typeof setInterval> | undefined;
     const pollStatus = async () => {
       try {
@@ -204,7 +205,7 @@ export const FeesPage = () => {
     pollStatus();
 
     return () => clearInterval(intervalId);
-  }, [bulkPrintTaskId]);
+  }, [bulkPrintTaskId, selectedPaymentIds.length]);
 
   const { data: children = [] } = useQuery({
     queryKey: ["my-children"],
