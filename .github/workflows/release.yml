@@ -135,7 +135,7 @@ jobs:
           tar -czf gilanios-frontend-${{ needs.validate-version.outputs.version }}.tar.gz -C frontend dist
 
       - name: Upload frontend artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: frontend-dist
           path: gilanios-frontend-${{ needs.validate-version.outputs.version }}.tar.gz
